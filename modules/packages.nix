@@ -1,0 +1,49 @@
+{ config, pkgs, inputs, ... }: {
+
+  # Allow unfree packages
+  nixpkgs.config.allowUnfree = true;
+
+  # SSH
+  programs.ssh.startAgent = true;
+
+  # Shell
+  programs.fish.enable = true;
+
+  # Steam
+  nixpkgs.overlays = [ inputs.millennium.overlays.default ];
+  programs.steam = {
+    enable = true;
+    package = pkgs.steam-millennium;
+  };
+
+  # Packages
+  environment.systemPackages = with pkgs; [
+    # GUI
+    (discord.override {
+    withVencord = true;
+    })
+    jetbrains.idea-ultimate
+    spotify
+    jellyfin-media-player
+    pdfslicer
+
+    # CLI
+    ghostty
+    starship
+    nix-your-shell
+    git
+    btop
+
+    # Deps
+    pulseaudio
+    nodejs
+
+    # Gaming
+    mangohud
+    goverlay
+    lact
+    ];
+
+  # Default applications
+  programs.firefox.enable = false;
+}
