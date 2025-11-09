@@ -27,6 +27,11 @@
     jellyfin-media-player
     pdfslicer
 
+    # Wallets
+    feather
+    electrum
+    electrum-ltc
+
     # CLI
     ghostty
     starship
