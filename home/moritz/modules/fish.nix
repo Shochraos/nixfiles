@@ -10,6 +10,9 @@
 
     functions = {
       la = {
+        body = "ls -al";
+      };
+      lr = {
         body = "ls -alR";
       };
       rebuild = {
@@ -17,6 +20,9 @@
       };
       nix-shell = {
         body = "nix-your-shell fish nix-shell -- $argv";
+      };
+      nix-develop = {
+        body = "nix-your-shell fish nix-develop -- $argv";
       };
     };
   };
