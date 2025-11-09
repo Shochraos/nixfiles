@@ -12,12 +12,12 @@
   [
   kdePackages.kdeconnect-kde
   kdePackages.kwallet-pam
+  kdePackages.skanpage
   ];
 
   # Exclude DE packages
   environment.plasma6.excludePackages = (with pkgs; [
   kdePackages.konsole
-  kdePackages.skanpage
   kdePackages.elisa
   kdePackages.khelpcenter
 ]);
