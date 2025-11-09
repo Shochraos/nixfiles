@@ -39,8 +39,6 @@
     nodejs
 
     # Gaming
-    mangohud
-    mangojuice
     lact
   ];
 
