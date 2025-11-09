@@ -60,9 +60,9 @@
 	      {
 			home-manager.useGlobalPkgs = true;
 			home-manager.useUserPackages = true;
-			home-manager.users.moritz = {
+			home-manager.users.shochraos = {
 				imports = [
-					./home/moritz/home.nix
+					./home/home.nix
 					zen-browser.homeModules.beta
 					];
 				home.packages = [

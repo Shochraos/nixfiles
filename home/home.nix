@@ -2,8 +2,8 @@
 { pkgs, ...}:
 
 {
-  home.username = "moritz";
-  home.homeDirectory = "/home/moritz";
+  home.username = "shochraos";
+  home.homeDirectory = "/home/shochraos";
   home.stateVersion = "25.05";
 
   fonts.fontconfig.enable = true;
