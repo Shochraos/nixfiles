@@ -29,7 +29,7 @@
 
     # Wallets
     feather
-    electrum
+    #electrum
     electrum-ltc
 
     # CLI
