@@ -40,6 +40,8 @@
 
     # Gaming
     lact
+    samrewritten
+    protonup-qt
   ];
 
    # LACT daemon
