@@ -1,7 +1,7 @@
 { config, pkgs, ... }: {
 
   # Hostname
-  networking.hostName = "azazel";
+  networking.hostName = "Azazel";
 
   # Networking
   networking.networkmanager.enable = true;

@@ -42,6 +42,7 @@
     lact
     samrewritten
     protonup-qt
+    r2modman
   ];
 
    # LACT daemon
