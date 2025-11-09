@@ -27,8 +27,8 @@
     };
   };
 
-  programs.starship = {
-    enable = true;
-    settings = pkgs.lib.importTOML ../../../configs/starship/starship.toml;
-  };
+  #programs.starship = {
+  #  enable = true;
+  #  settings = pkgs.lib.importTOML ../../../configs/starship/starship.toml;
+  #};
 }
