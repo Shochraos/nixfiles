@@ -30,7 +30,7 @@
     # Wallets
     feather
     #electrum
-    electrum-ltc
+    #electrum-ltc
 
     # CLI
     ghostty
