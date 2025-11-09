@@ -44,11 +44,9 @@
     lact
   ];
 
-  systemd.packages = with pkgs; [
-    lact
-  ];
-
-  systemd.services.lactd.enable = true;
+   # LACT daemon
+  systemd.packages = with pkgs; [ lact ];
+  systemd.services.lactd.wantedBy = ["multi-user.target"];
 
   # Default applications
   programs.firefox.enable = false;
