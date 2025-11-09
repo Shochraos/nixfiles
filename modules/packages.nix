@@ -48,7 +48,7 @@
     lact
   ];
 
-  systemd.services.lact.enable = true;
+  systemd.services.lactd.enable = true;
 
   # Default applications
   programs.firefox.enable = false;
