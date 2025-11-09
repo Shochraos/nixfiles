@@ -18,5 +18,7 @@
   environment.plasma6.excludePackages = (with pkgs; [
   kdePackages.konsole
   kdePackages.skanpage
+  kdePackages.elisa
+  kdePackages.khelpcenter
 ]);
 }
