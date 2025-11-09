@@ -17,14 +17,9 @@
 		};
 
 		millennium.url = "git+https://github.com/SteamClientHomebrew/Millennium";
-
-		nurpkgs = {
-              url = "github:mio-19/nurpkgs/bba2f2e4f1459ac2c98ff601dbaf1891160fc30a";
-              flake = false; # it’s not a flake
-        };
     };
 
-    outputs = { self, nixpkgs, home-manager, zen-browser, millennium, nurpkgs, ... }@inputs:
+    outputs = { self, nixpkgs, home-manager, zen-browser, millennium, ... }@inputs:
       let
       	system = "x86_64-linux";
       in {
@@ -36,25 +31,6 @@
 	    modules = [
 	      ./configuration.nix
 	      ./hardware-configuration.nix
-
-          # Jellyfin-Media-Player overlay to provide qt6 dependencies
-          {
-            nixpkgs.overlays = [
-              (final: prev: {
-                jellyfin-media-player =
-                  final.callPackage "${nurpkgs}/pkgs/jellyfin-media-player" {
-                    qtbase = final.qt6.qtbase;
-                    qt5compat = final.qt6.qt5compat;
-                    qtdeclarative = final.qt6.qtdeclarative;
-                    wrapQtAppsHook = final.qt6.wrapQtAppsHook;
-                    qtpositioning   = final.qt6.qtpositioning;
-                    qtwayland = final.qt6.qtwayland;
-                    qtwebchannel = final.qt6.qtwebchannel;
-                    qtwebengine = final.qt6.qtwebengine;
-                  };
-              })
-            ];
-          }
 
 	      home-manager.nixosModules.home-manager
 	      {

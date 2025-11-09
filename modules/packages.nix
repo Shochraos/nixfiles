@@ -24,8 +24,9 @@
     })
     jetbrains.idea-ultimate
     spotify
-    jellyfin-media-player
     pdfslicer
+    mpv
+    jellyfin-mpv-shim
 
     # Wallets
     feather

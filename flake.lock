@@ -186,30 +186,12 @@
         "type": "github"
       }
     },
-    "nurpkgs": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1762055719,
-        "narHash": "sha256-xylSKWPeB8on+W4Z5qzyA32Mzhf98hl61FiOzZTMQJM=",
-        "owner": "mio-19",
-        "repo": "nurpkgs",
-        "rev": "bba2f2e4f1459ac2c98ff601dbaf1891160fc30a",
-        "type": "github"
-      },
-      "original": {
-        "owner": "mio-19",
-        "repo": "nurpkgs",
-        "rev": "bba2f2e4f1459ac2c98ff601dbaf1891160fc30a",
-        "type": "github"
-      }
-    },
     "root": {
       "inputs": {
         "home-manager": "home-manager",
         "millennium": "millennium",
         "nix-your-shell": "nix-your-shell",
         "nixpkgs": "nixpkgs_2",
-        "nurpkgs": "nurpkgs",
         "zen-browser": "zen-browser"
       }
     },
