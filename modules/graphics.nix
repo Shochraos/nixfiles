@@ -3,6 +3,8 @@
   # OpenGL
   hardware.graphics = {
     enable = true;
+    extraPackages = with pkgs; [mangohud];
+    extraPackages32 = with pkgs; [mangohud];
   };
 
   # Load NVIDIA driver
