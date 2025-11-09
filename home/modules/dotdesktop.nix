@@ -5,7 +5,7 @@
       name = "SamRewritten";
       exec = "samrewritten %U";
       terminal = false;
-      icon = "samrewritten";
+      icon = "${../../assets/icons/samrewritten.png}";
       categories = [ "X-Games" ];
     };
   };
