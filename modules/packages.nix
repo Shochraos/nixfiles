@@ -40,9 +40,15 @@
 
     # Gaming
     mangohud
-    goverlay
+    mangojuice
     lact
-    ];
+  ];
+
+  systemd.packages = with pkgs; [
+    lact
+  ];
+
+  systemd.services.lact.enable = true;
 
   # Default applications
   programs.firefox.enable = false;
