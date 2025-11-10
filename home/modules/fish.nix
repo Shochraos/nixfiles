@@ -10,20 +10,42 @@
 
     functions = {
       la = {
-        body = "ls -al";
+        body = ''ls -al'';
       };
       lr = {
-        body = "ls -alR";
+        body = ''ls -alR'';
       };
       rebuild = {
-        body = "sudo nixos-rebuild switch --flake ~/NixOS-Config#azazel";
+        body = ''sudo nixos-rebuild switch --flake ~/NixOS-Config#azazel'';
       };
       nix-shell = {
-        body = "nix-your-shell fish nix-shell -- $argv";
+        body = ''nix-your-shell fish nix-shell -- $argv'';
       };
       nix-develop = {
-        body = "nix-your-shell fish nix-develop -- $argv";
+        body = ''nix-your-shell fish nix-develop -- $argv'';
       };
+
+      denv = {
+        body = ''
+          if test (count $argv) -eq 0
+              echo "Usage: denv <package1> <package2> ..."
+              return 1
+          end
+
+          set packages (string join " " $argv)
+          echo "{pkgs ? import <nixpkgs> {}}:" > shell.nix
+          echo "" >> shell.nix
+          echo "pkgs.mkShell {" >> shell.nix
+          echo "    packages = with pkgs; [ $packages ];" >> shell.nix
+          echo "}" >> shell.nix
+
+          echo "use nix" > .envrc
+
+          direnv allow
+
+          echo "Created shell.nix and .envrc for packages: $packages"
+          '';
+        };
     };
   };
 
