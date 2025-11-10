@@ -18,7 +18,9 @@
     ./modules/fish.nix
     ./modules/terminal.nix
     ./modules/ssh.nix
+    ./modules/git.nix
     ./modules/mangohud.nix
+    ./modules/mpv.nix
     ./modules/dotdesktop.nix
   ];
 

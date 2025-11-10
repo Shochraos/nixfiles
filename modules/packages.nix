@@ -16,7 +16,7 @@
     package = pkgs.steam-millennium;
   };
 
-  # Packages
+  # Additional packages not managed by home-manager
   environment.systemPackages = with pkgs; [
     # GUI
     (discord.override {
@@ -25,7 +25,6 @@
     jetbrains.idea-ultimate
     spotify
     pdfslicer
-    mpv
     jellyfin-mpv-shim
 
     # Wallets
@@ -34,15 +33,12 @@
     #electrum-ltc
 
     # CLI
-    ghostty
-    starship
     nix-your-shell
-    git
     btop
 
     # Deps
     pulseaudio
-    nodejs
+    #nodejs
 
     # Gaming
     lact
