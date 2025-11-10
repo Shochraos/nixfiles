@@ -1,5 +1,5 @@
-{ config, pkgs, ... }: {
-
+{ config, pkgs, ... }:
+{
   # User
   users.users.shochraos = {
     isNormalUser = true;

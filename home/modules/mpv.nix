@@ -3,7 +3,7 @@
   programs.mpv = {
     enable = true;
     config = {
-      "vo" = "gpu-next";
+      vo = "gpu-next";
     };
   };
 }

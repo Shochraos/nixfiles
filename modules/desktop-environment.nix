@@ -1,5 +1,5 @@
-{ config, pkgs, ... }: {
-
+{ config, pkgs, ... }:
+{
   # Disable X11
   services.xserver.enable = false;
 

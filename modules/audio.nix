@@ -1,5 +1,5 @@
-{ config, pkgs, ... }: {
-
+{ config, pkgs, ... }:
+{
   # Pipewire
   services.pulseaudio.enable = false;
   security.rtkit.enable = true;
