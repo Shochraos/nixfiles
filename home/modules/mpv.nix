@@ -21,4 +21,6 @@
      # };
     #};
   };
+
+  xdg.configFile."jellyfin-mpv-shim/conf.json".source = ../../configs/jellyfin-mpv-shim/conf.json;
 }
