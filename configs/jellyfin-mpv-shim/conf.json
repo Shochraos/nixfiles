@@ -14,7 +14,7 @@
     "force_audio_codec": null,
     "force_set_played": false,
     "force_video_codec": null,
-    "fullscreen": false,
+    "fullscreen": true,
     "health_check_interval": 300,
     "idle_cmd": null,
     "idle_cmd_delay": 60,
