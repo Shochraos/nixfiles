@@ -4,8 +4,6 @@
   home.homeDirectory = "/home/shochraos";
   home.stateVersion = "25.05";
 
-  fonts.fontconfig.enable = true;
-
   home.sessionVariables = {
     MANGOHUD = "1";
 
@@ -21,7 +19,4 @@
     ./modules/mpv.nix
     ./modules/dotdesktop.nix
   ];
-
-  programs.direnv.enable = true;
-  programs.direnv.nix-direnv.enable = true;
 }
