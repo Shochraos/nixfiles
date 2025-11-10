@@ -22,10 +22,12 @@
     (discord.override {
     withVencord = true;
     })
-    jetbrains.idea-ultimate
     spotify
     pdfslicer
     jellyfin-mpv-shim
+
+    # IDE with plugins
+    (jetbrains.plugins.addPlugins jetbrains.idea-ultimate ["github-copilot" "nixidea"])
 
     # Wallets
     feather
@@ -38,7 +40,6 @@
 
     # Deps
     pulseaudio
-    #nodejs
 
     # Gaming
     lact
@@ -47,7 +48,7 @@
     r2modman
   ];
 
-   # LACT daemon
+  # LACT daemon
   systemd.packages = with pkgs; [ lact ];
   systemd.services.lactd.wantedBy = ["multi-user.target"];
 
