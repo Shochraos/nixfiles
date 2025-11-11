@@ -1,4 +1,5 @@
-{ config, pkgs, ... }:
+{ config, pkgs, lib, ... }:
+lib.mkIf (config.networking.hostName == "Azazel")
 {
   # OpenGL
   hardware.graphics = {

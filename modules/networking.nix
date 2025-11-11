@@ -1,5 +1,6 @@
 { config, pkgs, ... }:
 {
+  #TODO EIGENES HOSTNAME MODUL UND IN DIE GITIGNORE
   # Hostname
   networking.hostName = "Azazel";
 

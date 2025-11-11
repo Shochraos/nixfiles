@@ -14,7 +14,7 @@
 
         # Window size
         window-height = 50;
-        window-width = 150;
+        window-width  = 150;
       };
   };
 

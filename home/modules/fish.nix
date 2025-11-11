@@ -16,7 +16,7 @@
         body = ''ls -alR'';
       };
       rebuild = {
-        body = ''sudo nixos-rebuild switch --flake ~/NixOS-Config#azazel'';
+        body = ''sudo nixos-rebuild switch --flake ~/NixOS-Config#system'';
       };
       nix-shell = {
         body = ''nix-your-shell fish nix-shell -- $argv'';

@@ -1,4 +1,7 @@
-{ config, pkgs, inputs, ... }:
+{ config, pkgs, inputs, lib, ... }:
+let
+  Azazel = lib.mkIf (config.networking.hostName == "Azazel");
+in
 {
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
@@ -9,30 +12,19 @@
   # Shell
   programs.fish.enable = true;
 
-  # Steam
-  nixpkgs.overlays = [ inputs.millennium.overlays.default ];
-  programs.steam = {
-    enable = true;
-    package = pkgs.steam-millennium;
-  };
+  # Default applications
+  programs.firefox.enable = false;
 
   # Additional packages not managed by home-manager
-  environment.systemPackages = with pkgs; [
+  environment.systemPackages =
+  with pkgs;
+  [
     # GUI
-    (discord.override {
-    withVencord = true;
-    })
-    spotify
+    (discord.override { withVencord = true; })
     pdfslicer
-    jellyfin-mpv-shim
 
     # IDE with plugins
     (jetbrains.plugins.addPlugins jetbrains.idea-ultimate ["github-copilot" "nixidea"])
-
-    # Wallets
-    feather
-    #electrum
-    #electrum-ltc
 
     # CLI
     nix-your-shell
@@ -40,18 +32,35 @@
 
     # Deps
     pulseaudio
+  ]
+  ++ lib.optionals (config.networking.hostName == "Azazel") (with pkgs;
+  [
+    # GUI
+    jellyfin-mpv-shim
+    spotify
+
+    # Wallets
+    feather
+    #electrum
+    #electrum-ltc
 
     # Gaming
     lact
     samrewritten
     protonup-qt
     r2modman
-  ];
+  ]);
+
+  # Steam
+  nixpkgs.overlays = Azazel [ inputs.millennium.overlays.default ];
+  programs.steam = Azazel {
+    enable = true;
+    package = pkgs.steam-millennium;
+  };
 
   # LACT daemon
-  systemd.packages = with pkgs; [ lact ];
-  systemd.services.lactd.wantedBy = ["multi-user.target"];
-
-  # Default applications
-  programs.firefox.enable = false;
+  systemd = Azazel {
+    packages = with pkgs; [ lact ];
+    services.lactd.wantedBy = [ "multi-user.target" ];
+  };
 }
