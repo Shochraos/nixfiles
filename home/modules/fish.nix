@@ -1,6 +1,7 @@
-{ pkgs, ... }:
+{ pkgs, lib, systemName, ... }:
 {
-  programs.fish = {
+  programs.fish =
+  {
     enable = true;
 
     interactiveShellInit = ''
@@ -8,24 +9,32 @@
       direnv hook fish | source
     '';
 
-    functions = {
-      la = {
+    functions =
+    {
+      la =
+      {
         body = ''ls -al'';
       };
-      lr = {
+      lr =
+      {
         body = ''ls -alR'';
       };
-      rebuild = {
-        body = ''sudo nixos-rebuild switch --flake ~/NixOS-Config#system'';
+      rebuild =
+      {
+        body = ''sudo nixos-rebuild switch --flake ~/NixOS-Config#${systemName}'';
       };
-      nix-shell = {
+
+      nix-shell =
+      {
         body = ''nix-your-shell fish nix-shell -- $argv'';
       };
-      nix-develop = {
+      nix-develop =
+      {
         body = ''nix-your-shell fish nix-develop -- $argv'';
       };
 
-      denv = {
+      denv =
+      {
         body = ''
           if test (count $argv) -eq 0
               echo "Usage: denv <package1> <package2> ..."
@@ -50,7 +59,8 @@
   };
 
   # Direnv
-  programs.direnv = {
+  programs.direnv =
+  {
     enable = true;
     silent = true;
     nix-direnv.enable = true;

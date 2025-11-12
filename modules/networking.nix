@@ -1,6 +1,5 @@
 { config, pkgs, ... }:
 {
-  #TODO EIGENES HOSTNAME MODUL UND IN DIE GITIGNORE
   # Hostname
   networking.hostName = "Azazel";
 
@@ -8,22 +7,32 @@
   networking.networkmanager.enable = true;
 
   # Firewall
-  networking.firewall = {
+  networking.firewall =
+  {
     enable = true;
-    allowedTCPPortRanges = [
+    allowedTCPPortRanges =
+    [
       { from = 1714; to = 8081; } # KDE Connect
     ];
-    allowedUDPPortRanges = [
+    allowedUDPPortRanges =
+    [
       { from = 1714; to = 1764; } # KDE Connect
     ];
   };
 
   # Network printing
-  services.printing.enable = true;
-
-  services.avahi.enable = true;
-  services.avahi.nssmdns4 = true;
-
-  hardware.sane.enable = true;
-  hardware.sane.extraBackends = [ pkgs.epkowa ];
+  services =
+  {
+    printing.enable = true;
+    avahi =
+    {
+      enable = true;
+      nssmdns4 = true;
+    };
+  };
+  hardware.sane =
+  {
+    enable = true;
+    extraBackends = [ pkgs.epkowa ];
+  };
 }

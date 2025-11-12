@@ -1,6 +1,6 @@
-{ config, pkgs, lib, ... }:
+{ pkgs, lib, systemName, ... }:
 let
-  Azazel = lib.mkIf (config.networking.hostName == "Azazel");
+  Azazel = lib.mkIf (systemName == "Azazel");
 in
 {
   # Bootloader
@@ -11,10 +11,11 @@ in
   boot.kernelPackages = pkgs.linuxPackages_latest;
 
   # Disable sleep modes
-  systemd.targets = Azazel {
-      "suspend".enable = false;
-      "hibernate".enable = false;
-      "hybrid-sleep".enable = false;
-      "suspend-then-hibernate".enable = false;
+  systemd.targets = Azazel
+  {
+    "suspend".enable = false;
+    "hibernate".enable = false;
+    "hybrid-sleep".enable = false;
+    "suspend-then-hibernate".enable = false;
   };
 }

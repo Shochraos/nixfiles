@@ -1,7 +1,9 @@
 { pkgs, ... }:
 {
-  xdg.desktopEntries = {
-    samrewritten = {
+  xdg.desktopEntries =
+  {
+    samrewritten =
+    {
       name = "SamRewritten";
       exec = "samrewritten %U";
       terminal = false;

@@ -1,8 +1,10 @@
 { pkgs, ... }:
 {
-  programs.git = {
+  programs.git =
+  {
     enable = true;
-    settings = {
+    settings =
+    {
       user.name  = "Shochraos";
       user.email = "github@shonline.slmail.me";
     };

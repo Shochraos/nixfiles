@@ -1,8 +1,8 @@
-{ config, pkgs, lib, ... }:
-lib.mkIf (config.networking.hostName == "Azazel")
+{ config, pkgs, ... }:
 {
   # OpenGL
-  hardware.graphics = {
+  hardware.graphics =
+  {
     enable = true;
   };
 
@@ -10,7 +10,8 @@ lib.mkIf (config.networking.hostName == "Azazel")
   services.xserver.videoDrivers = ["nvidia"];
 
   # Driver settings
-  hardware.nvidia = {
+  hardware.nvidia =
+  {
     # Modesetting is required.
     modesetting.enable = true;
 
@@ -33,7 +34,7 @@ lib.mkIf (config.networking.hostName == "Azazel")
     open = true;
 
     # Enable the Nvidia settings menu,
-	# accessible via `nvidia-settings`.
+	  # accessible via `nvidia-settings`.
     nvidiaSettings = false;
 
     # Optionally, you may need to select the appropriate driver version for your specific GPU.

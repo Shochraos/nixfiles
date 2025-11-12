@@ -10,15 +10,16 @@
   # Additional KDE packages
   environment.systemPackages = with pkgs;
   [
-  kdePackages.kdeconnect-kde
-  kdePackages.kwallet-pam
-  kdePackages.skanpage
+    kdePackages.kdeconnect-kde
+    kdePackages.kwallet-pam
+    kdePackages.skanpage
   ];
 
   # Exclude DE packages
-  environment.plasma6.excludePackages = (with pkgs; [
-  kdePackages.konsole
-  kdePackages.elisa
-  kdePackages.khelpcenter
-]);
+  environment.plasma6.excludePackages = (with pkgs;
+  [
+    kdePackages.konsole
+    kdePackages.elisa
+    kdePackages.khelpcenter
+  ]);
 }

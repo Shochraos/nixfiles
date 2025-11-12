@@ -1,6 +1,7 @@
 { pkgs, ... }:
 {
-  programs.mpv = {
+  programs.mpv =
+  {
     enable = true;
 
     # MPV config
@@ -13,14 +14,17 @@
     };
 
     # MPV scripts
-    scripts = with pkgs; [
+    scripts = with pkgs;
+    [
       mpvScripts.evafast
       mpvScripts.uosc
     ];
 
     # MPV script options
-    scriptOpts = {
-      uosc = {
+    scriptOpts =
+    {
+      uosc =
+      {
         # Controls
         controls="menu,gap:0.5,<has_many_video>video,<has_many_audio>audio,<video,audio>subtitles,space,play-pause,space,<video,audio>gap:1.0,<has_many_audio>gap:1.0,<has_many_video>gap:1.0,gap:0.5,fullscreen";
         controls_size=50;

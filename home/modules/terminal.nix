@@ -1,9 +1,11 @@
 { pkgs, ... }:
 {
-  programs.ghostty = {
+  programs.ghostty =
+  {
       enable = true;
       enableFishIntegration = true;
-      settings = {
+      settings =
+      {
         # Appearance
         background = "000000";
         background-opacity = 0.2;
@@ -18,9 +20,11 @@
       };
   };
 
-  programs.starship = {
+  programs.starship =
+  {
     enable = true;
-    settings = {
+    settings =
+    {
       aws = { symbol = " "; };
       buf = { symbol = " "; };
       bun = { symbol = " "; };
@@ -73,8 +77,10 @@
       xmake = { symbol = " "; };
       zig = { symbol = " "; };
 
-      os = {
-        symbols = {
+      os =
+      {
+        symbols =
+        {
           Alpaquita = " ";
           Alpine = " ";
           AlmaLinux = " ";

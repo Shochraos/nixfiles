@@ -1,13 +1,13 @@
-{ config, pkgs, inputs, ... }:
+{ config, pkgs, lib, systemName, ... }:
 {
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
-  imports = [
+  imports =
+  [
     # Hardware configuration
-    ./hardware-configuration.nix
+    ./hosts/hardware-configuration.nix
 
     # Modules
     ./modules/boot.nix
-    ./modules/graphics.nix
     ./modules/desktop-environment.nix
     ./modules/bluetooth.nix
     ./modules/audio.nix
@@ -15,9 +15,13 @@
     ./modules/locale.nix
     ./modules/packages.nix
     ./modules/user.nix
-    ./modules/samba.nix
     ./modules/automation.nix
-  ];
+  ]
+  ++ lib.optionals (systemName == "Azazel")
+  ([
+    ./modules/graphics.nix
+    ./modules/samba.nix
+  ]);
 
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions

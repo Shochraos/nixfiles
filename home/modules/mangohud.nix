@@ -1,8 +1,10 @@
 { pkgs, ... }:
 {
-  programs.mangohud = {
+  programs.mangohud =
+  {
     enable = true;
-    settings = {
+    settings =
+    {
       # FPS
       fps = true;
       fps_limit = 117;

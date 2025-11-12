@@ -1,20 +1,29 @@
-{ pkgs, ...}:
+{ pkgs, lib, systemName, ... }:
+let
+  Azazel = lib.mkIf (systemName == "Azazel");
+in
 {
-  home.username = "shochraos";
-  home.homeDirectory = "/home/shochraos";
-  home.stateVersion = "25.05";
-
-  home.sessionVariables = {
-    MANGOHUD = "1";
-
+  home =
+  {
+    username = "shochraos";
+    homeDirectory = "/home/shochraos";
+    stateVersion = "25.05";
+    sessionVariables = Azazel {
+      MANGOHUD = "1";
+    };
   };
 
-  imports = [
+  imports =
+  [
     ./modules/fonts.nix
     ./modules/fish.nix
     ./modules/terminal.nix
     ./modules/ssh.nix
     ./modules/git.nix
+    ./modules/packages.nix
+  ]
+  ++ lib.optionals (systemName == "Azazel")
+  [
     ./modules/mangohud.nix
     ./modules/mpv.nix
     ./modules/dotdesktop.nix

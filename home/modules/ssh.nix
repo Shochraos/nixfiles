@@ -4,7 +4,8 @@
     enable = true;
     enableDefaultConfig = false;
 
-    matchBlocks."github.com" = {
+    matchBlocks."github.com" =
+    {
         forwardAgent = true;
         extraOptions = {
           AddKeysToAgent = "yes";
@@ -12,7 +13,8 @@
           };
     };
 
-    matchBlocks."astaroth" = {
+    matchBlocks."astaroth" =
+    {
         forwardAgent = true;
         extraOptions = {
           AddKeysToAgent = "yes";
@@ -22,7 +24,8 @@
         };
     };
 
-    matchBlocks."*" = {
+    matchBlocks."*" =
+    {
       forwardAgent = true;
       extraOptions = {
         AddKeysToAgent = "yes";

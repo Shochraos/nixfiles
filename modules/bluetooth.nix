@@ -1,15 +1,19 @@
 { config, pkgs, ... }:
 {
   # Bluetooth
-  hardware.bluetooth = {
+  hardware.bluetooth =
+  {
     enable = true;
     powerOnBoot = true;
-    settings = {
-      General = {
+    settings =
+    {
+      General =
+      {
         Experimental = true;
         FastConnectable = true;
       };
-      Policy = {
+      Policy =
+      {
         AutoEnable = true;
       };
     };
