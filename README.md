@@ -23,3 +23,4 @@ You need to change the following settings after you clone the repository:**
 4. Adjust the `home.username` and `home.Directory` variables in `./home/home.nix`.
 5. Change the `lib.mkIf` and `++ lib.optionals` conditions to your chosen systemName(s) in all `*.nix` files where it's present.
 6. Review and adjust all package selections and configurations to your liking.
+7. Replace my hardware-configurations in `./hosts/[systemName]` with your own hardware configurations.
