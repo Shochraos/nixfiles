@@ -16,7 +16,7 @@
 
         # Window size
         window-height = if systemName == "Azazel" then 50 else 25 ;
-        window-width  = if systemName == "Azazel" then 150 else 75;
+        window-width  = if systemName == "Azazel" then 150 else 80;
       };
   };
 
