@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ pkgs, config, ... }:
 {
   programs.git =
   {
@@ -7,6 +7,7 @@
     {
       user.name  = "Shochraos";
       user.email = "github@shonline.slmail.me";
+      core.excludesfile = "${config.home.homeDirectory}/.gitignore";
     };
   };
 }

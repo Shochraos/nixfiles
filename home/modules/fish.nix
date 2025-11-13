@@ -1,4 +1,4 @@
-{ pkgs, lib, systemName, ... }:
+{ pkgs, lib, config, systemName, ... }:
 {
   programs.fish =
   {
@@ -21,7 +21,7 @@
       };
       rebuild =
       {
-        body = ''sudo nixos-rebuild switch --flake ~/NixOS-Config#${systemName}'';
+        body = ''sudo nixos-rebuild switch --flake ${config.home.homeDirectory}/nixfiles#${systemName}'';
       };
 
       nix-shell =

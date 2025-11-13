@@ -6,8 +6,8 @@
   [
     ./azazel/hardware-configuration.nix
   ]
-   ++ lib.optionals (systemName == "Azazel")
+   ++ lib.optionals (systemName == "Belphegor")
    [
-   #./belphegor/hardware-configuration.nix
+   ./belphegor/hardware-configuration.nix
    ];
 }

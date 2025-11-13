@@ -1,7 +1,10 @@
-{ config, pkgs, ... }:
+{ config, pkgs, lib, systemName, ... }:
+let
+  Belphegor = lib.mkIf (systemName == "Belphegor");
+in
 {
   # Hostname
-  networking.hostName = "Azazel";
+  networking.hostName = "${systemName}";
 
   # Networking
   networking.networkmanager.enable = true;
@@ -35,4 +38,10 @@
     enable = true;
     extraBackends = [ pkgs.epkowa ];
   };
+
+  environment.etc = lib.mkMerge [
+    (Belphegor {
+      "ssl/certs/T-TeleSec_GlobalRoot_Class_2.pem".source = ../assets/certs/T-TeleSec_GlobalRoot_Class_2.pem;
+    })
+  ];
 }

@@ -57,6 +57,30 @@
           }
         ];
       };
+
+      Belphegor  = nixpkgs.lib.nixosSystem
+            {
+              specialArgs = { inherit inputs; systemName = "Belphegor"; };
+
+              modules = [
+                ./configuration.nix
+
+                home-manager.nixosModules.home-manager
+                {
+                  home-manager.useGlobalPkgs = true;
+                  home-manager.useUserPackages = true;
+                  home-manager.extraSpecialArgs = { systemName = "Belphegor"; };
+                  home-manager.users.shochraos =
+                  {
+                    imports =
+                    [
+                      ./home/home.nix
+                      zen-browser.homeModules.beta
+                    ];
+                  };
+                }
+              ];
+            };
     };
   };
 }
