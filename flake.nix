@@ -42,16 +42,19 @@
             ./configuration.nix
             home-manager.nixosModules.home-manager
             {
-              home-manager.useGlobalPkgs = true;
-              home-manager.useUserPackages = true;
-              home-manager.extraSpecialArgs = { systemName = name; };
-              home-manager.users.shochraos =
+              home-manager =
               {
-                imports =
-                [
-                  ./home/home.nix
-                  zen-browser.homeModules.beta
-                ];
+                extraSpecialArgs = { systemName = name; };
+                useGlobalPkgs = true;
+                useUserPackages = true;
+                users.shochraos =
+                {
+                  imports =
+                  [
+                    ./home/home.nix
+                    zen-browser.homeModules.beta
+                  ];
+                };
               };
             }
           ];
