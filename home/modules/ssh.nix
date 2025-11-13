@@ -1,4 +1,4 @@
-{ pkgs, lib, systemName, ... }:
+{ config, pkgs, lib, systemName, ... }:
 {
   programs.ssh = {
     enable = true;
@@ -9,7 +9,7 @@
         forwardAgent = true;
         extraOptions = {
           AddKeysToAgent = "yes";
-          IdentityFile = "~/.ssh/${lib.toLower systemName}-git";
+          IdentityFile = "${config.home.homeDirectory}/.ssh/${lib.toLower systemName}-git";
           };
     };
 
@@ -18,7 +18,7 @@
         forwardAgent = true;
         extraOptions = {
           AddKeysToAgent = "yes";
-          IdentityFile = "~/.ssh/${lib.toLower systemName}";
+          IdentityFile = "${config.home.homeDirectory}/.ssh/${lib.toLower systemName}";
           HostName = "192.168.178.2";
           User = "root";
         };
@@ -29,7 +29,7 @@
       forwardAgent = true;
       extraOptions = {
         AddKeysToAgent = "yes";
-        IdentityFile = "~/.ssh/${lib.toLower systemName}";
+        IdentityFile = "${config.home.homeDirectory}/.ssh/${lib.toLower systemName}";
       };
     };
   };
@@ -37,8 +37,8 @@
   services.ssh-agent.enable = true;
 
   home.activation.add-ssh-key = ''
-    ${pkgs.openssh}/bin/ssh-add ~/.ssh/${lib.toLower systemName} </dev/null || true
-    ${pkgs.openssh}/bin/ssh-add ~/.ssh/${lib.toLower systemName}-git </dev/null || true
+    ${pkgs.openssh}/bin/ssh-add ${config.home.homeDirectory}/.ssh/${lib.toLower systemName} </dev/null || true
+    ${pkgs.openssh}/bin/ssh-add ${config.home.homeDirectory}/.ssh/${lib.toLower systemName}-git </dev/null || true
   '';
 }
 
