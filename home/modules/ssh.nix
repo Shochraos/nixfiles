@@ -35,10 +35,5 @@
   };
 
   services.ssh-agent.enable = true;
-
-  home.activation.add-ssh-key = ''
-    ${pkgs.openssh}/bin/ssh-add ${config.home.homeDirectory}/.ssh/${lib.toLower systemName} </dev/null || true
-    ${pkgs.openssh}/bin/ssh-add ${config.home.homeDirectory}/.ssh/${lib.toLower systemName}-git </dev/null || true
-  '';
 }
 
