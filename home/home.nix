@@ -1,14 +1,12 @@
-{ pkgs, lib, systemName, ... }:
-let
-  Azazel = lib.mkIf (systemName == "Azazel");
-in
+{ pkgs, lib, userName, isAzazel, ... }:
 {
   home =
   {
-    username = "shochraos";
-    homeDirectory = "/home/shochraos";
+    username = "${userName}";
+    homeDirectory = "/home/${userName}";
     stateVersion = "25.05";
-    sessionVariables = Azazel {
+    sessionVariables = lib.mkIf isAzazel
+    {
       MANGOHUD = "1";
     };
   };
@@ -22,7 +20,7 @@ in
     ./modules/git.nix
     ./modules/packages.nix
   ]
-  ++ lib.optionals (systemName == "Azazel")
+  ++ lib.optionals isAzazel
   [
     ./modules/mangohud.nix
     ./modules/mpv.nix

@@ -1,4 +1,4 @@
-{ config, pkgs, lib, systemName, ... }:
+{ config, pkgs, lib, isAzazel, ... }:
 {
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
   nix.settings.download-buffer-size = 524288000;
@@ -18,7 +18,7 @@
     ./modules/user.nix
     ./modules/automation.nix
   ]
-  ++ lib.optionals (systemName == "Azazel")
+  ++ lib.optionals isAzazel
   ([
     ./modules/graphics.nix
     ./modules/samba.nix

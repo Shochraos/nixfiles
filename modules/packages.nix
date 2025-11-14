@@ -1,7 +1,4 @@
-{ config, pkgs, inputs, lib, systemName, ... }:
-let
-  Azazel = lib.mkIf (systemName == "Azazel");
-in
+{ config, pkgs, inputs, lib, isAzazel, ... }:
 {
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
@@ -19,22 +16,22 @@ in
   environment.systemPackages =
   with pkgs;
   []
-  ++ lib.optionals (systemName == "Azazel") (with pkgs;
+  ++ lib.optionals isAzazel (with pkgs;
   [
     # Access to the lactd daemon
     lact
   ]);
 
   # Steam
-  nixpkgs.overlays = Azazel [ inputs.millennium.overlays.default ];
-  programs.steam = Azazel
+  nixpkgs.overlays = lib.optionals isAzazel [ inputs.millennium.overlays.default ];
+  programs.steam = lib.mkIf isAzazel
   {
     enable = true;
     package = pkgs.steam-millennium;
   };
 
   # LACT daemon
-  systemd = Azazel
+  systemd = lib.mkIf isAzazel
   {
     packages = with pkgs; [ lact ];
     services.lactd.wantedBy = [ "multi-user.target" ];

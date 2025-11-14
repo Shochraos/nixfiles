@@ -1,7 +1,4 @@
-{ config, pkgs, lib, systemName, ... }:
-let
-  Belphegor = lib.mkIf (systemName == "Belphegor");
-in
+{ config, pkgs, lib, systemName, isBelphegor, ... }:
 {
   # Hostname
   networking.hostName = "${systemName}";
@@ -40,7 +37,7 @@ in
   };
 
   environment.etc = lib.mkMerge [
-    (Belphegor {
+    (lib.mkIf isBelphegor {
       "ssl/certs/T-TeleSec_GlobalRoot_Class_2.pem".source = ../assets/certs/T-TeleSec_GlobalRoot_Class_2.pem;
     })
   ];

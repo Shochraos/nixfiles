@@ -1,4 +1,4 @@
-{ pkgs, lib, systemName, ... }:
+{ pkgs, lib, isAzazel, ... }:
 {
   # Browser
   programs.zen-browser.enable = true;
@@ -17,7 +17,7 @@
     nix-your-shell
     btop
   ]
-  ++ lib.optionals (systemName == "Azazel") (with pkgs;
+  ++ lib.optionals isAzazel (with pkgs;
   [
     # GUI
     jellyfin-mpv-shim

@@ -1,7 +1,4 @@
-{ pkgs, lib, systemName, ... }:
-let
-  Azazel = lib.mkIf (systemName == "Azazel");
-in
+{ pkgs, lib, isAzazel, ... }:
 {
   # Bootloader
   boot.loader.systemd-boot.enable = true;
@@ -11,7 +8,7 @@ in
   boot.kernelPackages = pkgs.linuxPackages_latest;
 
   # Disable sleep modes
-  systemd.targets = Azazel
+  systemd.targets = lib.mkIf isAzazel
   {
     "suspend".enable = false;
     "hibernate".enable = false;

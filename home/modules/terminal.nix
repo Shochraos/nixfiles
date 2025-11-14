@@ -1,4 +1,4 @@
-{ pkgs, systemName, ... }:
+{ pkgs, isAzazel, ... }:
 {
   programs.ghostty =
   {
@@ -15,8 +15,8 @@
         font-family = "Fira Code Nerd Font";
 
         # Window size
-        window-height = if systemName == "Azazel" then 50 else 25 ;
-        window-width  = if systemName == "Azazel" then 150 else 80;
+        window-height = if isAzazel then 50 else 25 ;
+        window-width  = if isAzazel then 150 else 80;
       };
   };
 
