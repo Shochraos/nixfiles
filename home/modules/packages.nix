@@ -11,7 +11,10 @@
     pdfslicer
 
     # IDE with plugins
-    (jetbrains.plugins.addPlugins jetbrains.idea-ultimate ["github-copilot" "nixidea"])
+    (jetbrains.plugins.addPlugins jetbrains.idea-ultimate [
+    #"github-copilot"
+    "nixidea"
+    ])
 
     # CLI
     nix-your-shell

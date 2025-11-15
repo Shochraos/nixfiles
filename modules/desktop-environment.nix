@@ -13,6 +13,9 @@
     kdePackages.kdeconnect-kde
     kdePackages.kwallet-pam
     kdePackages.skanpage
+    kdePackages.kcalc
+    kdePackages.partitionmanager
+    kdePackages.isoimagewriter
   ];
 
   # Exclude DE packages

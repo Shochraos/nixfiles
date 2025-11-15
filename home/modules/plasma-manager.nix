@@ -2,6 +2,55 @@
 {
   programs.plasma = {
       enable = true;
+      overrideConfig = true;
+
+      panels = [
+        {
+          location = "bottom";
+          floating = false;
+          height = 44;
+          hiding = "normalpanel";
+          opacity = "translucent";
+
+          widgets =
+          [
+            "org.kde.plasma.kickoff"
+            {
+              iconTasks = {
+                launchers = [];
+              };
+            }
+            "org.kde.plasma.marginsseparator"
+            {
+              systemTray.items = {
+                shown = [
+                  "org.kde.plasma.networkmanagement"
+                  "org.kde.plasma.volume"
+                  "org.kde.plasma.bluetooth"
+                ];
+                hidden = [
+                  "org.kde.plasma.mediacontroller"
+                  "org.kde.plasma.battery"
+                  "org.kde.plasma.brightness"
+                  "org.kde.plasma.microphone"
+                  "org.kde.plasma.power-management"
+                  "jellyfin-mpv-shim"
+                  #TODO currently broken, still shows Discord
+                  "com.discordapp.discord"
+                  "steam"
+                ];
+              };
+            }
+            {
+              digitalClock = {
+                calendar.firstDayOfWeek = "sunday";
+                time.format = "24h";
+              };
+            }
+          ];
+        }
+      ];
+
       input =
       {
           mice =
@@ -18,15 +67,21 @@
               middleButtonEmulation = false;
             }
             {
-              name = "Keychron  Keychron Link";
+              name = "Keychron  Keychron Link ";
+              vendorId = "3434";
+              productId = "d030";
               enable = false;
             }
             {
               name = "Razer Razer Basilisk V3 Pro Keyboard";
+              vendorId = "1532";
+              productId = "00ab";
               enable = false;
             }
             {
               name = "Razer Razer Basilisk V3 Pro Mouse";
+              vendorId = "1532";
+              productId = "00ab";
               enable = false;
             }
           ];
@@ -53,15 +108,6 @@
           "services/com.mitchellh.ghostty.desktop"._launch = "Meta+T";
         };
 
-        defaultApplications =
-        {
-          webBrowser = "zen-browser";
-          textEditor = "kwrite";
-          terminal = "ghostty";
-          musicPlayer = "mpv";
-          videoPlayer = "mpv";
-        };
-
         windows =
         {
           allowWindowsToRememberPositions = false;
@@ -76,7 +122,7 @@
             noiseStrength = 6;
           };
 
-          translucency.enable = true;
+          translucency.enable = false;
 
           desktopSwitching =
           {
@@ -85,11 +131,14 @@
           };
         };
 
-        virtualDesktops =
+        kwin =
         {
-          names = [ "Desktop_1" "Desktop_2" "Desktop_3" ];
-          number = 3;
-          rows = 1;
+          virtualDesktops =
+          {
+            names = [ "Desktop_1" "Desktop_2" "Desktop_3" ];
+            number = 3;
+            rows = 1;
+          };
         };
 
         window-rules =
@@ -248,7 +297,7 @@
           colorScheme = "MateriaDark";
           iconTheme = "Tela circle dark";
           soundTheme = "Ocean";
-          wallpaper = "../../assets/themes/org.kde.plasma.citygrow.zip";
+          wallpaperPictureOfTheDay.provider = "bing";
         };
 
         powerdevil =
@@ -266,5 +315,25 @@
             };
           };
         };
+
+        session =
+        {
+          sessionRestore.restoreOpenApplicationsOnLogin = "startWithEmptySession";
+        };
+
+      #TODO Volume widget should show virtual Audio Outputs, not possible currently
+      configFile =
+      {
+        "kdeglobals"."KFileDialog Settings" = {
+          "Show hidden files" = false;
+          "View Style" = "DetailTree";
+        };
+        "dolphinrc"."General" = {
+          RememberOpenedTabs = false;
+        };
+        "dolphinrc"."DetailsMode" = {
+          PreviewSize = 32;
+        };
   };
+};
 }
