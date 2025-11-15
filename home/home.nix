@@ -25,5 +25,6 @@
     ./modules/mangohud.nix
     ./modules/mpv.nix
     ./modules/dotdesktop.nix
+    ./modules/plasma-manager.nix
   ];
 }

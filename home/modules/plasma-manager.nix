@@ -34,7 +34,7 @@
           keyboard =
           {
             repeatDelay = 400;
-            repeatRate = 50;
+            repeatRate = 40;
           };
         };
 
@@ -87,7 +87,7 @@
 
         virtualDesktops =
         {
-          names = [ "Desktop1" "Desktop2" "Desktop3" ];
+          names = [ "Desktop_1" "Desktop_2" "Desktop_3" ];
           number = 3;
           rows = 1;
         };
@@ -95,27 +95,43 @@
         window-rules =
         [
           {
+            description = "Discord";
+            match =
+            {
+              window-class =
+              {
+                type = "exact";
+                value = "discord";
+                match-whole = false;
+              };
+            };
+            apply =
+            {
+              desktops = "Desktop_2";
+              position = { value = "0,0"; };
+              size = { value = "1920,2116"; };
+              noborder = { value = true; };
+              ignoregeometry = { apply = "force"; value = true; };
+            };
+          }
+          {
             description = "Spotify";
             match =
             {
               window-class =
               {
+                type = "exact";
                 value = "Spotify";
-                match-whole = true;
-                type = "exact";
-              };
-              desktops =
-              {
-                value = "Desktop1";
-                type = "exact";
+                match-whole = false;
               };
             };
             apply =
             {
+              desktops = "Desktop_2";
               position = { value = "1920,0"; };
               size = { value = "1920,2116"; };
               noborder = { value = true; };
-              ignoregeometry = { value = true; };
+              ignoregeometry = { apply = "force"; value = true; };
             };
           }
           {
@@ -124,21 +140,15 @@
             {
               window-class =
               {
+                type = "exact";
                 value = "zen-beta";
-                match-whole = true;
-                type = "exact";
-              };
-              desktops =
-              {
-                value = "Desktop2";
-                type = "exact";
+                match-whole = false;
               };
             };
             apply =
             {
+              desktops = "Desktop_3";
               position = { value = "0,0"; };
-              noborder = { value = false; };
-              ignoregeometry = { value = false; };
             };
           }
           {
@@ -147,21 +157,47 @@
             {
               window-class =
               {
+                type = "exact";
                 value = "steam";
-                match-whole = true;
-                type = "exact";
+                match-whole = false;
               };
-              desktops =
+              title =
               {
-                value = "Desktop2";
                 type = "exact";
+                value = "Steam";
               };
             };
             apply =
             {
+              desktops = "Desktop_3";
               position = { value = "1920,0"; };
-              size = { value = "1920,1080"; };
+              size = { value = "1920,2116"; };
+              ignoregeometry = { apply = "force"; value = true; };
+            };
+          }
+          {
+            description = "Steam Big Picture";
+            match =
+            {
+              window-class =
+              {
+                type = "exact";
+                value = "steam";
+                match-whole = false;
+              };
+              title =
+              {
+                type = "exact";
+                value = "Steam Big Picture Mode";
+              };
+            };
+            apply =
+            {
+              desktops = "Desktop_3";
+              position = { value = "1920,0"; };
+              size = { value = "1920,2116"; };
               noborder = { value = true; };
+              ignoregeometry = { apply = "force"; value = true; };
             };
           }
           {
@@ -170,59 +206,27 @@
             {
               window-class =
               {
+                type = "exact";
                 value = "com.mitchellh.ghostty";
-                match-whole = true;
-                type = "exact";
-              };
-              desktops =
-              {
-                value = "Desktop3";
-                type = "exact";
+                match-whole = false;
               };
             };
             apply =
             {
               position = { value = "1178,459"; };
-              size = { value = "800,600"; };
-              noborder = { value = true; };
-            };
-          }
-          {
-            description = "Discord";
-            match =
-            {
-              window-class =
-              {
-                value = "discord";
-                match-whole = true;
-                type = "exact";
-              };
-              desktops =
-              {
-                value = "Desktop1";
-                type = "exact";
-              };
-            };
-            apply =
-            {
-              position = { value = "0,0"; };
-              size = { value = "1920,2116"; };
-              noborder = { value = true; };
-              ignoregeometry = { value = true; };
             };
           }
           {
             description = "MPV";
             match = {
               window-class = {
+                type = "exact";
                 value = "mpv";
-                match-whole = true;
-                type = "exact";
+                match-whole = false;
               };
-              desktops = {
-                value = "Desktop1";
-                type = "exact";
-              };
+            };
+            apply = {
+              desktops = "Desktop_1";
             };
           }
         ];
@@ -247,13 +251,19 @@
           wallpaper = "../../assets/themes/org.kde.plasma.citygrow.zip";
         };
 
-        #TODO noch nicht fertig
         powerdevil =
         {
           AC =
           {
             autoSuspend.action = "nothing";
             dimDisplay.enable = false;
+            powerButtonAction = "showLogoutScreen";
+
+            turnOffDisplay =
+            {
+              idleTimeout = 36000;
+              idleTimeoutWhenLocked = "immediately";
+            };
           };
         };
   };
