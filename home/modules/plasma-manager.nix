@@ -1,5 +1,6 @@
 { pkgs, ... }:
 {
+  #TODO refactor into its own folder plasma-manager with plasma.nix and modules
   programs.plasma = {
       enable = true;
       overrideConfig = true;
@@ -25,18 +26,18 @@
               systemTray.items = {
                 shown = [
                   "org.kde.plasma.networkmanagement"
-                  "org.kde.plasma.volume"
                   "org.kde.plasma.bluetooth"
+                  "org.kde.plasma.volume"
                 ];
                 hidden = [
                   "org.kde.plasma.mediacontroller"
                   "org.kde.plasma.battery"
                   "org.kde.plasma.brightness"
-                  "org.kde.plasma.microphone"
                   "org.kde.plasma.power-management"
+                  "plasmashell_microphone"
                   "jellyfin-mpv-shim"
-                  #TODO currently broken, still shows Discord
-                  "com.discordapp.discord"
+                  #Discord
+                  "chrome_status_icon_1"
                   "steam"
                 ];
               };
