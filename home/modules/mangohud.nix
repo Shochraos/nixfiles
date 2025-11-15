@@ -21,6 +21,7 @@
 
       # General
       no_display = true;
+      background_alpha = 0;
     };
   };
 }

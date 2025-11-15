@@ -42,9 +42,11 @@
           end
 
           set packages (string join " " $argv)
+
           echo "{pkgs ? import <nixpkgs> {}}:" > shell.nix
           echo "" >> shell.nix
           echo "pkgs.mkShell {" >> shell.nix
+          echo "    name = \"$packages\";" >> shell.nix  # Add the name field
           echo "    packages = with pkgs; [ $packages ];" >> shell.nix
           echo "}" >> shell.nix
 

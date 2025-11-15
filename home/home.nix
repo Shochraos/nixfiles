@@ -19,6 +19,7 @@
     ./modules/ssh.nix
     ./modules/git.nix
     ./modules/packages.nix
+    ./modules/starship.nix
   ]
   ++ lib.optionals isAzazel
   [
