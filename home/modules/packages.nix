@@ -9,12 +9,10 @@
     # GUI
     (discord.override { withVencord = true; })
     pdfslicer
+    nextcloud-client
 
     # IDE with plugins
-    (jetbrains.plugins.addPlugins jetbrains.idea-ultimate [
-    #"github-copilot"
-    "nixidea"
-    ])
+    (jetbrains.plugins.addPlugins jetbrains.idea-ultimate [ "nixidea" ])
 
     # CLI
     nix-your-shell
@@ -36,6 +34,5 @@
     # Gaming
     samrewritten
     protonup-qt
-    r2modman
   ]);
 }

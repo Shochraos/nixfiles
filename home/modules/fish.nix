@@ -11,9 +11,10 @@
 
     shellAliases =
     {
-      ls = "eza -l";
-      la = "eza -al";
-      lr = "eza -alR";
+      ls = "eza -1 -h -l --icons --no-user --group-directories-first -F $argv";
+      la = "eza -1 -h -l --icons -a --no-user --group-directories-first -F $argv";
+      lr = "eza -1 -h -l --icons -a -R --no-user --group-directories-first -F $argv";
+      fd = "fd -H -- $argv";
       nix-shell = "nix-your-shell fish nix-shell -- $argv";
       nix-develop = "nix-your-shell fish nix-develop -- $argv";
 

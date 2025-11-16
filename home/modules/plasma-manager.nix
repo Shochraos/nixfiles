@@ -39,6 +39,7 @@
                   #Discord
                   "chrome_status_icon_1"
                   "steam"
+                  "Nextcloud"
                 ];
               };
             }
