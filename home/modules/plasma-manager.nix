@@ -251,6 +251,22 @@
             };
           }
           {
+            description = "Steam Games";
+            match =
+            {
+              window-class =
+              {
+                type = "regex";
+                value = "^steam_.*$";
+                match-whole = false;
+              };
+            };
+            apply =
+            {
+              desktops = "Desktop_1";
+            };
+          }
+          {
             description = "Ghostty";
             match =
             {
@@ -325,14 +341,21 @@
       #TODO Volume widget should show virtual Audio Outputs, not possible currently
       configFile =
       {
-        "kdeglobals"."KFileDialog Settings" = {
+        "kdeglobals".General =
+        {
+          TerminalApplication = "ghostty";
+        };
+        "kdeglobals"."KFileDialog Settings" =
+        {
           "Show hidden files" = false;
           "View Style" = "DetailTree";
         };
-        "dolphinrc"."General" = {
+        "dolphinrc"."General" =
+        {
           RememberOpenedTabs = false;
         };
-        "dolphinrc"."DetailsMode" = {
+        "dolphinrc"."DetailsMode" =
+        {
           PreviewSize = 32;
         };
   };
