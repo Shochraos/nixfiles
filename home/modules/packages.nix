@@ -18,6 +18,8 @@
 
     # CLI
     nix-your-shell
+    eza
+    fd
     btop
   ]
   ++ lib.optionals isAzazel (with pkgs;

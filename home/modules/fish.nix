@@ -9,30 +9,19 @@
       direnv hook fish | source
     '';
 
+    shellAliases =
+    {
+      ls = "eza -l";
+      la = "eza -al";
+      lr = "eza -alR";
+      nix-shell = "nix-your-shell fish nix-shell -- $argv";
+      nix-develop = "nix-your-shell fish nix-develop -- $argv";
+
+      rebuild = "sudo nixos-rebuild switch --flake ${config.home.homeDirectory}/nixfiles#${systemName}";
+    };
+
     functions =
     {
-      la =
-      {
-        body = ''ls -al'';
-      };
-      lr =
-      {
-        body = ''ls -alR'';
-      };
-      rebuild =
-      {
-        body = ''sudo nixos-rebuild switch --flake ${config.home.homeDirectory}/nixfiles#${systemName}'';
-      };
-
-      nix-shell =
-      {
-        body = ''nix-your-shell fish nix-shell -- $argv'';
-      };
-      nix-develop =
-      {
-        body = ''nix-your-shell fish nix-develop -- $argv'';
-      };
-
       denv =
       {
         body = ''
