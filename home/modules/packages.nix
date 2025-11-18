@@ -12,8 +12,8 @@
     nextcloud-client
 
     # IDE with plugins
-    (jetbrains.plugins.addPlugins jetbrains.idea-ultimate [ "nixidea"])
     jetbrains.pycharm-community
+    jetbrains.clion
 
     # CLI
     nix-your-shell
