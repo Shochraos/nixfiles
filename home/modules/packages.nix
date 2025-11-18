@@ -12,13 +12,17 @@
     nextcloud-client
 
     # IDE with plugins
-    (jetbrains.plugins.addPlugins jetbrains.idea-ultimate [ "nixidea" ])
+    (jetbrains.plugins.addPlugins jetbrains.idea-ultimate [ "nixidea"])
+    jetbrains.pycharm-community
 
     # CLI
     nix-your-shell
     eza
     fd
     btop
+
+    # Development
+    devenv
   ]
   ++ lib.optionals isAzazel (with pkgs;
   [
