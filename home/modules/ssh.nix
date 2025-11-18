@@ -1,4 +1,4 @@
-{ config, pkgs, lib, systemName, ... }:
+{ config, lib, systemName, ... }:
 {
   programs.ssh = {
     enable = true;

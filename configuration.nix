@@ -1,4 +1,4 @@
-{ config, pkgs, lib, isAzazel, ... }:
+{ lib, isAzazel, ... }:
 {
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
   nix.settings.download-buffer-size = 524288000;

@@ -1,4 +1,4 @@
-{ pkgs, lib, userName, isAzazel, ... }:
+{ lib, userName, isAzazel, ... }:
 {
   home =
   {

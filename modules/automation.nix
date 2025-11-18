@@ -1,4 +1,4 @@
-{ config, pkgs, ... }:
+{ ... }:
 {
   # Enable automatic Optimization of nix store size
   nix.optimise =

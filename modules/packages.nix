@@ -1,4 +1,4 @@
-{ config, pkgs, inputs, lib, isAzazel, ... }:
+{ pkgs, inputs, lib, isAzazel, ... }:
 {
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;

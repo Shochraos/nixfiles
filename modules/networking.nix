@@ -1,4 +1,4 @@
-{ config, pkgs, lib, systemName, isBelphegor, ... }:
+{ pkgs, lib, systemName, isBelphegor, ... }:
 {
   # Hostname
   networking.hostName = "${systemName}";

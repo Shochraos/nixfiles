@@ -1,4 +1,4 @@
-{ config, pkgs, lib, userName, ... }:
+{ config, pkgs, userName, ... }:
 {
   # Samba firewall rules
   networking.firewall.extraCommands = ''iptables -t raw -A OUTPUT -p udp -m udp --dport 137 -j CT --helper netbios-ns'';

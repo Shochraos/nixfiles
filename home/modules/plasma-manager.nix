@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ ... }:
 {
   #TODO refactor into its own folder plasma-manager with plasma.nix and modules
   programs.plasma = {
