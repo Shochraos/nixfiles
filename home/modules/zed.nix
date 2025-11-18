@@ -17,8 +17,8 @@
       };
 
       lsp = {
-        settings = {
-          nixd = { 
+        nixd = {
+          settings = { 
             autoArchive = true; 
             flakes = {
               autoEvalInputs = true;
