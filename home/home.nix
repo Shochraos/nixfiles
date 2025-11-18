@@ -20,6 +20,7 @@
     ./modules/git.nix
     ./modules/packages.nix
     ./modules/starship.nix
+    ./modules/zed.nix
   ]
   ++ lib.optionals isAzazel
   [
