@@ -16,7 +16,6 @@
     # MPV scripts
     scripts = with pkgs;
     [
-      mpvScripts.evafast
       mpvScripts.uosc
     ];
 
