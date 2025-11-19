@@ -1,14 +1,9 @@
 {pkgs, ...}:
 {
-  home.packages = with pkgs;
-  [
-    nixd
-    nil
-  ];
-  
   programs.zed-editor = {
     enable = true;
     extensions = [ "nix" ];
+    extraPackages = with pkgs; [ nixd ];
     userSettings = {
       theme = {
         mode = "system";
@@ -46,6 +41,7 @@
       
       languages = {
         Nix = {
+          language_servers = ["nixd" "!nil"];
           tab_size = 2;
         };
       };

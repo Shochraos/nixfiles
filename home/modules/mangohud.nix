@@ -7,7 +7,7 @@
     {
       # FPS
       fps = true;
-      fps_limit = 117;
+      fps_limit = 141;
 
       # CPU
       cpu_temp = true;
