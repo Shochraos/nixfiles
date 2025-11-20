@@ -137,17 +137,17 @@
             {
               GameChat-Chat = 
               {
-                command = "${config.home.homeDirectory}/Scripts/GameChat/gamechat_chat.sh";
+                command = "${config.home.homeDirectory}/Scripts/Pipewire/gamechat_chat.sh";
                 key = "XF86AudioLowerVolume";
               };
               GameChat-Game =
               {
-                command = "${config.home.homeDirectory}/Scripts/GameChat/gamechat_game.sh";
+                command = "${config.home.homeDirectory}/Scripts/Pipewire/gamechat_game.sh";
                 key = "XF86AudioRaiseVolume";
               };
               GameChat-Reset =
               {
-                command = "${config.home.homeDirectory}/Scripts/GameChat/gamechat_reset.sh";
+                command = "${config.home.homeDirectory}/Scripts/Pipewire/gamechat_reset.sh";
                 key = "Ctrl + Shift + D";
               };
             })
