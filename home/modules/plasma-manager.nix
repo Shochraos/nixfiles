@@ -356,23 +356,25 @@
           wallpaperPictureOfTheDay.provider = "bing";
         };
 
-        powerdevil =
-        {}
-        // lib.mkIf isAzazel
-        {
-          AC =
+        powerdevil = lib.mkMerge
+        [
+          {}
+          (lib.mkIf isAzazel
           {
-            autoSuspend.action = "nothing";
-            dimDisplay.enable = false;
-            powerButtonAction = "showLogoutScreen";
-
-            turnOffDisplay =
+            AC =
             {
-              idleTimeout = 36000;
-              idleTimeoutWhenLocked = "immediately";
+              autoSuspend.action = "nothing";
+              dimDisplay.enable = false;
+              powerButtonAction = "showLogoutScreen";
+  
+              turnOffDisplay =
+              {
+                idleTimeout = 36000;
+                idleTimeoutWhenLocked = "immediately";
+              };
             };
-          };
-        };
+          })
+        ];
 
         session =
         {
