@@ -28,10 +28,13 @@
                   "org.kde.plasma.networkmanagement"
                   "org.kde.plasma.bluetooth"
                   "org.kde.plasma.volume"
+                ]
+                ++ lib.optionals isBelphegor
+                [
+                  "org.kde.plasma.battery"
                 ];
                 hidden = [
                   "org.kde.plasma.mediacontroller"
-                  "org.kde.plasma.battery"
                   "org.kde.plasma.brightness"
                   "org.kde.plasma.power-management"
                   "plasmashell_microphone"
@@ -40,6 +43,10 @@
                   "chrome_status_icon_1"
                   "steam"
                   "Nextcloud"
+                ]
+                ++ lib.optionals isAzazel
+                [
+                  "org.kde.plasma.battery"
                 ];
               };
             }
