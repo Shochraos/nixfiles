@@ -131,17 +131,17 @@
               GameChat-Chat = 
               {
                 command = "${config.home.homeDirectory}/Scripts/GameChat/gamechat_chat.sh";
-                key = "temp";
+                key = "XF86AudioLowerVolume";
               };
               GameChat-Game =
               {
                 command = "${config.home.homeDirectory}/Scripts/GameChat/gamechat_game.sh";
-                key = "temp";
+                key = "XF86AudioRaiseVolume";
               };
               GameChat-Reset =
               {
                 command = "${config.home.homeDirectory}/Scripts/GameChat/gamechat_reset.sh";
-                key = "temp";
+                key = "Ctrl + Shift + M";
               };
             })
         ];
