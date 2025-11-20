@@ -148,7 +148,7 @@
               GameChat-Reset =
               {
                 command = "${config.home.homeDirectory}/Scripts/GameChat/gamechat_reset.sh";
-                key = "Ctrl + Shift + M";
+                key = "Ctrl + Shift + D";
               };
             })
         ];
