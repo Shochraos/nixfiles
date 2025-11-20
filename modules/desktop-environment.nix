@@ -7,6 +7,11 @@
   services.displayManager.sddm.enable = true;
   services.desktopManager.plasma6.enable = true;
 
+  environment.sessionVariables = 
+  {
+    KWIN_DRM_DEVICES = "/dev/dri/card1";
+  };
+  
   # Additional KDE packages
   environment.systemPackages = with pkgs;
   [

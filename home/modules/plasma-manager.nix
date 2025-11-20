@@ -1,4 +1,4 @@
-{ ... }:
+{ config, lib, isAzazel, isBelphegor, ... }:
 {
   #TODO refactor into its own folder plasma-manager with plasma.nix and modules
   programs.plasma = {
@@ -56,6 +56,8 @@
       input =
       {
           mice =
+          []
+          ++ lib.optionals isAzazel
           [
             {
               name = "Razer Razer Basilisk V3 Pro";
@@ -97,18 +99,52 @@
 
         shortcuts =
         {
-          kwin."Switch One Desktop to the Left" = ["Ctrl+T" "Meta+Ctrl+Left"];
-          kwin."Switch One Desktop to the Right" = ["Ctrl+W" "Meta+Ctrl+Right"];
+          kwin = 
+          {
+            "Switch One Desktop to the Left" = ["Ctrl+T" "Meta+Ctrl+Left"];
+            "Switch One Desktop to the Right" = ["Ctrl+W" "Meta+Ctrl+Right"];
+          };
 
-          mediacontrol.mediavolumedown = "F11";
-          mediacontrol.mediavolumeup = "F12";
-
-          "services/net.local.gamechat_chat.sh.desktop"._launch = "Volume Down";
-          "services/net.local.gamechat_game.sh.desktop"._launch = "Volume Up";
-          "services/net.local.gamechat_reset.sh.desktop"._launch = "Ctrl+Shift+D";
-          "services/org.kde.dolphin.desktop"._launch = "Meta+F";
-          "services/com.mitchellh.ghostty.desktop"._launch = "Meta+T";
+          mediacontrol =
+          {
+            mediavolumedown = "F11";
+            mediavolumeup = "F12";
+          };
         };
+        
+        hotkeys.commands = lib.mkMerge
+        [
+          {
+            Ghostty = 
+            {
+              command = "ghostty --gtk-single-instance=true";
+              key = "Meta + T";
+            };
+            Dolphin = 
+            {
+              command = "dolphin %u";
+              key = "Meta + F";
+            };
+          }
+          (lib.mkIf isAzazel
+            {
+              GameChat-Chat = 
+              {
+                command = "${config.home.homeDirectory}/Scripts/GameChat/gamechat_chat.sh";
+                key = "temp";
+              };
+              GameChat-Game =
+              {
+                command = "${config.home.homeDirectory}/Scripts/GameChat/gamechat_game.sh";
+                key = "temp";
+              };
+              GameChat-Reset =
+              {
+                command = "${config.home.homeDirectory}/Scripts/GameChat/gamechat_reset.sh";
+                key = "temp";
+              };
+            })
+        ];
 
         windows =
         {
@@ -144,6 +180,8 @@
         };
 
         window-rules =
+        []
+        ++ lib.optionals isAzazel
         [
           {
             description = "Discord";
@@ -319,6 +357,8 @@
         };
 
         powerdevil =
+        {}
+        // lib.mkIf isAzazel
         {
           AC =
           {
