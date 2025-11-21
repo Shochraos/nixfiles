@@ -20,6 +20,6 @@ It may break your system if you rebuild your system without adjusting it!
 You need to change the following settings after you clone the repository:**
 
 1. Adjust systemName(s) and `is[machineName]` expressions in the `Systems` section in `flake.nix` to match your machine(s).
-2. Change the `lib.mkIf` and `++ lib.optionals` `is[machineName]` variable names in all `*.nix` files if you changed them in Step 1 to your chosen systemName(s).
+2. Change the `lib.mkIf` and `++ lib.optionals` `is[machineName]` variable names in all `*.nix` files to your chosen variable names(s) if you changed them in Step 1.
 3. Review and adjust all package selections and configurations to your liking.
 4. Replace my hardware-configurations in `./hosts/[systemName]` with your own hardware configurations.
