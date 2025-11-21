@@ -1,10 +1,12 @@
 { ... }:
 {
+  # Enable Plasma-Manager and make it declarative
   programs.plasma = {
       enable = true;
       overrideConfig = true;
   };
   
+  # Import Plasma-Manager modules
   imports = 
   [
     ./modules/workspace.nix

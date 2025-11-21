@@ -11,6 +11,7 @@
     pulse.enable = true;
   };
 
+  # Manually add Pulseaudio to have access to pactl
   environment.systemPackages = with pkgs;
   [
     pulseaudio

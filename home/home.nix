@@ -1,5 +1,6 @@
 { lib, userName, isAzazel, ... }:
 {
+  # Username, Paths and Variables
   home =
   {
     username = "${userName}";
@@ -11,12 +12,13 @@
     };
   };
 
+  # Imports
   imports =
   [
-    # import plasma-manager
+    # Import plasma-manager
     ./plasma/plasma.nix
     
-    # general imports
+    # General imports
     ./modules/fonts.nix
     ./modules/fish.nix
     ./modules/terminal.nix

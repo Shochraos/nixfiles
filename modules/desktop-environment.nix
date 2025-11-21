@@ -7,6 +7,7 @@
   services.displayManager.sddm.enable = true;
   services.desktopManager.plasma6.enable = true;
 
+  # Manually set the graphics device due to plasma-manager resetting config
   environment.sessionVariables = 
   {
     KWIN_DRM_DEVICES = "/dev/dri/card1";
