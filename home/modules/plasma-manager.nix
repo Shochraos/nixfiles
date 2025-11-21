@@ -104,7 +104,8 @@
           };
         };
 
-        shortcuts =
+        shortcuts = lib.mkMerge
+        [
         {
           kwin = 
           {
@@ -117,42 +118,17 @@
             mediavolumedown = "F11";
             mediavolumeup = "F12";
           };
-        };
-        
-        hotkeys.commands = lib.mkMerge
-        [
-          {
-            Ghostty = 
-            {
-              command = "ghostty --gtk-single-instance=true";
-              key = "Meta + T";
-            };
-            Dolphin = 
-            {
-              command = "dolphin %u";
-              key = "Meta + F";
-            };
-          }
-          (lib.mkIf isAzazel
-            {
-              GameChat-Chat = 
-              {
-                command = "${config.home.homeDirectory}/Scripts/Pipewire/gamechat_chat.sh";
-                key = "XF86AudioLowerVolume";
-              };
-              GameChat-Game =
-              {
-                command = "${config.home.homeDirectory}/Scripts/Pipewire/gamechat_game.sh";
-                key = "XF86AudioRaiseVolume";
-              };
-              GameChat-Reset =
-              {
-                command = "${config.home.homeDirectory}/Scripts/Pipewire/gamechat_reset.sh";
-                key = "Ctrl + Shift + D";
-              };
-            })
+          "services/org.kde.dolphin.desktop"._launch = "Meta+F";
+          "services/com.mitchellh.ghostty.desktop"._launch = "Meta+T";         
+        }
+        (lib.mkIf isAzazel 
+        {
+          "services/gamechat_chat.desktop"._launch = "Volume Down";
+          "services/gamechat_game.desktop"._launch = "Volume Up";
+          "services/gamechat_reset.desktop"._launch = "Ctrl+Shift+D";
+        })
         ];
-
+        
         windows =
         {
           allowWindowsToRememberPositions = false;
