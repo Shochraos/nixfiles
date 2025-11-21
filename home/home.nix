@@ -14,7 +14,7 @@
   imports =
   [
     # import plasma-manager
-    ./plasma/plasma-manager.nix
+    ./plasma/plasma.nix
     
     # general imports
     ./modules/fonts.nix

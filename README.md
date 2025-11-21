@@ -8,6 +8,8 @@ It uses home-manager for user-level configuration and NixOS for system-level con
 - `./modules/*.nix`: Modularised NixOS configurations for system settings.
 - `./home/home.nix`: Entry-point for the home-manager configuration.
 - `./home/modules/*.nix`: Modularised home-manager configurations for user settings.
+- `./home/plasma/plasma.nix`: Entry-point for the plasma-manager configuration.
+- `./home/plasma/modules/*.nix`: Modularised plasma-manager configurations for plasma settings.
 - `./hosts/[systemName]/*.nix`: Device-specific hardware-configurations.
 - `./configs/*`: Contains package-specific configurations for which no home-manager module exists.
 - `./assets/*`: Contains assets needed by the config like icons, etc.
@@ -17,12 +19,7 @@ It uses home-manager for user-level configuration and NixOS for system-level con
 It may break your system if you rebuild your system without adjusting it!
 You need to change the following settings after you clone the repository:**
 
-1. Adjust systemName(s) in the `Systems` section in `flake.nix` to match your machine(s).
-2. Modify the `home-manager.users.[your-username]` variable in `flake.nix`.
-3. Change the `users.users.[your-username]` section in `users.nix`.
-4. Adjust the `home.username` and `home.Directory` variables in `./home/home.nix`.
-5. Change the `lib.mkIf` and `++ lib.optionals` conditions to your chosen systemName(s) in all `*.nix` files where it's present.
-6. Review and adjust all package selections and configurations to your liking.
-7. Replace my hardware-configurations in `./hosts/[systemName]` with your own hardware configurations.
-
-# Update needed because of Plasma-Manager
+1. Adjust systemName(s) and `is[machineName]` expressions in the `Systems` section in `flake.nix` to match your machine(s).
+2. Change the `lib.mkIf` and `++ lib.optionals` `is[machineName]` variable names in all `*.nix` files if you changed them in Step 1 to your chosen systemName(s).
+3. Review and adjust all package selections and configurations to your liking.
+4. Replace my hardware-configurations in `./hosts/[systemName]` with your own hardware configurations.
