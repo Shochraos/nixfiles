@@ -2,7 +2,8 @@
 {
   programs.plasma =
   {
-    panels = [
+    panels = 
+    [
       {
         location = "bottom";
         floating = false;
