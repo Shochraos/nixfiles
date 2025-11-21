@@ -13,7 +13,10 @@
 
   imports =
   [
-    ./modules/plasma-manager.nix
+    # import plasma-manager
+    ./plasma/plasma-manager.nix
+    
+    # general imports
     ./modules/fonts.nix
     ./modules/fish.nix
     ./modules/terminal.nix
@@ -23,6 +26,7 @@
     ./modules/starship.nix
     ./modules/zed.nix
   ]
+  # Azazel exclusive imports
   ++ lib.optionals isAzazel
   [
     ./modules/mangohud.nix
