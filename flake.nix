@@ -58,6 +58,7 @@
       modules = 
       [
         home-manager.nixosModules.home-manager
+        lanzaboote.nixosModules.lanzaboote
         ./hosts/Azazel
       ];
     };
