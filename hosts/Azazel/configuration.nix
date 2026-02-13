@@ -9,6 +9,4 @@
     
     ../../modules/utilities/amdpower.nix
   ];
-
-  networking.hostName = "azazel";
 }
