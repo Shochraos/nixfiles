@@ -1,5 +1,5 @@
 {
-  description = "Dentric NixOS Flake";
+  description = "Dendritic NixOS Flake";
 
   inputs =
     {
