@@ -51,16 +51,23 @@
     username = "shochraos";
   in 
   {
-    nixosConfigurations.Azazel = nixpkgs.lib.nixosSystem 
+    nixosConfigurations = 
+    let 
+      makeSystem = name: nixpkgs.lib.nixosSystem
+      {
+        inherit system;
+        specialArgs = { inherit inputs username; systemname = name;}; 
+        modules = 
+        [
+          home-manager.nixosModules.home-manager
+          lanzaboote.nixosModules.lanzaboote
+          ./hosts/${name}
+        ];
+    };
+    in
     {
-      inherit system;
-      specialArgs = { inherit inputs username; }; 
-      modules = 
-      [
-        home-manager.nixosModules.home-manager
-        lanzaboote.nixosModules.lanzaboote
-        ./hosts/Azazel
-      ];
+      Azazel = makeSystem "Azazel";
+      Belphegor = makeSystem "Belphegor";
     };
   };
 }
