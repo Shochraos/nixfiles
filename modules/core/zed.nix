@@ -1,5 +1,7 @@
 {  pkgs, username, systemname, ...}:
 {
+  programs.nix-ld.enable = true;
+  
   home-manager.users.${username} = 
   {
     programs.zed-editor = 

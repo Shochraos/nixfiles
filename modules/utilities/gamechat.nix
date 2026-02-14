@@ -19,7 +19,7 @@
       "gamechat_game" =
       {
         name = "gamechat_game";
-        exec = "/home/${username}//Scripts/Pipewire/gamechat_game.sh";
+        exec = "/home/${username}/Scripts/Pipewire/gamechat_game.sh";
         terminal = false;
         startupNotify = false;
         noDisplay = true;
@@ -28,7 +28,7 @@
       "gamechat_reset" =
       {
         name = "gamechat_reset";
-        exec = "/home/${username}//Scripts/Pipewire/gamechat_reset.sh";
+        exec = "/home/${username}/Scripts/Pipewire/gamechat_reset.sh";
         terminal = false;
         startupNotify = false;
         noDisplay = true;
