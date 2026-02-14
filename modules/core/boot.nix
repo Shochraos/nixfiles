@@ -1,5 +1,7 @@
 { pkgs, lib, ... }:
 {
+  environment.systemPackages = with pkgs; [ sbctl ];
+  
   # Bootloader
   #boot.loader.systemd-boot.enable = true;
   boot.loader.systemd-boot.enable = lib.mkForce false;
@@ -7,12 +9,6 @@
   {
     enable = true;
     pkiBundle = "/var/lib/sbctl";
-  };
-
-  services.scx = {
-      enable = true;
-      scheduler = "scx_lavd";
-      extraArgs = [ "--performance" ];
   };
   
   boot.loader.efi.canTouchEfiVariables = true;
@@ -25,7 +21,4 @@
     device = "/var/lib/swapfile";
     size = 16*1024;
   }];
-  
-  # Research
-  virtualisation.vswitch.enable = true;
 }

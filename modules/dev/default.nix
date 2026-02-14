@@ -2,10 +2,8 @@
 {
   imports = 
   [
-    ./zed.nix
+    ./research.nix
+    ./study.nix
     ./vm.nix
-    ./terminal.nix
-    ./git.nix
-    ./fonts.nix
   ];
 }

@@ -1,0 +1,4 @@
+{ ... }:
+{
+  virtualisation.vswitch.enable = true;
+}

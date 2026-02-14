@@ -6,5 +6,7 @@
     ./steam.nix
     ./mangohud.nix
     ./lact.nix
+    ./scx.nix
+    ./packages.nix
   ];
 }
