@@ -462,6 +462,22 @@
         "type": "github"
       }
     },
+    "nixpkgs-nvidia": {
+      "locked": {
+        "lastModified": 1771170098,
+        "narHash": "sha256-xWU7EFeR+OQk4UcykJD5pOjhHle6/VPAHQqsNUWj4Rc=",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "ab9ad415916a0fb89d1f539a9291d9737e95148e",
+        "type": "github"
+      },
+      "original": {
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "ab9ad415916a0fb89d1f539a9291d9737e95148e",
+        "type": "github"
+      }
+    },
     "plasma-manager": {
       "inputs": {
         "home-manager": [
@@ -532,6 +548,7 @@
         "millennium": "millennium",
         "nix-your-shell": "nix-your-shell",
         "nixpkgs": "nixpkgs",
+        "nixpkgs-nvidia": "nixpkgs-nvidia",
         "plasma-manager": "plasma-manager",
         "zen-browser": "zen-browser"
       }
