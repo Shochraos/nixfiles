@@ -8,7 +8,7 @@
       faugus-launcher
     ];
     
-    xdg.desktopEntires = 
+    xdg.desktopEntries = 
     {
       samrewritten =
       {

@@ -1,4 +1,4 @@
-{ pkgs, username, ... }:
+{ inputs, pkgs, username, ... }:
 {
   services.xserver.enable = false;
 
@@ -36,6 +36,8 @@
     
   home-manager.users.${username} = 
   {
+    imports = [ inputs.plasma-manager.homeModules.plasma-manager ];
+    
     programs.plasma = 
     {
       enable = true;
