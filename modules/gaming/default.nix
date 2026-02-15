@@ -2,11 +2,11 @@
 {
   imports = 
   [
-    ./nvidia.nix
-    ./steam.nix
-    ./mangohud.nix
     ./lact.nix
-    ./scx.nix
+    ./mangohud.nix
+    ./nvidia.nix
     ./packages.nix
+    ./scx.nix
+    ./steam.nix
   ];
 }

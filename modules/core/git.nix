@@ -1,4 +1,4 @@
-{ config, username, ... }:
+{ username, ... }:
 {
   home-manager.users.${username} =
   {
@@ -9,7 +9,7 @@
       {
         user.name  = "Shochraos";
         user.email = "github@shonline.slmail.me";
-        core.excludesfile = "${config.home.homeDirectory}/.gitignore";
+        core.excludesfile = "/home/${username}/.gitignore";
       };
     };
   };

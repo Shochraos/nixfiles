@@ -2,12 +2,17 @@
 {
   imports = 
   [
-    ./boot.nix
-    ./user.nix
-    ./kde.nix
-    ./network.nix
     ./audio.nix
+    ./boot.nix
+    ./fonts.nix
+    ./git.nix
+    ./kde.nix
     ./locale.nix
+    ./network.nix
+    ./ssh.nix
+    ./terminal.nix
+    ./user.nix
+    ./zed.nix
     ./zen.nix
   ];
 }
