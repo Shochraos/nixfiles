@@ -1,5 +1,11 @@
 { username, ... }:
 {
+  services.displayManager.autoLogin = 
+  {
+    enable = true;    
+    user = "shochraos";
+  };
+  
   home-manager.users.${username} = 
   {
     programs.plasma = 
