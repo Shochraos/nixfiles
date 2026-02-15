@@ -34,5 +34,15 @@
         noDisplay = true;
       };
     };
+    
+    programs.plasma = 
+    {
+      shortcuts =
+      {
+        "services/gamechat_chat.desktop"._launch = "Volume Down";
+        "services/gamechat_game.desktop"._launch = "Volume Up";
+        "services/gamechat_reset.desktop"._launch = "Ctrl+Shift+D";
+      };
+    };
   };
 }

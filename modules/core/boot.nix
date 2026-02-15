@@ -15,10 +15,4 @@
 
   # Kernel
   boot.kernelPackages = pkgs.linuxPackages_latest;
-
-  swapDevices =
-  [{
-    device = "/var/lib/swapfile";
-    size = 16*1024;
-  }];
 }
