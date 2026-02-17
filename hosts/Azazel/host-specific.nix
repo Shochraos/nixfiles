@@ -188,6 +188,27 @@
           };
         }
       ];
+      
+      panels = 
+      [
+        {     
+          widgets =
+          [
+            {
+              systemTray.items = 
+              {
+                hidden = [ "org.kde.plasma.battery" ];
+              };
+            }
+            {
+              digitalClock = {
+                calendar.firstDayOfWeek = "sunday";
+                time.format = "24h";
+              };
+            }
+          ];
+        }
+      ];
     };
   };
 }
