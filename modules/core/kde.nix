@@ -160,20 +160,23 @@
           [
             "org.kde.plasma.kickoff"
             {
-              iconTasks = {
+              iconTasks = 
+              {
                 launchers = [];
               };
             }
             "org.kde.plasma.marginsseparator"
             {
-              systemTray.items = {
-                shown = [
+              systemTray.items = 
+              {
+                shown = 
+                [
                   "org.kde.plasma.networkmanagement"
                   "org.kde.plasma.bluetooth"
                   "org.kde.plasma.volume"
-                  "org.kde.plasma.battery"
                 ];
-                hidden = [
+                hidden = 
+                [
                   "org.kde.plasma.mediacontroller"
                   "org.kde.plasma.brightness"
                   "org.kde.plasma.power-management"
@@ -187,7 +190,8 @@
               };
             }
             {
-              digitalClock = {
+              digitalClock = 
+              {
                 calendar.firstDayOfWeek = "sunday";
                 time.format = "24h";
               };
