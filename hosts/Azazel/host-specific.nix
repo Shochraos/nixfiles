@@ -1,4 +1,4 @@
-{ username, ... }:
+{ pkgs, username, ... }:
 {
   services.displayManager.autoLogin = 
   {
@@ -8,6 +8,12 @@
   
   home-manager.users.${username} = 
   {
+    home.packages = with pkgs; 
+    [     
+      feather
+      electrum
+    ];
+    
     programs.plasma = 
     {
       kscreenlocker =
