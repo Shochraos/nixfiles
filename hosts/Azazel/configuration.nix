@@ -17,7 +17,6 @@
     ../../modules/addons/scanprint.nix
     
     ../../modules/utilities/amdpower.nix
-    ../../modules/utilities/crypto.nix
     ../../modules/utilities/gamechat.nix
     ../../modules/utilities/inputremapper.nix
     ../../modules/utilities/mp3tag.nix
