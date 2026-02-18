@@ -4,6 +4,7 @@
   [
     ./research.nix
     ./study.nix
-    ./vm.nix
+    ./virtualization.nix
+    ./devenv.nix
   ];
 }
