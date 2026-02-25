@@ -1,5 +1,10 @@
 { pkgs, username, ... }:
 {
+  environment.systemPackages = with pkgs; 
+  [
+    wakeonlan
+  ];
+  
   services.displayManager.autoLogin = 
   {
     enable = true;    
