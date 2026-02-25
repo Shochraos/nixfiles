@@ -13,6 +13,8 @@
       {
         autoLock = true;
         timeout = 5;
+        passwordRequired = true;
+        passwordRequiredDelay = 5;
       };
       
       window-rules =
