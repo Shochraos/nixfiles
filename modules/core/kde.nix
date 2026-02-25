@@ -210,16 +210,10 @@
 
           turnOffDisplay =
           {
-            idleTimeout = 36000;
-            idleTimeoutWhenLocked = "immediately";
+            idleTimeout = null;
+            idleTimeoutWhenLocked = null;
           };
         };
-      };
-      
-      kscreenlocker =
-      {
-        passwordRequired = true;
-        passwordRequiredDelay = 5;
       };
           
       session =
