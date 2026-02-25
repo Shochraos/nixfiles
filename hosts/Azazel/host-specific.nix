@@ -24,6 +24,7 @@
       kscreenlocker =
       {
         autoLock = false;
+        passwordRequired = false;
       };
       
       window-rules =
