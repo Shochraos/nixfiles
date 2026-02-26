@@ -19,6 +19,15 @@
       electrum
     ];
     
+    programs.ghostty =
+    {
+        settings =
+        { 
+          window-height = 50;
+          window-width  = 150;
+        };
+    };
+    
     programs.plasma = 
     {
       kscreenlocker =

@@ -15,9 +15,6 @@
           background-blur = true;
   
           font-family = "Fira Code Nerd Font";
-  
-          window-height = 50;
-          window-width  = 150;
         };
     };
   };
