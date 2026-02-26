@@ -7,6 +7,15 @@
   
   home-manager.users.${username} = 
   {
+    programs.ghostty =
+    {
+        settings =
+        { 
+          window-height = 25;
+          window-width  = 75;
+        };
+    };
+    
     programs.plasma = 
     {
       kscreenlocker =
