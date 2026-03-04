@@ -1,4 +1,4 @@
-{ inputs, pkgs, username, ... }:
+{ inputs, pkgs, username, lib, ... }:
 {
   services.xserver.enable = false;
 
@@ -26,11 +26,11 @@
       enable = true;
       allowedTCPPortRanges =
       [
-        { from = 1714; to = 8081; } # KDE Connect
+        { from = 1714; to = 8081; }
       ];
       allowedUDPPortRanges =
       [
-        { from = 1714; to = 1764; } # KDE Connect
+        { from = 1714; to = 1764; }
       ];
     };
     
@@ -42,6 +42,12 @@
     {
       enable = true;
       overrideConfig = true;
+      
+      startup.desktopScript."panels".preCommands = lib.mkForce 
+      ''
+        sleep 3
+        [ -f /home/${username}/.config/plasma-org.kde.plasma.desktop-appletsrc ] && rm /home/${username}/.config/plasma-org.kde.plasma.desktop-appletsrc        
+      '';
       
       configFile =
       {
