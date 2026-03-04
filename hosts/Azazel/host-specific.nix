@@ -1,10 +1,5 @@
 { pkgs, username, ... }:
 {
-  environment.systemPackages = with pkgs; 
-  [
-    wakeonlan
-  ];
-  
   services.displayManager.autoLogin = 
   {
     enable = true;    
@@ -15,8 +10,10 @@
   {
     home.packages = with pkgs; 
     [     
+      wakeonlan
+      
       feather
-      electrum
+      #electrum
     ];
     
     programs.ghostty =
