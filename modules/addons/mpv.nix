@@ -2,11 +2,7 @@
 {
   home-manager.users.${username} = 
   {
-    home.packages = with pkgs; 
-    [ 
-      jetbrains-mono 
-      jellyfin-mpv-shim
-    ];
+    home.packages = with pkgs; [ jellyfin-mpv-shim ];
     
     programs.mpv =
     {
@@ -14,7 +10,7 @@
   
       config ={
         vo = "gpu-next";
-        osd-font="Jetbrains Mono";
+        osd-font="Fira Code Nerd Font";
       };
   
       scripts = with pkgs;
