@@ -7,4 +7,7 @@
   virtualisation.libvirtd.enable = true;
   
   virtualisation.spiceUSBRedirection.enable = true;
+  
+  # VSwitch
+  virtualisation.vswitch.enable = true;
 }
