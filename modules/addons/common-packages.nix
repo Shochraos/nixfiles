@@ -6,7 +6,7 @@
     [ 
       (discord.override { withVencord = true; }) 
       spotify
-      #anki  
+      anki  
     ];
   };
 }
