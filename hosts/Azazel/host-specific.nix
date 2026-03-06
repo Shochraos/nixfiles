@@ -13,7 +13,7 @@
       wakeonlan
       
       feather
-      #electrum
+      electrum
     ];
     
     programs.ghostty =
