@@ -5,8 +5,8 @@
     enable = true;
   };
 
-  services.xserver.videoDrivers = ["nvidia"];  
-  
+  services.xserver.videoDrivers = ["nvidia"];
+
   hardware.nvidia =
   {
     modesetting.enable = true;
@@ -23,6 +23,6 @@
             };
             fixedKernelPackages = nvidia-fixed-pkgs.linuxKernel.packagesFor config.boot.kernelPackages.kernel;
           in
-          fixedKernelPackages.nvidiaPackages.stable;
+          fixedKernelPackages.nvidiaPackages.beta;
   };
 }
