@@ -62,7 +62,7 @@
             window-class =
             {
               type = "exact";
-              value = "Spotify";
+              value = "spotify";
               match-whole = false;
             };
           };
