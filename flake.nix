@@ -5,7 +5,7 @@
     {
       nixpkgs =
       {
-        url = "github:NixOS/nixpkgs/nixos-unstable";
+        url = "github:NixOS/nixpkgs/nixos-unstable-small";
       };
       
       lanzaboote = 
@@ -44,8 +44,6 @@
         url = "github:SteamClientHomebrew/Millennium?dir=packages/nix"; 
         inputs.nixpkgs.follows = "nixpkgs";
       };
-      
-      nixpkgs-nvidia.url = "github:NixOS/nixpkgs/ab9ad415916a0fb89d1f539a9291d9737e95148e"; #Temporary NVIDIA 6.19 fix
     };
 
   outputs = { self, nixpkgs, lanzaboote, home-manager, plasma-manager, millennium, zen-browser, ... }@inputs: 
