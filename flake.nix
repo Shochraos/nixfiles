@@ -68,7 +68,7 @@
     in
     {
       Azazel = makeSystem "Azazel";
-      #Belphegor = makeSystem "Belphegor";
+      Belphegor = makeSystem "Belphegor";
     };
   };
 }
