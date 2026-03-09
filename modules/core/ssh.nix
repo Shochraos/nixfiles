@@ -1,33 +1,47 @@
 { lib, username, systemname, ... }:
 {
   programs.ssh.startAgent = true;
-  
-  home-manager.users.${username} = 
+
+  home-manager.users.${username} =
   {
-    programs.ssh = {
+    programs.ssh = 
+    {
       enable = true;
       enableDefaultConfig = false;
-  
+
       matchBlocks."github.com" =
       {
-          forwardAgent = true;
-          extraOptions = {
-            AddKeysToAgent = "yes";
-            IdentityFile = "/home/${username}/.ssh/${lib.toLower systemname}-git";
-            };
+        forwardAgent = true;
+        extraOptions = 
+        {
+          AddKeysToAgent = "yes";
+          IdentityFile = "/home/${username}/.ssh/${lib.toLower systemname}-git";
+        };
       };
-  
+
+      matchBlocks."git.freunds.me" =
+      {
+        forwardAgent = true;
+        extraOptions = 
+        {
+          AddKeysToAgent = "yes";
+          IdentityFile = "/home/${username}/.ssh/${lib.toLower systemname}-git";
+          Port = "2222";
+        };
+      };
+
       matchBlocks."astaroth" =
       {
-          forwardAgent = true;
-          extraOptions = {
-            AddKeysToAgent = "yes";
-            IdentityFile = "/home/${username}/.ssh/${lib.toLower systemname}";
-            HostName = "192.168.10.2";
-            User = "root";
-          };
+        forwardAgent = true;
+        extraOptions = 
+        {
+          AddKeysToAgent = "yes";
+          IdentityFile = "/home/${username}/.ssh/${lib.toLower systemname}";
+          HostName = "192.168.10.2";
+          User = "root";
+        };
       };
-  
+
       matchBlocks."*" =
       {
         forwardAgent = true;
@@ -37,8 +51,7 @@
         };
       };
     };
-  
+
     services.ssh-agent.enable = true;
   };
 }
-
