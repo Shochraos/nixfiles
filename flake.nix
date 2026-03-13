@@ -7,12 +7,6 @@
       {
         url = "github:NixOS/nixpkgs/nixos-unstable";
       };
-      
-      lanzaboote = 
-      {
-        url = "github:nix-community/lanzaboote/v1.0.0";
-        inputs.nixpkgs.follows = "nixpkgs";
-      };
   
       home-manager =
       {
@@ -46,7 +40,7 @@
       };
     };
 
-  outputs = { self, nixpkgs, lanzaboote, home-manager, plasma-manager, millennium, zen-browser, ... }@inputs: 
+  outputs = { self, nixpkgs, home-manager, plasma-manager, millennium, zen-browser, ... }@inputs: 
   let
     system = "x86_64-linux";
     username = "shochraos";
@@ -61,7 +55,6 @@
         modules = 
         [
           home-manager.nixosModules.home-manager
-          lanzaboote.nixosModules.lanzaboote
           ./hosts/${name}
         ];
     };
