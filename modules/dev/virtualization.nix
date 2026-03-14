@@ -8,6 +8,8 @@
   
   virtualisation.spiceUSBRedirection.enable = true;
   
-  # VSwitch
   virtualisation.vswitch.enable = true;
+  
+  users.groups.frrvty = {};
+  users.users.root.extraGroups = [ "frrvty" ];
 }

@@ -41,7 +41,6 @@
     programs.plasma = 
     {
       enable = true;
-      overrideConfig = true;
       
       startup.desktopScript."panels".preCommands = lib.mkForce 
       ''
