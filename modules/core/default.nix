@@ -6,7 +6,6 @@
     ./boot.nix
     ./fonts.nix
     ./git.nix
-    ./kde.nix
     ./locale.nix
     ./network.nix
     ./ssh.nix
