@@ -2,6 +2,12 @@
 {
   environment.sessionVariables.NIXOS_OZONE_WL = "1";
   
+  services.displayManager.dms-greeter = 
+  {
+    enable = true;
+    compositor.name = "hyprland";
+  };
+  
   xdg.portal = {
     enable = true;
     extraPortals = with pkgs; 
@@ -17,7 +23,7 @@
       };
     };
   };
-    
+      
   programs.hyprland = 
   {
    enable = true; 
@@ -29,7 +35,10 @@
   environment.systemPackages = with pkgs; 
   [ 
     playerctl
+    libsecret
   ];
+  
+  services.gnome.gnome-keyring.enable = true;
   
   home-manager.users.${username} = 
   {
@@ -69,6 +78,9 @@
       settings = 
       {
         dynamicTheming = false;
+        
+        # Lock screen
+        lockScreenPowerOffMonitorsOnLock = true;
       };
     };
     
@@ -82,6 +94,9 @@
           misc = 
           {
             middle_click_paste = false;
+            
+            mouse_move_enables_dpms = true; 
+            key_press_enables_dpms = true;
           };
           
           input = 
@@ -158,7 +173,7 @@
           
           bezier = 
           [
-                  "snappy, 0.05, 0.9, 0.1, 1.05"
+            "snappy, 0.05, 0.9, 0.1, 1.05"
           ];
           
           source = 
@@ -172,7 +187,6 @@
           bind = 
           [
             "$mod, Return, exec, ghostty"
-            "$mod SHIFT, M, exit"
             "$mod, Q, killactive"
             
             "$mod, left, movefocus, l"
@@ -188,10 +202,11 @@
             "$mod CTRL, left, workspace, m-1"
             "$mod CTRL, right, workspace, m+1"
             
-            "$mod, L, exec, dms ipc call lock lock"
-            
             "$mod, F, exec, dolphin"
             
+            # DMS binds
+            "$mod, L, exec, dms ipc call lock lock"
+            ", PRINT, exec, dms screenshot"
             "$mod, Space, exec, dms ipc call spotlight toggle"
             
             # Application specific binds
