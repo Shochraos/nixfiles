@@ -1,7 +1,5 @@
 { lib, username, systemname, ... }:
 {
-  programs.ssh.startAgent = true;
-
   home-manager.users.${username} =
   {
     programs.ssh = 
@@ -51,7 +49,5 @@
         };
       };
     };
-
-    services.ssh-agent.enable = true;
   };
 }
