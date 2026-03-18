@@ -202,6 +202,9 @@
             "$mod CTRL, left, workspace, m-1"
             "$mod CTRL, right, workspace, m+1"
             
+            "$mod CTRL SHIFT, left, movetoworkspace, -1"
+            "$mod CTRL SHIFT, right, movetoworkspace, +1"
+            
             "$mod, F, exec, dolphin"
             
             # DMS binds
