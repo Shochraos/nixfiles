@@ -13,7 +13,13 @@
         url = "github:nix-community/home-manager/";
         inputs.nixpkgs.follows = "nixpkgs";
       };
-  
+      
+      dms = 
+      {
+        url = "github:AvengeMedia/DankMaterialShell/stable";
+        inputs.nixpkgs.follows = "nixpkgs";
+      };
+      
       plasma-manager = 
       {
         url = "github:nix-community/plasma-manager";
@@ -40,7 +46,7 @@
       };
     };
 
-  outputs = { self, nixpkgs, home-manager, plasma-manager, millennium, zen-browser, ... }@inputs: 
+  outputs = { self, nixpkgs, home-manager, dms, plasma-manager, millennium, zen-browser, ... }@inputs: 
   let
     system = "x86_64-linux";
     username = "shochraos";
