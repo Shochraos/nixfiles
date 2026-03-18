@@ -1,10 +1,10 @@
 { pkgs, username, ... }:
 {
-  services.displayManager.autoLogin = 
-  {
-    enable = true;    
-    user = "shochraos";
-  };
+#services.displayManager.autoLogin = 
+ # {
+ #   enable = true;    
+ #   user = "shochraos";
+ # };
   
   home-manager.users.${username} = 
   {
