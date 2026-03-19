@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ pkgs, username, ... }:
 {
   xdg.portal = 
   {
@@ -20,6 +20,5 @@
       };
     };
   };
-  
   services.gnome.gnome-keyring.enable = true;
 }
