@@ -41,6 +41,11 @@
             kb_layout = "de"; 
             kb_variant = "nodeadkeys";
           };
+          
+          cursor = 
+          {
+            no_hardware_cursors = true;
+          };
         };
     };
     
