@@ -3,8 +3,8 @@
   stylix = 
   {
     enable = true;
-    #base16Scheme = "${pkgs.base16-schemes}/share/themes/nord.yaml";
-    base16Scheme = ../../assets/themes/adwaita.yaml;
+    base16Scheme = "${pkgs.base16-schemes}/share/themes/chalk.yaml";
+    #base16Scheme = ../../assets/themes/adwaita.yaml;
     
     cursor = 
     {
