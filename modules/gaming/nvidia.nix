@@ -5,12 +5,14 @@
     enable = true;
   };
 
+  boot.kernelParams = [ "nvidia.NVreg_TemporaryFilePath=/var/tmp" ];
+  
   services.xserver.videoDrivers = ["nvidia"];
 
   hardware.nvidia =
   {
     modesetting.enable = true;
-    powerManagement.enable = false;
+    powerManagement.enable = true;
     powerManagement.finegrained = false;
     open = true;
     nvidiaSettings = false;
