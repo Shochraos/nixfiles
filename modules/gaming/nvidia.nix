@@ -6,7 +6,7 @@
   };
   
   environment.systemPackages = with pkgs; [ nvidia-vaapi-driver egl-wayland ];
-  boot.kernelParams = [ "nvidia.NVreg_TemporaryFilePath=/var/tmp" "nvidia.NVreg_PreserveVideoMemoryAllocations=1" ];
+  boot.kernelParams = [ "nvidia.NVreg_TemporaryFilePath=/var/tmp" ];
   
   services.xserver.videoDrivers = ["nvidia"];
 
