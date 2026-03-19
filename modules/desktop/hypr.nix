@@ -35,6 +35,9 @@
         enable = true;
         systemd.enable = false;
         
+        package = null;
+        portalPackage = null;
+        
         settings = 
         {       
           misc = 
