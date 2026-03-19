@@ -4,6 +4,7 @@
   [  
     ../../modules/core
     ../../modules/nix
+    ../../modules/desktop
     
     ../../modules/gaming
     ../../modules/dev
@@ -21,7 +22,5 @@
     ../../modules/utilities/inputremapper.nix
     ../../modules/utilities/mp3tag.nix
     ../../modules/utilities/preventsleep.nix
-    
-    ../../modules/addons/hypr.nix
   ];
 }
