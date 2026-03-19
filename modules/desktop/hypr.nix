@@ -49,12 +49,6 @@
             
           };
           
-          input = 
-          {
-            kb_layout = "de"; 
-            kb_variant = "nodeadkeys";
-          };
-          
           general = 
           {
             gaps_in = 5;
