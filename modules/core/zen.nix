@@ -8,6 +8,10 @@
     programs.zen-browser = {
       enable = true;
       
+      profiles."Nix-Zen" = {
+          isDefault = true;
+        };
+      
       policies = let
         mkExtensionSettings = builtins.mapAttrs (_: pluginId: 
           {

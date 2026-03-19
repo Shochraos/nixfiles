@@ -1,28 +1,6 @@
-{ config, inputs, pkgs, username, ... }:
+{ config, pkgs, username, ... }:
 {
   environment.sessionVariables.NIXOS_OZONE_WL = "1";
-  
-  services.displayManager.dms-greeter = 
-  {
-    enable = true;
-    compositor.name = "hyprland";
-  };
-  
-  xdg.portal = {
-    enable = true;
-    extraPortals = with pkgs; 
-    [
-      xdg-desktop-portal-gtk
-    ];
-  
-    config = 
-    {
-      hyprland =
-      {
-        default = [ "hyprland" "gtk" ];
-      };
-    };
-  };
       
   programs.hyprland = 
   {
@@ -30,20 +8,14 @@
    withUWSM = true;
   };
   
-  programs.dconf.enable = true;
-  
   environment.systemPackages = with pkgs; 
   [ 
     playerctl
     libsecret
   ];
   
-  services.gnome.gnome-keyring.enable = true;
-  
   home-manager.users.${username} = 
-  {
-    imports = [ inputs.dms.homeModules.dank-material-shell ];
-    
+  { 
     xdg.configFile."uwsm/env".source = "${config.home-manager.users.${username}.home.sessionVariablesPackage}/etc/profile.d/hm-session-vars.sh"; 
     
     home.sessionVariables = 
@@ -56,32 +28,6 @@
       XDG_CURRENT_DESKTOP = "Hyprland";
       XDG_SESSION_TYPE = "wayland";
       XDG_SESSION_DESKTOP = "Hyprland";
-    };
-    
-    programs.dank-material-shell = 
-    {
-      enable = true;
-      
-      systemd = 
-      {
-          enable = true;
-          restartIfChanged = true;
-      };
-      
-      # Core features
-      enableSystemMonitoring = true; 
-      enableVPN = true; 
-      enableDynamicTheming = false;
-      enableAudioWavelength = true;
-      enableCalendarEvents = true; 
-      
-      settings = 
-      {
-        dynamicTheming = false;
-        
-        # Lock screen
-        lockScreenPowerOffMonitorsOnLock = true;
-      };
     };
     
     wayland.windowManager.hyprland = 
@@ -97,6 +43,10 @@
             
             mouse_move_enables_dpms = true; 
             key_press_enables_dpms = true;
+            
+            disable_hyprland_logo = true;
+            disable_splash_rendering = true;
+            
           };
           
           input = 
@@ -110,9 +60,6 @@
             gaps_in = 5;
             gaps_out = 5;
             border_size = 0;
-        
-            #"col.active_border" = "rgba(707070ff)";
-            #"col.inactive_border" = "rgba(d0d0d0ff)";
         
             layout = "dwindle";
           };
@@ -129,7 +76,6 @@
               render_power = 5;
               
               offset = "0 5";
-              color = "rgba(00000070)";
             };
           };
           

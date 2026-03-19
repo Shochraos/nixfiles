@@ -10,7 +10,6 @@
   
       config ={
         vo = "gpu-next";
-        osd-font="Fira Code Nerd Font";
       };
   
       scripts = with pkgs;

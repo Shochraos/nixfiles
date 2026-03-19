@@ -20,11 +20,10 @@
         inputs.nixpkgs.follows = "nixpkgs";
       };
       
-      plasma-manager = 
+      stylix = 
       {
-        url = "github:nix-community/plasma-manager";
+        url = "github:nix-community/stylix";
         inputs.nixpkgs.follows = "nixpkgs";
-        inputs.home-manager.follows = "home-manager";
       };
   
       zen-browser =
@@ -33,6 +32,12 @@
         inputs.nixpkgs.follows = "nixpkgs";
       };
   
+      spicetify-nix = 
+      {
+        url = "github:Gerg-L/spicetify-nix";
+        inputs.nixpkgs.follows = "nixpkgs";
+      };
+      
       nix-your-shell =
       {
         url = "github:MercuryTechnologies/nix-your-shell";
@@ -46,7 +51,7 @@
       };
     };
 
-  outputs = { self, nixpkgs, home-manager, dms, plasma-manager, millennium, zen-browser, ... }@inputs: 
+  outputs = { self, nixpkgs, home-manager, dms, stylix, spicetify-nix, millennium, zen-browser, ... }@inputs: 
   let
     system = "x86_64-linux";
     username = "shochraos";
@@ -61,6 +66,7 @@
         modules = 
         [
           home-manager.nixosModules.home-manager
+          stylix.nixosModules.stylix
           ./hosts/${name}
         ];
     };
