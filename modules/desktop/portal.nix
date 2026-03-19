@@ -13,6 +13,8 @@
       hyprland =
       {
         default = [ "hyprland" "gtk" ];
+        "org.freedesktop.portal.FileChooser" = [ "gtk" ];
+        "org.freedesktop.portal.OpenURI" = [ "gtk" ];
       };
     };
   };
