@@ -74,6 +74,7 @@
     {
       Azazel = makeSystem "Azazel";
       Belphegor = makeSystem "Belphegor";
+      Solas = makeSystem "Solas";
     };
   };
 }
