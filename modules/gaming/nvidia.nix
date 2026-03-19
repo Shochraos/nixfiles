@@ -1,11 +1,12 @@
-{ config, ... }:
+{ config, username, pkgs, ... }:
 {
   hardware.graphics =
   {
     enable = true;
   };
-
-  boot.kernelParams = [ "nvidia.NVreg_TemporaryFilePath=/var/tmp" ];
+  
+  environment.systemPackages = with pkgs; [ nvidia-vaapi-driver egl-wayland ];
+  boot.kernelParams = [ "nvidia.NVreg_TemporaryFilePath=/var/tmp" "nvidia.NVreg_PreserveVideoMemoryAllocations=1" ];
   
   services.xserver.videoDrivers = ["nvidia"];
 
@@ -17,5 +18,15 @@
     open = true;
     nvidiaSettings = false;
     package = config.boot.kernelPackages.nvidiaPackages.beta;
+  };
+  
+  home-manager.users.${username} = 
+  {
+    home.sessionVariables = 
+    {
+      "LIBVA_DRIVER_NAME" = "nvidia";
+      "__GLX_VENDOR_LIBRARY_NAME" = "nvidia";
+      "NVD_BACKEND" = "direct";
+    };
   };
 }
