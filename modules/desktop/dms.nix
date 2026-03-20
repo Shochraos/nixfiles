@@ -11,7 +11,8 @@
   {
     imports = 
     [ 
-      inputs.dms.homeModules.dank-material-shell 
+      inputs.dms.homeModules.dank-material-shell
+      inputs.dms-plugin-registry.modules.default 
       inputs.danksearch.homeModules.dsearch
     ];
     
@@ -31,6 +32,11 @@
       enableDynamicTheming = false;
       enableAudioWavelength = true;
       enableCalendarEvents = true; 
+      
+      plugins = 
+      {
+        wallpaperBing.enable = true;
+      };
       
       settings = 
       {
