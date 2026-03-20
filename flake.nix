@@ -20,6 +20,12 @@
         inputs.nixpkgs.follows = "nixpkgs";
       };
       
+      dms-plugin-registry = 
+      {
+         url = "github:AvengeMedia/dms-plugin-registry";
+         inputs.nixpkgs.follows = "nixpkgs";
+       };
+      
       danksearch = 
       {
         url = "github:AvengeMedia/danksearch";
@@ -57,7 +63,7 @@
       };
     };
 
-  outputs = { self, nixpkgs, home-manager, dms, stylix, spicetify-nix, millennium, zen-browser, ... }@inputs: 
+  outputs = { self, nixpkgs, home-manager, dms, danksearch, dms-plugin-registry, stylix, spicetify-nix, millennium, zen-browser, ... }@inputs: 
   let
     system = "x86_64-linux";
     username = "shochraos";
