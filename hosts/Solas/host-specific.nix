@@ -20,16 +20,22 @@
         {
           kb_layout = "us"; 
           kb_variant = "altgr-intl";
+          
+          touchpad = 
+          {
+            natural_scroll = true;
+          };
         };
         
         gesture = 
         [
             "3, horizontal, workspace"
-          ];
+        ];
         
-        gestures = {
-          workspace_swipe_invert = false;
-          };
+        gestures = 
+        {
+          workspace_swipe_invert = true;
+        };
       };
     };
   };
