@@ -12,6 +12,10 @@
   
   environment.systemPackages = with pkgs; 
   [ 
+    # Gnome utils
+    nautilus
+    impression
+    
     playerctl
     libsecret
   ];

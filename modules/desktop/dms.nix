@@ -9,7 +9,11 @@
   
   home-manager.users.${username} = 
   {
-    imports = [ inputs.dms.homeModules.dank-material-shell ];
+    imports = 
+    [ 
+      inputs.dms.homeModules.dank-material-shell 
+      inputs.danksearch.homeModules.dsearch
+    ];
     
     programs.dank-material-shell = 
     {
@@ -35,6 +39,11 @@
         # Lock screen
         lockScreenPowerOffMonitorsOnLock = true;
       };
+    };
+    
+    programs.dsearch = 
+    {
+      enable = true;
     };
   };
 }
