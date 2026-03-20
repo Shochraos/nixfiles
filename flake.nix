@@ -20,6 +20,12 @@
         inputs.nixpkgs.follows = "nixpkgs";
       };
       
+      danksearch = 
+      {
+        url = "github:AvengeMedia/danksearch";
+        inputs.nixpkgs.follows = "nixpkgs";
+      };
+      
       stylix = 
       {
         url = "github:nix-community/stylix";
