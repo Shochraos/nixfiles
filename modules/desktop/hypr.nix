@@ -1,6 +1,8 @@
 { config, pkgs, username, ... }:
 {
   environment.sessionVariables.NIXOS_OZONE_WL = "1";
+  
+  services.power-profiles-daemon.enable = true;
       
   programs.hyprland = 
   {
