@@ -155,8 +155,6 @@
             "$mod CTRL SHIFT, left, movetoworkspace, -1"
             "$mod CTRL SHIFT, right, movetoworkspace, +1"
             
-            "$mod, F, exec, dolphin"
-            
             # DMS binds
             "$mod, L, exec, dms ipc call lock lock"
             ", PRINT, exec, dms screenshot"
