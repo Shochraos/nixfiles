@@ -136,6 +136,7 @@
           bind = 
           [
             "$mod, Return, exec, ghostty"
+            "$mod, F, exec, nautilus"
             "$mod, Q, killactive"
             
             "$mod, left, movefocus, l"
