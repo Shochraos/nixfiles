@@ -21,6 +21,14 @@
           kb_layout = "us"; 
           kb_variant = "altgr-intl";
         };
+        
+        gestures = {
+          workspace_swipe = true;
+          workspace_swipe_fingers = 3;
+          
+          # Optional für die "natürliche" Scrollrichtung:
+          # workspace_swipe_invert = false;
+          };
       };
     };
   };
