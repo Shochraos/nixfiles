@@ -1,10 +1,27 @@
-{ inputs, username, ... }:
+{ inputs, pkgs, username, ... }:
 {
   services.displayManager.dms-greeter = 
   {
     enable = true;
     compositor.name = "hyprland";
     configHome = "/home/${username}";
+  };
+  
+  programs.kdeconnect =
+  {
+    enable = true;
+    package = pkgs.valent;
+  };
+  
+  systemd.user.services.valent = 
+  {
+    description = "Valent (KDE Connect Implementation)";
+    wantedBy = [ "graphical-session.target" ];
+    partOf = [ "graphical-session.target" ];
+    serviceConfig = {
+      ExecStart = "${pkgs.valent}/bin/valent --gapplication-service";
+      Restart = "on-failure";
+    };
   };
   
   home-manager.users.${username} = 
@@ -33,17 +50,71 @@
       enableAudioWavelength = true;
       enableCalendarEvents = true; 
       
+      managePluginSettings = true;
+      
       plugins = 
       {
         wallpaperBing.enable = true;
+        dankKDEConnect.enable = true;
       };
       
       settings = 
       {
         dynamicTheming = false;
         
+        # Notifications
+        notificationPopupPosition = 3;
+        notificationHistoryMaxAgeDays = 3;
+        
+        # Spotlight search
+        sortAppsAlphabetically = true;
+        dankLauncherV2Size = "medium";
+        launcherLogoMode = "os";
+        
+        # USWM
+        launchPrefix = "uwsm-app -- ";
+        
+        # Top bar
+        barConfigs = 
+        [
+          {
+            id = "default";
+            name = "Main Bar";
+            
+            enabled = true;
+            position = 0;
+            screenPreferences = [ "all" ];
+            
+            spacing = 0;
+            innerPadding = 5;
+            bottomGap = -5;
+            transparency = 0;
+            visible = true;
+            
+            leftWidgets = [ "launcherButton" "workspaceSwitcher" "focusedWindow" ];
+            centerWidgets = [ "music" "clock" "weather" ];
+            rightWidgets =
+            [ 
+              { id = "wallpaperBing"; enabled = false; }
+              { id = "dankKDEConnect"; enabled = true; }
+              { id = "systemTray"; enabled = true; }
+              { id = "clipboard"; enabled = true; }
+              { id = "cpuUsage"; enabled = true; }
+              { id = "memUsage"; enabled = true; }
+              { id = "notificationButton"; enabled = true; }
+              { id = "battery"; enabled = true; }
+              { id = "controlCenterButton"; enabled = true; }
+            ];
+          }
+        ];
+        
         # Lock screen
+        loginctlLockIntegration = true;
         lockScreenPowerOffMonitorsOnLock = true;
+      
+        # Power menu
+        powerMenuActions = [ "reboot" "poweroff" "lock" "restart" ];
+        powerMenuDefaultAction = "poweroff";
       };
     };
     

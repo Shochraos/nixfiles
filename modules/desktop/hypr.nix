@@ -15,6 +15,7 @@
     # Gnome utils
     nautilus
     impression
+    gnome-text-editor
     
     playerctl
     libsecret
@@ -55,7 +56,6 @@
             
             disable_hyprland_logo = true;
             disable_splash_rendering = true;
-            
           };
           
           general = 
@@ -71,7 +71,7 @@
             rounding = 12;
         
             active_opacity = 1.0;
-            inactive_opacity = 0.9;
+            inactive_opacity = 1.0;
         
             shadow = {
               enabled = true;
@@ -90,7 +90,7 @@
           ];
           
           exec-once = 
-          [                   
+          [
             "bash -c 'wl-paste --watch cliphist store &'"
           ];
           
@@ -101,13 +101,17 @@
 
           windowrule = 
           [
-            #"match:app-id ^(org.quickshell)$, float on"
+            # System ui
+            "match:class ^(xdg-desktop-portal-gtk)$, float on"
+            "match:class ^(org.quickshell)$, float on"
+            "match:class ^(valent)$, float on"
             
             "match:class ^(discord)$, workspace 2"
             "match:class ^(spotify)$, workspace 2"
             
             "match:class ^(zen-beta)$, workspace 3"
             "match:class ^(steam)$, workspace 3"
+            "match:class ^(steam)$, match:title ^(Steam Settings)$, float on"
             
             "match:class ^(Discord)$, float on"
             # Arknights Endfield
@@ -166,6 +170,9 @@
             ", F8, exec, playerctl --player=spotify previous"
             ", F9, exec, playerctl --player=spotify play-pause"
             ", F10, exec, playerctl --player=spotify next"
+          ];
+          binde = 
+          [
             ", F11, exec, playerctl --player=spotify volume 0.05-"
             ", F12, exec, playerctl --player=spotify volume 0.05+"
           ];
