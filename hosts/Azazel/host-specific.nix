@@ -40,6 +40,8 @@
           {
             kb_layout = "de"; 
             kb_variant = "nodeadkeys";
+             
+            accel_profile = "flat";
           };
           
           cursor = 
