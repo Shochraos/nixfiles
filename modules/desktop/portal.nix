@@ -20,5 +20,22 @@
       };
     };
   };
-  services.gnome.gnome-keyring.enable = true;
+  
+  systemd.user.services.xdg-desktop-portal = 
+  {
+    after = [ "graphical-session.target" ];
+    requires = [ "graphical-session.target" ];
+  };
+  
+  systemd.user.services.xdg-desktop-portal-hyprland = 
+  {
+    after = [ "graphical-session.target" ];
+    requires = [ "graphical-session.target" ];
+  };
+  
+  systemd.user.services.xdg-desktop-portal-gtk = 
+  {
+    after = [ "graphical-session.target" ];
+    requires = [ "graphical-session.target" ];
+  };
 }
