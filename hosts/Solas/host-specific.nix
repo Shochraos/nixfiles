@@ -2,6 +2,7 @@
 {
   services.fprintd.enable = true;
   services.upower.enable = true;
+  services.fwupd.enable = true;
   
   services.xserver.xkb =
   {
