@@ -19,10 +19,31 @@
     impression
     gnome-text-editor
     loupe
+    evince
     
     playerctl
     libsecret
   ];
+  
+  xdg.mime = {
+    enable = true;
+  
+    defaultApplications = {
+      "text/html" = "zen-beta.desktop";
+      "x-scheme-handler/http" = "zen-beta.desktop";
+      "x-scheme-handler/https" = "zen-beta.desktop";
+      "x-scheme-handler/about" = "zen-beta.desktop";
+      "x-scheme-handler/unknown" = "zen-beta.desktop";
+      
+      "application/pdf" = [ "org.gnome.Evince.desktop" "zen-beta.desktop" ];
+      
+      "image/jpeg" = "org.gnome.Loupe.desktop";
+      "image/png" = "org.gnome.Loupe.desktop";
+      "video/mp4" = "mpv.desktop";
+      "video/mkv" = "mpv.desktop";
+      "text/plain" = "org.gnome.TextEditor.desktop";
+    };
+  };
   
   home-manager.users.${username} = 
   { 
