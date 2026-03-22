@@ -143,6 +143,7 @@
           [
             "$mod, Return, exec, ghostty"
             "$mod, F, exec, nautilus"
+            "$mod, T, exec, gnome-text-editor"
             "$mod, Q, killactive"
             
             "$mod, left, movefocus, l"
@@ -165,18 +166,6 @@
             "$mod, L, exec, dms ipc call lock lock"
             ", PRINT, exec, dms screenshot"
             "$mod, Space, exec, dms ipc call spotlight toggle"
-            
-            # Application specific binds
-            ", F6, sendshortcut, CTRL SHIFT, M, class:^(discord)$"
-            ", F7, sendshortcut, CTRL SHIFT, D, class:^(discord)$"
-            ", F8, exec, playerctl --player=spotify previous"
-            ", F9, exec, playerctl --player=spotify play-pause"
-            ", F10, exec, playerctl --player=spotify next"
-          ];
-          binde = 
-          [
-            ", F11, exec, playerctl --player=spotify volume 0.05-"
-            ", F12, exec, playerctl --player=spotify volume 0.05+"
           ];
         };
     };
