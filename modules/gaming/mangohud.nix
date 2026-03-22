@@ -8,7 +8,7 @@
       settings =
       {
         fps = true;
-        fps_limit = 141;
+        fps_limit = 144;
 
         cpu_temp = true;
         cpu_mhz = true;

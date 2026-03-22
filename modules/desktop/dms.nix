@@ -60,7 +60,17 @@
       
       settings = 
       {
+        # Use Stylix for theming
         dynamicTheming = false;
+        
+        hyprlandOutputSettings = 
+        {
+          "desc:LG Electronics LG TV SSCR2 0x01010101" = 
+          {
+            bitdepth = 10;
+            vrrFullscreenOnly = false;
+          };
+        };
         
         # Notifications
         notificationPopupPosition = 3;
