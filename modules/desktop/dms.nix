@@ -47,7 +47,7 @@
       enableSystemMonitoring = true; 
       enableVPN = true; 
       enableDynamicTheming = false;
-      enableAudioWavelength = true;
+      enableAudioWavelength = false;
       enableCalendarEvents = true; 
       
       managePluginSettings = true;
@@ -68,7 +68,7 @@
           "desc:LG Electronics LG TV SSCR2 0x01010101" = 
           {
             bitdepth = 10;
-            vrrFullscreenOnly = false;
+            vrrFullscreenOnly = true;
           };
         };
         

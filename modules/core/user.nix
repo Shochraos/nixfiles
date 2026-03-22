@@ -25,11 +25,19 @@
       ];
     };
     
+    programs.nh = 
+    {
+      enable = true;
+      clean.enable = false;
+      clean.extraArgs = "--keep-since 4d --keep 3";
+    };
+    
     programs.fish =
     {
       enable = true;
   
-      interactiveShellInit = ''
+      interactiveShellInit = 
+      ''
         set fish_greeting # Disable greeting
         direnv hook fish | source
       '';
@@ -42,7 +50,8 @@
         nix-shell = "nix-your-shell fish nix-shell -- $argv";
         nix-develop = "nix-your-shell fish nix-develop -- $argv";
   
-        rebuild = "sudo nixos-rebuild switch --flake path:/home/${username}/nixfiles#${systemname}";
+        rebuild = "nh os switch --ask path:/home/${username}/nixfiles -H ${systemname}";
+        update = "nh os switch -u --ask path:/home/${username}/nixfiles -H ${systemname}";
       };
   
       functions =
