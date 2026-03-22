@@ -26,7 +26,7 @@
           "firefox@tampermonkey.net" = "tampermonkey";
           "CanvasBlocker@kkapsner.de" = "canvasblocker";
           "@testpilot-containers" = "multi-account-containers";
-          "78272b6fa58f4a1abaac99321d503a20" = "proton-pass";
+          "78272b6fa58f4a1abaac99321d503a20@proton.me" = "proton-pass";
         };
 
         SearchEngines = 
