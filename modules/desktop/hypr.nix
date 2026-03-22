@@ -18,6 +18,7 @@
     nautilus
     impression
     gnome-text-editor
+    loupe
     
     playerctl
     libsecret
