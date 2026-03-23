@@ -61,6 +61,12 @@
       XDG_SESSION_DESKTOP = "Hyprland";
     };
     
+    qt = 
+    {
+      enable = true;
+      platformTheme.name = "qtct";
+    };
+    
     wayland.windowManager.hyprland = 
     {
         enable = true;

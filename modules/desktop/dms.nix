@@ -46,7 +46,7 @@
       # Core features
       enableSystemMonitoring = true; 
       enableVPN = true; 
-      enableDynamicTheming = false;
+      enableDynamicTheming = true;
       enableAudioWavelength = false;
       enableCalendarEvents = true; 
       
@@ -60,8 +60,10 @@
       
       settings = 
       {
-        # Use Stylix for theming
-        dynamicTheming = false;
+        # Use Matugen for theming
+        currentThemeName = "dynamic";
+        currentThemeCategory = "dynamic";
+        matugenScheme = "scheme-fidelity";
         
         hyprlandOutputSettings = 
         {
