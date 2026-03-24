@@ -41,9 +41,26 @@
   
   home-manager.users.${username} = 
   {
-    stylix.targets.zen-browser.profileNames = [ "Nix-Zen" ];
+    xdg.configFile."matugen/config.toml".source = ../../configs/matugen/config.toml; 
     
-    stylix.targets.mangohud.enable = false;
-    stylix.targets.starship.enable = false;
+    home.packages = with pkgs; 
+    [
+      adw-gtk3
+    ];
+    
+    dconf.settings = 
+    {
+      "org/gnome/desktop/interface" = 
+      {
+        gtk-theme = "adw-gtk3-dark"; 
+        color-scheme = "prefer-dark";
+      };
+    };
+    
+    qt = 
+    {
+      enable = true;
+      platformTheme.name = "qtct";
+    };
   };
 }

@@ -33,22 +33,9 @@
       inputs.danksearch.homeModules.dsearch
     ];
     
-    home.packages = with pkgs; 
-    [
-      adw-gtk3
-    ];
-    
-    dconf.settings = {
-      "org/gnome/desktop/interface" = {
-        gtk-theme = "adw-gtk3-dark"; 
-        color-scheme = "prefer-dark";
-      };
-    };
-    
     programs.dank-material-shell = 
     {
       enable = true;
-      
       systemd = 
       {
           enable = true;
@@ -57,8 +44,8 @@
       
       # Core features
       enableSystemMonitoring = true; 
-      enableVPN = true; 
       enableDynamicTheming = true;
+      enableVPN = true; 
       enableAudioWavelength = false;
       enableCalendarEvents = true; 
       
@@ -71,7 +58,7 @@
       };
       
       settings = 
-      {
+      { 
         # Use Matugen for theming
         currentThemeName = "dynamic";
         currentThemeCategory = "dynamic";
