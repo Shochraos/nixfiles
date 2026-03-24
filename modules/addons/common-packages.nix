@@ -1,4 +1,4 @@
-{ inputs, username, pkgs, ... }:
+{ config, inputs, username, pkgs, ... }:
 {
   home-manager.users.${username} =
   {
@@ -16,6 +16,18 @@
       {
         enable = true;
         theme = spicePkgs.themes.sleek;
+        enabledSnippets = 
+        [
+        ''
+          * {
+            font-family: "${config.stylix.fonts.sansSerif.name}", sans-serif !important;
+          }
+          
+          code, pre {
+            font-family: "${config.stylix.fonts.monospace.name}", monospace !important;
+          }
+          ''
+        ];
         customColorScheme = builtins.fromJSON (builtins.readFile ../../assets/themes/spicetify.json);
       };
     
