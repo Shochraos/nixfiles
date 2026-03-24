@@ -11,6 +11,12 @@
       extraPackages = with pkgs; [ nixd ];
       userSettings = 
       {
+        theme = 
+        {
+          mode = "system";
+          light = "DankShell Dark";
+          dark = "DankShell Dark";
+        };
         lsp = 
         {
           nixd = 
