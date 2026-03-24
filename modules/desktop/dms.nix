@@ -1,4 +1,4 @@
-{ inputs, pkgs, username, ... }:
+{ inputs, username, ... }:
 {
   services.displayManager.dms-greeter = 
   {
