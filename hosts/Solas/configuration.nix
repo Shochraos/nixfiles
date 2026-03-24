@@ -13,7 +13,7 @@
     ../../modules/addons/common-packages.nix
     ../../modules/addons/office.nix
     ../../modules/addons/scanprint.nix
-      ../../modules/addons/kde-connect.nix
+    ../../modules/addons/kde-connect.nix
     
     ../../modules/utilities/amdpower.nix
   ];
