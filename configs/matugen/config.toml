@@ -1,0 +1,14 @@
+[config]
+[templates.spotify]
+input_path = '~/nixfiles/assets/templates/spicetify.json.j2'
+output_path = '~/nixfiles/assets/themes/spicetify.json'
+#post_hook = 'spicetify watch -s 2>&1 | sed "/Reloaded Spotify/q"'
+
+[templates.vesktop]
+input_path = '~/nixfiles/assets/templates/discord.css'
+output_path = '~/.config/Vencord/themes/matugen.css'
+
+[templates.steam]
+input_path = '~/nixfiles/assets/templates/steam.css'
+output_path = '~/.steam/steam/steamui/skins/Adwaita-for-Steam/millennium/millennium.css'
+#post_hook =  'adwaita-steam-gtk -i'
