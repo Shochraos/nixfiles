@@ -14,4 +14,9 @@
   
   users.groups.lp.members = [ username ];
   users.groups.scanner.members = [ username ];
+  
+  environment.systemPackages = with pkgs; 
+  [ 
+    simple-scan
+  ];
 }
