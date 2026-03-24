@@ -16,6 +16,7 @@
     ../../modules/addons/sshfs.nix
     ../../modules/addons/office.nix
     ../../modules/addons/scanprint.nix
+    ../../modules/addons/kde-connect.nix
     
     ../../modules/utilities/amdpower.nix
     ../../modules/utilities/gamechat.nix
