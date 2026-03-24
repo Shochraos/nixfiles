@@ -4,7 +4,7 @@
   [
     ./hypr.nix
     ./dms.nix
-    ./stylix.nix
+    ./theme.nix
     ./portal.nix
   ];
 }
