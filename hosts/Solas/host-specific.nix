@@ -4,6 +4,12 @@
   services.upower.enable = true;
   services.fwupd.enable = true;
   
+  hardware.alsa.enablePersistence = true;
+  services.udev.extraRules = 
+  ''
+    ACTION=="add", SUBSYSTEM=="leds", KERNEL=="platform::micmute", RUN+="${pkgs.coreutils}/bin/chmod a+w /sys/class/leds/platform::micmute/brightness"
+  '';
+  
   services.xserver.xkb =
   {
     layout = "us";
@@ -43,6 +49,12 @@
           workspace_swipe_invert = true;
         };
         
+        bindl =
+        [
+          ", XF86AudioMicMute, exec, sh -c 'wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle; if grep -q 0 /sys/class/leds/platform::micmute/brightness; then echo 1 > /sys/class/leds/platform::micmute/brightness; else echo 0 > /sys/class/leds/platform::micmute/brightness; fi'"
+          
+        ];
+        
         binde = 
         [
           ", XF86AudioRaiseVolume, exec, wpctl set-volume -l 1.0 @DEFAULT_AUDIO_SINK@ 5%+"
@@ -55,7 +67,6 @@
         bindel = 
         [
           ", XF86AudioMute, exec, wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"
-          ", XF86AudioMicMute, exec, wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle"
         ];
       };
     };
