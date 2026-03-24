@@ -1,4 +1,4 @@
-{ inputs, username, ... }:
+{ inputs, config, username, ... }:
 {
   services.displayManager.dms-greeter = 
   {
@@ -46,6 +46,12 @@
         currentThemeName = "dynamic";
         currentThemeCategory = "dynamic";
         matugenScheme = "scheme-fidelity";
+        
+        fontFamily = config.stylix.fonts.sansSerif.name;
+        monoFontFamily = config.stylix.fonts.monospace.name;
+        
+        fontScale = 1;
+        fontWeight = 400;
         
         hyprlandOutputSettings = 
         {
