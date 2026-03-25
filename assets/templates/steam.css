@@ -28,6 +28,6 @@
     --adw-sidebar-border-rgb: {{ colors.background.default.red }} {{ colors.background.default.green }} {{ colors.background.default.blue }} !important;
     --adw-sidebar-backdrop-rgb: {{ colors.background.default.red }} {{ colors.background.default.green }} {{ colors.background.default.blue }} !important;
 
-    --adw-text-font-primary: "${config.stylix.fonts.sansSerif.name}", sans-serif !important;
-    --adw-text-font-monospace-primary: "${config.stylix.fonts.monospace.name}", monospace !important;
+    --adw-text-font-primary: "Overpass ", sans-serif !important;
+    --adw-text-font-monospace-primary: "Nerd-Fonts Overpass Mono", monospace !important;
 }
