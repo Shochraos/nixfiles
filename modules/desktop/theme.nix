@@ -39,11 +39,6 @@
   
   programs.dconf.enable = true;
   
-  users.users.${username} = 
-  { 
-    extraGroups = [ "greeter" ]; 
-  };
-  
   home-manager.users.${username} = 
   {
     xdg.configFile."matugen/config.toml".source = ../../configs/matugen/config.toml; 

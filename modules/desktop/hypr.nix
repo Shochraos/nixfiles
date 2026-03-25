@@ -114,14 +114,11 @@
             "3, persistent:true"
         ];
         
-        exec-once = 
-        [
-          "bash -c 'wl-paste --watch cliphist store &'"
-        ];
+        exec-once = [];
         
         layerrule = 
         [
-          #"noanim, ^(dms)$"
+          "match:class ^(dms)$, no_anim on"
         ];
 
         windowrule = 
@@ -139,6 +136,7 @@
           "match:class ^(steam)$, match:title ^(Steam Settings)$, float on"
           
           "match:class ^(Discord)$, float on"
+          
           # Arknights Endfield
           "match:class ^(endfield.exe)$, match:title ^(Form)$, float on, suppress_event maximize fullscreen activatefocus, fullscreen_state 0 0, workspace 3 silent"
         ];

@@ -21,7 +21,6 @@
         eza
         fd
         btop
-        wl-clipboard-rs
       ];
     };
     
@@ -52,6 +51,9 @@
   
         rebuild = "nh os switch --ask path:/home/${username}/nixfiles -H ${systemname}";
         update = "nh os switch -u --ask path:/home/${username}/nixfiles -H ${systemname}";
+        
+        copy = "dms cl copy $argv";
+        paste = "dms cl paste";
       };
   
       functions =
