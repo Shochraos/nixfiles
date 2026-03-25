@@ -42,6 +42,8 @@
         
         bindl =
         [
+          ", switch:on:Lid Switch, exec, dms ipc call lock lock"
+          
           ", XF86AudioMute, exec, wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"
           '', XF86AudioMicMute, exec, sh -c "wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle; dms brightness get leds:platform::micmute | grep -q ' 0%' && dms brightness set leds:platform::micmute 100 || dms brightness set leds:platform::micmute 0"''        
         ];
