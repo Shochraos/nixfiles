@@ -18,7 +18,7 @@
         theme = spicePkgs.themes.sleek;
         enabledSnippets = 
         [
-        ''
+        ''  
           * {
             font-family: "${config.stylix.fonts.sansSerif.name}", sans-serif !important;
           }
