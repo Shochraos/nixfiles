@@ -7,6 +7,11 @@
     configHome = "/home/${username}";
   };
   
+  users.users.${username} = 
+  { 
+    extraGroups = [ "greeter" ]; 
+  };
+  
   home-manager.users.${username} = 
   {
     imports = 
@@ -42,17 +47,18 @@
       
       settings = 
       { 
-        # Use Matugen for theming
+        # Matugen
         currentThemeName = "dynamic";
         currentThemeCategory = "dynamic";
         matugenScheme = "scheme-fidelity";
         
+        # Fonts
         fontFamily = config.stylix.fonts.sansSerif.name;
         monoFontFamily = config.stylix.fonts.monospace.name;
-        
         fontScale = 1;
         fontWeight = 400;
         
+        # Displays
         hyprlandOutputSettings = 
         {
           "desc:LG Electronics LG TV SSCR2 0x01010101" = 
@@ -60,6 +66,18 @@
             bitdepth = 10;
             vrrFullscreenOnly = true;
           };
+        };
+        
+        # Clipboard
+        clipboardSettings = 
+        {
+          disabled = false;
+          disableHistory = false;
+          maxHistory = 25;
+          maxEntrySize = 5242880;
+          autoClearDays = 1;
+          clearAtStartup = true;
+
         };
         
         # Notifications
