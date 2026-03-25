@@ -1,4 +1,4 @@
-{ config, inputs, username, pkgs, ... }:
+{ inputs, username, pkgs, ... }:
 {
   home-manager.users.${username} =
   {
@@ -19,12 +19,12 @@
         enabledSnippets = 
         [
         ''  
-          * {
-            font-family: "${config.stylix.fonts.sansSerif.name}", sans-serif !important;
+          html, body, #main, .Root, [class*="encore-"] {
+              font-family: 'Overpass', sans-serif !important;
           }
           
-          code, pre {
-            font-family: "${config.stylix.fonts.monospace.name}", monospace !important;
+          .encore-icon, .icon, svg {
+              font-family: unset !important;
           }
           ''
         ];

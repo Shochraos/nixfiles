@@ -16,9 +16,6 @@
 
 /* customize things here */
 :root {
-	/* font, change to 'gg sans' for default discord font*/
-	--font: 'Overpass';
-
 	/* top left corner text */
 	--corner-text: 'Midnight';
 
@@ -96,4 +93,12 @@
 .selected_f6f816 .link_d8bfb3 * {
   color: var(--text-0) !important;
   fill: var(--text-0) !important;
+}
+
+body, div, span, a, h1, h2, h3, h4, h5, h6, p, label, input, button {
+    font-family: 'Overpass', sans-serif !important;
+}
+
+code, pre, pre *, code *, [class*="code"] {
+    font-family: 'OverpassM Nerd Font Mono', monospace !important;
 }
