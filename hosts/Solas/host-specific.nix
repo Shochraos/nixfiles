@@ -1,14 +1,10 @@
-{ pkgs, username,... }:
+{ username, ... }:
 {
   services.fprintd.enable = true;
   services.upower.enable = true;
   services.fwupd.enable = true;
   
   hardware.alsa.enablePersistence = true;
-  services.udev.extraRules = 
-  ''
-    ACTION=="add", SUBSYSTEM=="leds", KERNEL=="platform::micmute", RUN+="${pkgs.coreutils}/bin/chmod a+w /sys/class/leds/platform::micmute/brightness"
-  '';
   
   services.xserver.xkb =
   {
@@ -18,12 +14,7 @@
   console.keyMap = "us";
   
   home-manager.users.${username} = 
-  {
-    home.packages = with pkgs;
-    [
-      brightnessctl
-    ];
-    
+  { 
     wayland.windowManager.hyprland = 
     {
       settings = 
@@ -51,8 +42,8 @@
         
         bindl =
         [
-          ", XF86AudioMicMute, exec, sh -c 'wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle; if grep -q 0 /sys/class/leds/platform::micmute/brightness; then echo 1 > /sys/class/leds/platform::micmute/brightness; else echo 0 > /sys/class/leds/platform::micmute/brightness; fi'"
-          
+          ", XF86AudioMute, exec, wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"
+          '', XF86AudioMicMute, exec, sh -c "wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle; dms brightness get leds:platform::micmute | grep -q ' 0%' && dms brightness set leds:platform::micmute 100 || dms brightness set leds:platform::micmute 0"''        
         ];
         
         binde = 
@@ -60,13 +51,11 @@
           ", XF86AudioRaiseVolume, exec, wpctl set-volume -l 1.0 @DEFAULT_AUDIO_SINK@ 5%+"
           ", XF86AudioLowerVolume, exec, wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-"
           
-          ", XF86MonBrightnessUp, exec, brightnessctl set 5%+"
-          ", XF86MonBrightnessDown, exec, brightnessctl set 5%-"
-        ];
-        
-        bindel = 
-        [
-          ", XF86AudioMute, exec, wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"
+          ", XF86MonBrightnessUp, exec, dms ipc call brightness increment 5 backlight:amdgpu_bl1"
+          ", XF86MonBrightnessDown, exec, dms ipc call brightness decrement 5 backlight:amdgpu_bl1"
+      
+          ", F6, exec, dms ipc call brightness increment 25 leds:tpacpi::kbd_backlight"
+          ", F5, exec, dms ipc call brightness decrement 25 leds:tpacpi::kbd_backlight"
         ];
       };
     };
