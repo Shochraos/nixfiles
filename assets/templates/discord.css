@@ -17,7 +17,7 @@
 /* customize things here */
 :root {
 	/* font, change to 'gg sans' for default discord font*/
-	--font: '${config.stylix.fonts.sansSerif.name}';
+	--font: 'Overpass';
 
 	/* top left corner text */
 	--corner-text: 'Midnight';
