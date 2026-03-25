@@ -26,7 +26,7 @@
       monospace = 
       {
         package = pkgs.nerd-fonts.overpass;
-        name = "Nerd Fonts Overpass Mono";
+        name = "OverpassM Nerd Font Mono";
       };
   
       emoji = 
@@ -51,6 +51,9 @@
     home.packages = with pkgs; 
     [
       adw-gtk3
+      
+      overpass
+      nerd-fonts.overpass
     ];
     
     dconf.settings = 
@@ -67,5 +70,8 @@
       enable = true;
       platformTheme.name = "qtct";
     };
+    
+    stylix.targets.zed.fonts.enable = true;
+    stylix.targets.gtk.fonts.enable = true;
   };
 }
