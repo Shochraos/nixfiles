@@ -27,7 +27,12 @@
     --adw-sidebar-fg-rgb: {{ colors.on_background.default.red }} {{ colors.on_background.default.green }} {{ colors.on_background.default.blue }} !important;
     --adw-sidebar-border-rgb: {{ colors.background.default.red }} {{ colors.background.default.green }} {{ colors.background.default.blue }} !important;
     --adw-sidebar-backdrop-rgb: {{ colors.background.default.red }} {{ colors.background.default.green }} {{ colors.background.default.blue }} !important;
+}
 
-    --adw-text-font-primary: "Overpass ", sans-serif !important;
-    --adw-text-font-monospace-primary: "Nerd-Fonts Overpass Mono", monospace !important;
+body, div, span, h1, h2, h3, h4, h5, h6, p, a, button, input, label {
+    font-family: 'Overpass', sans-serif !important;
+}
+
+svg, .SVGIcon_Button, .SVGIcon, [class*="icon" i] {
+    font-family: inherit !important;
 }
