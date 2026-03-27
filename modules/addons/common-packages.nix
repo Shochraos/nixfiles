@@ -28,7 +28,7 @@
           }
           ''
         ];
-        customColorScheme = builtins.fromJSON (builtins.readFile ../../assets/themes/spicetify.json);
+        customColorScheme = builtins.fromJSON (builtins.readFile ../../local/themes/spicetify.json);
       };
     
     wayland.windowManager.hyprland = 
