@@ -85,7 +85,7 @@
           general = 
           {
             gaps_in = 5;
-            gaps_out = 5;
+            gaps_out = 10;
             border_size = 0;
         
             layout = "dwindle";
@@ -185,8 +185,15 @@
           
           # DMS binds
           "$mod, L, exec, dms ipc call lock lock"
-          ", PRINT, exec, dms screenshot"
+          
+          ", PRINT, exec, dms screenshot --no-file"
+          "$mod, PRINT, exec, dms screenshot"
+          
           "$mod, Space, exec, dms ipc call spotlight toggle"
+          "$mod, V, exec, dms ipc call clipboard toggle"
+          "$mod, M, exec, dms ipc call processlist focusOrToggle"
+          "$mod, N, exec, dms ipc call notifications toggle"
+          "$mod, TAB, exec, dms ipc call hypr toggleOverview"
         ];
         bindm =
         [

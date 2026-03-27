@@ -41,7 +41,7 @@
       
       plugins = 
       {
-        wallpaperBing.enable = true;
+        calculator.enable = true;
         dankKDEConnect.enable = true;
       };
       

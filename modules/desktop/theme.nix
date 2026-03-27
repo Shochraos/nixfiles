@@ -35,6 +35,14 @@
         name = "Noto Color Emoji";
       };
     };
+    
+    icons = 
+    {
+      enable = true;
+      package = pkgs.papirus-icon-theme;
+      dark = "Papirus-Dark";
+      light = "Papirus-Light";
+    };
   };
   
   programs.dconf.enable = true;
