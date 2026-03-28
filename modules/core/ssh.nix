@@ -16,6 +16,16 @@
           IdentityFile = "/home/${username}/.ssh/${lib.toLower systemname}-git";
         };
       };
+      
+      matchBlocks."git-ce.rwth-aachen.de" = 
+      {
+        forwardAgent = true;
+        extraOptions = 
+        {
+          AddKeysToAgent = "yes";
+          IdentityFile = "/home/${username}/.ssh/${lib.toLower systemname}-git";
+        };
+      };
 
       matchBlocks."git.freunds.me" =
       {
