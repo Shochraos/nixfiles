@@ -8,6 +8,14 @@
       feishin 
     ];
     
+    xdg.autostart = 
+    {
+      entries = 
+      [
+        "${pkgs.nextcloud-client}/share/applications/com.nextcloud.desktopclient.nextcloud.desktop"
+      ];
+    };
+    
     programs.vdirsyncer.enable = true;
     services.vdirsyncer.enable = true;
     programs.khal = 

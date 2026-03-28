@@ -2,8 +2,17 @@
 {
   programs.firefox.enable = false;
 
-  home-manager.users.${username} = {
+  home-manager.users.${username} = { config, ...}:
+  {
     imports = [ inputs.zen-browser.homeModules.beta ];
+    
+    xdg.autostart = 
+    {
+      entries = 
+      [
+        "${config.programs.zen-browser.package}/share/applications/zen-beta.desktop"
+      ];
+    };
 
     programs.zen-browser = {
       enable = true;
