@@ -21,6 +21,11 @@
       inputs.danksearch.homeModules.dsearch
     ];
     
+    xdg.autostart = 
+    {
+      enable = true;
+    };
+    
     programs.dank-material-shell = 
     {
       enable = true;
