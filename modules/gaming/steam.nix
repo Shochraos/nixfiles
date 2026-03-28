@@ -18,5 +18,13 @@
       PROTON_USE_NTSYNC = "1";
       PROTON_DLSS_UPGRADE = "1";
     };
+    
+    xdg.autostart = 
+    {
+      entries = 
+      [
+        "${pkgs.steam}/share/applications/steam.desktop"
+      ];
+    };
   };
 }

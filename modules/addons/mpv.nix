@@ -1,6 +1,6 @@
 { pkgs, username, ... }:
 {
-  home-manager.users.${username} = 
+  home-manager.users.${username} =
   {
     home.packages = with pkgs; [ jellyfin-mpv-shim ];
     
@@ -30,6 +30,14 @@
       };
     };
   
+    xdg.autostart = 
+    {
+      entries = 
+      [
+        "${pkgs.jellyfin-mpv-shim}/share/applications/jellyfin-mpv-shim.desktop"
+      ];
+    };
+    
     xdg.configFile."jellyfin-mpv-shim/conf.json".source = ../../configs/jellyfin-mpv-shim/conf.json;
   };
 }
