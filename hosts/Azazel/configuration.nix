@@ -21,6 +21,7 @@
     ../../modules/utilities/amdpower.nix
     ../../modules/utilities/gamechat.nix
     ../../modules/utilities/inputremapper.nix
+    ../../modules/utilities/lgtv.nix
     ../../modules/utilities/mp3tag.nix
     ../../modules/utilities/preventsleep.nix
   ];
