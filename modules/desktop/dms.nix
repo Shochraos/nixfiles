@@ -117,7 +117,7 @@
             
             leftWidgets = [ "launcherButton" "workspaceSwitcher" "focusedWindow" ];
             centerWidgets = [ "music" "clock" "weather" ];
-            rightWidgets = [ "dankKDEConnect" "clipboard" "battery" "cpuUsage" "memUsage" "notificationButton" "simpleAudioControl" "controlCenterButton" ];
+            rightWidgets = [ "systemTray" "dankKDEConnect" "clipboard" "battery" "cpuUsage" "memUsage" "notificationButton" "simpleAudioControl" "controlCenterButton" ];
           }
         ];
         
