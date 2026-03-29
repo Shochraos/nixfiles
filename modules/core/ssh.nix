@@ -53,7 +53,8 @@
       matchBlocks."*" =
       {
         forwardAgent = true;
-        extraOptions = {
+        extraOptions = 
+        {
           AddKeysToAgent = "yes";
           IdentityFile = "/home/${username}/.ssh/${lib.toLower systemname}";
         };
