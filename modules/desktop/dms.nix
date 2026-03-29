@@ -48,6 +48,7 @@
       {
         calculator.enable = true;
         dankKDEConnect.enable = true;
+        simpleAudioControl.enable = true;
       };
       
       settings = 
@@ -116,18 +117,7 @@
             
             leftWidgets = [ "launcherButton" "workspaceSwitcher" "focusedWindow" ];
             centerWidgets = [ "music" "clock" "weather" ];
-            rightWidgets =
-            [ 
-              { id = "wallpaperBing"; enabled = false; }
-              { id = "dankKDEConnect"; enabled = true; }
-              { id = "systemTray"; enabled = true; }
-              { id = "clipboard"; enabled = true; }
-              { id = "cpuUsage"; enabled = true; }
-              { id = "memUsage"; enabled = true; }
-              { id = "notificationButton"; enabled = true; }
-              { id = "battery"; enabled = true; }
-              { id = "controlCenterButton"; enabled = true; }
-            ];
+            rightWidgets = [ "dankKDEConnect" "clipboard" "battery" "cpuUsage" "memUsage" "notificationButton" "simpleAudioControl" "controlCenterButton" ];
           }
         ];
         
