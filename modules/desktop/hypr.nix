@@ -86,8 +86,9 @@
           {
             gaps_in = 5;
             gaps_out = 10;
-            border_size = 0;
-        
+            border_size = 1;
+            "col.inactive_border" = "rgba(00000000)";
+            
             layout = "dwindle";
           };
         
@@ -149,7 +150,14 @@
         
         bezier = 
         [
-          "snappy, 0.05, 0.9, 0.1, 1.05"
+          "easeInSine, 0.12, 0, 0.39, 0"
+          "easeInOutSine, 0.37, 0, 0.63, 1"
+        ];
+        
+        animation =
+        [
+          "windows, 1, 2, easeInSine, slide"
+          "workspaces, 1, 2, easeInOutSine, slidevert"
         ];
         
         source = 
@@ -157,6 +165,7 @@
           "~/.config/hypr/dms/colors.conf"
           "~/.config/hypr/dms/layout.conf"
           "~/.config/hypr/dms/outputs.conf"
+          "~/.config/hypr/dms/cursor.conf"
         ];
         
         "$mod" = "SUPER";
