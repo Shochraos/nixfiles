@@ -21,16 +21,25 @@ in
       ];
     };
     
-    xdg.autostart.entries = 
-    [
-      "${pkgs.makeDesktopItem 
+    systemd.user.services.gamechat-mix =
+    {
+      Unit =
       {
-        name = "gamechat_mix";
-        desktopName = "GameChat-Mix";
-        exec = "${gamechat_mix}";
-        noDisplay = true;
-      }
-      }/share/applications/gamechat_mix.desktop"
-    ];
+        Description = "Dynamically sorts audio streams into sinks to independently manage volume";
+        PartOf = [ "graphical-session.target" ];
+      };
+    
+      Service =
+      {
+        Type = "simple";
+        ExecStart = "${gamechat_mix}";
+        Restart = "always";
+      };
+    
+      Install =
+      {
+        WantedBy = [ "graphical-session.target" ];
+      };
+    };
   };
 }
