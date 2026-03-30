@@ -1,15 +1,5 @@
-{ pkgs, username, ... }:
-let
-  mic-mute = pkgs.writeShellScript "mic-mute.sh" (builtins.readFile ../../assets/scripts/mic-mute.sh);
-in
-{
-  environment.etc =
-  {
-    "ssl/certs/T-TeleSec_GlobalRoot_Class_2.pem".source = ../../assets/certs/T-TeleSec_GlobalRoot_Class_2.pem;
-  };
-  
-  systemd.network.wait-online.enable = false;
-  
+{ username, ... }:
+{ 
   services.fprintd.enable = true;
   services.upower.enable = true;
   services.fwupd.enable = true;
@@ -24,28 +14,7 @@ in
   console.keyMap = "us";
   
   home-manager.users.${username} = 
-  { 
-    systemd.user.services.micmute-led =
-    {
-      Unit =
-      {
-        Description = "Sync mic mute status with keyboard LED";
-        PartOf = [ "graphical-session.target" ];
-      };
-    
-      Service =
-      {
-        Type = "simple";
-        ExecStart = "${mic-mute}";
-        Restart = "always";
-      };
-    
-      Install =
-      {
-        WantedBy = [ "graphical-session.target" ];
-      };
-    };
-      
+  {   
     wayland.windowManager.hyprland = 
     {
       settings = 
@@ -76,7 +45,6 @@ in
           ", switch:on:Lid Switch, exec, dms ipc call lock lock"
           
           ", XF86AudioMute, exec, wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"
-          #'', XF86AudioMicMute, exec, sh -c "wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle; dms brightness get leds:platform::micmute | grep -q ' 0%' && dms brightness set leds:platform::micmute 100 || dms brightness set leds:platform::micmute 0"''        
           ", XF86AudioMicMute, exec, wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle"
         ];
         
