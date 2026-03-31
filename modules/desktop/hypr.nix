@@ -150,13 +150,13 @@
         
         bezier = 
         [
-          "easeInSine, 0.12, 0, 0.39, 0"
+          "easeOutSine, 0.61, 1, 0.88, 1"
           "easeInOutSine, 0.37, 0, 0.63, 1"
         ];
         
         animation =
         [
-          "windows, 1, 2, easeInSine, slide"
+          "windows, 1, 2, easeOutSine, slide"
           "workspaces, 1, 2, easeInOutSine, slidevert"
         ];
         
