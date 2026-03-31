@@ -17,7 +17,7 @@ in
       [
         ", XF86AudioRaiseVolume, exec, ${gamechat_game}"
         ", XF86AudioLowerVolume, exec, ${gamechat_chat}"
-        "CTRL SHIFT, D, exec, ${gamechat_reset}"
+        ", XF86AudioMute, exec, ${gamechat_reset}"
       ];
     };
     
