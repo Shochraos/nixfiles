@@ -9,6 +9,7 @@
     ../../modules/dev
     
     ../../modules/addons/bluetooth.nix
+    ../../modules/addons/fprint.nix
     ../../modules/addons/cloud.nix
     ../../modules/addons/common-packages.nix
     ../../modules/addons/office.nix
