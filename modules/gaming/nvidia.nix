@@ -3,11 +3,10 @@
   hardware.graphics =
   {
     enable = true;
+    enable32Bit = true;
   };
   
   environment.systemPackages = with pkgs; [ nvidia-vaapi-driver egl-wayland ];
-  boot.kernelParams = [ "nvidia.NVreg_TemporaryFilePath=/var/tmp" ];
-  
   services.xserver.videoDrivers = ["nvidia"];
 
   hardware.nvidia =
@@ -17,7 +16,7 @@
     powerManagement.finegrained = false;
     open = true;
     nvidiaSettings = false;
-    package = config.boot.kernelPackages.nvidiaPackages.beta;
+    package = config.boot.kernelPackages.nvidiaPackages.stable;
   };
   
   home-manager.users.${username} = 
