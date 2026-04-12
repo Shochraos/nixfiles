@@ -45,6 +45,25 @@
     };
   };
   
+  environment.systemPackages = with pkgs; [ bibata-cursors ];
+  
+  services.displayManager.dms-greeter = 
+  {
+    compositor.customConfig = 
+    ''
+        env = XCURSOR_THEME,Bibata-Modern-Classic
+        env = XCURSOR_SIZE,24
+        
+        misc 
+        {
+          disable_hyprland_logo = true
+          disable_splash_rendering = true
+          force_default_wallpaper = 0
+          background_color = rgb(000000)
+        }
+    '';
+  };
+  
   programs.dconf.enable = true;
   
   home-manager.users.${username} = 
