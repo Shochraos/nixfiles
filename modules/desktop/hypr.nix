@@ -175,6 +175,7 @@
           "$mod, F, exec, nautilus"
           "$mod, T, exec, gnome-text-editor"
           "$mod, Q, killactive"
+          "$mod CTRL, F, fullscreen, 0"
           
           "$mod, left, movefocus, l"
           "$mod, right, movefocus, r"
