@@ -14,14 +14,52 @@
       ];
     };
 
-    programs.zen-browser = {
+    programs.zen-browser = 
+    {
       enable = true;
       
-      profiles."Nix-Zen" = {
+      profiles."Nix-Zen" = 
+      {
           isDefault = true;
+          
+          settings = 
+          {
+            "app.normandy.api_url" = "";
+            "app.normandy.enabled" = false;
+            "browser.aboutConfig.showWarning" = false;
+            "browser.download.panel.shown" = false;
+            "browser.search.suggest.enabled" = false;
+            "browser.tabs.warnOnClose" = false;
+            "browser.tabs.warnOnCloseOther" = false;
+            "browser.uitour.enabled" = false;
+            "findbar.highlightAll" = true;
+            "full-screen-api.warning.timeout" = 0;
+            "gfx.webrender.all" = true;
+            "media.autoplay.default" = 5;
+            "media.ffmpeg.vaapi.enabled" = true;
+            "media.peerconnection.ice.default_address_only" = true;
+            "network.prefetch-next" = false;
+            "privacy.donottrackheader.enabled" = true;
+            "widget.use-xdg-desktop-portal.file-picker" = 1;
+            
+            "network.cookie.lifetimePolicy" = 2;
+            "privacy.sanitize.sanitizeOnShutdown" = true;
+            "privacy.clearOnShutdown.cookies" = true;
+            "privacy.clearOnShutdown.cache" = true;
+            "privacy.clearOnShutdown.history" = false;
+            "privacy.clearOnShutdown.sessions" = false;
+            
+            "widget.wayland.fractional-scale.enabled" = true;
+            "apz.overscroll.enabled" = true;
+            
+            "browser.tabs.closeWindowWithLastTab" = false;
+            "browser.compactmode.show" = true;
+            "toolkit.legacyUserProfileCustomizations.stylesheets" = true;
+          };
         };
       
-      policies = let
+      policies = 
+      let
         mkExtensionSettings = builtins.mapAttrs (_: pluginId: 
           {
           install_url = "https://addons.mozilla.org/firefox/downloads/latest/${pluginId}/latest.xpi";
@@ -61,27 +99,6 @@
             IconURL = "https://nixos.org/favicon.ico";
             Alias = "@np";
           }];
-        };
-
-        Preferences = 
-        {
-          "app.normandy.api_url" = "";
-          "app.normandy.enabled" = false;
-          "browser.aboutConfig.showWarning" = false;
-          "browser.download.panel.shown" = false;
-          "browser.search.suggest.enabled" = false;
-          "browser.tabs.warnOnClose" = false;
-          "browser.tabs.warnOnCloseOther" = false;
-          "browser.uitour.enabled" = false;
-          "findbar.highlightAll" = true;
-          "full-screen-api.warning.timeout" = 0;
-          "gfx.webrender.all" = true;
-          "media.autoplay.default" = 5;
-          "media.ffmpeg.vaapi.enabled" = true;
-          "media.peerconnection.ice.default_address_only" = true;
-          "network.prefetch-next" = false;
-          "privacy.donottrackheader.enabled" = true;
-          "widget.use-xdg-desktop-portal.file-picker" = 1;
         };
 
         Cookies = 
