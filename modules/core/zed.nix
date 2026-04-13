@@ -64,6 +64,21 @@
             language_servers = ["nixd" "!nil"];
             tab_size = 2;
           };
+          
+          Python = 
+          {
+            language_servers = [ "ty" "!basedpyright" ];
+            code_actions_on_format = {
+              "source.organizeImports.ruff" = true;
+            };
+            formatter = 
+            {
+              language_server = 
+              {
+                name = "ruff";
+              };
+            };
+          };
         };
       };
     };
