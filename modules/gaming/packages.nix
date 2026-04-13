@@ -1,5 +1,7 @@
 { username, pkgs, ... }:
 {
+  hardware.xone.enable = true;
+  
   home-manager.users.${username} =
   {
     home.packages = with pkgs;
