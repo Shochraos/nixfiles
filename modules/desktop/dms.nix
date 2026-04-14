@@ -1,5 +1,6 @@
 { inputs, config, username, ... }:
 {
+  services.displayManager.defaultSession = "hyprland-uwsm";
   services.displayManager.dms-greeter = 
   {
     enable = true;
