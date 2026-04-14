@@ -16,6 +16,7 @@
     ../../modules/addons/scanprint.nix
     ../../modules/addons/kde-connect.nix
     ../../modules/addons/laptop-networking.nix
+    ../../modules/addons/scx.nix
     
     ../../modules/utilities/amdpower.nix
     ../../modules/utilities/mic-mute.nix
