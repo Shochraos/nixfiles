@@ -15,6 +15,15 @@
       electrum
     ];
     
+    xdg.autostart = 
+    {
+      entries = 
+      [
+        "${pkgs.discord.desktopItem}/share/applications/discord.desktop"
+        "${pkgs.spotify}/share/applications/spotify.desktop"
+      ];
+    };
+    
     wayland.windowManager.hyprland = 
     {
         settings = 
