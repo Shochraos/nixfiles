@@ -4,15 +4,6 @@
   {
     imports = [  inputs.spicetify-nix.homeManagerModules.default ];
     
-    xdg.autostart = 
-    {
-      entries = 
-      [
-        "${pkgs.discord.desktopItem}/share/applications/discord.desktop"
-        "${pkgs.spotify}/share/applications/spotify.desktop"
-      ];
-    };
-    
     home.packages = with pkgs; 
     [ 
       (discord.override { withVencord = true; }) 
