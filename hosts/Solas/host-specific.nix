@@ -87,11 +87,11 @@
             rightWidgets = [ "systemTray" "dankKDEConnect" "clipboard" "battery" "cpuUsage" "memUsage" "notificationButton" "simpleAudioControl" "controlCenterButton" ];
           }
         ];
+        
+        # Power menu
+        powerMenuActions = [ "suspend ""reboot" "poweroff" ];
+        powerMenuDefaultAction = "poweroff";
       };
-      
-      # Power menu
-      powerMenuActions = [ "suspend ""reboot" "poweroff" ];
-      powerMenuDefaultAction = "poweroff";
     };
   };
 }
