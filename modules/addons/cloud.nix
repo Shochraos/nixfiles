@@ -39,7 +39,7 @@
           khal.type = "discover";
           
           vdirsyncer.enable = true;
-          vdirsyncer.collections = [ "personal" "work" "dozentenplan-hs-fulda" ]; 
+          vdirsyncer.collections = [ "personal" "work" "stundenplan-hs-fulda" "dozentenplan-hs-fulda" "feiertage" ]; 
           
           remote = {
             type = "caldav";
