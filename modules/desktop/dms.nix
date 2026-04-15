@@ -89,7 +89,8 @@
         
         # Notifications
         notificationPopupPosition = 3;
-        notificationHistoryMaxAgeDays = 3;
+        notificationHistoryMaxCount = 20;
+        notificationHistoryMaxAgeDays = 1;
         
         # Spotlight search
         sortAppsAlphabetically = true;
@@ -102,10 +103,6 @@
         # Lock screen
         loginctlLockIntegration = true;
         lockScreenPowerOffMonitorsOnLock = true;
-      
-        # Power menu
-        powerMenuActions = [ "reboot" "poweroff" "lock" "restart" ];
-        powerMenuDefaultAction = "poweroff";
       };
     };
     

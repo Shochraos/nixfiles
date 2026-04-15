@@ -65,6 +65,7 @@
     {
       settings = 
       {
+        # DankBar
         barConfigs = 
         [
           {
@@ -87,6 +88,10 @@
           }
         ];
       };
+      
+      # Power menu
+      powerMenuActions = [ "suspend ""reboot" "poweroff" ];
+      powerMenuDefaultAction = "poweroff";
     };
   };
 }

@@ -43,6 +43,7 @@
         };
     };
     
+    # DankBar
     programs.dank-material-shell = 
     {
       settings = 
@@ -91,6 +92,10 @@
             }
           ];
       };
+      
+      # Power menu
+      powerMenuActions = [ "reboot" "poweroff" ];
+      powerMenuDefaultAction = "poweroff";
     };
   };
 }
