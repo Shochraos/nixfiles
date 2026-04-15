@@ -99,29 +99,6 @@
         # USWM
         launchPrefix = "uwsm-app -- ";
         
-        # Top bar
-        barConfigs = 
-        [
-          {
-            id = "default";
-            name = "Main Bar";
-            
-            enabled = true;
-            position = 0;
-            screenPreferences = [ "all" ];
-            
-            spacing = 0;
-            innerPadding = 5;
-            bottomGap = -5;
-            transparency = 0;
-            visible = true;
-            
-            leftWidgets = [ "launcherButton" "workspaceSwitcher" "focusedWindow" ];
-            centerWidgets = [ "music" "clock" "weather" ];
-            rightWidgets = [ "systemTray" "dankKDEConnect" "clipboard" "battery" "cpuUsage" "memUsage" "notificationButton" "simpleAudioControl" "controlCenterButton" ];
-          }
-        ];
-        
         # Lock screen
         loginctlLockIntegration = true;
         lockScreenPowerOffMonitorsOnLock = true;
