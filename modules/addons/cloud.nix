@@ -39,7 +39,7 @@
           khal.type = "discover";
           
           vdirsyncer.enable = true;
-          vdirsyncer.collections = [ "personal" "work" ]; 
+          vdirsyncer.collections = [ "personal" "work" "dozentenplan-hs-fulda" ]; 
           
           remote = {
             type = "caldav";
