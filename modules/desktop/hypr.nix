@@ -113,6 +113,8 @@
           "1, persistent:true"
           "2, persistent:true"
           "3, persistent:true"
+          "4, persistent:true"
+          "5, persistent:true"
         ];
 
         exec-once = [ ];
@@ -127,17 +129,7 @@
           "match:class ^(org.quickshell)$, float on"
           "match:class ^(valent)$, float on"
 
-          "match:class ^(discord)$, workspace 2"
-          "match:class ^(spotify)$, workspace 2"
-
-          "match:class ^(zen-beta)$, workspace 3"
-          "match:class ^(steam)$, workspace 3"
-          "match:class ^(steam)$, match:title ^(Steam Settings)$, float on"
-
           "match:class ^(Discord)$, float on"
-
-          # Arknights Endfield
-          "match:class ^(endfield.exe)$, match:title ^(Form)$, float on, suppress_event maximize fullscreen activatefocus, fullscreen_state 0 0, workspace 3 silent"
         ];
 
         dwindle = {
@@ -201,6 +193,22 @@
         bindm = [
           "$mod, mouse:272, movewindow"
           "$mod, mouse:273, resizewindow"
+        ];
+
+        bindr = [
+          # Discord
+          ", F9, sendshortcut, CTRL SHIFT, M, class:^(discord)$"
+          ", F10, sendshortcut, CTRL SHIFT, D, class:^(discord)$"
+
+          # Spotify
+          ", XF86AudioPrev, exec, playerctl --player=spotify previous"
+          ", XF86AudioPlay, exec, playerctl --player=spotify play-pause"
+          ", XF86AudioNext, exec, playerctl --player=spotify next"
+        ];
+        binde = [
+          # Spotify
+          ", F11, exec, playerctl --player=spotify volume 0.05-"
+          ", F12, exec, playerctl --player=spotify volume 0.05+"
         ];
       };
     };
