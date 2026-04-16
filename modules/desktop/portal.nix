@@ -1,40 +1,35 @@
 { pkgs, ... }:
 {
-  xdg.portal = 
-  {
+  xdg.portal = {
     enable = true;
-    extraPortals = with pkgs; 
-    [
+    extraPortals = with pkgs; [
       xdg-desktop-portal-gtk
     ];
-  
-    config = 
-    {
-      hyprland =
-      {
-        default = [ "hyprland" "gtk" ];
+
+    config = {
+      hyprland = {
+        default = [
+          "hyprland"
+          "gtk"
+        ];
       };
-      common = 
-      {
+      common = {
         default = [ "gtk" ];
       };
     };
   };
-  
-  systemd.user.services.xdg-desktop-portal = 
-  {
+
+  systemd.user.services.xdg-desktop-portal = {
     after = [ "graphical-session.target" ];
     requires = [ "graphical-session.target" ];
   };
-  
-  systemd.user.services.xdg-desktop-portal-hyprland = 
-  {
+
+  systemd.user.services.xdg-desktop-portal-hyprland = {
     after = [ "graphical-session.target" ];
     requires = [ "graphical-session.target" ];
   };
-  
-  systemd.user.services.xdg-desktop-portal-gtk = 
-  {
+
+  systemd.user.services.xdg-desktop-portal-gtk = {
     after = [ "graphical-session.target" ];
     requires = [ "graphical-session.target" ];
   };

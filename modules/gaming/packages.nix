@@ -1,27 +1,22 @@
 { username, pkgs, ... }:
 {
   hardware.xone.enable = true;
-  
-  home-manager.users.${username} =
-  {
-    home.packages = with pkgs;
-    [
+
+  home-manager.users.${username} = {
+    home.packages = with pkgs; [
       samrewritten
       faugus-launcher
     ];
-    
-    xdg.desktopEntries = 
-    {
-      samrewritten =
-      {
+
+    xdg.desktopEntries = {
+      samrewritten = {
         name = "SamRewritten";
         exec = "samrewritten %U";
         terminal = false;
         icon = "${../../assets/icons/samrewritten.png}";
       };
-      
-      ironymodmanager =
-      {
+
+      ironymodmanager = {
         name = "IronyModManager";
         exec = "direnv exec /home/${username}/Applications/ironymodmanager/IronyModManager";
         terminal = false;

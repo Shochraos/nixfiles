@@ -1,12 +1,9 @@
 { username, ... }:
 {
-  home-manager.users.${username} =
-  {
-    programs.mangohud =
-    {
+  home-manager.users.${username} = {
+    programs.mangohud = {
       enable = true;
-      settings =
-      {
+      settings = {
         fps = true;
         fps_limit = 144;
 
@@ -25,8 +22,7 @@
       };
     };
 
-    home.sessionVariables =
-    {
+    home.sessionVariables = {
       MANGOHUD = "1";
     };
   };
