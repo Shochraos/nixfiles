@@ -70,10 +70,25 @@
     home.packages = with pkgs; 
     [
       adw-gtk3
-      
       overpass
       nerd-fonts.overpass
     ];
+    
+    programs.dank-material-shell.settings = 
+    {
+      # Matugen
+      currentThemeName = "dynamic";
+      currentThemeCategory = "dynamic";
+      matugenScheme = "scheme-fidelity";
+      widgetBackgroundColor = "sth";
+      widgetColorMode = "default";
+      
+      # Fonts
+      fontFamily = config.stylix.fonts.sansSerif.name;
+      monoFontFamily = config.stylix.fonts.monospace.name;
+      fontScale = 1;
+      fontWeight = 400;
+    };
     
     dconf.settings = 
     {

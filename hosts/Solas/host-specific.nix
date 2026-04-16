@@ -71,16 +71,20 @@
           {
             id = "default";
             name = "Main Bar";
-            
             enabled = true;
+            visible = true;
             position = 0;
+            bottomGap = -5;
+            innerPadding = 5;
+            spacing = 0;
+            transparency = 0;
             screenPreferences = [ "all" ];
             
-            spacing = 0;
-            innerPadding = 5;
-            bottomGap = -5;
-            transparency = 0;
-            visible = true;
+            borderEnabled = false;
+            widgetOutlineEnabled = true;
+            widgetOutlineColor = "primary";
+            widgetOutlineThickness = 1;
+            widgetOutlineOpacity = 0.35;
             
             leftWidgets = [ "launcherButton" "workspaceSwitcher" "focusedWindow" ];
             centerWidgets = [ "music" "clock" "weather" ];

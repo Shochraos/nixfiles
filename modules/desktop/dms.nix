@@ -1,4 +1,4 @@
-{ inputs, config, username, ... }:
+{ inputs, username, ... }:
 {
   services.displayManager.defaultSession = "hyprland-uwsm";
   services.displayManager.dms-greeter = 
@@ -22,10 +22,7 @@
       inputs.danksearch.homeModules.dsearch
     ];
     
-    xdg.autostart = 
-    {
-      enable = true;
-    };
+    xdg.autostart.enable = true;
     
     programs.dank-material-shell = 
     {
@@ -54,17 +51,6 @@
       
       settings = 
       { 
-        # Matugen
-        currentThemeName = "dynamic";
-        currentThemeCategory = "dynamic";
-        matugenScheme = "scheme-fidelity";
-        
-        # Fonts
-        fontFamily = config.stylix.fonts.sansSerif.name;
-        monoFontFamily = config.stylix.fonts.monospace.name;
-        fontScale = 1;
-        fontWeight = 400;
-        
         # Displays
         hyprlandOutputSettings = 
         {
@@ -92,7 +78,7 @@
         notificationHistoryMaxCount = 20;
         notificationHistoryMaxAgeDays = 1;
         
-        # Spotlight search
+        # Application launcher
         sortAppsAlphabetically = true;
         dankLauncherV2Size = "medium";
         launcherLogoMode = "os";
@@ -106,6 +92,7 @@
       };
     };
     
+    # DankSearch - FuzzyFinder
     programs.dsearch = 
     {
       enable = true;

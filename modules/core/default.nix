@@ -13,5 +13,6 @@
     ./user.nix
     ./zed.nix
     ./zen.nix
+    ./scheduling.nix
   ];
 }
