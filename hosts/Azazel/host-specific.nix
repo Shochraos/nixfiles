@@ -49,7 +49,7 @@
       settings = 
       {
         barConfigs = [
-          {
+          {     
             id = "default";
             name = "Main Bar";
             enabled = true;
@@ -60,7 +60,13 @@
             spacing = 0;
             transparency = 0;
             screenPreferences = [ "all" ];
-      
+            
+            borderEnabled = false;
+            widgetOutlineEnabled = true;
+            widgetOutlineColor = "primary";
+            widgetOutlineThickness = 1;
+            widgetOutlineOpacity = 0.35;
+            
             leftWidgets = 
             [
               { id = "spacer"; enabled = true; size = 5; }
