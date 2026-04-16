@@ -1,16 +1,22 @@
-{ config, username, pkgs, ... }:
 {
-  hardware.graphics =
-  {
+  config,
+  username,
+  pkgs,
+  ...
+}:
+{
+  hardware.graphics = {
     enable = true;
     enable32Bit = true;
   };
-  
-  environment.systemPackages = with pkgs; [ nvidia-vaapi-driver egl-wayland ];
-  services.xserver.videoDrivers = ["nvidia"];
 
-  hardware.nvidia =
-  {
+  environment.systemPackages = with pkgs; [
+    nvidia-vaapi-driver
+    egl-wayland
+  ];
+  services.xserver.videoDrivers = [ "nvidia" ];
+
+  hardware.nvidia = {
     modesetting.enable = true;
     powerManagement.enable = true;
     powerManagement.finegrained = false;
@@ -18,11 +24,9 @@
     nvidiaSettings = false;
     package = config.boot.kernelPackages.nvidiaPackages.stable;
   };
-  
-  home-manager.users.${username} = 
-  {
-    home.sessionVariables = 
-    {
+
+  home-manager.users.${username} = {
+    home.sessionVariables = {
       "LIBVA_DRIVER_NAME" = "nvidia";
       "__GLX_VENDOR_LIBRARY_NAME" = "nvidia";
       "NVD_BACKEND" = "direct";

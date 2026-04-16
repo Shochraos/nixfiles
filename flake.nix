@@ -1,92 +1,91 @@
 {
   description = "Dendritic NixOS Flake";
 
-  inputs =
-    {
-      nixpkgs =
-      {
-        url = "github:NixOS/nixpkgs/nixos-unstable";
-      };
-  
-      home-manager =
-      {
-        url = "github:nix-community/home-manager/";
-        inputs.nixpkgs.follows = "nixpkgs";
-      };
-      
-      dms = 
-      {
-        url = "github:AvengeMedia/DankMaterialShell/";
-        inputs.nixpkgs.follows = "nixpkgs";
-      };
-      
-      dms-plugin-registry = 
-      {
-         url = "github:AvengeMedia/dms-plugin-registry";
-         inputs.nixpkgs.follows = "nixpkgs";
-       };
-      
-      danksearch = 
-      {
-        url = "github:AvengeMedia/danksearch";
-        inputs.nixpkgs.follows = "nixpkgs";
-      };
-      
-      stylix = 
-      {
-        url = "github:nix-community/stylix";
-        inputs.nixpkgs.follows = "nixpkgs";
-      };
-  
-      zen-browser =
-      {
-        url = "github:0xc000022070/zen-browser-flake";
-        inputs.nixpkgs.follows = "nixpkgs";
-      };
-  
-      spicetify-nix = 
-      {
-        url = "github:Gerg-L/spicetify-nix";
-        inputs.nixpkgs.follows = "nixpkgs";
-      };
-      
-      nix-your-shell =
-      {
-        url = "github:MercuryTechnologies/nix-your-shell";
-        inputs.nixpkgs.follows = "nixpkgs";
-      };
-  
-      millennium =
-      {
-        url = "github:SteamClientHomebrew/Millennium?dir=packages/nix"; 
-        inputs.nixpkgs.follows = "nixpkgs";
-      };
+  inputs = {
+    nixpkgs = {
+      url = "github:NixOS/nixpkgs/nixos-unstable";
     };
 
-  outputs = { self, nixpkgs, home-manager, dms, danksearch, dms-plugin-registry, stylix, spicetify-nix, millennium, zen-browser, ... }@inputs: 
-  let
-    system = "x86_64-linux";
-    username = "shochraos";
-  in 
-  {
-    nixosConfigurations = 
-    let 
-      makeSystem = name: nixpkgs.lib.nixosSystem
-      {
-        inherit system;
-        specialArgs = { inherit inputs username; systemname = name;}; 
-        modules = 
-        [
-          home-manager.nixosModules.home-manager
-          stylix.nixosModules.stylix
-          ./hosts/${name}
-        ];
+    nix-cachyos-kernel.url = "github:xddxdd/nix-cachyos-kernel/release";
+
+    home-manager = {
+      url = "github:nix-community/home-manager/";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
-    in
-    {
-      Azazel = makeSystem "Azazel";
-      Belphegor = makeSystem "Belphegor";
-      Solas = makeSystem "Solas";
+
+    dms = {
+      url = "github:AvengeMedia/DankMaterialShell/";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    dms-plugin-registry = {
+      url = "github:AvengeMedia/dms-plugin-registry";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    danksearch = {
+      url = "github:AvengeMedia/danksearch";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    stylix = {
+      url = "github:nix-community/stylix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    zen-browser = {
+      url = "github:0xc000022070/zen-browser-flake";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    spicetify-nix = {
+      url = "github:Gerg-L/spicetify-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    nix-your-shell = {
+      url = "github:MercuryTechnologies/nix-your-shell";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    millennium = {
+      url = "github:SteamClientHomebrew/Millennium?dir=packages/nix";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
   };
+
+  outputs =
+    {
+      nixpkgs,
+      home-manager,
+      stylix,
+      ...
+    }@inputs:
+    let
+      system = "x86_64-linux";
+      username = "shochraos";
+    in
+    {
+      nixosConfigurations =
+        let
+          makeSystem =
+            name:
+            nixpkgs.lib.nixosSystem {
+              inherit system;
+              specialArgs = {
+                inherit inputs username;
+                systemname = name;
+              };
+              modules = [
+                home-manager.nixosModules.home-manager
+                stylix.nixosModules.stylix
+                ./hosts/${name}
+              ];
+            };
+        in
+        {
+          Azazel = makeSystem "Azazel";
+          Solas = makeSystem "Solas";
+        };
+    };
 }

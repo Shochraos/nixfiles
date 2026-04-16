@@ -1,7 +1,6 @@
 { ... }:
 {
-  imports = 
-  [
+  imports = [
     ./audio.nix
     ./boot.nix
     ./fonts.nix

@@ -1,7 +1,6 @@
 { ... }:
 {
-  imports = 
-  [
+  imports = [
     ./lact.nix
     ./mangohud.nix
     ./nvidia.nix

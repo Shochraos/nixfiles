@@ -1,69 +1,58 @@
 { inputs, username, ... }:
 {
   services.displayManager.defaultSession = "hyprland-uwsm";
-  services.displayManager.dms-greeter = 
-  {
+  services.displayManager.dms-greeter = {
     enable = true;
     compositor.name = "hyprland";
     configHome = "/home/${username}";
   };
-  
-  users.users.${username} = 
-  { 
-    extraGroups = [ "greeter" ]; 
+
+  users.users.${username} = {
+    extraGroups = [ "greeter" ];
   };
-  
-  home-manager.users.${username} = 
-  {
-    imports = 
-    [ 
+
+  home-manager.users.${username} = {
+    imports = [
       inputs.dms.homeModules.dank-material-shell
-      inputs.dms-plugin-registry.modules.default 
+      inputs.dms-plugin-registry.modules.default
       inputs.danksearch.homeModules.dsearch
     ];
-    
+
     xdg.autostart.enable = true;
-    
-    programs.dank-material-shell = 
-    {
+
+    programs.dank-material-shell = {
       enable = true;
-      systemd = 
-      {
-          enable = true;
-          restartIfChanged = true;
+      systemd = {
+        enable = true;
+        restartIfChanged = true;
       };
-      
+
       # Core features
-      enableSystemMonitoring = true; 
+      enableSystemMonitoring = true;
       enableDynamicTheming = true;
-      enableVPN = true; 
+      enableVPN = true;
       enableAudioWavelength = false;
-      enableCalendarEvents = true; 
-      
+      enableCalendarEvents = true;
+
       managePluginSettings = true;
-      
-      plugins = 
-      {
+
+      plugins = {
         calculator.enable = true;
         dankKDEConnect.enable = true;
         simpleAudioControl.enable = true;
       };
-      
-      settings = 
-      { 
+
+      settings = {
         # Displays
-        hyprlandOutputSettings = 
-        {
-          "desc:LG Electronics LG TV SSCR2 0x01010101" = 
-          {
+        hyprlandOutputSettings = {
+          "desc:LG Electronics LG TV SSCR2 0x01010101" = {
             bitdepth = 10;
             vrrFullscreenOnly = true;
           };
         };
-        
+
         # Clipboard
-        clipboardSettings = 
-        {
+        clipboardSettings = {
           disabled = false;
           disableHistory = false;
           maxHistory = 25;
@@ -72,29 +61,28 @@
           clearAtStartup = true;
 
         };
-        
+
         # Notifications
         notificationPopupPosition = 3;
         notificationHistoryMaxCount = 20;
         notificationHistoryMaxAgeDays = 1;
-        
+
         # Application launcher
         sortAppsAlphabetically = true;
         dankLauncherV2Size = "medium";
         launcherLogoMode = "os";
-        
+
         # USWM
         launchPrefix = "uwsm-app -- ";
-        
+
         # Lock screen
         loginctlLockIntegration = true;
         lockScreenPowerOffMonitorsOnLock = true;
       };
     };
-    
+
     # DankSearch - FuzzyFinder
-    programs.dsearch = 
-    {
+    programs.dsearch = {
       enable = true;
     };
   };

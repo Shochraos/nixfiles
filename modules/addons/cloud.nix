@@ -1,59 +1,59 @@
-{ pkgs, username, ...}:
+{ pkgs, username, ... }:
 {
-  home-manager.users.${username} =
-  {
-    home.packages = with pkgs; 
-    [     
+  home-manager.users.${username} = {
+    home.packages = with pkgs; [
       nextcloud-client
-      feishin 
+      feishin
     ];
-    
-    xdg.autostart = 
-    {
-      entries = 
-      [
+
+    xdg.autostart = {
+      entries = [
         "${pkgs.nextcloud-client}/share/applications/com.nextcloud.desktopclient.nextcloud.desktop"
       ];
     };
-    
+
     programs.vdirsyncer.enable = true;
     services.vdirsyncer.enable = true;
-    programs.khal = 
-    {
-     enable = true;
-     settings = 
-     {
-       default.default_calendar = "personal";
-     };
+    programs.khal = {
+      enable = true;
+      settings = {
+        default.default_calendar = "personal";
+      };
     };
-  
-    accounts.calendar =
-    {
+
+    accounts.calendar = {
       basePath = ".local/share/calendars";
-      accounts = 
-      {
-        nextcloud = 
-        {
+      accounts = {
+        nextcloud = {
           primary = false;
           khal.enable = true;
           khal.type = "discover";
-          
+
           vdirsyncer.enable = true;
-          vdirsyncer.collections = [ "personal" "work" "stundenplan-hs-fulda" "dozentenplan-hs-fulda" "feiertage" ]; 
-          
+          vdirsyncer.collections = [
+            "personal"
+            "work"
+            "stundenplan-hs-fulda"
+            "dozentenplan-hs-fulda"
+            "feiertage"
+          ];
+
           remote = {
             type = "caldav";
             url = "https://cloud.freunds.me/remote.php/dav/calendars/Shochraos/";
             userName = "Shochraos";
-            passwordCommand = [ "cat" "/home/${username}/nixfiles/local/nextcloud_cal_pass" ];
+            passwordCommand = [
+              "cat"
+              "/home/${username}/nixfiles/local/nextcloud_cal_pass"
+            ];
           };
-          
+
           local = {
             type = "filesystem";
             fileExt = ".ics";
           };
         };
-        };  
       };
+    };
   };
 }
