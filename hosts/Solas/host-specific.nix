@@ -101,7 +101,7 @@
 
         # Power menu
         powerMenuActions = [
-          "suspend "
+          "suspend"
           "reboot"
           "poweroff"
         ];
