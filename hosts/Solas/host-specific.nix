@@ -2,7 +2,7 @@
 {
   services.upower.enable = true;
   services.fwupd.enable = true;
-  
+
   systemd.network.wait-online.enable = false;
 
   hardware.alsa.enablePersistence = true;
@@ -13,7 +13,14 @@
   };
   console.keyMap = "us";
 
-  home-manager.users.${username} = {
+  home-manager.users.${username} =
+  { config, ... }:
+  {
+    xdg.autostart = {
+      entries = [
+        "${config.programs.zed-editor.package}/share/applications/dev.zed.Zed.desktop"
+      ];
+    };
     wayland.windowManager.hyprland = {
       settings = {
         input = {
@@ -24,6 +31,17 @@
             natural_scroll = true;
           };
         };
+
+        workspace = [
+          "1, persistent:true"
+          "2, persistent:true"
+          "3, persistent:true"
+        ];
+
+        windowrule = [
+          "match:class ^(zen-beta)$, workspace 3 silent"
+          "match:class ^(dev.zed.Zed)$, workspace 2 silent"
+        ];
 
         gesture = [
           "3, horizontal, workspace"
@@ -55,7 +73,6 @@
 
     programs.dank-material-shell = {
       settings = {
-        # DankBar
         barConfigs = [
           {
             id = "default";
@@ -76,25 +93,95 @@
             widgetOutlineOpacity = 0.35;
 
             leftWidgets = [
-              "launcherButton"
-              "workspaceSwitcher"
-              "focusedWindow"
+              {
+                id = "spacer";
+                enabled = true;
+                size = 5;
+              }
+              {
+                id = "clock";
+                enabled = true;
+              }
+              {
+                id = "spacer";
+                enabled = true;
+                size = 15;
+              }
+              {
+                id = "workspaceSwitcher";
+                enabled = true;
+              }
+              {
+                id = "runningApps";
+                enabled = true;
+              }
             ];
+
             centerWidgets = [
-              "music"
-              "clock"
-              "weather"
+              {
+                id = "focusedWindow";
+                enabled = true;
+              }
             ];
+
             rightWidgets = [
-              "systemTray"
-              "dankKDEConnect"
-              "clipboard"
-              "battery"
-              "cpuUsage"
-              "memUsage"
-              "notificationButton"
-              "simpleAudioControl"
-              "controlCenterButton"
+              {
+                id = "notificationButton";
+                enabled = true;
+              }
+              {
+                id = "clipboard";
+                enabled = true;
+              }
+              {
+                id = "dankKDEConnect";
+                enabled = true;
+              }
+              {
+                id = "spacer";
+                enabled = true;
+                size = 15;
+              }
+              {
+                id = "battery";
+                enabled = true;
+              }
+              {
+                id = "cpuUsage";
+                enabled = true;
+                minimumWidth = true;
+              }
+              {
+                id = "cpuTemp";
+                enabled = true;
+                minimumWidth = true;
+              }
+              {
+                id = "network_speed_monitor";
+                enabled = true;
+              }
+              {
+                id = "spacer";
+                enabled = true;
+                size = 15;
+              }
+              {
+                id = "systemTray";
+                enabled = true;
+              }
+              {
+                id = "simpleAudioControl";
+                enabled = true;
+              }
+              {
+                id = "controlCenterButton";
+                enabled = true;
+              }
+              {
+                id = "spacer";
+                enabled = true;
+                size = 5;
+              }
             ];
           }
         ];
