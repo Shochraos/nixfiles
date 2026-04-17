@@ -18,6 +18,14 @@
         };
       };
 
+      matchBlocks."private-cloud.informatik.hs-fulda.de" = {
+        forwardAgent = true;
+        extraOptions = {
+          AddKeysToAgent = "yes";
+          IdentityFile = "/home/${username}/.ssh/openstack-uni";
+        };
+      };
+      
       matchBlocks."git-ce.rwth-aachen.de" = {
         forwardAgent = true;
         extraOptions = {
