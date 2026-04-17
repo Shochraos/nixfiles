@@ -115,16 +115,11 @@
                 id = "runningApps";
                 enabled = true;
               }
-            ];
-
-            centerWidgets = [
               {
-                id = "focusedWindow";
+                id = "spacer";
                 enabled = true;
+                size = 15;
               }
-            ];
-
-            rightWidgets = [
               {
                 id = "notificationButton";
                 enabled = true;
@@ -137,11 +132,16 @@
                 id = "dankKDEConnect";
                 enabled = true;
               }
+            ];
+
+            centerWidgets = [
               {
-                id = "spacer";
+                id = "focusedWindow";
                 enabled = true;
-                size = 15;
               }
+            ];
+
+            rightWidgets = [
               {
                 id = "battery";
                 enabled = true;
@@ -158,6 +158,10 @@
               }
               {
                 id = "network_speed_monitor";
+                enabled = true;
+              }
+              {
+                id = "vpn";
                 enabled = true;
               }
               {
