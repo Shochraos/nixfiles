@@ -39,6 +39,14 @@
             no_hardware_cursors = true;
           };
 
+          workspace = [
+            "1, persistent:true"
+            "2, persistent:true"
+            "3, persistent:true"
+            "4, persistent:true"
+            "5, persistent:true"
+          ];
+          
           windowrule = [
             "match:class ^(zen-beta)$, workspace 2 silent"
             "match:class ^(dev.zed.Zed)$, workspace 3 silent"
