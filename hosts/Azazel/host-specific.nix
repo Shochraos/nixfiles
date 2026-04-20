@@ -4,12 +4,6 @@
   ...
 }:
 {
-  services.xserver.xkb = {
-    layout = "de";
-    variant = "";
-  };
-  console.keyMap = "de";
-
   home-manager.users.${username} =
     { config, ... }:
     {
@@ -29,8 +23,8 @@
       wayland.windowManager.hyprland = {
         settings = {
           input = {
-            kb_layout = "de";
-            kb_variant = "nodeadkeys";
+            kb_layout = "us";
+            kb_variant = "altgr-intl";
 
             accel_profile = "flat";
           };

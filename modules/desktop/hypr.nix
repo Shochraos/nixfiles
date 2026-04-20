@@ -193,9 +193,9 @@
           ", F10, sendshortcut, CTRL SHIFT, D, class:^(discord)$"
 
           # Spotify
-          ", XF86AudioPrev, exec, playerctl --player=spotify previous"
-          ", XF86AudioPlay, exec, playerctl --player=spotify play-pause"
-          ", XF86AudioNext, exec, playerctl --player=spotify next"
+          ", F1, exec, playerctl --player=spotify previous"
+          ", F2, exec, playerctl --player=spotify play-pause"
+          ", F3, exec, playerctl --player=spotify next"
         ];
         binde = [
           # Spotify

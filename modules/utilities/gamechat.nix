@@ -19,10 +19,10 @@ in
 
   home-manager.users.${username} = {
     wayland.windowManager.hyprland.settings = {
-      bind = [
-        ", XF86AudioRaiseVolume, exec, ${gamechat_game}"
-        ", XF86AudioLowerVolume, exec, ${gamechat_chat}"
-        ", XF86AudioMute, exec, ${gamechat_reset}"
+      bindr = [
+        ", F5, exec, ${gamechat_game}"
+        ", F6, exec, ${gamechat_chat}"
+        ", F7, exec, ${gamechat_reset}"
       ];
     };
 
