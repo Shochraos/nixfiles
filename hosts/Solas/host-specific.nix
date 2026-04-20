@@ -7,12 +7,6 @@
 
   hardware.alsa.enablePersistence = true;
 
-  services.xserver.xkb = {
-    layout = "us";
-    variant = "altgr-intl";
-  };
-  console.keyMap = "us";
-
   home-manager.users.${username} =
   { config, ... }:
   {
