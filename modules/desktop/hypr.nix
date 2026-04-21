@@ -78,7 +78,7 @@
         misc = {
           middle_click_paste = false;
 
-          mouse_move_enables_dpms = true;
+          mouse_move_enables_dpms = false;
           key_press_enables_dpms = true;
 
           disable_hyprland_logo = true;
