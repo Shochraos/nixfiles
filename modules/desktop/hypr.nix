@@ -122,6 +122,7 @@
           "match:class ^(valent)$, float on"
 
           "match:class ^(Discord)$, float on"
+          "match:class ^(com.nextcloud.desktopclient.nextcloud)$, float on"
         ];
 
         dwindle = {
@@ -153,6 +154,7 @@
           "$mod, T, exec, gnome-text-editor"
           "$mod, Q, killactive"
           "$mod CTRL, F, fullscreen, 0"
+          "$mod ALT, F, togglefloating"
 
           "$mod, left, movefocus, l"
           "$mod, right, movefocus, r"
