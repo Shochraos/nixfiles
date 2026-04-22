@@ -49,8 +49,8 @@
         nix-shell = "nix-your-shell fish nix-shell -- $argv";
         nix-develop = "nix-your-shell fish nix-develop -- $argv";
 
-        rebuild = "nh os switch --ask path:/home/${username}/nixfiles -H ${systemname}";
-        update = "nh os switch -u --ask path:/home/${username}/nixfiles -H ${systemname}";
+        rebuild = "nh os switch --ask path:/home/${username}/Repositories/nixfiles -H ${systemname}";
+        update = "nh os switch -u --ask path:/home/${username}/Repositories/nixfiles -H ${systemname}";
 
         copy = "dms cl copy $argv";
         paste = "dms cl paste";
