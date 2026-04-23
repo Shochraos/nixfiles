@@ -24,7 +24,7 @@
                 name = "Qwen 3.6 35B Local";
                 limit = {
                   context = 49152;
-                  output = 4096;
+                  output = 8192;
                 };
               };
             };
