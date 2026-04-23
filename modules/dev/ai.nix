@@ -23,7 +23,7 @@
               "qwen3.6" = {
                 name = "Qwen 3.6 35B Local";
                 limit = {
-                  context = 32768;
+                  context = 49152;
                   output = 4096;
                 };
               };
@@ -43,7 +43,7 @@
             Type = "simple";
             ExecStart = "${
               (pkgs.llama-cpp.override { cudaSupport = true; })
-            }/bin/llama-server --model ${config.home.homeDirectory}/Models/Qwen3.6-35B-A3B-UD-IQ4_NL_XL.gguf --port 8081 -ngl 99 -ctk q8_0 -ctv q8_0 -c 32768";
+            }/bin/llama-server --model ${config.home.homeDirectory}/Models/Qwen3.6-35B-A3B-UD-IQ4_NL_XL.gguf --port 8081 -ngl 99 -ctk q8_0 -ctv q8_0 -c 49152";
             Restart = "on-failure";
             RestartSec = 5;
           };
