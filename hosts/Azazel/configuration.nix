@@ -6,8 +6,10 @@
     ../../modules/desktop
 
     ../../modules/gaming
-    ../../modules/dev
-
+    
+    ../../modules/dev/ai.nix
+    ../../modules/dev/virtualization.nix  
+    
     ../../modules/addons/bluetooth.nix
     ../../modules/addons/cloud.nix
     ../../modules/addons/common-packages.nix
