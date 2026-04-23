@@ -5,7 +5,7 @@
     ../../modules/nix
     ../../modules/desktop
 
-    ../../modules/dev
+    ../../modules/dev/virtualization.nix  
 
     ../../modules/addons/bluetooth.nix
     ../../modules/addons/fprint.nix
