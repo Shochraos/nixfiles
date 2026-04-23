@@ -18,7 +18,9 @@
     Persistent = true;
   };
 
-  nixpkgs.config.allowUnfree = true;
+  nixpkgs.config = {
+    allowUnfree = true;
+  };
 
   system.stateVersion = "25.05";
 
