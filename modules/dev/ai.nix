@@ -6,6 +6,7 @@
       home.packages = with pkgs; [
         gemini-cli
         opencode
+        (pkgs.llama-cpp.override { cudaSupport = true; })
       ];
 
       xdg.configFile."opencode/opencode.json".text = builtins.toJSON {
@@ -23,8 +24,8 @@
               "qwen3.6" = {
                 name = "Qwen 3.6 35B Local";
                 limit = {
-                  context = 49152;
-                  output = 8192;
+                  context = 262144;
+                  output = 32768;
                 };
               };
             };
@@ -43,8 +44,8 @@
             Type = "simple";
             ExecStart = "${
               (pkgs.llama-cpp.override { cudaSupport = true; })
-            }/bin/llama-server --model ${config.home.homeDirectory}/Models/Qwen3.6-35B-A3B-UD-IQ4_NL_XL.gguf --port 8081 -ngl 99 -ctk q8_0 -ctv q8_0 -c 49152";
-            Restart = "on-failure";
+              }/bin/llama-server --model ${config.home.homeDirectory}/Models/Qwen3.6-35B-A3B-UD-Q5_K_XL.gguf --port 8081 --jinja -ctk q8_0 -ctv q8_0 -c 262144 -n 32768 --temp 0.6 --top-p 0.95 --top-k 20 --presence-penalty 0.0 --min-p 0.0";            
+              Restart = "on-failure";
             RestartSec = 5;
           };
         };
