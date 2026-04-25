@@ -22,6 +22,7 @@
       homeDirectory = "/home/${username}";
       packages = with pkgs; [
         nix-your-shell
+        
         eza
         fd
         btop
