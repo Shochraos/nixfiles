@@ -48,6 +48,12 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    nix-index-database = {
+      url = "github:nix-community/nix-index-database";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+
     millennium = {
       url = "github:SteamClientHomebrew/Millennium?dir=packages/nix";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -59,6 +65,7 @@
       nixpkgs,
       home-manager,
       stylix,
+      nix-index-database,
       ...
     }@inputs:
     let
