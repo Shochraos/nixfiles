@@ -19,7 +19,6 @@
   environment.systemPackages = with pkgs; [
     # Gnome utils
     nautilus
-    impression
     gnome-text-editor
     loupe
     evince
