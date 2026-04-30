@@ -51,6 +51,9 @@
 
             # Arknights Endfield
             "match:class ^(endfield.exe)$, match:title ^(Form)$, float on, suppress_event maximize fullscreen activatefocus, fullscreen_state 0 0, workspace 3 silent"
+            
+            #Stardew Valley
+            "match:class ^(XTerm)$, float on"
           ];
         };
       };
