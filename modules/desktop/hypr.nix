@@ -190,18 +190,18 @@
 
         bindr = [
           # Discord
-          ", F9, sendshortcut, CTRL SHIFT, M, class:^(discord)$"
-          ", F10, sendshortcut, CTRL SHIFT, D, class:^(discord)$"
+          ", code:199, sendshortcut, CTRL SHIFT, M, class:^(discord)$"
+          ", code:200, sendshortcut, CTRL SHIFT, D, class:^(discord)$"
 
           # Spotify
-          ", F1, exec, playerctl --player=spotify previous"
-          ", F2, exec, playerctl --player=spotify play-pause"
-          ", F3, exec, playerctl --player=spotify next"
+          ", code:191, exec, playerctl --player=spotify previous"
+          ", code:192, exec, playerctl --player=spotify play-pause"
+          ", code:193, exec, playerctl --player=spotify next"
         ];
         binde = [
           # Spotify
-          ", F11, exec, playerctl --player=spotify volume 0.05-"
-          ", F12, exec, playerctl --player=spotify volume 0.05+"
+          ", code:201, exec, playerctl --player=spotify volume 0.05-"
+          ", code:202, exec, playerctl --player=spotify volume 0.05+"
         ];
       };
     };
