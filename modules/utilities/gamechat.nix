@@ -20,9 +20,9 @@ in
   home-manager.users.${username} = {
     wayland.windowManager.hyprland.settings = {
       bindr = [
-        ", F5, exec, ${gamechat_game}"
-        ", F6, exec, ${gamechat_chat}"
-        ", F7, exec, ${gamechat_reset}"
+        ", code:195, exec, ${gamechat_game}"
+        ", code:196, exec, ${gamechat_chat}"
+        ", code:197, exec, ${gamechat_reset}"
       ];
     };
 
