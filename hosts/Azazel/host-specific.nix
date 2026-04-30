@@ -19,7 +19,7 @@
           "${config.programs.zed-editor.package}/share/applications/dev.zed.Zed.desktop"
         ];
       };
-
+      
       wayland.windowManager.hyprland = {
         settings = {
           input = {
@@ -40,7 +40,7 @@
             "4, persistent:true"
             "5, persistent:true"
           ];
-          
+
           windowrule = [
             "match:class ^(zen-beta)$, workspace 2 silent"
             "match:class ^(dev.zed.Zed)$, workspace 3 silent"
@@ -51,7 +51,7 @@
 
             # Arknights Endfield
             "match:class ^(endfield.exe)$, match:title ^(Form)$, float on, suppress_event maximize fullscreen activatefocus, fullscreen_state 0 0, workspace 3 silent"
-            
+
             #Stardew Valley
             "match:class ^(XTerm)$, float on"
           ];
