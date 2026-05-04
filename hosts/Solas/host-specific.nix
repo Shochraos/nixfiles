@@ -1,4 +1,4 @@
-{ username, ... }:
+{ pkgs, username, ... }:
 {
   services.upower.enable = true;
   services.fwupd.enable = true;
@@ -10,6 +10,11 @@
   home-manager.users.${username} =
   { config, ... }:
   {
+    home.packages = with pkgs;
+    [
+      pdfpc
+    ];
+    
     xdg.autostart = {
       entries = [
         "${config.programs.zed-editor.package}/share/applications/dev.zed.Zed.desktop"
@@ -35,6 +40,7 @@
         windowrule = [
           "match:class ^(zen-beta)$, workspace 3 silent"
           "match:class ^(dev.zed.Zed)$, workspace 2 silent"
+          "match:class ^(pdfpc)$, match:fullscreen_state_internal 0, fullscreen on"
         ];
 
         gesture = [
