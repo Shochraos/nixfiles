@@ -6,5 +6,6 @@
     ./nvidia.nix
     ./packages.nix
     ./steam.nix
+    ./sunshine.nix
   ];
 }
