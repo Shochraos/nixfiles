@@ -3,7 +3,7 @@
   username,
   ...
 }:
-{
+{ 
   home-manager.users.${username} =
     { config, ... }:
     {
