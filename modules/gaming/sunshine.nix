@@ -26,6 +26,12 @@ in
         }
       ];
     };
+
+    settings = { 
+      "nvenc_preset" = 7;
+      "nvenc_twopass" = "full_res";
+      "nvenc_spatial_aq" = "enabled";
+    };
   };
 
   home-manager.users.${username} = {
