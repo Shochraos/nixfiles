@@ -61,7 +61,7 @@
           clearAtStartup = true;
 
         };
-
+        
         # Notifications
         notificationPopupPosition = 3;
         notificationHistoryMaxCount = 20;

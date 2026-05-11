@@ -76,6 +76,8 @@
       widgetBackgroundColor = "sth";
       widgetColorMode = "default";
 
+      popupTransparency = 0.2;
+      
       # Fonts
       fontFamily = config.stylix.fonts.sansSerif.name;
       monoFontFamily = config.stylix.fonts.monospace.name;
