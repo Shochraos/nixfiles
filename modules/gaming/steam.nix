@@ -16,7 +16,6 @@
 
   home-manager.users.${username} = {
     home.sessionVariables = {
-      #PROTON_ENABLE_WAYLAND = "1";
       PROTON_USE_NTSYNC = "1";
       PROTON_DLSS_UPGRADE = "1";
     };
