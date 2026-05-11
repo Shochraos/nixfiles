@@ -1,9 +1,13 @@
 { pkgs, username, ... }:
+let
+  nocturne = pkgs.callPackage ../../packages/nocturne { };
+in
 {
   home-manager.users.${username} = {
     home.packages = with pkgs; [
       nextcloud-client
       feishin
+      nocturne
     ];
 
     xdg.autostart = {
