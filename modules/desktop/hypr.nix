@@ -99,6 +99,21 @@
           active_opacity = 1.0;
           inactive_opacity = 1.0;
 
+          blur = {
+              enabled = true;
+              size = 2;
+              passes = 4;
+      
+              ignore_opacity = true;
+              new_optimizations = true;
+              xray = false;
+      
+              noise = 0.02;
+              contrast = 1.1;
+              vibrancy = 0.2;
+              vibrancy_darkness = 0.3;
+          };
+          
           shadow = {
             enabled = true;
             range = 30;
@@ -111,7 +126,9 @@
         exec-once = [ ];
 
         layerrule = [
-          "match:class ^(dms)$, no_anim on"
+          "no_anim on, match:namespace ^(dms.*)$"
+          "blur on, match:namespace ^(dms.*)$"
+          "ignore_alpha 0, match:namespace ^(dms.*)$"
         ];
 
         windowrule = [
