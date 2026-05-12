@@ -126,7 +126,7 @@
         exec-once = [ ];
 
         layerrule = [
-          "no_anim on, match:namespace ^(dms.*)$"
+          "animation windows, match:namespace ^(dms.*)$"
           "blur on, match:namespace ^(dms.*)$"
           "ignore_alpha 0, match:namespace ^(dms.*)$"
         ];
@@ -149,11 +149,13 @@
         bezier = [
           "easeOutSine, 0.61, 1, 0.88, 1"
           "easeInOutSine, 0.37, 0, 0.63, 1"
+          "dmsMenuCurve, 0.05, 0.9, 0.1, 1.05"
         ];
 
         animation = [
           "windows, 1, 2, easeOutSine, slide"
           "workspaces, 1, 2, easeInOutSine, slidevert"
+          "layers, 1, 4, dmsMenuCurve, fade"
         ];
 
         source = [
