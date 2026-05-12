@@ -77,6 +77,13 @@
       widgetColorMode = "default";
 
       popupTransparency = 0.2;
+
+      animationSpeed = 0;
+      syncComponentAnimationSpeeds = false;
+      popoutAnimationSpeed = 0;
+      modalAnimationSpeed = 0;
+
+      modalDarkenBackground = true;
       
       # Fonts
       fontFamily = config.stylix.fonts.sansSerif.name;
