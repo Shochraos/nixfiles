@@ -98,7 +98,7 @@
 
           active_opacity = 1.0;
           inactive_opacity = 1.0;
-
+          
           blur = {
               enabled = true;
               size = 2;
@@ -117,8 +117,7 @@
           shadow = {
             enabled = true;
             range = 30;
-            render_power = 5;
-
+            render_power = 3;
             offset = "0 5";
           };
         };
@@ -126,9 +125,14 @@
         exec-once = [ ];
 
         layerrule = [
-          "animation windows, match:namespace ^(dms.*)$"
+          #Blur
           "blur on, match:namespace ^(dms.*)$"
           "ignore_alpha 0, match:namespace ^(dms.*)$"
+
+          #Animations
+          "no_anim on, match:namespace ^(dms:bar)$"
+          "animation slide top, match:namespace ^(dms:(app-launcher|control-center|clipboard-popout|battery|vpn|dash|notification-center-popout|process-list-popout|popout|plugins:*|plugins:plugin))$"
+          "animation popin 80%, match:namespace ^(dms:(clipboard|file-browser|settings|spotlight|bluetooth-pairing|color-picker|hyprkeybinds|network-info|network-info-wired|notification-center-modal|polkit|power-menu|process-list-modal|wifi-password|confirm-modal|modal))$"
         ];
 
         windowrule = [
@@ -147,15 +151,15 @@
         };
 
         bezier = [
-          "easeOutSine, 0.61, 1, 0.88, 1"
-          "easeInOutSine, 0.37, 0, 0.63, 1"
-          "dmsMenuCurve, 0.05, 0.9, 0.1, 1.05"
+          "fastInSlowOut, 0.61, 1, 0.88, 1"
+          "fastInFastOut, 0.37, 0, 0.63, 1"
+          "fastInSlowBounce, 0.05, 0.9, 0.1, 1.05"
         ];
 
         animation = [
-          "windows, 1, 2, easeOutSine, slide"
-          "workspaces, 1, 2, easeInOutSine, slidevert"
-          "layers, 1, 4, dmsMenuCurve, fade"
+          "windows, 1, 2.5, fastInSlowOut, slide"
+          "workspaces, 1, 2.5, fastInFastOut, slidevert"
+          "layers, 1, 2.5, fastInSlowBounce, fade"
         ];
 
         source = [
