@@ -7,6 +7,8 @@
     configHome = "/home/${username}";
   };
 
+  services.accounts-daemon.enable = true;
+
   users.users.${username} = {
     extraGroups = [ "greeter" ];
   };
@@ -61,7 +63,7 @@
           clearAtStartup = true;
 
         };
-        
+
         # Notifications
         notificationPopupPosition = 3;
         notificationHistoryMaxCount = 20;
