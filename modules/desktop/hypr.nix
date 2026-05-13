@@ -98,22 +98,22 @@
 
           active_opacity = 1.0;
           inactive_opacity = 1.0;
-          
+
           blur = {
               enabled = true;
               size = 2;
               passes = 4;
-      
+
               ignore_opacity = true;
               new_optimizations = true;
               xray = false;
-      
+
               noise = 0.02;
               contrast = 1.1;
               vibrancy = 0.2;
               vibrancy_darkness = 0.3;
           };
-          
+
           shadow = {
             enabled = true;
             range = 30;
@@ -151,15 +151,15 @@
         };
 
         bezier = [
-          "fastInSlowOut, 0.61, 1, 0.88, 1"
-          "fastInFastOut, 0.37, 0, 0.63, 1"
-          "fastInSlowBounce, 0.05, 0.9, 0.1, 1.05"
+          "curveWindow, 0.61, 1, 0.88, 1"
+          "curveWorkspace, 0.25, 1, 0.5, 1"
+          "curveMenu, 0.05, 0.9, 0.1, 1.05"
         ];
 
         animation = [
-          "windows, 1, 2.5, fastInSlowOut, slide"
-          "workspaces, 1, 2.5, fastInFastOut, slidevert"
-          "layers, 1, 3, fastInSlowBounce, fade"
+          "windows, 1, 2.5, curveWindow, slide"
+          "workspaces, 1, 2.5, curveWorkspace, slidevert"
+          "layers, 1, 2.5, curveMenu, popin 80%"
         ];
 
         source = [
