@@ -131,7 +131,7 @@
 
           #Animations
           "no_anim on, match:namespace ^(dms:bar)$"
-          "animation slide top, match:namespace ^(dms:(app-launcher|control-center|clipboard-popout|battery|vpn|dash|notification-center-popout|process-list-popout|popout|plugins:*|plugins:plugin))$"
+          "animation slide top, match:namespace ^(dms:(app-launcher|control-center|clipboard-popout|battery|vpn|dash|notification-center-popout|process-list-popout|popout|plugins:.*|plugins:plugin))$"
           "animation popin 80%, match:namespace ^(dms:(clipboard|file-browser|settings|spotlight|bluetooth-pairing|color-picker|hyprkeybinds|network-info|network-info-wired|notification-center-modal|polkit|power-menu|process-list-modal|wifi-password|confirm-modal|modal))$"
         ];
 
