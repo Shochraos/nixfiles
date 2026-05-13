@@ -49,6 +49,8 @@
 
         gestures = {
           workspace_swipe_invert = true;
+          workspace_swipe_distance = 150;
+          workspace_swipe_cancel_ratio = 0.5;
         };
 
         bindl = [
