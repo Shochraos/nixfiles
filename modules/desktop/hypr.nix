@@ -159,7 +159,7 @@
         animation = [
           "windows, 1, 2.5, fastInSlowOut, slide"
           "workspaces, 1, 2.5, fastInFastOut, slidevert"
-          "layers, 1, 2.5, fastInSlowBounce, fade"
+          "layers, 1, 3, fastInSlowBounce, fade"
         ];
 
         source = [
