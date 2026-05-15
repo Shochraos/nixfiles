@@ -58,11 +58,12 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-
     millennium = {
       url = "github:SteamClientHomebrew/Millennium?dir=packages/nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    nix-proton-cachyos.url = "github:Shochraos/nix-proton-cachyos";
   };
 
   outputs =
