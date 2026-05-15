@@ -26,14 +26,14 @@
                 command = [ "nixfmt" ];
               };
               nixpkgs = {
-                expr = "import (builtins.getFlake \"/home/${username}/nixfiles\").inputs.nixpkgs";
+                expr = "import (builtins.getFlake \"/home/${username}/Repositories/nixfiles\").inputs.nixpkgs";
               };
               options = {
                 nixos = {
-                  expr = "(builtins.getFlake \"/home/${username}/nixfiles\").nixosConfigurations.${systemname}.options";
+                  expr = "(builtins.getFlake \"/home/${username}/Repositories/nixfiles\").nixosConfigurations.${systemname}.options";
                 };
                 home-manager = {
-                  expr = "(builtins.getFlake \"/home/${username}/nixfiles\").nixosConfigurations.${systemname}.options.home-manager.users.type.getSubOptions []";
+                  expr = "(builtins.getFlake \"/home/${username}/Repositories/nixfiles\").nixosConfigurations.${systemname}.options.home-manager.users.type.getSubOptions []";
                 };
               };
             };
