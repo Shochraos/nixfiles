@@ -11,7 +11,7 @@
   home-manager.users.${username} = {
     programs.zed-editor = {
       enable = true;
-      extensions = [ "nix" ];
+      extensions = [ "nix" "csv" ];
       extraPackages = with pkgs; [ nixd ];
       userSettings = {
         theme = {
