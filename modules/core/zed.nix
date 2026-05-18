@@ -46,7 +46,7 @@
           metrics = false;
         };
 
-        load_direnv = "shell_hook";
+        load_direnv = "direct";
         base_keymap = "VSCode";
 
         vim_mode = false;
