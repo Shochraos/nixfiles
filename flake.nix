@@ -59,8 +59,7 @@
     };
 
     millennium = {
-      url = "github:SteamClientHomebrew/Millennium?dir=packages/nix";
-      inputs.nixpkgs.follows = "nixpkgs";
+      url = "github:SteamClientHomebrew/Millennium/next?dir=packages/nix";
     };
 
     nix-proton-cachyos.url = "github:Shochraos/nix-proton-cachyos";
@@ -71,7 +70,6 @@
       nixpkgs,
       home-manager,
       stylix,
-      nix-index-database,
       ...
     }@inputs:
     let
