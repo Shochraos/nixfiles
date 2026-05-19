@@ -9,4 +9,4 @@ output_path = '~/.config/Vencord/themes/matugen.css'
 
 [templates.steam]
 input_path = '~/Repositories/nixfiles/assets/templates/steam.css'
-output_path = '~/.steam/steam/steamui/skins/Adwaita-for-Steam/millennium/millennium.css'
+output_path = '~/.steam/steam/millennium/themes/Adwaita-for-Steam/millennium/millennium.css'
