@@ -145,64 +145,6 @@
           "~/.config/hypr/dms/outputs.conf"
           "~/.config/hypr/dms/cursor.conf"
         ];
-
-        "$mod" = "SUPER";
-        bind = [
-          "$mod, Return, exec, ghostty"
-          "$mod, F, exec, nautilus"
-          "$mod, T, exec, gnome-text-editor"
-          "$mod, Q, killactive"
-          "$mod CTRL, F, fullscreen, 0"
-          "$mod ALT, F, togglefloating"
-
-          "$mod, left, movefocus, l"
-          "$mod, right, movefocus, r"
-          "$mod, up, movefocus, u"
-          "$mod, down, movefocus, d"
-
-          "$mod SHIFT, left, movewindow, l"
-          "$mod SHIFT, right, movewindow, r"
-          "$mod SHIFT, up, movewindow, u"
-          "$mod SHIFT, down, movewindow, d"
-
-          "$mod CTRL, left, workspace, m-1"
-          "$mod CTRL, right, workspace, m+1"
-
-          "$mod CTRL SHIFT, left, movetoworkspace, -1"
-          "$mod CTRL SHIFT, right, movetoworkspace, +1"
-
-          # DMS binds
-          "$mod, L, exec, dms ipc call lock lock"
-
-          ", PRINT, exec, dms screenshot --no-file"
-          "$mod, PRINT, exec, dms screenshot"
-
-          "$mod, Space, exec, dms ipc call spotlight toggle"
-          "$mod, V, exec, dms ipc call clipboard toggle"
-          "$mod, M, exec, dms ipc call processlist focusOrToggle"
-          "$mod, N, exec, dms ipc call notifications toggle"
-          "$mod, TAB, exec, dms ipc call hypr toggleOverview"
-        ];
-        bindm = [
-          "$mod, mouse:272, movewindow"
-          "$mod, mouse:273, resizewindow"
-        ];
-
-        bindr = [
-          # Discord
-          ", code:199, sendshortcut, CTRL SHIFT, M, class:^(discord)$"
-          ", code:200, sendshortcut, CTRL SHIFT, D, class:^(discord)$"
-
-          # Spotify
-          ", code:191, exec, playerctl --player=spotify previous"
-          ", code:192, exec, playerctl --player=spotify play-pause"
-          ", code:193, exec, playerctl --player=spotify next"
-        ];
-        binde = [
-          # Spotify
-          ", code:201, exec, playerctl --player=spotify volume 0.05-"
-          ", code:202, exec, playerctl --player=spotify volume 0.05+"
-        ];
       };
     };
   };

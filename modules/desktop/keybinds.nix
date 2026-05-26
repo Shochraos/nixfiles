@@ -8,7 +8,7 @@ let
 in
 {
   home-manager.users.${username} =
-    { config, ... }:
+    { config, pkgs, ... }:
     {
       wayland.windowManager.hyprland = {
         bind = [
@@ -255,6 +255,15 @@ in
               "code:197"
               (lua "hl.dsp.exec_cmd(\"gamechat_reset\")")
               { release = true; }
+            ];
+          }
+        ]
+        ++ lib.optionals (config.modules.lgtv.isLoaded or false) [
+          {
+            _args = [
+              "SUPER ALT, Home"
+              (lua "hl.dsp.exec_cmd(\"sudo ${pkgs.systemd}/bin/systemctl start wol-lgtv.service\")")
+              { locked = true; }
             ];
           }
         ];
