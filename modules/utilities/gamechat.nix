@@ -1,4 +1,9 @@
-{ pkgs, username, ... }:
+{
+  pkgs,
+  lib,
+  username,
+  ...
+}:
 let
   gamechat_mix = pkgs.writeShellScript "gamechat_mix.sh" (
     builtins.readFile ../../assets/scripts/gamechat_mix.sh
@@ -14,32 +19,35 @@ let
   );
 in
 {
-  services.pipewire.pulse.enable = true;
-  environment.systemPackages = with pkgs; [ pulseaudio ];
+  options.modules.gamechat.isLoaded = lib.mkOption {
+    type = lib.types.bool;
+    default = true;
+  };
+  config = {
+    services.pipewire.pulse.enable = true;
+    environment.systemPackages = with pkgs; [
+      pulseaudio
+      gamechat_chat
+      gamechat_game
+      gamechat_reset
+    ];
 
-  home-manager.users.${username} = {
-    wayland.windowManager.hyprland.settings = {
-      bindr = [
-        ", code:195, exec, ${gamechat_game}"
-        ", code:196, exec, ${gamechat_chat}"
-        ", code:197, exec, ${gamechat_reset}"
-      ];
-    };
+    home-manager.users.${username} = {
+      systemd.user.services.gamechat-mix = {
+        Unit = {
+          Description = "Dynamically sorts audio streams into sinks to independently manage volume";
+          PartOf = [ "graphical-session.target" ];
+        };
 
-    systemd.user.services.gamechat-mix = {
-      Unit = {
-        Description = "Dynamically sorts audio streams into sinks to independently manage volume";
-        PartOf = [ "graphical-session.target" ];
-      };
+        Service = {
+          Type = "simple";
+          ExecStart = "${gamechat_mix}/bin/gamechat_mix";
+          Restart = "always";
+        };
 
-      Service = {
-        Type = "simple";
-        ExecStart = "${gamechat_mix}";
-        Restart = "always";
-      };
-
-      Install = {
-        WantedBy = [ "graphical-session.target" ];
+        Install = {
+          WantedBy = [ "graphical-session.target" ];
+        };
       };
     };
   };
