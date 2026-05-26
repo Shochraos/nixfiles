@@ -43,13 +43,13 @@ let
 in
 stdenv.mkDerivation (finalAttrs: {
   pname = "nocturne";
-  version = "1.0.1";
+  version = "1.2.0";
 
   src = fetchFromGitHub {
     owner = "Jeffser";
     repo = "Nocturne";
     tag = finalAttrs.version;
-    hash = "sha256-nW8DCziEERN6xamT+eS6eGTnoNWG6OTdgLb4E2FIzXQ=";
+    hash = "sha256-ycoparYMzM2P5uz4H5FBNhYgFP/BCj6oVAk2QOEIcMA=";
   };
 
   nativeBuildInputs = [
