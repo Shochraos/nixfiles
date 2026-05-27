@@ -2,6 +2,7 @@
   config,
   pkgs,
   username,
+  lib,
   ...
 }:
 {
@@ -74,6 +75,19 @@
       portalPackage = null;
 
       settings = {
+        input = {
+          kb_layout = "us";
+          kb_variant = "altgr-intl";
+        }
+        // lib.optionalAttrs (config.modules.solas.isLoaded or false) {
+          touchpad = {
+            natural_scroll = true;
+          };
+        }
+        // lib.optionalAttrs (config.modules.azazel.isLoaded or false) {
+          accel_profile = "flat";
+        };
+
         misc = {
           middle_click_paste = false;
 
@@ -108,35 +122,58 @@
           };
         };
 
-        exec-once = [ ];
-
-        layerrule = [
-          "match:class ^(dms)$, no_anim on"
-        ];
-
-        windowrule = [
-          # System ui
-          "match:class ^(xdg-desktop-portal-gtk)$, float on"
-          "match:class ^(org.quickshell)$, float on"
-          "match:class ^(valent)$, float on"
-
-          "match:class ^(Discord)$, float on"
-          "match:class ^(com.nextcloud.desktopclient.nextcloud)$, float on"
-        ];
-
         dwindle = {
           force_split = 2;
           preserve_split = true;
         };
 
-        bezier = [
-          "easeOutSine, 0.61, 1, 0.88, 1"
-          "easeInOutSine, 0.37, 0, 0.63, 1"
-        ];
+        gesture =
+          [ ]
+          ++ lib.optionals (config.modules.solas.isLoaded or false) [
+            {
+              _args = [
+                {
+                  fingers = 3;
+                  direction = "horizontal";
+                  action = "workspace";
+                }
+              ];
+            }
+          ];
 
-        animation = [
-          "windows, 1, 2, easeOutSine, slide"
-          "workspaces, 1, 2, easeInOutSine, slidevert"
+        workspace = [
+          {
+            _args = [
+              1
+              { persistent = true; }
+            ];
+          }
+          {
+            _args = [
+              2
+              { persistent = true; }
+            ];
+          }
+          {
+            _args = [
+              3
+              { persistent = true; }
+            ];
+          }
+        ]
+        ++ lib.optionals (config.modules.azazel.isLoaded or false) [
+          {
+            _args = [
+              4
+              { persistent = true; }
+            ];
+          }
+          {
+            _args = [
+              5
+              { persistent = true; }
+            ];
+          }
         ];
 
         source = [
@@ -145,6 +182,16 @@
           "~/.config/hypr/dms/outputs.conf"
           "~/.config/hypr/dms/cursor.conf"
         ];
+      }
+      // lib.optionalAttrs (config.modules.solas.isLoaded or false) {
+        gestures = {
+          workspace_swipe_invert = true;
+        };
+      }
+      // lib.optionalAttrs (config.modules.azazel.isLoaded or false) {
+        cursor = {
+          no_hardware_cursors = true;
+        };
       };
     };
   };
