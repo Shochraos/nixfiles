@@ -266,6 +266,72 @@ in
               { locked = true; }
             ];
           }
+        ]
+        ++ lib.optionals (config.modules.solas.isLoaded or false) [
+          {
+            _args = [
+              "switch:on:Lid Switch"
+              (lua "hl.dsp.exec_cmd(\"dms ipc call lock lock\")")
+              { locked = true; }
+            ];
+          }
+          {
+            _args = [
+              "XF86AudioMute"
+              (lua "hl.dsp.exec_cmd(\"wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle\")")
+              { locked = true; }
+            ];
+          }
+          {
+            _args = [
+              "XF86AudioMicMute"
+              (lua "hl.dsp.exec_cmd(\"wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle\")")
+              { locked = true; }
+            ];
+          }
+
+          {
+            _args = [
+              "XF86AudioRaiseVolume"
+              (lua "hl.dsp.exec_cmd(\"wpctl set-volume -l 1.0 @DEFAULT_AUDIO_SINK@ 5%+\")")
+              { repeating = true; }
+            ];
+          }
+          {
+            _args = [
+              "XF86AudioLowerVolume"
+              (lua "hl.dsp.exec_cmd(\"wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-\")")
+              { repeating = true; }
+            ];
+          }
+          {
+            _args = [
+              "XF86MonBrightnessUp"
+              (lua "hl.dsp.exec_cmd(\"dms ipc call brightness increment 5 backlight:amdgpu_bl1\")")
+              { repeating = true; }
+            ];
+          }
+          {
+            _args = [
+              "XF86MonBrightnessDown"
+              (lua "hl.dsp.exec_cmd(\"dms ipc call brightness decrement 5 backlight:amdgpu_bl1\")")
+              { repeating = true; }
+            ];
+          }
+          {
+            _args = [
+              "F6"
+              (lua "hl.dsp.exec_cmd(\"dms ipc call brightness increment 25 leds:tpacpi::kbd_backlight\")")
+              { repeating = true; }
+            ];
+          }
+          {
+            _args = [
+              "F5"
+              (lua "hl.dsp.exec_cmd(\"dms ipc call brightness decrement 25 leds:tpacpi::kbd_backlight\")")
+              { repeating = true; }
+            ];
+          }
         ];
       };
     };
