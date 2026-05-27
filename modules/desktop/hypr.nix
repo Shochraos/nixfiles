@@ -49,9 +49,11 @@
     };
   };
 
-  home-manager.users.${username} = {
+  home-manager.users.${username} = 
+  { config, ...}:
+  {
     xdg.configFile."uwsm/env".source = "${
-      config.home-manager.users.${username}.home.sessionVariablesPackage
+      config.home.sessionVariablesPackage
     }/etc/profile.d/hm-session-vars.sh";
 
     home.sessionVariables = {
@@ -180,10 +182,10 @@
         ];
 
         source = [
-          "~/.config/hypr/dms/colors.conf"
-          "~/.config/hypr/dms/layout.conf"
-          "~/.config/hypr/dms/outputs.conf"
-          "~/.config/hypr/dms/cursor.conf"
+          "${config.home.homeDirectory}/.config/hypr/dms/colors.lua"
+          "${config.home.homeDirectory}/.config/hypr/dms/layout.lua"
+          "${config.home.homeDirectory}/.config/hypr/dms/outputs.lua"
+          "${config.home.homeDirectory}/.config/hypr/dms/cursor.lua"
         ];
       };
     };
