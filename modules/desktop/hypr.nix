@@ -18,12 +18,10 @@
   services.gnome.gnome-keyring.enable = true;
 
   environment.systemPackages = with pkgs; [
-    # Gnome utils
     nautilus
     gnome-text-editor
     loupe
     evince
-
     playerctl
     libsecret
   ];
@@ -69,75 +67,80 @@
 
     wayland.windowManager.hyprland = {
       enable = true;
+      configType = "lua";
       systemd.enable = false;
 
       package = null;
       portalPackage = null;
 
       settings = {
-        input = {
-          kb_layout = "us";
-          kb_variant = "altgr-intl";
+        config = {
+          input = {
+            kb_layout = "us";
+            kb_variant = "altgr-intl";
+          }
+          // lib.optionalAttrs (config.modules.solas.isLoaded or false) {
+            touchpad = {
+              natural_scroll = true;
+            };
+          }
+          // lib.optionalAttrs (config.modules.azazel.isLoaded or false) {
+            accel_profile = "flat";
+          };
+
+          misc = {
+            middle_click_paste = false;
+            mouse_move_enables_dpms = false;
+            key_press_enables_dpms = true;
+            disable_hyprland_logo = true;
+            disable_splash_rendering = true;
+          };
+
+          general = {
+            gaps_in = 5;
+            gaps_out = 10;
+            border_size = 1;
+            col = {
+              inactive_border = "rgba(00000000)";
+            };
+            layout = "dwindle";
+          };
+
+          decoration = {
+            rounding = 12;
+            active_opacity = 1.0;
+            inactive_opacity = 1.0;
+            shadow = {
+              enabled = true;
+              range = 30;
+              render_power = 5;
+              offset = "0 5";
+            };
+          };
+
+          dwindle = {
+            force_split = 2;
+            preserve_split = true;
+          };
         }
         // lib.optionalAttrs (config.modules.solas.isLoaded or false) {
-          touchpad = {
-            natural_scroll = true;
+          gestures = {
+            workspace_swipe_invert = true;
           };
         }
         // lib.optionalAttrs (config.modules.azazel.isLoaded or false) {
-          accel_profile = "flat";
-        };
-
-        misc = {
-          middle_click_paste = false;
-
-          mouse_move_enables_dpms = false;
-          key_press_enables_dpms = true;
-
-          disable_hyprland_logo = true;
-          disable_splash_rendering = true;
-        };
-
-        general = {
-          gaps_in = 5;
-          gaps_out = 10;
-          border_size = 1;
-          "col.inactive_border" = "rgba(00000000)";
-
-          layout = "dwindle";
-        };
-
-        decoration = {
-          rounding = 12;
-
-          active_opacity = 1.0;
-          inactive_opacity = 1.0;
-
-          shadow = {
-            enabled = true;
-            range = 30;
-            render_power = 5;
-
-            offset = "0 5";
+          cursor = {
+            no_hardware_cursors = true;
           };
-        };
-
-        dwindle = {
-          force_split = 2;
-          preserve_split = true;
         };
 
         gesture =
           [ ]
           ++ lib.optionals (config.modules.solas.isLoaded or false) [
             {
-              _args = [
-                {
-                  fingers = 3;
-                  direction = "horizontal";
-                  action = "workspace";
-                }
-              ];
+              fingers = 3;
+              direction = "horizontal";
+              action = "workspace";
             }
           ];
 
@@ -182,16 +185,6 @@
           "~/.config/hypr/dms/outputs.conf"
           "~/.config/hypr/dms/cursor.conf"
         ];
-      }
-      // lib.optionalAttrs (config.modules.solas.isLoaded or false) {
-        gestures = {
-          workspace_swipe_invert = true;
-        };
-      }
-      // lib.optionalAttrs (config.modules.azazel.isLoaded or false) {
-        cursor = {
-          no_hardware_cursors = true;
-        };
       };
     };
   };

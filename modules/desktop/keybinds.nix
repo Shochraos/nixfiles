@@ -14,172 +14,172 @@ in
         bind = [
           {
             _args = [
-              "SUPER, Return"
-              (lua "hl.dsp.exec_cmd(\"ghostty\")")
+              "SUPER + Return"
+              (lua "hl.dsp.exec_cmd('ghostty')")
             ];
           }
           {
             _args = [
-              "SUPER, F"
-              (lua "hl.dsp.exec_cmd(\"nautilus\")")
+              "SUPER + F"
+              (lua "hl.dsp.exec_cmd('nautilus')")
             ];
           }
           {
             _args = [
-              "SUPER, T"
-              (lua "hl.dsp.exec_cmd(\"gnome-text-editor\")")
+              "SUPER + T"
+              (lua "hl.dsp.exec_cmd('gnome-text-editor')")
             ];
           }
           {
             _args = [
-              "SUPER, Q"
-              (lua "hl.dsp.killactive()")
+              "SUPER + Q"
+              (lua "hl.dsp.window.close()")
             ];
           }
           {
             _args = [
-              "SUPER CTRL, F"
-              (lua "hl.dsp.fullscreen(0)")
+              "SUPER + CTRL + F"
+              (lua "hl.dsp.window.fullscreen()")
             ];
           }
           {
             _args = [
-              "SUPER ALT, F"
-              (lua "hl.dsp.togglefloating()")
+              "SUPER + ALT + F"
+              (lua "hl.dsp.window.float({ action = 'toggle' })")
             ];
           }
           {
             _args = [
-              "SUPER, left"
-              (lua "hl.dsp.movefocus(\"l\")")
+              "SUPER + left"
+              (lua "hl.dsp.focus({ direction = 'left' })")
             ];
           }
           {
             _args = [
-              "SUPER, right"
-              (lua "hl.dsp.movefocus(\"r\")")
+              "SUPER + right"
+              (lua "hl.dsp.focus({ direction = 'right' })")
             ];
           }
           {
             _args = [
-              "SUPER, up"
-              (lua "hl.dsp.movefocus(\"u\")")
+              "SUPER + up"
+              (lua "hl.dsp.focus({ direction = 'up' })")
             ];
           }
           {
             _args = [
-              "SUPER, down"
-              (lua "hl.dsp.movefocus(\"d\")")
+              "SUPER + down"
+              (lua "hl.dsp.focus({ direction = 'down' })")
             ];
           }
           {
             _args = [
-              "SUPER SHIFT, left"
-              (lua "hl.dsp.movewindow(\"l\")")
+              "SUPER + SHIFT + left"
+              (lua "hl.dsp.window.move({ direction = 'left' })")
             ];
           }
           {
             _args = [
-              "SUPER SHIFT, right"
-              (lua "hl.dsp.movewindow(\"r\")")
+              "SUPER + SHIFT + right"
+              (lua "hl.dsp.window.move({ direction = 'right' })")
             ];
           }
           {
             _args = [
-              "SUPER SHIFT, up"
-              (lua "hl.dsp.movewindow(\"u\")")
+              "SUPER + SHIFT + up"
+              (lua "hl.dsp.window.move({ direction = 'up' })")
             ];
           }
           {
             _args = [
-              "SUPER SHIFT, down"
-              (lua "hl.dsp.movewindow(\"d\")")
+              "SUPER + SHIFT + down"
+              (lua "hl.dsp.window.move({ direction = 'down' })")
             ];
           }
           {
             _args = [
-              "SUPER CTRL, left"
-              (lua "hl.dsp.workspace(\"m-1\")")
+              "SUPER + CTRL + left"
+              (lua "hl.dsp.focus({ workspace = 'm-1' })")
             ];
           }
           {
             _args = [
-              "SUPER CTRL, right"
-              (lua "hl.dsp.workspace(\"m+1\")")
+              "SUPER + CTRL + right"
+              (lua "hl.dsp.focus({ workspace = 'm+1' })")
             ];
           }
           {
             _args = [
-              "SUPER CTRL SHIFT, left"
-              (lua "hl.dsp.movetoworkspace(\"-1\")")
+              "SUPER + CTRL + SHIFT + left"
+              (lua "hl.dsp.window.move({ workspace = '-1' })")
             ];
           }
           {
             _args = [
-              "SUPER CTRL SHIFT, right"
-              (lua "hl.dsp.movetoworkspace(\"+1\")")
+              "SUPER + CTRL + SHIFT + right"
+              (lua "hl.dsp.window.move({ workspace = '+1' })")
             ];
           }
           {
             _args = [
-              "SUPER, L"
-              (lua "hl.dsp.exec_cmd(\"dms ipc call lock lock\")")
+              "SUPER + L"
+              (lua "hl.dsp.exec_cmd('dms ipc call lock lock')")
             ];
           }
           {
             _args = [
               "PRINT"
-              (lua "hl.dsp.exec_cmd(\"dms screenshot --no-file\")")
+              (lua "hl.dsp.exec_cmd('dms screenshot --no-file')")
             ];
           }
           {
             _args = [
-              "SUPER, PRINT"
-              (lua "hl.dsp.exec_cmd(\"dms screenshot\")")
+              "SUPER + PRINT"
+              (lua "hl.dsp.exec_cmd('dms screenshot')")
             ];
           }
           {
             _args = [
-              "SUPER, Space"
-              (lua "hl.dsp.exec_cmd(\"dms ipc call spotlight toggle\")")
+              "SUPER + Space"
+              (lua "hl.dsp.exec_cmd('dms ipc call spotlight toggle')")
             ];
           }
           {
             _args = [
-              "SUPER, V"
-              (lua "hl.dsp.exec_cmd(\"dms ipc call clipboard toggle\")")
+              "SUPER + V"
+              (lua "hl.dsp.exec_cmd('dms ipc call clipboard toggle')")
             ];
           }
           {
             _args = [
-              "SUPER, M"
-              (lua "hl.dsp.exec_cmd(\"dms ipc call processlist focusOrToggle\")")
+              "SUPER + M"
+              (lua "hl.dsp.exec_cmd('dms ipc call processlist focusOrToggle')")
             ];
           }
           {
             _args = [
-              "SUPER, N"
-              (lua "hl.dsp.exec_cmd(\"dms ipc call notifications toggle\")")
+              "SUPER + N"
+              (lua "hl.dsp.exec_cmd('dms ipc call notifications toggle')")
             ];
           }
           {
             _args = [
-              "SUPER, TAB"
-              (lua "hl.dsp.exec_cmd(\"dms ipc call hypr toggleOverview\")")
+              "SUPER + TAB"
+              (lua "hl.dsp.exec_cmd('dms ipc call hypr toggleOverview')")
             ];
           }
 
           {
             _args = [
-              "SUPER, mouse:272"
-              (lua "hl.dsp.movewindow()")
+              "SUPER + mouse:272"
+              (lua "hl.dsp.window.drag()")
               { mouse = true; }
             ];
           }
           {
             _args = [
-              "SUPER, mouse:273"
-              (lua "hl.dsp.resizewindow()")
+              "SUPER + mouse:273"
+              (lua "hl.dsp.window.resize()")
               { mouse = true; }
             ];
           }
@@ -187,35 +187,35 @@ in
           {
             _args = [
               "code:199"
-              (lua "hl.dsp.sendshortcut(\"CTRL SHIFT, M, class:^(discord)$\")")
+              (lua "hl.dsp.send_shortcut({ mods = 'CTRL SHIFT', key = 'M', window = 'class:^(discord)$' })")
               { release = true; }
             ];
           }
           {
             _args = [
               "code:200"
-              (lua "hl.dsp.sendshortcut(\"CTRL SHIFT, D, class:^(discord)$\")")
+              (lua "hl.dsp.send_shortcut({ mods = 'CTRL SHIFT', key = 'D', window = 'class:^(discord)$' })")
               { release = true; }
             ];
           }
           {
             _args = [
               "code:191"
-              (lua "hl.dsp.exec_cmd(\"playerctl --player=spotify previous\")")
+              (lua "hl.dsp.exec_cmd('playerctl --player=spotify previous')")
               { release = true; }
             ];
           }
           {
             _args = [
               "code:192"
-              (lua "hl.dsp.exec_cmd(\"playerctl --player=spotify play-pause\")")
+              (lua "hl.dsp.exec_cmd('playerctl --player=spotify play-pause')")
               { release = true; }
             ];
           }
           {
             _args = [
               "code:193"
-              (lua "hl.dsp.exec_cmd(\"playerctl --player=spotify next\")")
+              (lua "hl.dsp.exec_cmd('playerctl --player=spotify next')")
               { release = true; }
             ];
           }
@@ -223,14 +223,14 @@ in
           {
             _args = [
               "code:201"
-              (lua "hl.dsp.exec_cmd(\"playerctl --player=spotify volume 0.05-\")")
+              (lua "hl.dsp.exec_cmd('playerctl --player=spotify volume 0.05-')")
               { repeating = true; }
             ];
           }
           {
             _args = [
               "code:202"
-              (lua "hl.dsp.exec_cmd(\"playerctl --player=spotify volume 0.05+\")")
+              (lua "hl.dsp.exec_cmd('playerctl --player=spotify volume 0.05+')")
               { repeating = true; }
             ];
           }
@@ -239,21 +239,21 @@ in
           {
             _args = [
               "code:195"
-              (lua "hl.dsp.exec_cmd(\"gamechat_game\")")
+              (lua "hl.dsp.exec_cmd('gamechat_game')")
               { release = true; }
             ];
           }
           {
             _args = [
               "code:196"
-              (lua "hl.dsp.exec_cmd(\"gamechat_chat\")")
+              (lua "hl.dsp.exec_cmd('gamechat_chat')")
               { release = true; }
             ];
           }
           {
             _args = [
               "code:197"
-              (lua "hl.dsp.exec_cmd(\"gamechat_reset\")")
+              (lua "hl.dsp.exec_cmd('gamechat_reset')")
               { release = true; }
             ];
           }
@@ -261,8 +261,8 @@ in
         ++ lib.optionals (config.modules.lgtv.isLoaded or false) [
           {
             _args = [
-              "SUPER ALT, Home"
-              (lua "hl.dsp.exec_cmd(\"sudo ${pkgs.systemd}/bin/systemctl start wol-lgtv.service\")")
+              "SUPER + ALT + Home"
+              (lua "hl.dsp.exec_cmd('sudo ${pkgs.systemd}/bin/systemctl start wol-lgtv.service')")
               { locked = true; }
             ];
           }
@@ -271,21 +271,21 @@ in
           {
             _args = [
               "switch:on:Lid Switch"
-              (lua "hl.dsp.exec_cmd(\"dms ipc call lock lock\")")
+              (lua "hl.dsp.exec_cmd('dms ipc call lock lock')")
               { locked = true; }
             ];
           }
           {
             _args = [
               "XF86AudioMute"
-              (lua "hl.dsp.exec_cmd(\"wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle\")")
+              (lua "hl.dsp.exec_cmd('wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle')")
               { locked = true; }
             ];
           }
           {
             _args = [
               "XF86AudioMicMute"
-              (lua "hl.dsp.exec_cmd(\"wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle\")")
+              (lua "hl.dsp.exec_cmd('wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle')")
               { locked = true; }
             ];
           }
@@ -293,42 +293,42 @@ in
           {
             _args = [
               "XF86AudioRaiseVolume"
-              (lua "hl.dsp.exec_cmd(\"wpctl set-volume -l 1.0 @DEFAULT_AUDIO_SINK@ 5%+\")")
+              (lua "hl.dsp.exec_cmd('wpctl set-volume -l 1.0 @DEFAULT_AUDIO_SINK@ 5%+')")
               { repeating = true; }
             ];
           }
           {
             _args = [
               "XF86AudioLowerVolume"
-              (lua "hl.dsp.exec_cmd(\"wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-\")")
+              (lua "hl.dsp.exec_cmd('wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-')")
               { repeating = true; }
             ];
           }
           {
             _args = [
               "XF86MonBrightnessUp"
-              (lua "hl.dsp.exec_cmd(\"dms ipc call brightness increment 5 backlight:amdgpu_bl1\")")
+              (lua "hl.dsp.exec_cmd('dms ipc call brightness increment 5 backlight:amdgpu_bl1')")
               { repeating = true; }
             ];
           }
           {
             _args = [
               "XF86MonBrightnessDown"
-              (lua "hl.dsp.exec_cmd(\"dms ipc call brightness decrement 5 backlight:amdgpu_bl1\")")
+              (lua "hl.dsp.exec_cmd('dms ipc call brightness decrement 5 backlight:amdgpu_bl1')")
               { repeating = true; }
             ];
           }
           {
             _args = [
               "F6"
-              (lua "hl.dsp.exec_cmd(\"dms ipc call brightness increment 25 leds:tpacpi::kbd_backlight\")")
+              (lua "hl.dsp.exec_cmd('dms ipc call brightness increment 25 leds:tpacpi::kbd_backlight')")
               { repeating = true; }
             ];
           }
           {
             _args = [
               "F5"
-              (lua "hl.dsp.exec_cmd(\"dms ipc call brightness decrement 25 leds:tpacpi::kbd_backlight\")")
+              (lua "hl.dsp.exec_cmd('dms ipc call brightness decrement 25 leds:tpacpi::kbd_backlight')")
               { repeating = true; }
             ];
           }
