@@ -83,7 +83,7 @@
       popoutAnimationSpeed = 0;
       modalAnimationSpeed = 0;
 
-      modalDarkenBackground = true;
+      modalDarkenBackground = false;
       
       # Fonts
       fontFamily = config.stylix.fonts.sansSerif.name;

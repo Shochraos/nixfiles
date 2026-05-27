@@ -99,6 +99,8 @@
           active_opacity = 1.0;
           inactive_opacity = 1.0;
 
+          dim_around = 0.6;
+          
           blur = {
               enabled = true;
               size = 2;
@@ -128,6 +130,8 @@
           #Blur
           "blur on, match:namespace ^(dms.*)$"
           "ignore_alpha 0, match:namespace ^(dms.*)$"
+
+          "dim_around 1, match:namespace ^(dms:(clipboard|file-browser|settings|spotlight|bluetooth-pairing|color-picker|hyprkeybinds|network-info|network-info-wired|notification-center-modal|polkit|power-menu|process-list-modal|wifi-password|confirm-modal|modal))$"
 
           #Animations
           "no_anim on, match:namespace ^(dms:bar)$"
@@ -160,6 +164,7 @@
           "windows, 1, 2.5, curveWindow, slide"
           "workspaces, 1, 2.5, curveWorkspace, slidevert"
           "layers, 1, 2.5, curveMenu, popin 80%"
+          "fadeLayers, 0"        
         ];
 
         source = [
