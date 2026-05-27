@@ -10,7 +10,7 @@ in
   home-manager.users.${username} =
     { config, pkgs, ... }:
     {
-      wayland.windowManager.hyprland = {
+      wayland.windowManager.hyprland.settings = {
         bind = [
           {
             _args = [
