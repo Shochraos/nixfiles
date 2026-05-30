@@ -76,7 +76,7 @@
       widgetBackgroundColor = "sth";
       widgetColorMode = "default";
 
-      popupTransparency = 0.2;
+      popupTransparency = 0.35;
 
       animationSpeed = 0;
       syncComponentAnimationSpeeds = false;
