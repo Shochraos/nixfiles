@@ -81,10 +81,6 @@
           bezier = "curveMenu";
           style = "popin 80%";
         }
-        {
-          leaf = "fadeLayers";
-          enabled = false;
-        }
       ];
 
       layer_rule = [
