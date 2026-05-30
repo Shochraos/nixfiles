@@ -7,6 +7,8 @@
     configHome = "/home/${username}";
   };
 
+  services.accounts-daemon.enable = true;
+
   users.users.${username} = {
     extraGroups = [ "greeter" ];
   };
