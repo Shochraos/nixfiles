@@ -113,6 +113,7 @@ in
               rounding = 12;
               active_opacity = 1.0;
               inactive_opacity = 1.0;
+              dim_around = 0.66;
               shadow = {
                 enabled = true;
                 range = 30;
