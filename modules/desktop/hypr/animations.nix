@@ -111,7 +111,7 @@
           match = {
             namespace = "^(dms:(app-launcher|control-center|clipboard-popout|battery|vpn|dash|notification-center-popout|process-list-popout|popout|plugins:.*|plugins:plugin))$";
           };
-          animation = "slide";
+          animation = "slide top";
         }
         {
           match = {
