@@ -7,7 +7,6 @@ in
     home.packages = with pkgs; [
       nextcloud-client
       feishin
-      #nocturne
     ];
 
     xdg.autostart = {
