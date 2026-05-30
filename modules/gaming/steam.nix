@@ -24,9 +24,7 @@ in
   home-manager.users.${username} = {
     home.sessionVariables = {
       PROTON_DLSS_UPGRADE = "1";
-      PROTON_VKD3D_HEAP = "1";
-      PROTON_USE_NTSYNC = "1";
-      VKD3D_CONFIG = "enable_experimental_features,descriptor_heap";
+      VKD3D_CONFIG = "descriptor_heap";
     };
 
     xdg.autostart = {
