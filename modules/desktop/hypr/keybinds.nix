@@ -189,14 +189,12 @@ in
             _args = [
               "code:199"
               (lua "hl.dsp.send_shortcut({ mods = 'CTRL SHIFT', key = 'M', window = 'class:^(discord)$' })")
-              { release = true; }
             ];
           }
           {
             _args = [
               "code:200"
               (lua "hl.dsp.send_shortcut({ mods = 'CTRL SHIFT', key = 'D', window = 'class:^(discord)$' })")
-              { release = true; }
             ];
           }
           {
