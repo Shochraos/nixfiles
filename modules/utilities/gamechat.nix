@@ -8,13 +8,13 @@ let
   gamechat_mix = pkgs.writeShellScript "gamechat_mix.sh" (
     builtins.readFile ../../assets/scripts/gamechat_mix.sh
   );
-  gamechat_chat = pkgs.writeShellScript "gamechat_chat.sh" (
+  gamechat_chat = pkgs.writeShellScriptBin "gamechat_chat" (
     builtins.readFile ../../assets/scripts/gamechat_chat.sh
   );
-  gamechat_game = pkgs.writeShellScript "gamechat_game.sh" (
+  gamechat_game = pkgs.writeShellScriptBin "gamechat_game" (
     builtins.readFile ../../assets/scripts/gamechat_game.sh
   );
-  gamechat_reset = pkgs.writeShellScript "gamechat_reset.sh" (
+  gamechat_reset = pkgs.writeShellScriptBin "gamechat_reset" (
     builtins.readFile ../../assets/scripts/gamechat_reset.sh
   );
 in
@@ -41,7 +41,7 @@ in
 
         Service = {
           Type = "simple";
-          ExecStart = "${gamechat_mix}/bin/gamechat_mix";
+          ExecStart = "${gamechat_mix}";
           Restart = "always";
         };
 
