@@ -10,52 +10,42 @@
       enable = true;
       enableDefaultConfig = false;
 
-      matchBlocks."github.com" = {
-        forwardAgent = true;
-        extraOptions = {
+      settings = {
+        "github.com" = {
+          forwardAgent = true;
           AddKeysToAgent = "yes";
           IdentityFile = "/home/${username}/.ssh/${lib.toLower systemname}-git";
         };
-      };
 
-      matchBlocks."private-cloud.informatik.hs-fulda.de" = {
-        forwardAgent = true;
-        extraOptions = {
+        "private-cloud.informatik.hs-fulda.de" = {
+          forwardAgent = true;
           AddKeysToAgent = "yes";
           IdentityFile = "/home/${username}/.ssh/openstack-uni";
         };
-      };
-      
-      matchBlocks."git-ce.rwth-aachen.de" = {
-        forwardAgent = true;
-        extraOptions = {
+
+        "git-ce.rwth-aachen.de" = {
+          forwardAgent = true;
           AddKeysToAgent = "yes";
           IdentityFile = "/home/${username}/.ssh/${lib.toLower systemname}-git";
         };
-      };
 
-      matchBlocks."git.freunds.me" = {
-        forwardAgent = true;
-        extraOptions = {
+        "git.freunds.me" = {
+          forwardAgent = true;
           AddKeysToAgent = "yes";
           IdentityFile = "/home/${username}/.ssh/${lib.toLower systemname}-git";
           Port = "2222";
         };
-      };
 
-      matchBlocks."astaroth" = {
-        forwardAgent = true;
-        extraOptions = {
+        "astaroth" = {
+          forwardAgent = true;
           AddKeysToAgent = "yes";
           IdentityFile = "/home/${username}/.ssh/${lib.toLower systemname}";
           HostName = "192.168.10.2";
           User = "root";
         };
-      };
 
-      matchBlocks."*" = {
-        forwardAgent = true;
-        extraOptions = {
+        "*" = {
+          forwardAgent = true;
           AddKeysToAgent = "yes";
           IdentityFile = "/home/${username}/.ssh/${lib.toLower systemname}";
         };
