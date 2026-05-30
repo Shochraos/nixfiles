@@ -3,7 +3,7 @@
   username,
   ...
 }:
-{ 
+{
   home-manager.users.${username} =
     { config, ... }:
     {
@@ -18,44 +18,6 @@
           "${pkgs.spotify}/share/applications/spotify.desktop"
           "${config.programs.zed-editor.package}/share/applications/dev.zed.Zed.desktop"
         ];
-      };
-      
-      wayland.windowManager.hyprland = {
-        settings = {
-          input = {
-            kb_layout = "us";
-            kb_variant = "altgr-intl";
-
-            accel_profile = "flat";
-          };
-
-          cursor = {
-            no_hardware_cursors = true;
-          };
-
-          workspace = [
-            "1, persistent:true"
-            "2, persistent:true"
-            "3, persistent:true"
-            "4, persistent:true"
-            "5, persistent:true"
-          ];
-
-          windowrule = [
-            "match:class ^(zen-beta)$, workspace 2 silent"
-            "match:class ^(dev.zed.Zed)$, workspace 3 silent"
-            "match:class ^(discord)$, workspace 4 silent"
-            "match:class ^(spotify)$, workspace 5 silent"
-            "match:class ^(steam)$, workspace 5 silent"
-            "match:class ^(steam)$, match:title ^(Steam Settings)$, float on"
-
-            # Arknights Endfield
-            "match:class ^(endfield.exe)$, match:title ^(Form)$, float on, suppress_event maximize fullscreen activatefocus, fullscreen_state 0 0, workspace 3 silent"
-
-            #Stardew Valley
-            "match:class ^(XTerm)$, float on"
-          ];
-        };
       };
 
       # DankBar

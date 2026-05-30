@@ -1,7 +1,7 @@
 { ... }:
 {
   imports = [
-    ./hypr.nix
+    ./hypr
     ./dms.nix
     ./theme.nix
     ./portal.nix
