@@ -1,10 +1,7 @@
 { ... }:
 {
   imports = [
-    ./hypr.nix
-    ./animations.nix
-    ./window_rules.nix
-    ./keybinds.nix
+    ./hypr
     ./dms.nix
     ./theme.nix
     ./portal.nix
