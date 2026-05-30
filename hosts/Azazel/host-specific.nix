@@ -33,7 +33,7 @@
               position = 0;
               bottomGap = -5;
               innerPadding = 5;
-              spacing = 2;
+              spacing = 0;
               transparency = 0;
 
               screenPreferences = [ "all" ];
