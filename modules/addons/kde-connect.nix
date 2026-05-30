@@ -1,17 +1,23 @@
-{ pkgs, ... }:
+{ pkgs, username, ... }:
 {
   programs.kdeconnect = {
     enable = true;
     package = pkgs.valent;
   };
 
-  systemd.user.services.valent = {
-    description = "Valent (KDE Connect Implementation)";
-    wantedBy = [ "graphical-session.target" ];
-    partOf = [ "graphical-session.target" ];
-    serviceConfig = {
-      ExecStart = "${pkgs.valent}/bin/valent --gapplication-service";
-      Restart = "on-failure";
+  home-manager.users.${username} = {
+    systemd.user.services.valent = {
+      Unit = {
+        Description = "Valent (KDE Connect Implementation)";
+        PartOf = [ "graphical-session.target" ];
+      };
+      Service = {
+        ExecStart = "${pkgs.valent}/bin/valent --gapplication-service";
+        Restart = "on-failure";
+      };
+      Install = {
+        WantedBy = [ "graphical-session.target" ];
+      };
     };
   };
 }
