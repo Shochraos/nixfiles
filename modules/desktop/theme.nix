@@ -5,6 +5,8 @@
   ...
 }:
 {
+  environment.systemPackages = with pkgs; [ bibata-cursors ];
+  
   stylix = {
     enable = true;
     base16Scheme = "${pkgs.base16-schemes}/share/themes/chalk.yaml";
@@ -42,21 +44,6 @@
       light = "Papirus-Light";
     };
   };
-
-  environment.systemPackages = with pkgs; [ bibata-cursors ];
-
-  services.displayManager.dms-greeter = {
-    compositor.customConfig = ''
-      env = XCURSOR_THEME,Bibata-Modern-Classic
-      env = XCURSOR_SIZE,24
-
-      misc:disable_hyprland_logo = true
-      misc:disable_splash_rendering = true
-      misc:force_default_wallpaper = 0
-      misc:background_color = rgb(000000)
-    '';
-  };
-
   programs.dconf.enable = true;
 
   home-manager.users.${username} = {
@@ -67,30 +54,6 @@
       overpass
       nerd-fonts.overpass
     ];
-
-    programs.dank-material-shell.settings = {
-      # Matugen
-      currentThemeName = "dynamic";
-      currentThemeCategory = "dynamic";
-      matugenScheme = "scheme-fidelity";
-      widgetBackgroundColor = "sth";
-      widgetColorMode = "default";
-
-      popupTransparency = 0.35;
-
-      animationSpeed = 0;
-      syncComponentAnimationSpeeds = false;
-      popoutAnimationSpeed = 0;
-      modalAnimationSpeed = 0;
-
-      modalDarkenBackground = false;
-      
-      # Fonts
-      fontFamily = config.stylix.fonts.sansSerif.name;
-      monoFontFamily = config.stylix.fonts.monospace.name;
-      fontScale = 1;
-      fontWeight = 400;
-    };
 
     dconf.settings = {
       "org/gnome/desktop/interface" = {
