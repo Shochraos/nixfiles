@@ -1,10 +1,22 @@
-{ inputs, username, ... }:
+{ inputs, config, lib, username, ... }:
 {
   services.displayManager.defaultSession = "hyprland-uwsm";
   services.displayManager.dms-greeter = {
     enable = true;
-    compositor.name = "hyprland";
     configHome = "/home/${username}";
+
+    compositor = {
+      name = "hyprland";
+      customConfig = ''
+        env = XCURSOR_THEME,Bibata-Modern-Classic
+        env = XCURSOR_SIZE,24
+  
+        misc:disable_hyprland_logo = true
+        misc:disable_splash_rendering = true
+        misc:force_default_wallpaper = 0
+        misc:background_color = rgb(000000)
+      '';
+    };
   };
 
   services.accounts-daemon.enable = true;
@@ -45,14 +57,6 @@
       };
 
       settings = {
-        # Displays
-        hyprlandOutputSettings = {
-          "desc:LG Electronics LG TV SSCR2 0x01010101" = {
-            bitdepth = 10;
-            vrrFullscreenOnly = true;
-          };
-        };
-
         # Clipboard
         clipboardSettings = {
           disabled = false;
@@ -80,6 +84,37 @@
         # Lock screen
         loginctlLockIntegration = true;
         lockScreenPowerOffMonitorsOnLock = true;
+
+        # Matugen
+        currentThemeName = "dynamic";
+        currentThemeCategory = "dynamic";
+        matugenScheme = "scheme-fidelity";
+        widgetBackgroundColor = "sth";
+        widgetColorMode = "default";
+  
+        popupTransparency = 0.35;
+  
+        animationSpeed = 0;
+        syncComponentAnimationSpeeds = false;
+        popoutAnimationSpeed = 0;
+        modalAnimationSpeed = 0;
+  
+        modalDarkenBackground = false;
+        
+        # Fonts
+        fontFamily = config.stylix.fonts.sansSerif.name;
+        monoFontFamily = config.stylix.fonts.monospace.name;
+        fontScale = 1;
+        fontWeight = 400;
+      }
+      // lib.optionalAttrs (config.modules.azazel.isLoaded or false) {
+        # Displays
+        hyprlandOutputSettings = {
+          "desc:LG Electronics LG TV SSCR2 0x01010101" = {
+            bitdepth = 10;
+            vrrFullscreenOnly = true;
+          };
+        };
       };
     };
 

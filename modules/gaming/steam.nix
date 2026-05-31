@@ -16,7 +16,6 @@ in
     package = pkgs.millennium-steam;
     extraCompatPackages =
     [ 
-      pkgs.proton-ge-bin
       proton-cachyos 
     ];
   };
