@@ -8,7 +8,14 @@
   programs.nix-ld.enable = true;
   environment.systemPackages = [ pkgs.nixfmt ];
 
-  home-manager.users.${username} = {
+  home-manager.users.${username} = 
+  { config, ...}:
+  {
+    xdg.autostart = {
+      entries = [
+        "${config.programs.zed-editor.package}/share/applications/dev.zed.Zed.desktop"
+      ];
+    };
     programs.zed-editor = {
       enable = true;
       extensions = [ "nix" "csv" ];
