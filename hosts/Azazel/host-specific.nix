@@ -4,19 +4,17 @@
   ...
 }:
 {
-  home-manager.users.${username} =
-    { config, ... }:
-    {
-      home.packages = with pkgs; [
-        feather
-        electrum
-      ];
+  home-manager.users.${username} = {
+    home.packages = with pkgs; [
+      feather
+      electrum
+    ];
 
-      xdg.autostart = {
-        entries = [
-          "${pkgs.discord.desktopItem}/share/applications/discord.desktop"
-          "${pkgs.spotify}/share/applications/spotify.desktop"
-        ];
-      };
+    xdg.autostart = {
+      entries = [
+        "${pkgs.discord.desktopItem}/share/applications/discord.desktop"
+        "${pkgs.spotify}/share/applications/spotify.desktop"
+      ];
     };
+  };
 }
