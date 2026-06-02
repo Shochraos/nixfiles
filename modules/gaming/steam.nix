@@ -6,6 +6,7 @@
 }:
 let
   proton-cachyos = inputs.nix-proton-cachyos.packages.${pkgs.system}.proton-cachyos;
+  dw-proton = inputs.nix-dw-proton.packages.${pkgs.system}.dw-proton;
 in
 {
   boot.kernelModules = [ "ntsync" ];
@@ -17,6 +18,7 @@ in
     extraCompatPackages =
     [ 
       proton-cachyos 
+      dw-proton
     ];
   };
 
