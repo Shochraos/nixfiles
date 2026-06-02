@@ -10,9 +10,9 @@
 
     lanzaboote = {
       url = "github:nix-community/lanzaboote/v1.0.0";
-      inputs.nixpkgs.follows = "nixpkgs";    
+      inputs.nixpkgs.follows = "nixpkgs";
     };
-      
+
     home-manager = {
       url = "github:nix-community/home-manager/";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -63,6 +63,8 @@
     };
 
     nix-proton-cachyos.url = "github:Shochraos/nix-proton-cachyos";
+
+    nix-dw-proton.url = "github:shochraos/nix-dw-proton";
   };
 
   outputs =
