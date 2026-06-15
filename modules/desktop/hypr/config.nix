@@ -85,7 +85,7 @@
               kb_layout = "us";
               kb_variant = "altgr-intl";
             }
-            // osConfig.host.hyprland.inputExtra;
+            // osConfig.host.hyprland.input;
 
             misc = {
               middle_click_paste = false;
@@ -123,7 +123,7 @@
               preserve_split = true;
             };
           }
-          // osConfig.host.hyprland.settingsExtra;
+          // osConfig.host.hyprland.settings;
 
           gesture = osConfig.host.hyprland.gestures;
 

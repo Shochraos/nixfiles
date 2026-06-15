@@ -6,10 +6,10 @@
 {
   # Host-specific Hyprland layout/capabilities (consumed in modules/desktop/hypr/*)
   host.hyprland = {
-    inputExtra = {
+    input = {
       accel_profile = "flat";
     };
-    settingsExtra = {
+    settings = {
       cursor = {
         no_hardware_cursors = true;
       };
