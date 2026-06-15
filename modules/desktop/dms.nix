@@ -117,7 +117,7 @@
             "reboot"
             "poweroff"
           ]
-          ++ osConfig.host.dms.powerMenuExtraActions;
+          ++ osConfig.host.dms.powerMenuActions;
           powerMenuDefaultAction = "poweroff";
 
           # Bars (host-specific layout, see hosts/<name>/host-specific.nix)

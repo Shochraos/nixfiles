@@ -125,7 +125,7 @@ in
 
   # Host-specific DMS layout (consumed in modules/desktop/dms.nix)
   host.dms = {
-    powerMenuExtraActions = [ "suspend" ];
+    powerMenuActions = [ "suspend" ];
     barConfigs = [
       {
         id = "default";
