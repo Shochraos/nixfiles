@@ -15,7 +15,6 @@ in
 
   hardware.alsa.enablePersistence = true;
 
-  # Host-specific Hyprland layout/capabilities (consumed in modules/desktop/hypr/*)
   host.hyprland = {
     input = {
       touchpad = {
@@ -123,7 +122,6 @@ in
     ];
   };
 
-  # Host-specific DMS layout (consumed in modules/desktop/dms.nix)
   host.dms = {
     powerMenuActions = [ "suspend" ];
     barConfigs = [

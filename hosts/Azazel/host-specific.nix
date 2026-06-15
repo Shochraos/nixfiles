@@ -4,7 +4,6 @@
   ...
 }:
 {
-  # Host-specific Hyprland layout/capabilities (consumed in modules/desktop/hypr/*)
   host.hyprland = {
     input = {
       accel_profile = "flat";
@@ -81,7 +80,6 @@
     ];
   };
 
-  # Host-specific DMS layout (consumed in modules/desktop/dms.nix)
   host.dms = {
     hyprlandOutputSettings = {
       "desc:LG Electronics LG TV SSCR2 0x01010101" = {
