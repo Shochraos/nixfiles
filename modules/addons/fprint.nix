@@ -1,8 +1,11 @@
-{ ... }:
 {
-  services.fprintd.enable = true;
-  security.pam.services = {
-    login.fprintAuth = false;
-    greetd.fprintAuth = false;
-  };
+  aspects.fprint =
+    { ... }:
+    {
+      services.fprintd.enable = true;
+      security.pam.services = {
+        login.fprintAuth = false;
+        greetd.fprintAuth = false;
+      };
+    };
 }

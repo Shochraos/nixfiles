@@ -1,19 +1,22 @@
-{ pkgs, username, ... }:
 {
-  services = {
-    printing.enable = true;
-    avahi = {
-      enable = true;
-      nssmdns4 = true;
+  aspects.scanprint =
+    { pkgs, username, ... }:
+    {
+      services = {
+        printing.enable = true;
+        avahi = {
+          enable = true;
+          nssmdns4 = true;
+        };
+      };
+
+      hardware.sane.enable = true;
+
+      users.groups.lp.members = [ username ];
+      users.groups.scanner.members = [ username ];
+
+      environment.systemPackages = with pkgs; [
+        simple-scan
+      ];
     };
-  };
-
-  hardware.sane.enable = true;
-
-  users.groups.lp.members = [ username ];
-  users.groups.scanner.members = [ username ];
-
-  environment.systemPackages = with pkgs; [
-    simple-scan
-  ];
 }

@@ -1,55 +1,58 @@
 {
-  lib,
-  username,
-  systemname,
-  ...
-}:
-{
-  home-manager.users.${username} = {
-    programs.ssh = {
-      enable = true;
-      enableDefaultConfig = false;
+  aspects.ssh =
+    {
+      lib,
+      username,
+      systemname,
+      ...
+    }:
+    {
+      home-manager.users.${username} = {
+        programs.ssh = {
+          enable = true;
+          enableDefaultConfig = false;
 
-      settings = {
-        "github.com" = {
-          forwardAgent = true;
-          AddKeysToAgent = "yes";
-          IdentityFile = "/home/${username}/.ssh/${lib.toLower systemname}-git";
-        };
+          settings = {
+            "github.com" = {
+              forwardAgent = true;
+              AddKeysToAgent = "yes";
+              IdentityFile = "/home/${username}/.ssh/${lib.toLower systemname}-git";
+            };
 
-        "private-cloud.informatik.hs-fulda.de" = {
-          forwardAgent = true;
-          AddKeysToAgent = "yes";
-          IdentityFile = "/home/${username}/.ssh/openstack-uni";
-        };
+            "private-cloud.informatik.hs-fulda.de" = {
+              forwardAgent = true;
+              AddKeysToAgent = "yes";
+              IdentityFile = "/home/${username}/.ssh/openstack-uni";
+            };
 
-        "git-ce.rwth-aachen.de" = {
-          forwardAgent = true;
-          AddKeysToAgent = "yes";
-          IdentityFile = "/home/${username}/.ssh/${lib.toLower systemname}-git";
-        };
+            "git-ce.rwth-aachen.de" = {
+              forwardAgent = true;
+              AddKeysToAgent = "yes";
+              IdentityFile = "/home/${username}/.ssh/${lib.toLower systemname}-git";
+            };
 
-        "git.freunds.me" = {
-          forwardAgent = true;
-          AddKeysToAgent = "yes";
-          IdentityFile = "/home/${username}/.ssh/${lib.toLower systemname}-git";
-          Port = "2222";
-        };
+            "git.freunds.me" = {
+              forwardAgent = true;
+              AddKeysToAgent = "yes";
+              IdentityFile = "/home/${username}/.ssh/${lib.toLower systemname}-git";
+              Port = "2222";
+            };
 
-        "astaroth" = {
-          forwardAgent = true;
-          AddKeysToAgent = "yes";
-          IdentityFile = "/home/${username}/.ssh/${lib.toLower systemname}";
-          HostName = "192.168.10.2";
-          User = "root";
-        };
+            "astaroth" = {
+              forwardAgent = true;
+              AddKeysToAgent = "yes";
+              IdentityFile = "/home/${username}/.ssh/${lib.toLower systemname}";
+              HostName = "192.168.10.2";
+              User = "root";
+            };
 
-        "*" = {
-          forwardAgent = true;
-          AddKeysToAgent = "yes";
-          IdentityFile = "/home/${username}/.ssh/${lib.toLower systemname}";
+            "*" = {
+              forwardAgent = true;
+              AddKeysToAgent = "yes";
+              IdentityFile = "/home/${username}/.ssh/${lib.toLower systemname}";
+            };
+          };
         };
       };
     };
-  };
 }

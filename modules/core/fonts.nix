@@ -1,11 +1,14 @@
-{ pkgs, username, ... }:
 {
-  fonts.packages = with pkgs; [
-    noto-fonts-cjk-sans
-    noto-fonts-cjk-serif
-  ];
+  aspects.fonts =
+    { pkgs, username, ... }:
+    {
+      fonts.packages = with pkgs; [
+        noto-fonts-cjk-sans
+        noto-fonts-cjk-serif
+      ];
 
-  home-manager.users.${username} = {
-    fonts.fontconfig.enable = true;
-  };
+      home-manager.users.${username} = {
+        fonts.fontconfig.enable = true;
+      };
+    };
 }
