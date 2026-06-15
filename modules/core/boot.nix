@@ -17,6 +17,6 @@
   nix.settings.trusted-public-keys = [ "lantian:EeAUQ+W+6r7EtwnmYjeVwx5kOGEBpjlBfPlzGlTNvHc=" ]; 
   
   # nix-cachyos-kernel
-  nixpkgs.overlays = [ inputs.nix-cachyos-kernel.overlays.default ];
+  nixpkgs.overlays = [ inputs.nix-cachyos-kernel.overlays.pinned ];
   boot.kernelPackages = pkgs.cachyosKernels.linuxPackages-cachyos-latest-lto-zen4;
 }
