@@ -286,6 +286,15 @@
                 id = "dankKDEConnect";
                 enabled = true;
               }
+              {
+                id = "spacer";
+                enabled = true;
+                size = 15;
+              }
+              {
+                id = "battery";
+                enabled = true;
+              }
             ];
 
             centerWidgets = [
@@ -296,10 +305,6 @@
             ];
 
             rightWidgets = [
-              {
-                id = "battery";
-                enabled = true;
-              }
               {
                 id = "cpuUsage";
                 enabled = true;
