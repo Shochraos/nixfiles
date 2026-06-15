@@ -1,5 +1,5 @@
 {
-  aspects.scanprint =
+  aspects.nixos.scanprint =
     { pkgs, username, ... }:
     {
       services = {

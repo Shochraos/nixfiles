@@ -1,9 +1,8 @@
 {
-  aspects.theme =
+  aspects.nixos.theme =
     {
       pkgs,
       config,
-      username,
       ...
     }:
     {
@@ -47,30 +46,32 @@
         };
       };
       programs.dconf.enable = true;
+    };
 
-      home-manager.users.${username} = {
-        xdg.configFile."matugen/config.toml".source = ../../configs/matugen/config.toml;
+  aspects.home.theme =
+    { pkgs, ... }:
+    {
+      xdg.configFile."matugen/config.toml".source = ../../configs/matugen/config.toml;
 
-        home.packages = with pkgs; [
-          adw-gtk3
-          overpass
-          nerd-fonts.overpass
-        ];
+      home.packages = with pkgs; [
+        adw-gtk3
+        overpass
+        nerd-fonts.overpass
+      ];
 
-        dconf.settings = {
-          "org/gnome/desktop/interface" = {
-            gtk-theme = "adw-gtk3-dark";
-            color-scheme = "prefer-dark";
-          };
+      dconf.settings = {
+        "org/gnome/desktop/interface" = {
+          gtk-theme = "adw-gtk3-dark";
+          color-scheme = "prefer-dark";
         };
-
-        qt = {
-          enable = true;
-          platformTheme.name = "qtct";
-        };
-
-        stylix.targets.zed.fonts.enable = true;
-        stylix.targets.gtk.fonts.enable = true;
       };
+
+      qt = {
+        enable = true;
+        platformTheme.name = "qtct";
+      };
+
+      stylix.targets.zed.fonts.enable = true;
+      stylix.targets.gtk.fonts.enable = true;
     };
 }

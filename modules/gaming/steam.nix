@@ -1,7 +1,6 @@
 {
-  aspects.steam =
+  aspects.nixos.steam =
     {
-      username,
       inputs,
       pkgs,
       ...
@@ -22,18 +21,20 @@
           dw-proton
         ];
       };
+    };
 
-      home-manager.users.${username} = {
-        home.sessionVariables = {
-          PROTON_DLSS_UPGRADE = "1";
-          VKD3D_CONFIG = "descriptor_heap";
-        };
+  aspects.home.steam =
+    { pkgs, ... }:
+    {
+      home.sessionVariables = {
+        PROTON_DLSS_UPGRADE = "1";
+        VKD3D_CONFIG = "descriptor_heap";
+      };
 
-        xdg.autostart = {
-          entries = [
-            "${pkgs.steam}/share/applications/steam.desktop"
-          ];
-        };
+      xdg.autostart = {
+        entries = [
+          "${pkgs.steam}/share/applications/steam.desktop"
+        ];
       };
     };
 }

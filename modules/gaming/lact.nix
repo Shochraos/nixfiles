@@ -1,5 +1,5 @@
 {
-  aspects.lact =
+  aspects.nixos.lact =
     { pkgs, ... }:
     {
       environment.systemPackages = with pkgs; [ lact ];

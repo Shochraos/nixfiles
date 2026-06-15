@@ -1,11 +1,6 @@
 {
-  aspects.user =
-    {
-      username,
-      systemname,
-      pkgs,
-      ...
-    }:
+  aspects.nixos.user =
+    { username, pkgs, ... }:
     {
       users.users.${username} = {
         isNormalUser = true;
@@ -17,173 +12,180 @@
       };
 
       programs.fish.enable = true;
+    };
 
-      home-manager.users.${username} = {
-        home = {
-          username = username;
-          homeDirectory = "/home/${username}";
-          packages = with pkgs; [
-            nix-your-shell
+  aspects.home.user =
+    {
+      pkgs,
+      username,
+      systemname,
+      ...
+    }:
+    {
+      home = {
+        username = username;
+        homeDirectory = "/home/${username}";
+        packages = with pkgs; [
+          nix-your-shell
 
-            eza
-            fd
-            btop
-          ];
+          eza
+          fd
+          btop
+        ];
+      };
+
+      programs.nh = {
+        enable = true;
+        clean.enable = true;
+        clean.extraArgs = "--keep-since 7d --keep 10";
+      };
+
+      programs.fish = {
+        enable = true;
+
+        interactiveShellInit = ''
+          set fish_greeting # Disable greeting
+          direnv hook fish | source
+        '';
+
+        shellAliases = {
+          ls = "eza -1 -h -l --icons --no-user --group-directories-first -F $argv";
+          la = "eza -1 -h -l --icons -a --no-user --group-directories-first -F $argv";
+          lr = "eza -1 -h -l --icons -a -R --no-user --group-directories-first -F $argv";
+          nix-shell = "nix-your-shell fish nix-shell -- $argv";
+          nix-develop = "nix-your-shell fish nix-develop -- $argv";
+
+          nh-switch = "nh os switch --ask path:/home/${username}/Repositories/nixfiles -H ${systemname}";
+          nh-boot = "nh os boot --ask path:/home/${username}/Repositories/nixfiles -H ${systemname}";
+          nh-update = "nh os boot -u --ask path:/home/${username}/Repositories/nixfiles -H ${systemname}";
+
+          copy = "dms cl copy $argv";
+          paste = "dms cl paste";
         };
 
-        programs.nh = {
-          enable = true;
-          clean.enable = true;
-          clean.extraArgs = "--keep-since 7d --keep 10";
+        functions = {
+          denv = {
+            body = ''
+              if test (count $argv) -eq 0
+                  echo "Usage: denv <package1> <package2> ..."
+                  return 1
+              end
+
+              set packages (string join " " $argv)
+
+              echo "{pkgs ? import <nixpkgs> {}}:" > shell.nix
+              echo "" >> shell.nix
+              echo "pkgs.mkShell {" >> shell.nix
+              echo "    name = \"$packages\";" >> shell.nix  # Add the name field
+              echo "    packages = with pkgs; [ $packages ];" >> shell.nix
+              echo "}" >> shell.nix
+
+              echo "use nix" > .envrc
+
+              direnv allow
+
+              echo "Created shell.nix and .envrc for packages: $packages"
+            '';
+          };
         };
+      };
 
-        programs.fish = {
-          enable = true;
+      programs.direnv = {
+        enable = true;
+        silent = true;
+        nix-direnv.enable = true;
+      };
 
-          interactiveShellInit = ''
-            set fish_greeting # Disable greeting
-            direnv hook fish | source
+      programs.starship = {
+        enable = true;
+        settings = {
+          format = ''
+            [╭╴](fg:arrow)$username$directory($git_branch$git_status)($nix_shell)($python$c$cpp)$cmd_duration
+            [╰─](fg:arrow)$character
           '';
 
-          shellAliases = {
-            ls = "eza -1 -h -l --icons --no-user --group-directories-first -F $argv";
-            la = "eza -1 -h -l --icons -a --no-user --group-directories-first -F $argv";
-            lr = "eza -1 -h -l --icons -a -R --no-user --group-directories-first -F $argv";
-            nix-shell = "nix-your-shell fish nix-shell -- $argv";
-            nix-develop = "nix-your-shell fish nix-develop -- $argv";
+          add_newline = true;
+          palette = "foo";
 
-            nh-switch = "nh os switch --ask path:/home/${username}/Repositories/nixfiles -H ${systemname}";
-            nh-boot = "nh os boot --ask path:/home/${username}/Repositories/nixfiles -H ${systemname}";
-            nh-update = "nh os boot -u --ask path:/home/${username}/Repositories/nixfiles -H ${systemname}";
-
-            copy = "dms cl copy $argv";
-            paste = "dms cl paste";
+          palettes.foo = {
+            arrow = "#353535";
+            os = "#C60C34";
+            directory = "#FF5B2E";
+            git = "#B02B10";
+            git_status = "#8B1D2C";
+            python = "#F0B40F";
+            clang = "#00599D";
+            clangpp = "#00329D";
+            nix_shell = "#2565BE";
+            duration = "#64B5A5";
+            text_color = "#EDF2F4";
+            text_light = "#EDF2F4";
           };
 
-          functions = {
-            denv = {
-              body = ''
-                if test (count $argv) -eq 0
-                    echo "Usage: denv <package1> <package2> ..."
-                    return 1
-                end
-
-                set packages (string join " " $argv)
-
-                echo "{pkgs ? import <nixpkgs> {}}:" > shell.nix
-                echo "" >> shell.nix
-                echo "pkgs.mkShell {" >> shell.nix
-                echo "    name = \"$packages\";" >> shell.nix  # Add the name field
-                echo "    packages = with pkgs; [ $packages ];" >> shell.nix
-                echo "}" >> shell.nix
-
-                echo "use nix" > .envrc
-
-                direnv allow
-
-                echo "Created shell.nix and .envrc for packages: $packages"
-              '';
-            };
+          username = {
+            format = "[]($style)[ shochraos](bg:$style fg:text_color)[]($style)";
+            style_user = "os";
+            show_always = true;
+            disabled = false;
           };
-        };
 
-        programs.direnv = {
-          enable = true;
-          silent = true;
-          nix-direnv.enable = true;
-        };
+          character = {
+            success_symbol = "[󰍟](fg:arrow)";
+            error_symbol = "[󰍟](fg:red)";
+          };
 
-        programs.starship = {
-          enable = true;
-          settings = {
-            format = ''
-              [╭╴](fg:arrow)$username$directory($git_branch$git_status)($nix_shell)($python$c$cpp)$cmd_duration
-              [╰─](fg:arrow)$character
-            '';
+          directory = {
+            format = " [](fg:directory)[  $path ]($style)[$read_only]($read_only_style)[](fg:directory)";
+            truncation_length = 3;
+            style = "fg:text_color bg:directory";
+            read_only_style = "fg:text_color bg:directory";
+            before_repo_root_style = "fg:text_color bg:directory";
+            truncation_symbol = "…/";
+            truncate_to_repo = true;
+            read_only = "  ";
+          };
 
-            add_newline = true;
-            palette = "foo";
+          git_branch = {
+            format = " [](fg:git)[$symbol$branch](fg:text_light bg:git)[](fg:git)";
+            symbol = " ";
+          };
 
-            palettes.foo = {
-              arrow = "#353535";
-              os = "#C60C34";
-              directory = "#FF5B2E";
-              git = "#B02B10";
-              git_status = "#8B1D2C";
-              python = "#F0B40F";
-              clang = "#00599D";
-              clangpp = "#00329D";
-              nix_shell = "#2565BE";
-              duration = "#64B5A5";
-              text_color = "#EDF2F4";
-              text_light = "#EDF2F4";
-            };
+          git_status = {
+            format = "([ ](fg:git_status)[ $all_status$ahead_behind ]($style)[](fg:git_status))";
+            style = "fg:text_light bg:git_status";
+          };
 
-            username = {
-              format = "[]($style)[ shochraos](bg:$style fg:text_color)[]($style)";
-              style_user = "os";
-              show_always = true;
-              disabled = false;
-            };
+          cmd_duration = {
+            format = " [](fg:duration)[ $duration]($style)[](fg:duration)";
+            style = "fg:text_light bg:duration";
+            min_time = 500;
+          };
 
-            character = {
-              success_symbol = "[󰍟](fg:arrow)";
-              error_symbol = "[󰍟](fg:red)";
-            };
+          python = {
+            format = "[ ](fg:python)[$symbol$pyenv_prefix($version )(\($virtualenv\))]($style)[](fg:python)";
+            symbol = " ";
+            version_format = "$raw";
+            style = "fg:text_light bg:python";
+            disabled = false;
+          };
 
-            directory = {
-              format = " [](fg:directory)[  $path ]($style)[$read_only]($read_only_style)[](fg:directory)";
-              truncation_length = 3;
-              style = "fg:text_color bg:directory";
-              read_only_style = "fg:text_color bg:directory";
-              before_repo_root_style = "fg:text_color bg:directory";
-              truncation_symbol = "…/";
-              truncate_to_repo = true;
-              read_only = "  ";
-            };
+          c = {
+            format = "[ ](fg:clang)[$symbol($version(-$name) )](bg:clang fg:text_color)[](fg:clang)";
+            symbol = " ";
+            version_format = "$raw";
+            disabled = false;
+          };
 
-            git_branch = {
-              format = " [](fg:git)[$symbol$branch](fg:text_light bg:git)[](fg:git)";
-              symbol = " ";
-            };
+          cpp = {
+            format = "[ ](fg:clangpp)[$symbol($version(-$name) )](bg:clangpp fg:text_color)[](fg:clangpp)";
+            symbol = " ";
+            disabled = false;
+          };
 
-            git_status = {
-              format = "([ ](fg:git_status)[ $all_status$ahead_behind ]($style)[](fg:git_status))";
-              style = "fg:text_light bg:git_status";
-            };
-
-            cmd_duration = {
-              format = " [](fg:duration)[ $duration]($style)[](fg:duration)";
-              style = "fg:text_light bg:duration";
-              min_time = 500;
-            };
-
-            python = {
-              format = "[ ](fg:python)[$symbol$pyenv_prefix($version )(\($virtualenv\))]($style)[](fg:python)";
-              symbol = " ";
-              version_format = "$raw";
-              style = "fg:text_light bg:python";
-              disabled = false;
-            };
-
-            c = {
-              format = "[ ](fg:clang)[$symbol($version(-$name) )](bg:clang fg:text_color)[](fg:clang)";
-              symbol = " ";
-              version_format = "$raw";
-              disabled = false;
-            };
-
-            cpp = {
-              format = "[ ](fg:clangpp)[$symbol($version(-$name) )](bg:clangpp fg:text_color)[](fg:clangpp)";
-              symbol = " ";
-              disabled = false;
-            };
-
-            nix_shell = {
-              format = "[ ](fg:nix_shell)[ ($name)]($style)[](fg:nix_shell)";
-              style = "bg:nix_shell fg:text_color";
-              disabled = false;
-            };
+          nix_shell = {
+            format = "[ ](fg:nix_shell)[ ($name)]($style)[](fg:nix_shell)";
+            style = "bg:nix_shell fg:text_color";
+            disabled = false;
           };
         };
       };

@@ -1,16 +1,12 @@
 {
-  aspects.gamechat =
+  aspects.nixos.gamechat =
     {
       pkgs,
       lib,
-      username,
       ...
     }:
     let
       lua = lib.generators.mkLuaInline;
-      gamechat_mix = pkgs.writeShellScript "gamechat_mix.sh" (
-        builtins.readFile ../../assets/scripts/gamechat_mix.sh
-      );
       gamechat_chat = pkgs.writeShellScriptBin "gamechat_chat" (
         builtins.readFile ../../assets/scripts/gamechat_chat.sh
       );
@@ -54,23 +50,30 @@
           ];
         }
       ];
+    };
 
-      home-manager.users.${username} = {
-        systemd.user.services.gamechat-mix = {
-          Unit = {
-            Description = "Dynamically sorts audio streams into sinks to independently manage volume";
-            PartOf = [ "graphical-session.target" ];
-          };
+  aspects.home.gamechat =
+    { pkgs, ... }:
+    let
+      gamechat_mix = pkgs.writeShellScript "gamechat_mix.sh" (
+        builtins.readFile ../../assets/scripts/gamechat_mix.sh
+      );
+    in
+    {
+      systemd.user.services.gamechat-mix = {
+        Unit = {
+          Description = "Dynamically sorts audio streams into sinks to independently manage volume";
+          PartOf = [ "graphical-session.target" ];
+        };
 
-          Service = {
-            Type = "simple";
-            ExecStart = "${gamechat_mix}";
-            Restart = "always";
-          };
+        Service = {
+          Type = "simple";
+          ExecStart = "${gamechat_mix}";
+          Restart = "always";
+        };
 
-          Install = {
-            WantedBy = [ "graphical-session.target" ];
-          };
+        Install = {
+          WantedBy = [ "graphical-session.target" ];
         };
       };
     };

@@ -1,12 +1,10 @@
 {
-  aspects.office =
-    { pkgs, username, ... }:
+  aspects.home.office =
+    { pkgs, ... }:
     {
-      home-manager.users.${username} = {
-        home.packages = with pkgs; [
-          libreoffice-qt-fresh
-          pdfarranger
-        ];
-      };
+      home.packages = with pkgs; [
+        libreoffice-qt-fresh
+        pdfarranger
+      ];
     };
 }

@@ -1,8 +1,7 @@
 {
-  aspects.nvidia =
+  aspects.nixos.nvidia =
     {
       config,
-      username,
       pkgs,
       ...
     }:
@@ -26,13 +25,13 @@
         nvidiaSettings = false;
         package = config.boot.kernelPackages.nvidiaPackages.stable;
       };
-
-      home-manager.users.${username} = {
-        home.sessionVariables = {
-          "LIBVA_DRIVER_NAME" = "nvidia";
-          "__GLX_VENDOR_LIBRARY_NAME" = "nvidia";
-          "NVD_BACKEND" = "direct";
-        };
-      };
     };
+
+  aspects.home.nvidia = {
+    home.sessionVariables = {
+      "LIBVA_DRIVER_NAME" = "nvidia";
+      "__GLX_VENDOR_LIBRARY_NAME" = "nvidia";
+      "NVD_BACKEND" = "direct";
+    };
+  };
 }
