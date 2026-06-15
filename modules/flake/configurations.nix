@@ -1,9 +1,3 @@
-# Assembles the NixOS systems from the class-keyed aspects in `aspects.nixos.*`
-# and `aspects.home.*`. Hosts are composed by aspect *name*; each name resolves to
-# its system module (if any) and its home module (if any), so a single name list
-# pulls in both halves of a cross-cutting aspect. Home modules are attached once via
-# `home-manager.users.<user>.imports`; since they are no longer lexically nested in
-# their nixos module, `extraSpecialArgs` supplies inputs/username/systemname.
 { inputs, config, ... }:
 let
   system = "x86_64-linux";
@@ -15,7 +9,6 @@ let
   sysFor = names: map (n: nixosAspects.${n}) (builtins.filter (n: nixosAspects ? ${n}) names);
   homeFor = names: map (n: homeAspects.${n}) (builtins.filter (n: homeAspects ? ${n}) names);
 
-  # Aspect bundles (mirror the former modules/*/default.nix groupings), by name.
   core = [
     "audio"
     "boot"
