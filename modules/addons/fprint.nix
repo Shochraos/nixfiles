@@ -1,5 +1,5 @@
 {
-  aspects.fprint =
+  aspects.nixos.fprint =
     { ... }:
     {
       services.fprintd.enable = true;

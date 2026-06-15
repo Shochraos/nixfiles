@@ -1,5 +1,5 @@
 {
-  aspects.portal =
+  aspects.nixos.portal =
     { pkgs, ... }:
     {
       xdg.portal = {

@@ -1,5 +1,5 @@
 {
-  aspects.boot =
+  aspects.nixos.boot =
     {
       inputs,
       lib,

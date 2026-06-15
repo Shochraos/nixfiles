@@ -1,5 +1,5 @@
 {
-  aspects.home-manager =
+  aspects.nixos.home-manager =
     { ... }:
     {
       home-manager = {
