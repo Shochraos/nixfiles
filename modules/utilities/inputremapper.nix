@@ -1,17 +1,18 @@
 {
-  aspects.inputremapper =
-    { username, pkgs, ... }:
+  aspects.nixos.inputremapper = {
+    services.input-remapper = {
+      enable = true;
+      enableUdevRules = true;
+    };
+  };
+
+  aspects.home.inputremapper =
+    { pkgs, ... }:
     {
-      services.input-remapper = {
-        enable = true;
-        enableUdevRules = true;
-      };
-      home-manager.users.${username} = {
-        xdg.autostart = {
-          entries = [
-            "${pkgs.input-remapper}/share/applications/input-remapper-autoload.desktop"
-          ];
-        };
+      xdg.autostart = {
+        entries = [
+          "${pkgs.input-remapper}/share/applications/input-remapper-autoload.desktop"
+        ];
       };
     };
 }

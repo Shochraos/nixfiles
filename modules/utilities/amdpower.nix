@@ -1,5 +1,5 @@
 {
-  aspects.amdpower =
+  aspects.nixos.amdpower =
     { username, pkgs, ... }:
     {
       users.groups.power_c = { };

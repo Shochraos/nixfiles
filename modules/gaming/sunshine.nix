@@ -1,5 +1,5 @@
 {
-  aspects.sunshine =
+  aspects.nixos.sunshine =
     { pkgs, username, ... }:
     let
       moondeck = pkgs.callPackage ../../packages/moondeck-buddy { };
@@ -36,11 +36,16 @@
         };
       };
 
-      home-manager.users.${username} = {
-        home.packages = [ moondeck ];
-        xdg.autostart.entries = [ "${moondeck}/share/applications/MoonDeckBuddy.desktop" ];
-      };
-
       networking.firewall.allowedTCPPorts = [ 59999 ];
+    };
+
+  aspects.home.sunshine =
+    { pkgs, ... }:
+    let
+      moondeck = pkgs.callPackage ../../packages/moondeck-buddy { };
+    in
+    {
+      home.packages = [ moondeck ];
+      xdg.autostart.entries = [ "${moondeck}/share/applications/MoonDeckBuddy.desktop" ];
     };
 }

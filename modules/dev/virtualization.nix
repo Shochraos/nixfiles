@@ -1,5 +1,5 @@
 {
-  aspects.virtualization =
+  aspects.nixos.virtualization =
     { username, ... }:
     {
       programs.virt-manager.enable = true;

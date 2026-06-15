@@ -1,5 +1,5 @@
 {
-  aspects.sshfs =
+  aspects.nixos.sshfs =
     {
       pkgs,
       lib,

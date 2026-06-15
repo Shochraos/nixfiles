@@ -1,9 +1,8 @@
 {
-  aspects.lgtv =
+  aspects.nixos.lgtv =
     {
       pkgs,
       lib,
-      username,
       ...
     }:
     let
@@ -50,23 +49,25 @@
           ];
         }
       ];
+    };
 
-      home-manager.users.${username} = {
-        systemd.user.services.sol-lgtv = {
-          Unit = {
-            Description = "Shutdown-On-LAN for LGTV";
-            PartOf = [ "graphical-session.target" ];
-          };
-          Service = {
-            Type = "oneshot";
-            ExecStart = "${pkgs.coreutils}/bin/true";
-            RemainAfterExit = true;
-            WorkingDirectory = "/home/${username}/Applications/bscpylgtv";
-            ExecStop = "${pkgs.direnv}/bin/direnv exec /home/${username}/Applications/bscpylgtv bscpylgtvcommand 192.168.30.6 power_off";
-          };
-          Install = {
-            WantedBy = [ "graphical-session.target" ];
-          };
+  aspects.home.lgtv =
+    { pkgs, username, ... }:
+    {
+      systemd.user.services.sol-lgtv = {
+        Unit = {
+          Description = "Shutdown-On-LAN for LGTV";
+          PartOf = [ "graphical-session.target" ];
+        };
+        Service = {
+          Type = "oneshot";
+          ExecStart = "${pkgs.coreutils}/bin/true";
+          RemainAfterExit = true;
+          WorkingDirectory = "/home/${username}/Applications/bscpylgtv";
+          ExecStop = "${pkgs.direnv}/bin/direnv exec /home/${username}/Applications/bscpylgtv bscpylgtvcommand 192.168.30.6 power_off";
+        };
+        Install = {
+          WantedBy = [ "graphical-session.target" ];
         };
       };
     };
