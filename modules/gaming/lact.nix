@@ -1,8 +1,11 @@
-{ pkgs, ... }:
 {
-  environment.systemPackages = with pkgs; [ lact ];
-  systemd = {
-    packages = with pkgs; [ lact ];
-    services.lactd.wantedBy = [ "multi-user.target" ];
-  };
+  aspects.lact =
+    { pkgs, ... }:
+    {
+      environment.systemPackages = with pkgs; [ lact ];
+      systemd = {
+        packages = with pkgs; [ lact ];
+        services.lactd.wantedBy = [ "multi-user.target" ];
+      };
+    };
 }
