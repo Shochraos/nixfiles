@@ -4,7 +4,6 @@
     { config, ... }:
     {
       home.packages = with pkgs; [
-        gemini-cli
         opencode
         (pkgs.llama-cpp.override { cudaSupport = true; })
       ];

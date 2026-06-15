@@ -11,6 +11,7 @@
     home.packages = with pkgs; [
       (discord.override { withVencord = true; })
       anki
+      claude-code
     ];
 
     programs.spicetify =
