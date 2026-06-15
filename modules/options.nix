@@ -40,7 +40,7 @@ in
       };
 
       dms = {
-        powerMenuExtraActions = mkOption {
+        powerMenuActions = mkOption {
           type = types.listOf types.str;
           default = [ ];
           description = "Extra DMS power-menu actions for this host.";
