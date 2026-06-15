@@ -9,46 +9,33 @@ let
   sysFor = names: map (n: nixosAspects.${n}) (builtins.filter (n: nixosAspects ? ${n}) names);
   homeFor = names: map (n: homeAspects.${n}) (builtins.filter (n: homeAspects ? ${n}) names);
 
-  core = [
-    "audio"
+  base = [
     "boot"
-    "fonts"
-    "git"
+    "nix"
     "locale"
     "network"
-    "ssh"
-    "terminal"
-    "user"
-    "zed"
-    "zen"
+    "audio"
+    "fonts"
     "scheduling"
+    "user"
+    "terminal"
+    "remotes"
   ];
-  nixConfig = [
-    "nix"
-    "home-manager"
-  ];
-  hyprland = [
-    "config"
-    "animations"
-    "keybinds"
-    "window_rules"
-  ];
-  desktop = hyprland ++ [
-    "dms"
-    "theme"
-    "portal"
-  ];
-  gaming = [
-    "lact"
-    "mangohud"
-    "nvidia"
-    "packages"
-    "steam"
-    "sunshine"
+
+  desktop = base ++ [
+    "hyprland"
+    "dankshell"
+    "browser"
+    "editor"
+    "apps"
+    "sync"
+    "kde-connect"
+    "printing"
+    "bluetooth"
   ];
 
   mkHost =
-    name: names: pathModules:
+    name: names:
     inputs.nixpkgs.lib.nixosSystem {
       inherit system;
       specialArgs = {
@@ -67,71 +54,38 @@ let
           home-manager.users.${username}.imports = homeFor names;
         }
       ]
-      ++ pathModules
       ++ sysFor names;
     };
 in
 {
   flake.nixosConfigurations = {
-    Azazel =
-      mkHost "Azazel"
-        (
-          core
-          ++ nixConfig
-          ++ desktop
-          ++ gaming
-          ++ [
-            "ai"
-            "virtualization"
+    Azazel = mkHost "Azazel" (
+      desktop
+      ++ [
+        "azazel"
+        "cpu-amd"
+        "gaming"
+        "ai"
+        "media"
+        "remote-mounts"
+        "virtualization"
+        "gamechat"
+        "inputremapper"
+        "lgtv"
+        "mp3tag"
+        "preventsleep"
+      ]
+    );
 
-            "bluetooth"
-            "cloud"
-            "common-packages"
-            "mpv"
-            "sshfs"
-            "office"
-            "scanprint"
-            "kde-connect"
-
-            "amdpower"
-            "gamechat"
-            "inputremapper"
-            "lgtv"
-            "mp3tag"
-            "preventsleep"
-          ]
-        )
-        [
-          ../../hosts/Azazel/hardware-configuration.nix
-          ../../hosts/Azazel/filesystems.nix
-          ../../hosts/Azazel/host-specific.nix
-        ];
-
-    Solas =
-      mkHost "Solas"
-        (
-          core
-          ++ nixConfig
-          ++ desktop
-          ++ [
-            "virtualization"
-
-            "bluetooth"
-            "fprint"
-            "cloud"
-            "common-packages"
-            "office"
-            "scanprint"
-            "kde-connect"
-
-            "amdpower"
-            "mic-mute"
-          ]
-        )
-        [
-          ../../hosts/Solas/hardware-configuration.nix
-          ../../hosts/Solas/filesystems.nix
-          ../../hosts/Solas/host-specific.nix
-        ];
+    Solas = mkHost "Solas" (
+      desktop
+      ++ [
+        "solas"
+        "cpu-amd"
+        "fingerprint"
+        "virtualization"
+        "mic-mute"
+      ]
+    );
   };
 }
