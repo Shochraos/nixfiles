@@ -17,12 +17,12 @@ in
 
   # Host-specific Hyprland layout/capabilities (consumed in modules/desktop/hypr/*)
   host.hyprland = {
-    inputExtra = {
+    input = {
       touchpad = {
         natural_scroll = true;
       };
     };
-    settingsExtra = {
+    settings = {
       gestures = {
         workspace_swipe_invert = true;
       };

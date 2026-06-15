@@ -1,8 +1,3 @@
-# Typed slots for host-specific layout/capability data. Shared modules (hypr,
-# dms) *consume* these; hosts and feature modules *populate* them. This replaces
-# the former `config.modules.<host>.isLoaded or false` host-identity coupling.
-# list-typed slots concatenate across all definitions, so several producers can
-# contribute (e.g. host + gamechat + lgtv all add keybinds).
 { lib, ... }:
 let
   inherit (lib) mkOption types;
@@ -12,12 +7,12 @@ in
   aspects.nixos.hostOptions = {
     options.host = {
       hyprland = {
-        inputExtra = mkOption {
+        input = mkOption {
           type = types.attrs;
           default = { };
           description = "Extra Hyprland `input` settings merged for this host.";
         };
-        settingsExtra = mkOption {
+        settings = mkOption {
           type = types.attrs;
           default = { };
           description = "Extra top-level Hyprland config settings for this host.";

@@ -81,8 +81,6 @@
       {
         imports = [ (import-tree ./modules) ];
 
-        # The `aspects.<name>` namespace: reusable NixOS modules contributed by
-        # files under ./modules and composed into hosts in flake/configurations.nix.
         options.aspects = lib.mkOption {
           type = lib.types.lazyAttrsOf (lib.types.lazyAttrsOf lib.types.deferredModule);
           default = { };
