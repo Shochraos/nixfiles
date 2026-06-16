@@ -10,12 +10,12 @@ in
         input = mkOption {
           type = types.attrs;
           default = { };
-          description = "Extra Hyprland `input` settings merged for this host.";
+          description = "Hyprland `input` settings merged for this host.";
         };
         settings = mkOption {
           type = types.attrs;
           default = { };
-          description = "Extra top-level Hyprland config settings for this host.";
+          description = "Hyprland top-level config settings for this host.";
         };
         gestures = mkOption {
           type = anyList;
@@ -25,17 +25,17 @@ in
         workspaceRules = mkOption {
           type = anyList;
           default = [ ];
-          description = "Extra Hyprland `workspace_rule` entries for this host.";
+          description = "Hyprland `workspace_rule` entries for this host.";
         };
         windowRules = mkOption {
           type = anyList;
           default = [ ];
-          description = "Extra Hyprland `window_rule` entries for this host.";
+          description = "Hyprland `window_rule` entries for this host.";
         };
         keybinds = mkOption {
           type = anyList;
           default = [ ];
-          description = "Extra Hyprland `bind` entries (from host + feature modules).";
+          description = "Hyprland `bind` entries (from host + feature modules).";
         };
       };
 
@@ -43,7 +43,7 @@ in
         powerMenuActions = mkOption {
           type = types.listOf types.str;
           default = [ ];
-          description = "Extra DMS power-menu actions for this host.";
+          description = "DMS power-menu actions for this host.";
         };
         barConfigs = mkOption {
           type = anyList;
@@ -53,7 +53,7 @@ in
         hyprlandOutputSettings = mkOption {
           type = types.attrs;
           default = { };
-          description = "Per-output DMS Hyprland settings for this host.";
+          description = "DMS Hyprland Output settings for this host.";
         };
       };
     };
