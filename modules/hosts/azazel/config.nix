@@ -91,10 +91,13 @@
           visible = true;
 
           position = 0;
-          bottomGap = -5;
+          bottomGap = 0;
           innerPadding = 5;
           spacing = 0;
           transparency = 0;
+
+          popupGapsAuto = false;
+          popupGapsManual = 6;
 
           screenPreferences = [ "all" ];
 
@@ -102,7 +105,7 @@
           widgetOutlineEnabled = true;
           widgetOutlineColor = "primary";
           widgetOutlineThickness = 1;
-          widgetOutlineOpacity = 0.30;
+          widgetOutlineOpacity = 0.35;
 
           leftWidgets = [
             {
@@ -153,6 +156,10 @@
               id = "spacer";
               enabled = true;
               size = 15;
+            }
+            {
+              id = "claudeUsage";
+              enabled = true;
             }
             {
               id = "cpuUsage";
