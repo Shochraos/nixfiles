@@ -29,13 +29,16 @@
     };
 
   aspects.home.dankshell =
-    { inputs, osConfig, ... }:
+    { inputs, osConfig, pkgs, ... }:
     {
       imports = [
         inputs.dms.homeModules.dank-material-shell
         inputs.dms-plugin-registry.nixosModules.default
         inputs.danksearch.homeModules.dsearch
       ];
+
+      # Claude Usage
+      home.packages = [ pkgs.jq ];
 
       xdg.autostart.enable = true;
 
@@ -58,6 +61,7 @@
           calculator.enable = true;
           dankKDEConnect.enable = true;
           simpleAudioControl.enable = true;
+          claudeUsage.enable = true;
         };
 
         settings = {
