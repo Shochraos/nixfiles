@@ -132,13 +132,13 @@
             visible = true;
 
             position = 0;
-            bottomGap = -3;
+            bottomGap = 0;
             innerPadding = 5;
             spacing = 0;
             transparency = 0;
 
             popupGapsAuto = false;
-            popupGapsManual = 24;
+            popupGapsManual = 6;
 
             screenPreferences = [ "all" ];
 
@@ -149,11 +149,6 @@
             widgetOutlineOpacity = 0.35;
 
             leftWidgets = [
-              {
-                id = "spacer";
-                enabled = true;
-                size = 5;
-              }
               {
                 id = "clock";
                 enabled = true;
@@ -236,11 +231,6 @@
               {
                 id = "controlCenterButton";
                 enabled = true;
-              }
-              {
-                id = "spacer";
-                enabled = true;
-                size = 5;
               }
             ];
           }
