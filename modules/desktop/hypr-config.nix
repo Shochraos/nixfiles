@@ -97,7 +97,7 @@
 
             general = {
               gaps_in = 5;
-              gaps_out = 10;
+              gaps_out = 5;
               border_size = 1;
               col = {
                 inactive_border = "rgba(00000000)";
@@ -110,6 +110,20 @@
               active_opacity = 1.0;
               inactive_opacity = 1.0;
               dim_around = 0.66;
+              blur = {
+                enabled = true;
+                size = 3;
+                passes = 2;
+        
+                ignore_opacity = true;
+                new_optimizations = true;
+                xray = false;
+        
+                noise = 0.02;
+                contrast = 1.1;
+                vibrancy = 0.2;
+                vibrancy_darkness = 0.3;
+              };
               shadow = {
                 enabled = true;
                 range = 30;
