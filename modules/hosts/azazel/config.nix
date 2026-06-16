@@ -105,7 +105,7 @@
           widgetOutlineEnabled = true;
           widgetOutlineColor = "primary";
           widgetOutlineThickness = 1;
-          widgetOutlineOpacity = 0.35;
+          widgetOutlineOpacity = 0.1;
 
           leftWidgets = [
             {
