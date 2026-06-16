@@ -122,7 +122,14 @@
           {
             _args = [
               "SUPER + L"
-              (lua "hl.dsp.exec_cmd('dms ipc call lock lock')")
+              (lua ''
+                function()
+                  hl.dispatch(hl.dsp.exec_cmd('dms ipc call lock lock'))
+                  hl.timer(function()
+                    hl.dispatch(hl.dsp.dpms({ action = "disable" }))
+                  end, {timeout = 500, type = "oneshot"})
+                end
+              '')
             ];
           }
           {
