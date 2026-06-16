@@ -132,10 +132,13 @@
             visible = true;
 
             position = 0;
-            bottomGap = -5;
+            bottomGap = -3;
             innerPadding = 5;
             spacing = 0;
             transparency = 0;
+
+            popupGapsAuto = false;
+            popupGapsManual = 24;
 
             screenPreferences = [ "all" ];
 
@@ -186,12 +189,7 @@
                 enabled = true;
               }
               {
-                id = "spacer";
-                enabled = true;
-                size = 15;
-              }
-              {
-                id = "battery";
+                id = "claudeUsage";
                 enabled = true;
               }
             ];
@@ -205,6 +203,10 @@
 
             rightWidgets = [
               {
+                id = "battery";
+                enabled = true;
+              }
+              {
                 id = "cpuUsage";
                 enabled = true;
                 minimumWidth = true;
@@ -213,10 +215,6 @@
                 id = "cpuTemp";
                 enabled = true;
                 minimumWidth = true;
-              }
-              {
-                id = "network_speed_monitor";
-                enabled = true;
               }
               {
                 id = "vpn";
