@@ -39,7 +39,7 @@
 
       # Claude Usage
       home.packages = [ pkgs.jq ];
-
+      
       xdg.autostart.enable = true;
 
       programs.dank-material-shell = {
