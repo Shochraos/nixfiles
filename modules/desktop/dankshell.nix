@@ -86,7 +86,7 @@
           launchPrefix = "uwsm-app -- ";
 
           loginctlLockIntegration = true;
-          lockScreenPowerOffMonitorsOnLock = true;
+          lockScreenPowerOffMonitorsOnLock = false;
 
           currentThemeName = "dynamic";
           currentThemeCategory = "dynamic";
