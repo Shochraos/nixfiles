@@ -27,6 +27,11 @@
             AddKeysToAgent = "yes";
             IdentityFile = "/home/${username}/.ssh/${lib.toLower systemname}-git";
           };
+          "codeberg.org" = {
+            forwardAgent = true;
+            AddKeysToAgent = "yes";
+            IdentityFile = "/home/${username}/.ssh/${lib.toLower systemname}-git";
+          };
 
           "private-cloud.informatik.hs-fulda.de" = {
             forwardAgent = true;
