@@ -15,6 +15,9 @@
           core.excludesfile = "/home/${username}/.gitignore";
           init.defaultBranch = "main";
         };
+        extraConfig = {
+          url."git@git-ce.rwth-aachen.de:".insteadOf = "https://git-ce.rwth-aachen.de/";
+        };
       };
 
       programs.ssh = {
