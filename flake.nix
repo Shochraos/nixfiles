@@ -6,10 +6,18 @@
       url = "github:NixOS/nixpkgs/nixos-unstable";
     };
 
+    flake-parts = {
+      url = "github:hercules-ci/flake-parts";
+      inputs.nixpkgs-lib.follows = "nixpkgs";
+    };
+
+    import-tree.url = "github:vic/import-tree";
+
     nix-cachyos-kernel.url = "github:xddxdd/nix-cachyos-kernel/release";
 
     lanzaboote = {
-      url = "github:nix-community/lanzaboote/v1.0.0";
+      #url = "github:nix-community/lanzaboote/v1.0.0";
+      url = "github:nix-community/lanzaboote/0403b4b7e8b2612657f0053a4c315e6c43eee9e6";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
@@ -19,7 +27,7 @@
     };
 
     dms = {
-      url = "github:AvengeMedia/DankMaterialShell/";
+      url = "github:AvengeMedia/DankMaterialShell/stable";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
@@ -59,7 +67,8 @@
     };
 
     millennium = {
-      url = "github:SteamClientHomebrew/Millennium/next?dir=packages/nix";
+      #url = "github:SteamClientHomebrew/Millennium/next?dir=packages/nix";
+      url = "github:Izumemori/Millennium/fix/nix-build?dir=packages/nix";
     };
 
     nix-proton-cachyos.url = "github:Shochraos/nix-proton-cachyos";
@@ -68,37 +77,18 @@
   };
 
   outputs =
-    {
-      nixpkgs,
-      home-manager,
-      stylix,
-      ...
-    }@inputs:
-    let
-      system = "x86_64-linux";
-      username = "shochraos";
-    in
-    {
-      nixosConfigurations =
-        let
-          makeSystem =
-            name:
-            nixpkgs.lib.nixosSystem {
-              inherit system;
-              specialArgs = {
-                inherit inputs username;
-                systemname = name;
-              };
-              modules = [
-                home-manager.nixosModules.home-manager
-                stylix.nixosModules.stylix
-                ./hosts/${name}
-              ];
-            };
-        in
-        {
-          Azazel = makeSystem "Azazel";
-          Solas = makeSystem "Solas";
+    inputs@{ flake-parts, import-tree, ... }:
+    flake-parts.lib.mkFlake { inherit inputs; } (
+      { lib, ... }:
+      {
+        imports = [ (import-tree ./modules) ];
+
+        options.aspects = lib.mkOption {
+          type = lib.types.lazyAttrsOf (lib.types.lazyAttrsOf lib.types.deferredModule);
+          default = { };
         };
-    };
+
+        config.systems = [ "x86_64-linux" ];
+      }
+    );
 }
