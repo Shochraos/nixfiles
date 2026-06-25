@@ -1,13 +1,18 @@
-{ inputs, config, ... }:
+{ inputs, config, lib, ... }:
 let
   system = "x86_64-linux";
   username = "shochraos";
 
+  containerUser = "containerUser";
+
   nixosAspects = config.aspects.nixos or { };
   homeAspects = config.aspects.home or { };
+  containerAspects = config.aspects.containers or { };
 
-  sysFor = names: map (n: nixosAspects.${n}) (builtins.filter (n: nixosAspects ? ${n}) names);
-  homeFor = names: map (n: homeAspects.${n}) (builtins.filter (n: homeAspects ? ${n}) names);
+  pick = set: names: map (n: set.${n}) (builtins.filter (n: set ? ${n}) names);
+  sysFor = pick nixosAspects;
+  homeFor = pick homeAspects;
+  containersFor = pick containerAspects;
 
   base = [
     "boot"
@@ -34,8 +39,17 @@ let
     "bluetooth"
   ];
 
+  containers = [
+    "quadlet"
+    "proxy"
+  ];
+
   mkHost =
     name: names:
+    let
+      containerModules = containersFor names;
+      enableContainers = builtins.elem "quadlet" names && containerModules != [ ];
+    in
     inputs.nixpkgs.lib.nixosSystem {
       inherit system;
       specialArgs = {
@@ -45,6 +59,7 @@ let
       modules = [
         inputs.home-manager.nixosModules.home-manager
         inputs.stylix.nixosModules.stylix
+        inputs.quadlet-nix.nixosModules.quadlet
         nixosAspects.hostOptions
         {
           home-manager.extraSpecialArgs = {
@@ -54,13 +69,17 @@ let
           home-manager.users.${username}.imports = homeFor names;
         }
       ]
-      ++ sysFor names;
+      ++ sysFor names
+      ++ lib.optional enableContainers {
+        home-manager.users.${containerUser}.imports = containerModules;
+      };
     };
 in
 {
   flake.nixosConfigurations = {
     Azazel = mkHost "Azazel" (
       desktop
+      ++ containers
       ++ [
         "azazel"
         "cpu-amd"
