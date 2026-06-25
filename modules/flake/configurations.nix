@@ -1,18 +1,14 @@
-{ inputs, config, lib, ... }:
+{ inputs, config, ... }:
 let
   system = "x86_64-linux";
   username = "shochraos";
 
-  containerUser = "containerUser";
-
   nixosAspects = config.aspects.nixos or { };
   homeAspects = config.aspects.home or { };
-  containerAspects = config.aspects.containers or { };
 
   pick = set: names: map (n: set.${n}) (builtins.filter (n: set ? ${n}) names);
   sysFor = pick nixosAspects;
   homeFor = pick homeAspects;
-  containersFor = pick containerAspects;
 
   base = [
     "boot"
@@ -42,14 +38,11 @@ let
   containers = [
     "quadlet"
     "proxy"
+    "nextcloud"
   ];
 
   mkHost =
     name: names:
-    let
-      containerModules = containersFor names;
-      enableContainers = builtins.elem "quadlet" names && containerModules != [ ];
-    in
     inputs.nixpkgs.lib.nixosSystem {
       inherit system;
       specialArgs = {
@@ -69,10 +62,7 @@ let
           home-manager.users.${username}.imports = homeFor names;
         }
       ]
-      ++ sysFor names
-      ++ lib.optional enableContainers {
-        home-manager.users.${containerUser}.imports = containerModules;
-      };
+      ++ sysFor names;
     };
 in
 {
