@@ -40,7 +40,7 @@
         }
         {
           match = {
-            class = "^(Spotify)$";
+            class = "^(spotify)$";
           };
           workspace = "5 silent";
         }
