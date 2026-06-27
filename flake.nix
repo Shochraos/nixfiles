@@ -13,11 +13,8 @@
 
     import-tree.url = "github:vic/import-tree";
 
-    nix-cachyos-kernel.url = "github:xddxdd/nix-cachyos-kernel/release";
-
     lanzaboote = {
-      #url = "github:nix-community/lanzaboote/v1.0.0";
-      url = "github:nix-community/lanzaboote/0403b4b7e8b2612657f0053a4c315e6c43eee9e6";
+      url = "github:nix-community/lanzaboote/v1.1.0";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
@@ -67,8 +64,7 @@
     };
 
     millennium = {
-      #url = "github:SteamClientHomebrew/Millennium/next?dir=packages/nix";
-      url = "github:Izumemori/Millennium/fix/nix-build?dir=packages/nix";
+      url = "github:SteamClientHomebrew/Millennium/next?dir=packages/nix";
     };
 
     nix-proton-cachyos.url = "github:Shochraos/nix-proton-cachyos";
