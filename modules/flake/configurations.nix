@@ -39,6 +39,7 @@ let
     "quadlet"
     "proxy"
     "nextcloud"
+    "immich"
   ];
 
   mkHost =
@@ -88,6 +89,7 @@ in
 
     Solas = mkHost "Solas" (
       desktop
+      ++ containers
       ++ [
         "solas"
         "cpu-amd"

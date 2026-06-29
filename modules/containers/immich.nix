@@ -1,7 +1,7 @@
 { ... }:
 let
-  containerName = "nextcloud";
-  containerDir = "/mnt/containers/nextcloud";
+  containerName = "immich";
+  containerDir = "/mnt/containers/immich";
 in
 {
   aspects.nixos.${containerName} =
@@ -22,36 +22,47 @@ in
         }) volumeDirs
       );
 
-      virtualisation.quadlet.pods.nextcloudStack.podConfig = {
+      virtualisation.quadlet.pods.immichStack.podConfig = {
         networks = [ networks.internal.ref ];
-        networkAliases = [ "nextcloud" ];
+        networkAliases = [ "immich" ];
       };
 
       virtualisation.quadlet.containers = {
-        nextcloud = {
+        immich = {
           containerConfig = {
-            image = "lscr.io/linuxserver/nextcloud:latest";
-            pod = pods.nextcloudStack.ref;
+            image = "ghcr.io/imagegenius/immich:latest";
+            pod = pods.immichStack.ref;
 
             volumes = [
-              "${containerDir}/config:/config"
+              "${containerDir}:/config"
               #Testing, set to real data storage later
-              "${containerDir}/data:/data"
+              "${containerDir}/data:/photos"
             ];
 
             environments = { 
               PUID = "700"; 
               GUID = "700";
-              TZ = "Europe/Berlin";
+
+              SERVER_PORT = "8080";
+
+              DB_HOSTNAME = "localhost";
+              DB_USERNAME = "test";
+              DB_PASSWORD = "test";
+              DB_DATABASE_NAME = "db";
+              DB_PORT = "5432";
+
+              REDIS_HOSTNAME = "localhost";
+              REDIS_PASSWORD = "";
+              REDIS_PORT = "6379";
             };
           };
           serviceConfig.TimeoutStartSec = "60";
         };
 
-        postgres-nc = {
+        postgres-im = {
           containerConfig = {
-            image = "docker.io/library/postgres:15";
-            pod = pods.nextcloudStack.ref;
+            image = "ghcr.io/immich-app/postgres:16-vectorchord0.3.0-pgvectors0.3.0";
+            pod = pods.immichStack.ref;
 
             volumes = [
               "${containerDir}/postgres:/var/lib/postgresql/data"
@@ -68,10 +79,10 @@ in
           serviceConfig.TimeoutStartSec = "60";
         };
 
-        valkey-nc = {
+        valkey-im = {
           containerConfig = {
             image = "docker.io/valkey/valkey";
-            pod = pods.nextcloudStack.ref;
+            pod = pods.immichStack.ref;
 
             volumes = [
               "${containerDir}/valkey:/data"

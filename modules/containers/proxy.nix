@@ -1,7 +1,7 @@
 { ... }:
 let
   containerName = "proxy";
-  containerDir = "/var/lib/containers/proxy";
+  containerDir = "/mnt/containers/proxy";
 in
 {
   aspects.nixos.${containerName} =
@@ -20,14 +20,14 @@ in
 
       # testing
       networking.hosts = {
-        "127.0.0.1" = [ "test.local" "npm.local" ];
+        "127.0.0.1" = [ "npm.local" "cloud.local" "immich.local" ];
       };
 
       virtualisation.quadlet.containers.nginx = {
         containerConfig = {
           image = "jlesage/nginx-proxy-manager:latest";
           networks = [ networks.internal.ref ];
-          volumes = [ "${containerDir}:/config" ];
+          volumes = [ "${containerDir}:/config:U" ];
           environments = {
             USER_ID = "0";
             GROUP_ID = "0";
