@@ -482,11 +482,11 @@
     "nixfiles-private": {
       "flake": false,
       "locked": {
-        "lastModified": 1783011667,
-        "narHash": "sha256-gsPrtosJc0v2WHYcLUCdfhST7lFgXye8OWLsMN0SUTw=",
+        "lastModified": 1783012698,
+        "narHash": "sha256-pLdz2+wFGUw4JIejONb9ZyTAbkcRk9dSDyUl1jJugig=",
         "ref": "refs/heads/main",
-        "rev": "f8faa231b9552cf560f2049be4b6e26eba2cca8d",
-        "revCount": 1,
+        "rev": "98fbda60cb553ef7b7452642a91e08da5822842e",
+        "revCount": 2,
         "type": "git",
         "url": "ssh://git@git.freunds.me:2222/Shochraos/nixfiles-private.git"
       },
