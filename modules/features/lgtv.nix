@@ -3,6 +3,7 @@
     {
       pkgs,
       lib,
+      username,
       ...
     }:
     let
@@ -23,13 +24,13 @@
 
         serviceConfig = {
           Type = "oneshot";
-          ExecStart = "${pkgs.wakeonlan}/bin/wakeonlan wakeonlan -i 192.168.30.6 60:45:e8:1e:b5:40";
+          ExecStart = "${pkgs.wakeonlan}/bin/wakeonlan -i 192.168.30.6 60:45:e8:1e:b5:40";
         };
       };
 
       security.sudo.extraRules = [
         {
-          users = [ "shochraos" ];
+          users = [ username ];
           commands = [
             {
               command = "${pkgs.systemd}/bin/systemctl start wol-lgtv.service";

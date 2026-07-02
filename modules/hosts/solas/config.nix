@@ -8,6 +8,8 @@
       lua = lib.generators.mkLuaInline;
     in
     {
+      system.stateVersion = "25.05";
+
       services.upower.enable = true;
       services.fwupd.enable = true;
 
@@ -126,28 +128,6 @@
         powerMenuActions = [ "suspend" ];
         barConfigs = [
           {
-            id = "default";
-            name = "Main Bar";
-            enabled = true;
-            visible = true;
-
-            position = 0;
-            bottomGap = 0;
-            innerPadding = 5;
-            spacing = 0;
-            transparency = 0;
-
-            popupGapsAuto = false;
-            popupGapsManual = 6;
-
-            screenPreferences = [ "all" ];
-
-            borderEnabled = false;
-            widgetOutlineEnabled = true;
-            widgetOutlineColor = "primary";
-            widgetOutlineThickness = 1;
-            widgetOutlineOpacity = 0.35;
-
             leftWidgets = [
               {
                 id = "clock";
@@ -241,6 +221,8 @@
   aspects.home.solas =
     { pkgs, ... }:
     {
+      home.stateVersion = "25.05";
+
       home.packages = with pkgs; [
         pdfpc
       ];

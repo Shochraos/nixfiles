@@ -13,11 +13,6 @@
       };
     };
 
-    systemd.timers."nix-gc.timer".timerConfig = {
-      OnCalendar = "daily";
-      Persistent = true;
-    };
-
     nixpkgs.config = {
       allowUnfree = true;
     };
@@ -26,8 +21,6 @@
       useGlobalPkgs = true;
       useUserPackages = true;
     };
-
-    system.stateVersion = "25.05";
   };
 
   aspects.home.nix =
@@ -41,7 +34,6 @@
       };
       programs.nix-index-database.comma.enable = true;
 
-      home.stateVersion = "25.05";
       home.packages = with pkgs; [ nix-init ];
     };
 }

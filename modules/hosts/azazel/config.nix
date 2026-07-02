@@ -1,5 +1,7 @@
 {
   aspects.nixos.azazel = {
+    system.stateVersion = "25.05";
+
     host.hyprland = {
       input = {
         accel_profile = "flat";
@@ -85,28 +87,6 @@
       };
       barConfigs = [
         {
-          id = "default";
-          name = "Main Bar";
-          enabled = true;
-          visible = true;
-
-          position = 0;
-          bottomGap = 0;
-          innerPadding = 5;
-          spacing = 0;
-          transparency = 0;
-
-          popupGapsAuto = false;
-          popupGapsManual = 6;
-
-          screenPreferences = [ "all" ];
-
-          borderEnabled = false;
-          widgetOutlineEnabled = true;
-          widgetOutlineColor = "primary";
-          widgetOutlineThickness = 1;
-          widgetOutlineOpacity = 0.35;
-
           leftWidgets = [
             {
               id = "spacer";
@@ -202,6 +182,8 @@
   aspects.home.azazel =
     { pkgs, ... }:
     {
+      home.stateVersion = "25.05";
+
       home.packages = with pkgs; [
         feather
         electrum

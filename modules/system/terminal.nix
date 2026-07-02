@@ -122,7 +122,7 @@
           };
 
           username = {
-            format = "[]($style)[ shochraos](bg:$style fg:text_color)[]($style)";
+            format = "[]($style)[ ${username}](bg:$style fg:text_color)[]($style)";
             style_user = "os";
             show_always = true;
             disabled = false;

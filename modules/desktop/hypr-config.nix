@@ -80,12 +80,11 @@
         portalPackage = null;
 
         settings = {
-          config = {
-            input = {
+          config = lib.recursiveUpdate {
+            input = lib.recursiveUpdate {
               kb_layout = "us";
               kb_variant = "altgr-intl";
-            }
-            // osConfig.host.hyprland.input;
+            } osConfig.host.hyprland.input;
 
             misc = {
               middle_click_paste = false;
@@ -114,11 +113,11 @@
                 enabled = true;
                 size = 3;
                 passes = 2;
-        
+
                 ignore_opacity = true;
                 new_optimizations = true;
                 xray = false;
-        
+
                 noise = 0.02;
                 contrast = 1.1;
                 vibrancy = 0.2;
@@ -136,8 +135,7 @@
               force_split = 2;
               preserve_split = true;
             };
-          }
-          // osConfig.host.hyprland.settings;
+          } osConfig.host.hyprland.settings;
 
           gesture = osConfig.host.hyprland.gestures;
 
