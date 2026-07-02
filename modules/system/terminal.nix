@@ -9,7 +9,6 @@
     {
       pkgs,
       username,
-      systemname,
       ...
     }:
     {
@@ -35,6 +34,7 @@
 
       programs.nh = {
         enable = true;
+        flake = "/home/${username}/Repositories/nixfiles";
         clean.enable = true;
         clean.extraArgs = "--keep-since 7d --keep 10";
       };
@@ -54,9 +54,9 @@
           nix-shell = "nix-your-shell fish nix-shell -- $argv";
           nix-develop = "nix-your-shell fish nix-develop -- $argv";
 
-          nh-switch = "nh os switch --ask path:/home/${username}/Repositories/nixfiles -H ${systemname}";
-          nh-boot = "nh os boot --ask path:/home/${username}/Repositories/nixfiles -H ${systemname}";
-          nh-update = "nh os boot -u --ask path:/home/${username}/Repositories/nixfiles -H ${systemname}";
+          nh-switch = "nh os switch --ask";
+          nh-boot = "nh os boot --ask";
+          nh-update = "nh os boot -u --ask";
 
           copy = "dms cl copy $argv";
           paste = "dms cl paste";
