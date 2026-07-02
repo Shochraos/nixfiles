@@ -1,7 +1,7 @@
 [config]
 [templates.spotify]
 input_path = '~/Repositories/nixfiles/assets/templates/spicetify.json.j2'
-output_path = '~/Repositories/nixfiles/local/themes/spicetify.json'
+output_path = '~/Repositories/nixfiles/configs/matugen/spicetify.json'
 
 [templates.vesktop]
 input_path = '~/Repositories/nixfiles/assets/templates/discord.css'

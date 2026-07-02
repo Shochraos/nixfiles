@@ -1,0 +1,23 @@
+{
+  "main": "121415",
+  "main-secondary": "37393b",
+  "accent": "a3cce7",
+  "button": "a3cce7",
+  "button-secondary": "b9c9d5",
+  "button-active": "c5e7ff",
+  "button-disabled": "37393b",
+  "misc": "f2bc8a",
+  "subtext": "c1c7cd",
+  "text": "e2e2e4",
+  "sidebar": "121415",
+  "player": "121415",
+  "card": "37393b",
+  "notification": "121415",
+  "notification-error": "ffb4ab",
+  "shadow": "000000",
+  "nav-active-text": "a3cce7",
+  "nav-active": "a3cce7",
+  "tab-active": "121415",
+  "play-button": "a3cce7",
+  "playback-bar": "c5e7ff"
+}

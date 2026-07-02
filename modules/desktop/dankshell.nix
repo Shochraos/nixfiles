@@ -29,7 +29,37 @@
     };
 
   aspects.home.dankshell =
-    { inputs, osConfig, pkgs, ... }:
+    {
+      inputs,
+      osConfig,
+      pkgs,
+      ...
+    }:
+    let
+      barDefaults = {
+        id = "default";
+        name = "Main Bar";
+        enabled = true;
+        visible = true;
+
+        position = 0;
+        bottomGap = 0;
+        innerPadding = 5;
+        spacing = 0;
+        transparency = 0;
+
+        popupGapsAuto = false;
+        popupGapsManual = 6;
+
+        screenPreferences = [ "all" ];
+
+        borderEnabled = false;
+        widgetOutlineEnabled = true;
+        widgetOutlineColor = "primary";
+        widgetOutlineThickness = 1;
+        widgetOutlineOpacity = 0.35;
+      };
+    in
     {
       imports = [
         inputs.dms.homeModules.dank-material-shell
@@ -39,7 +69,7 @@
 
       # Claude Usage
       home.packages = [ pkgs.jq ];
-      
+
       xdg.autostart.enable = true;
 
       programs.dank-material-shell = {
@@ -94,7 +124,7 @@
           widgetBackgroundColor = "sth";
           widgetColorMode = "default";
 
-          popupTransparency = 0.1;
+          popupTransparency = 0.35;
 
           animationSpeed = 0;
           syncComponentAnimationSpeeds = false;
@@ -115,7 +145,7 @@
           ++ osConfig.host.dms.powerMenuActions;
           powerMenuDefaultAction = "poweroff";
 
-          barConfigs = osConfig.host.dms.barConfigs;
+          barConfigs = map (bar: barDefaults // bar) osConfig.host.dms.barConfigs;
 
           hyprlandOutputSettings = osConfig.host.dms.hyprlandOutputSettings;
         };

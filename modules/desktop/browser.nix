@@ -8,6 +8,7 @@
       config,
       inputs,
       lib,
+      systemname,
       ...
     }:
     {
@@ -68,6 +69,16 @@
                 installation_mode = "force_installed";
               }
             );
+
+            cookieFile = "${inputs.nixfiles-private}/${systemname}/allowed_cookies.txt";
+            allowedCookies =
+              lib.warnIf (!builtins.pathExists cookieFile)
+                "browser: ${systemname}/allowed_cookies.txt missing in nixfiles-private, cookie allowlist is empty"
+                (
+                  lib.optionals (builtins.pathExists cookieFile) (
+                    lib.lists.remove "" (lib.strings.splitString "\n" (builtins.readFile cookieFile))
+                  )
+                );
           in
           {
             ExtensionSettings = mkExtensionSettings {
@@ -104,9 +115,7 @@
             };
 
             Cookies = {
-              Allow = lib.lists.remove "" (
-                lib.strings.splitString "\n" (builtins.readFile ../../local/allowed_cookies.txt)
-              );
+              Allow = allowedCookies;
               Behavior = "reject-foreign";
               Locked = true;
             };

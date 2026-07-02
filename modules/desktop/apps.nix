@@ -30,7 +30,7 @@
               }
             ''
           ];
-          customColorScheme = builtins.fromJSON (builtins.readFile ../../local/themes/spicetify.json);
+          customColorScheme = builtins.fromJSON (builtins.readFile ../../configs/matugen/spicetify.json);
         };
     };
 }

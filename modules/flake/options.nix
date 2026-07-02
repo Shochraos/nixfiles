@@ -8,12 +8,12 @@ in
     options.host = {
       hyprland = {
         input = mkOption {
-          type = types.attrs;
+          type = types.attrsOf types.anything;
           default = { };
           description = "Hyprland `input` settings merged for this host.";
         };
         settings = mkOption {
-          type = types.attrs;
+          type = types.attrsOf types.anything;
           default = { };
           description = "Hyprland top-level config settings for this host.";
         };
@@ -48,10 +48,10 @@ in
         barConfigs = mkOption {
           type = anyList;
           default = [ ];
-          description = "DMS bar layout for this host.";
+          description = "DMS bar layout for this host. Each entry is merged over the shared bar defaults in dankshell.nix, so hosts usually only set the widget lists.";
         };
         hyprlandOutputSettings = mkOption {
-          type = types.attrs;
+          type = types.attrsOf types.anything;
           default = { };
           description = "DMS Hyprland Output settings for this host.";
         };

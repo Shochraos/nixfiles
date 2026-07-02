@@ -36,26 +36,32 @@ let
 
   mkHost =
     name: names:
-    inputs.nixpkgs.lib.nixosSystem {
-      inherit system;
-      specialArgs = {
-        inherit inputs username;
-        systemname = name;
+    let
+      unknown = builtins.filter (n: !(nixosAspects ? ${n} || homeAspects ? ${n})) names;
+    in
+    if unknown != [ ] then
+      throw "host ${name} references unknown aspects: ${builtins.concatStringsSep ", " unknown}"
+    else
+      inputs.nixpkgs.lib.nixosSystem {
+        inherit system;
+        specialArgs = {
+          inherit inputs username;
+          systemname = name;
+        };
+        modules = [
+          inputs.home-manager.nixosModules.home-manager
+          inputs.stylix.nixosModules.stylix
+          nixosAspects.hostOptions
+          {
+            home-manager.extraSpecialArgs = {
+              inherit inputs username;
+              systemname = name;
+            };
+            home-manager.users.${username}.imports = homeFor names;
+          }
+        ]
+        ++ sysFor names;
       };
-      modules = [
-        inputs.home-manager.nixosModules.home-manager
-        inputs.stylix.nixosModules.stylix
-        nixosAspects.hostOptions
-        {
-          home-manager.extraSpecialArgs = {
-            inherit inputs username;
-            systemname = name;
-          };
-          home-manager.users.${username}.imports = homeFor names;
-        }
-      ]
-      ++ sysFor names;
-    };
 in
 {
   flake.nixosConfigurations = {

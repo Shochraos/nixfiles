@@ -1,60 +1,70 @@
 {
   aspects.home.sync =
-    { pkgs, username, ... }:
     {
-      home.packages = with pkgs; [
-        nextcloud-client
-        feishin
-      ];
-
-      xdg.autostart = {
-        entries = [
-          "${pkgs.nextcloud-client}/share/applications/com.nextcloud.desktopclient.nextcloud.desktop"
+      inputs,
+      lib,
+      pkgs,
+      ...
+    }:
+    let
+      passFile = "${inputs.nixfiles-private}/nextcloud_cal_pass";
+    in
+    lib.warnIf (!builtins.pathExists passFile)
+      "sync: nextcloud_cal_pass missing in nixfiles-private, calendar sync will fail to authenticate"
+      {
+        home.packages = with pkgs; [
+          nextcloud-client
+          feishin
         ];
-      };
 
-      programs.vdirsyncer.enable = true;
-      services.vdirsyncer.enable = true;
-      programs.khal = {
-        enable = true;
-        settings = {
-          default.default_calendar = "personal";
+        xdg.autostart = {
+          entries = [
+            "${pkgs.nextcloud-client}/share/applications/com.nextcloud.desktopclient.nextcloud.desktop"
+          ];
         };
-      };
 
-      accounts.calendar = {
-        basePath = ".local/share/calendars";
-        accounts = {
-          nextcloud = {
-            primary = false;
-            khal.enable = true;
-            khal.type = "discover";
+        programs.vdirsyncer.enable = true;
+        services.vdirsyncer.enable = true;
+        programs.khal = {
+          enable = true;
+          settings = {
+            default.default_calendar = "personal";
+          };
+        };
 
-            vdirsyncer.enable = true;
-            vdirsyncer.collections = [
-              "personal"
-              "work"
-              "stundenplan-hs-fulda"
-              "dozentenplan-hs-fulda"
-              "feiertage"
-            ];
+        accounts.calendar = {
+          basePath = ".local/share/calendars";
+          accounts = {
+            nextcloud = {
+              primary = false;
+              khal.enable = true;
+              khal.type = "discover";
 
-            remote = {
-              type = "caldav";
-              url = "https://cloud.freunds.me/remote.php/dav/calendars/Shochraos/";
-              userName = "Shochraos";
-              passwordCommand = [
-                "cat"
-                "/home/${username}/nixfiles/local/nextcloud_cal_pass"
+              vdirsyncer.enable = true;
+              vdirsyncer.collections = [
+                "personal"
+                "work"
+                "stundenplan-hs-fulda"
+                "dozentenplan-hs-fulda"
+                "feiertage"
               ];
-            };
 
-            local = {
-              type = "filesystem";
-              fileExt = ".ics";
+              remote = {
+                type = "caldav";
+                url = "https://cloud.freunds.me/remote.php/dav/calendars/Shochraos/";
+                userName = "Shochraos";
+                passwordCommand = [
+                  "cat"
+                  passFile
+                ];
+              };
+
+              local = {
+                type = "filesystem";
+                fileExt = ".ics";
+              };
             };
           };
         };
       };
-    };
 }

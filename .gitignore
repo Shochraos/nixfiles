@@ -1,3 +1,4 @@
 local/
 CLAUDE.md
 .claude/
+nixfiles-private/

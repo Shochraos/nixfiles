@@ -14,8 +14,6 @@
           user.email = "github@shonline.slmail.me";
           core.excludesfile = "/home/${username}/.gitignore";
           init.defaultBranch = "main";
-        };
-        extraConfig = {
           url."git@git-ce.rwth-aachen.de:".insteadOf = "https://git-ce.rwth-aachen.de/";
         };
       };
@@ -26,12 +24,10 @@
 
         settings = {
           "github.com" = {
-            forwardAgent = true;
             AddKeysToAgent = "yes";
             IdentityFile = "/home/${username}/.ssh/${lib.toLower systemname}-git";
           };
           "codeberg.org" = {
-            forwardAgent = true;
             AddKeysToAgent = "yes";
             IdentityFile = "/home/${username}/.ssh/${lib.toLower systemname}-git";
           };
@@ -43,13 +39,11 @@
           };
 
           "git-ce.rwth-aachen.de" = {
-            forwardAgent = true;
             AddKeysToAgent = "yes";
             IdentityFile = "/home/${username}/.ssh/${lib.toLower systemname}-git";
           };
 
           "git.freunds.me" = {
-            forwardAgent = true;
             AddKeysToAgent = "yes";
             IdentityFile = "/home/${username}/.ssh/${lib.toLower systemname}-git";
             Port = "2222";
@@ -64,7 +58,6 @@
           };
 
           "*" = {
-            forwardAgent = true;
             AddKeysToAgent = "yes";
             IdentityFile = "/home/${username}/.ssh/${lib.toLower systemname}";
           };

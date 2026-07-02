@@ -19,7 +19,7 @@
     };
 
     home-manager = {
-      url = "github:nix-community/home-manager/";
+      url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
@@ -41,11 +41,13 @@
     stylix = {
       url = "github:nix-community/stylix";
       inputs.nixpkgs.follows = "nixpkgs";
+      inputs.flake-parts.follows = "flake-parts";
     };
 
     zen-browser = {
       url = "github:0xc000022070/zen-browser-flake";
       inputs.nixpkgs.follows = "nixpkgs";
+      inputs.home-manager.follows = "home-manager";
     };
 
     spicetify-nix = {
@@ -67,9 +69,20 @@
       url = "github:SteamClientHomebrew/Millennium/next?dir=packages/nix";
     };
 
-    nix-proton-cachyos.url = "github:Shochraos/nix-proton-cachyos";
+    nix-proton-cachyos = {
+      url = "github:Shochraos/nix-proton-cachyos";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
 
-    nix-dw-proton.url = "github:shochraos/nix-dw-proton";
+    nix-dw-proton = {
+      url = "github:shochraos/nix-dw-proton";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    nixfiles-private = {
+      url = "git+ssh://git@git.freunds.me:2222/Shochraos/nixfiles-private.git";
+      flake = false;
+    };
   };
 
   outputs =
