@@ -102,9 +102,10 @@
             maxEntrySize = 5242880;
             autoClearDays = 1;
             clearAtStartup = true;
-
           };
 
+          soundsEnabled = false;
+          
           notificationPopupPosition = 3;
           notificationHistoryMaxCount = 20;
           notificationHistoryMaxAgeDays = 1;
