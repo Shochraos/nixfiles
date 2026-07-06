@@ -1,6 +1,10 @@
 {
-  aspects.nixos.nix = {
+  aspects.nixos.nix = 
+  { username, ...}:
+  {
     nix = {
+      settings.trusted-users = [ "root" "${username}" ];
+      
       settings.experimental-features = [
         "nix-command"
         "flakes"
