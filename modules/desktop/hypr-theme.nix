@@ -54,6 +54,8 @@
   aspects.home.hyprland =
     { pkgs, ... }:
     {
+      home.pointerCursor.enable = true;
+      
       xdg.configFile."matugen/config.toml".source = ../../configs/matugen/config.toml;
 
       home.packages = with pkgs; [
