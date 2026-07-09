@@ -66,7 +66,7 @@
     };
 
     millennium = {
-      url = "github:SteamClientHomebrew/Millennium/next?dir=packages/nix";
+      url = "github:SteamClientHomebrew/Millennium/?dir=packages/nix";
     };
 
     nix-proton-cachyos = {
