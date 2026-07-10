@@ -83,6 +83,10 @@
       url = "git+ssh://git@git.freunds.me:2222/Shochraos/nixfiles-private.git";
       flake = false;
     };
+
+    determinate = {
+      url = "https://flakehub.com/f/DeterminateSystems/determinate/*";
+    };
   };
 
   outputs =
