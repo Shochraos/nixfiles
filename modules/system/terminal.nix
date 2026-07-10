@@ -35,7 +35,7 @@
       programs.nh = {
         enable = true;
         flake = "/home/${username}/Repositories/nixfiles";
-        clean.enable = true;
+        clean.enable = false;
         clean.extraArgs = "--keep-since 7d --keep 10";
       };
 

@@ -12,6 +12,7 @@ let
   base = [
     "boot"
     "nix"
+    "determinate"
     "locale"
     "network"
     "audio"
