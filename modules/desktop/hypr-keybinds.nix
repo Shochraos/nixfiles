@@ -193,13 +193,13 @@
           {
             _args = [
               "code:199"
-              (lua "hl.dsp.send_shortcut({ mods = 'CTRL SHIFT', key = 'M', window = 'class:^(discord)$' })")
+              (lua "hl.dsp.exec_cmd('dms ipc call discord toggleMute')")
             ];
           }
           {
             _args = [
               "code:200"
-              (lua "hl.dsp.send_shortcut({ mods = 'CTRL SHIFT', key = 'D', window = 'class:^(discord)$' })")
+              (lua "hl.dsp.exec_cmd('dms ipc call discord toggleDeafen')")
             ];
           }
           {
