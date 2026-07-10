@@ -6,7 +6,10 @@
       ...
     }:
     {
-      environment.systemPackages = with pkgs; [ bibata-cursors ];
+      environment.systemPackages = with pkgs; [ 
+        bibata-cursors 
+        papirus-icon-theme
+      ];
 
       stylix = {
         enable = true;
@@ -63,6 +66,7 @@
         "org/gnome/desktop/interface" = {
           gtk-theme = "adw-gtk3-dark";
           color-scheme = "prefer-dark";
+          icon-theme = "Papirus-Dark";
         };
       };
 
