@@ -67,8 +67,11 @@
         inputs.danksearch.homeModules.dsearch
       ];
 
-      # Claude Usage
-      home.packages = [ pkgs.jq ];
+      # Claude Usage and DiscordVoice
+      home.packages = [ 
+        pkgs.jq 
+        pkgs.python3
+      ];
 
       xdg.autostart.enable = true;
 
@@ -92,6 +95,10 @@
           dankKDEConnect.enable = true;
           simpleAudioControl.enable = true;
           claudeUsage.enable = true;
+          tasks.enable = true;
+          discordVoice.enable = true;
+          
+          #dcalUpcoming.enable = true;
         };
 
         settings = {
