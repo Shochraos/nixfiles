@@ -98,6 +98,10 @@
               enabled = true;
             }
             {
+              id = "tasks";
+              enabled = true;
+            }
+            {
               id = "spacer";
               enabled = true;
               size = 15;
@@ -107,7 +111,7 @@
               enabled = true;
             }
             {
-              id = "runningApps";
+              id = "discordVoice";
               enabled = true;
             }
           ];
