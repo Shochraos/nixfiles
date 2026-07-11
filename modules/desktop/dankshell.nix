@@ -96,8 +96,11 @@
           simpleAudioControl.enable = true;
           claudeUsage.enable = true;
           tasks.enable = true;
-          discordVoice.enable = true;
-          
+          discordVoice = {
+            enable = true;
+            settings.maxBarAvatars = 10;
+          };
+
           #dcalUpcoming.enable = true;
         };
 
