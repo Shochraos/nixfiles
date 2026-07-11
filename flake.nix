@@ -2,10 +2,17 @@
   description = "Dendritic NixOS Flake";
 
   inputs = {
+    ### Repositories and private Inputs ###
     nixpkgs = {
       url = "github:NixOS/nixpkgs/nixos-unstable";
     };
 
+    nixfiles-private = {
+      url = "git+ssh://git@git.freunds.me:2222/Shochraos/nixfiles-private.git";
+      flake = false;
+    };
+
+    ### Nix Utilities
     flake-parts = {
       url = "github:hercules-ci/flake-parts";
       inputs.nixpkgs-lib.follows = "nixpkgs";
@@ -13,9 +20,8 @@
 
     import-tree.url = "github:vic/import-tree";
 
-    lanzaboote = {
-      url = "github:nix-community/lanzaboote/v1.1.0";
-      inputs.nixpkgs.follows = "nixpkgs";
+    determinate = {
+      url = "https://flakehub.com/f/DeterminateSystems/determinate/*";
     };
 
     home-manager = {
@@ -23,6 +29,23 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    nix-your-shell = {
+      url = "github:MercuryTechnologies/nix-your-shell";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    nix-index-database = {
+      url = "github:nix-community/nix-index-database";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    ### Boot ###
+    lanzaboote = {
+      url = "github:nix-community/lanzaboote/v1.1.0";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    ### DMS and Desktop ###
     dms = {
       url = "github:AvengeMedia/DankMaterialShell/stable";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -44,6 +67,8 @@
       inputs.flake-parts.follows = "flake-parts";
     };
 
+
+    ### Miscellaneous ###
     zen-browser = {
       url = "github:0xc000022070/zen-browser-flake";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -55,16 +80,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    nix-your-shell = {
-      url = "github:MercuryTechnologies/nix-your-shell";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
-    nix-index-database = {
-      url = "github:nix-community/nix-index-database";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
+    ### Gaming ###
     millennium = {
       url = "github:SteamClientHomebrew/Millennium/?dir=packages/nix";
     };
@@ -77,15 +93,6 @@
     nix-dw-proton = {
       url = "github:shochraos/nix-dw-proton";
       inputs.nixpkgs.follows = "nixpkgs";
-    };
-
-    nixfiles-private = {
-      url = "git+ssh://git@git.freunds.me:2222/Shochraos/nixfiles-private.git";
-      flake = false;
-    };
-
-    determinate = {
-      url = "https://flakehub.com/f/DeterminateSystems/determinate/*";
     };
   };
 
