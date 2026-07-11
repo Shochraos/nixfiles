@@ -12,7 +12,6 @@ let
   base = [
     "boot"
     "nix"
-    "determinate"
     "locale"
     "network"
     "audio"
@@ -20,6 +19,7 @@ let
     "scheduling"
     "user"
     "terminal"
+    "shell"
     "remotes"
   ];
 
