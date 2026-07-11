@@ -19,6 +19,7 @@ let
     "scheduling"
     "user"
     "terminal"
+    "shell"
     "remotes"
   ];
 
