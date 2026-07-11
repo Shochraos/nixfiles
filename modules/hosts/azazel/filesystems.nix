@@ -1,8 +1,26 @@
 {
   aspects.nixos.azazel = {
     fileSystems."/" = {
+      device = "none";
+      fsType = "tmpfs";
+      options = [
+        "defaults"
+        "size=4G"
+        "mode=755"
+      ];
+    };
+
+    fileSystems."/persist" = {
       device = "/dev/disk/by-uuid/4c651ae6-5cff-446f-a8f0-323a9f047f90";
       fsType = "ext4";
+      neededForBoot = true;
+    };
+
+    fileSystems."/nix" = {
+      device = "/persist/nix";
+      fsType = "none";
+      options = [ "bind" ];
+      neededForBoot = true;
     };
 
     fileSystems."/boot" = {
@@ -24,7 +42,7 @@
         device = "/dev/disk/by-uuid/b59488dd-4453-432c-b2c9-712796ee9ad5";
       }
       {
-        device = "/var/lib/swapfile";
+        device = "/persist/var/lib/swapfile";
         size = 32 * 1024;
       }
     ];

@@ -72,6 +72,7 @@ in
       desktop
       ++ [
         "azazel"
+        "impermanence"
         "cpu-amd"
         "gaming"
         "ai"
