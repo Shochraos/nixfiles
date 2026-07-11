@@ -19,7 +19,6 @@
         gnome-text-editor
         loupe
         evince
-        playerctl
         libsecret
       ];
 
