@@ -1,9 +1,7 @@
 {
   aspects.nixos.nix =
-  { inputs, username, ... }:
+  { username, ... }:
   {
-    imports = [ inputs.determinate.nixosModules.default ];
-
     nix = {
       settings.trusted-users = [ "root" "${username}" ];
 
@@ -13,15 +11,9 @@
       ];
       settings.download-buffer-size = 524288000;
       settings.auto-optimise-store = true;
-
-      settings.lazy-trees = true;
-      settings.eval-cores = 0;
+      
 
       channel.enable = false;
-    };
-
-    environment.etc."determinate/config.json".text = builtins.toJSON {
-      garbageCollector.strategy = "automatic";
     };
 
     nixpkgs.config = {
@@ -53,7 +45,7 @@
       programs.nh = {
         enable = true;
         flake = "/home/${username}/Repositories/nixfiles";
-        clean.enable = false;
+        clean.enable = true;
         clean.extraArgs = "--keep-since 7d --keep 10";
       };
 
