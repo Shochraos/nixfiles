@@ -32,6 +32,7 @@
       "LIBVA_DRIVER_NAME" = "nvidia";
       "__GLX_VENDOR_LIBRARY_NAME" = "nvidia";
       "NVD_BACKEND" = "direct";
+      "__GL_SHADER_DISK_CACHE" = "1";
       "__GL_SHADER_DISK_CACHE_SIZE" = "51539607552"; # 48 GiB
     };
   };
