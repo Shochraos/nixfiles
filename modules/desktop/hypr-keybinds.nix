@@ -205,37 +205,22 @@
           {
             _args = [
               "code:191"
-              (lua "hl.dsp.exec_cmd('playerctl --player=spotify previous')")
+              (lua "hl.dsp.exec_cmd('dms ipc call mpris previous')")
               { release = true; }
             ];
           }
           {
             _args = [
               "code:192"
-              (lua "hl.dsp.exec_cmd('playerctl --player=spotify play-pause')")
+              (lua "hl.dsp.exec_cmd('dms ipc call mpris playPause')")
               { release = true; }
             ];
           }
           {
             _args = [
               "code:193"
-              (lua "hl.dsp.exec_cmd('playerctl --player=spotify next')")
+              (lua "hl.dsp.exec_cmd('dms ipc call mpris next')")
               { release = true; }
-            ];
-          }
-
-          {
-            _args = [
-              "code:201"
-              (lua "hl.dsp.exec_cmd('playerctl --player=spotify volume 0.05-')")
-              { repeating = true; }
-            ];
-          }
-          {
-            _args = [
-              "code:202"
-              (lua "hl.dsp.exec_cmd('playerctl --player=spotify volume 0.05+')")
-              { repeating = true; }
             ];
           }
         ]
