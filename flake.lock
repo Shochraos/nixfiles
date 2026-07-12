@@ -417,11 +417,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1782439654,
-        "narHash": "sha256-GhALv/h2NOTwCTj1BYzMc0AU8b+5yyg8rNO7fr632Hg=",
+        "lastModified": 1783867246,
+        "narHash": "sha256-DEE8fE7iAUyPCjanzAQTuFQOJrxyzdTgV5NdvBQd0MA=",
         "owner": "shochraos",
         "repo": "nix-dw-proton",
-        "rev": "929013e4b0b7a50436926011ae43d9f56cb1f08b",
+        "rev": "1f04b2eb8601bd8a2d8da7b99dfe90115a6700d2",
         "type": "github"
       },
       "original": {
@@ -457,11 +457,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1782592201,
-        "narHash": "sha256-8oPL0JIkW65Nw5aFL2AIOgPE3Ekex1y5PcLuS/NBIv8=",
+        "lastModified": 1783866938,
+        "narHash": "sha256-JrUnlG0z3UpkjF01OMa69o5ZCBwBghFx0dPJadMnjGs=",
         "owner": "Shochraos",
         "repo": "nix-proton-cachyos",
-        "rev": "66c7dd230a01537270afa568d15158df66aa7619",
+        "rev": "68d1b91145884cf7b573640d1cfffd3fa12abb06",
         "type": "github"
       },
       "original": {
