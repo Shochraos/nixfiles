@@ -80,7 +80,7 @@
 
     host.dms = {
       hyprlandOutputSettings = {
-        "desc:LG Electronics LG TV SSCR2 0x01010101" = {
+        "HDMI-A-1" = {
           bitdepth = 10;
           vrrFullscreenOnly = true;
         };
