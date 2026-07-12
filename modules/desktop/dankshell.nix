@@ -144,6 +144,19 @@
 
           modalDarkenBackground = false;
 
+          m3ElevationEnabled = false;
+          modalElevationEnabled = false;
+          popoutElevationEnabled = false;
+          barElevationEnabled = false;
+
+          cornerRadius = 16;
+          hyprlandLayoutGapsOverride = -2;
+
+          iconThemeDark = "Papirus-Dark";
+
+          controlCenterShowMicPercent = false;
+          osdPowerProfileEnabled = false;
+
           fontFamily = osConfig.stylix.fonts.sansSerif.name;
           monoFontFamily = osConfig.stylix.fonts.monospace.name;
           fontScale = 1;
