@@ -120,6 +120,10 @@
           notificationHistoryMaxCount = 20;
           notificationHistoryMaxAgeDays = 1;
 
+          hyprlandLayoutRadiusOverride = 12;
+          hyprlandLayoutBorderSize = 1;
+          hyprlandResizeOnBorder = false;
+
           sortAppsAlphabetically = true;
           dankLauncherV2Size = "medium";
           launcherLogoMode = "os";
