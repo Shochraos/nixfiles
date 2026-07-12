@@ -160,9 +160,11 @@
           outputs = {
             _var = lua "require('dms.outputs')";
           };
-
           cursor = {
             _var = lua "require('dms.cursor')";
+          };
+          layout = {
+            _var = lua "require('dms.layout')";
           };
         };
       };
