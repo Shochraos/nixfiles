@@ -2,6 +2,41 @@
   aspects.nixos.azazel = {
     system.stateVersion = "25.05";
 
+    host.wireguard.profiles = {
+      hs-fulda = {
+        presharedKey = true;
+
+        connection = {
+          id = "hs-fulda";
+          type = "wireguard";
+          interface-name = "hs-fulda";
+          autoconnect = false;
+        };
+
+        wireguard.mtu = 1392;
+
+        "wireguard-peer.E9rVjRfxl5F6amOjc5FBQ7+1minLp60LetMF/y2N3wE=" = {
+          endpoint = "eduvpn01.rz.hs-fulda.de:443";
+          allowed-ips = "0.0.0.0/0;::/0;";
+        };
+
+        ipv4 = {
+          method = "manual";
+          address1 = "10.248.0.59/19";
+          dns = "10.0.0.53;";
+          dns-search = "~;";
+        };
+
+        ipv6 = {
+          method = "manual";
+          addr-gen-mode = "default";
+          address1 = "2001:638:301:f820::3b/64";
+          dns = "2001:638:301::53;";
+          dns-search = "~;";
+        };
+      };
+    };
+
     host.hyprland = {
       input = {
         accel_profile = "flat";
@@ -92,10 +127,6 @@
               enabled = true;
             }
             {
-              id = "tasks";
-              enabled = true;
-            }
-            {
               id = "spacer";
               enabled = true;
               size = 15;
@@ -151,6 +182,10 @@
             }
             {
               id = "network_speed_monitor";
+              enabled = true;
+            }
+            {
+              id = "vpn";
               enabled = true;
             }
             {
