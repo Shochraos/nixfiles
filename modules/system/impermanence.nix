@@ -1,6 +1,11 @@
 {
   aspects.nixos.impermanence =
-    { inputs, username, ... }:
+    {
+      inputs,
+      username,
+      config,
+      ...
+    }:
     {
       imports = [ inputs.impermanence.nixosModules.impermanence ];
 
@@ -20,7 +25,8 @@
           "/etc/cups"
           "/etc/lact"
           "/etc/NetworkManager/system-connections"
-        ];
+        ]
+        ++ config.host.persistence.directories;
 
         files = [
           "/etc/machine-id"
@@ -31,7 +37,8 @@
           "/etc/gshadow"
           "/etc/subuid"
           "/etc/subgid"
-        ];
+        ]
+        ++ config.host.persistence.files;
 
         users.${username} = {
           directories = [
@@ -80,12 +87,14 @@
             ".local/share/DankMaterialShell"
 
             ".local/state/DankMaterialShell"
-          ];
+          ]
+          ++ config.host.persistence.home.directories;
 
           files = [
             ".claude.json"
             ".aiopylgtv.sqlite"
-          ];
+          ]
+          ++ config.host.persistence.home.files;
         };
       };
     };
