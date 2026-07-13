@@ -11,6 +11,7 @@ let
 
   base = [
     "boot"
+    "secrets"
     "nix"
     "locale"
     "network"
@@ -21,6 +22,7 @@ let
     "terminal"
     "shell"
     "remotes"
+    "wireguard"
   ];
 
   desktop = base ++ [
