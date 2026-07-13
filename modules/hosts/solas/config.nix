@@ -17,6 +17,64 @@
 
       hardware.alsa.enablePersistence = true;
 
+      host.wireguard.profiles = {
+        home = {
+          connection = {
+            id = "home";
+            type = "wireguard";
+            interface-name = "home";
+            autoconnect = false;
+          };
+
+          "wireguard-peer.MgkkQIkInEWcDGnK3smCD0V1F+O2/WREI+MQuA1mMU8=" = {
+            endpoint = "freunds.me:51820";
+            allowed-ips = "0.0.0.0/0;";
+          };
+
+          ipv4 = {
+            method = "manual";
+            address1 = "192.168.137.4/32";
+            dns = "192.168.1.2;";
+            dns-search = "~;";
+          };
+
+          ipv6.method = "disabled";
+        };
+
+        hs-fulda = {
+          presharedKey = true;
+
+          connection = {
+            id = "hs-fulda";
+            type = "wireguard";
+            interface-name = "hs-fulda";
+            autoconnect = false;
+          };
+
+          wireguard.mtu = 1392;
+
+          "wireguard-peer.E9rVjRfxl5F6amOjc5FBQ7+1minLp60LetMF/y2N3wE=" = {
+            endpoint = "eduvpn01.rz.hs-fulda.de:443";
+            allowed-ips = "0.0.0.0/0;::/0;";
+          };
+
+          ipv4 = {
+            method = "manual";
+            address1 = "10.248.0.74/19";
+            dns = "10.0.0.53;";
+            dns-search = "~;";
+          };
+
+          ipv6 = {
+            method = "manual";
+            addr-gen-mode = "default";
+            address1 = "2001:638:301:f820::4a/64";
+            dns = "2001:638:301::53;";
+            dns-search = "~;";
+          };
+        };
+      };
+
       host.hyprland = {
         input = {
           touchpad = {

@@ -1,7 +1,9 @@
 keys:
   - &host_azazel age1pr3jnxgw8c2wg7pupmv2wnqfstsynaw3vqn7sc25zjm709wdcfeq0k9gfk
+  - &host_solas age1n9ajm05eynncjppnf5fr7uj0zxw9fr6hgs7whsltzd606gat63vqxkd8ur
 creation_rules:
   - path_regex: secrets/[^/]+\.yaml$
     key_groups:
       - age:
           - *host_azazel
+          - *host_solas
