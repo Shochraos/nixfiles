@@ -47,6 +47,31 @@ in
         };
       };
 
+      persistence = {
+        directories = mkOption {
+          type = anyList;
+          default = [ ];
+          description = "Extra system-level persistence directories for this host.";
+        };
+        files = mkOption {
+          type = anyList;
+          default = [ ];
+          description = "Extra system-level persistence files for this host.";
+        };
+        home = {
+          directories = mkOption {
+            type = anyList;
+            default = [ ];
+            description = "Extra home persistence directories for this host.";
+          };
+          files = mkOption {
+            type = anyList;
+            default = [ ];
+            description = "Extra home persistence files for this host.";
+          };
+        };
+      };
+
       dms = {
         powerMenuActions = mkOption {
           type = types.listOf types.str;
