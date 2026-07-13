@@ -11,6 +11,7 @@ let
 
   base = [
     "boot"
+    "secrets"
     "nix"
     "locale"
     "network"
