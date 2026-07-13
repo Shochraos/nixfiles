@@ -126,6 +126,11 @@
 
       host.dms = {
         powerMenuActions = [ "suspend" ];
+        hyprlandOutputSettings = {
+          "eDP-1" = {
+            bitdepth = 10;
+          };
+        };
         barConfigs = [
           {
             leftWidgets = [

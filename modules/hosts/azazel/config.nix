@@ -6,11 +6,6 @@
       input = {
         accel_profile = "flat";
       };
-      settings = {
-        cursor = {
-          no_hardware_cursors = true;
-        };
-      };
       workspaceRules = [
         {
           workspace = "4";
@@ -81,8 +76,7 @@
     host.dms = {
       hyprlandOutputSettings = {
         "HDMI-A-1" = {
-          bitdepth = 10;
-          vrrFullscreenOnly = true;
+          vrrFullscreenOnly = false;
         };
       };
       barConfigs = [

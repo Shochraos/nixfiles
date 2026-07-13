@@ -1,6 +1,6 @@
 {
   aspects.home.apps =
-    { inputs, pkgs, ... }:
+    { inputs, pkgs, systemname, ... }:
     {
       imports = [ inputs.spicetify-nix.homeManagerModules.default ];
 
@@ -30,7 +30,7 @@
               }
             ''
           ];
-          customColorScheme = builtins.fromJSON (builtins.readFile ../../configs/matugen/spicetify.json);
+          customColorScheme = builtins.fromJSON (builtins.readFile ../../configs/matugen/spicetify-${systemname}.json);
         };
     };
 }
