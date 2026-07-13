@@ -39,6 +39,14 @@ in
         };
       };
 
+      wireguard = {
+        profiles = mkOption {
+          type = types.attrsOf types.anything;
+          default = { };
+          description = "NetworkManager WireGuard profiles for this host (keyfile sections, without key material). Each profile reads its private key from the sops secret `wireguard/<host>/<profile>`; setting `presharedKey = true` on a profile additionally injects `wireguard/<host>/<profile>-psk` into its peer sections.";
+        };
+      };
+
       dms = {
         powerMenuActions = mkOption {
           type = types.listOf types.str;

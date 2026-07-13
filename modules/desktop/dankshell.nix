@@ -95,7 +95,6 @@
           dankKDEConnect.enable = true;
           simpleAudioControl.enable = true;
           claudeUsage.enable = true;
-          tasks.enable = true;
           discordVoice = {
             enable = true;
             settings.maxBarAvatars = 10;
