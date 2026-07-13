@@ -52,11 +52,24 @@
     };
 
   aspects.home.hyprland =
-    { pkgs, ... }:
+    { pkgs, systemname, ... }:
     {
       home.pointerCursor.enable = true;
-      
-      xdg.configFile."matugen/config.toml".source = ../../configs/matugen/config.toml;
+
+      xdg.configFile."matugen/config.toml".text = ''
+        [config]
+        [templates.spotify]
+        input_path = '~/Repositories/nixfiles/assets/templates/spicetify.json.j2'
+        output_path = '~/Repositories/nixfiles/configs/matugen/spicetify-${systemname}.json'
+
+        [templates.vesktop]
+        input_path = '~/Repositories/nixfiles/assets/templates/discord.css'
+        output_path = '~/.config/Vencord/themes/matugen.css'
+
+        [templates.steam]
+        input_path = '~/Repositories/nixfiles/assets/templates/steam.css'
+        output_path = '~/.steam/steam/millennium/themes/simply-dark/colors.css'
+      '';
 
       home.packages = with pkgs; [
         adw-gtk3
