@@ -22,6 +22,7 @@ let
     "terminal"
     "shell"
     "remotes"
+    "wireguard"
   ];
 
   desktop = base ++ [
@@ -82,7 +83,6 @@ in
         "lgtv"
         "mp3tag"
         "preventsleep"
-        "wireguard"
       ]
     );
 
