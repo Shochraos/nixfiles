@@ -111,7 +111,7 @@
     host.dms = {
       hyprlandOutputSettings = {
         "HDMI-A-1" = {
-          vrrFullscreenOnly = false;
+          vrrFullscreenOnly = true;
         };
       };
       barConfigs = [
