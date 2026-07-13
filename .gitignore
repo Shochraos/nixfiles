@@ -1,4 +1,3 @@
-local/
 CLAUDE.md
 .claude/
-nixfiles-private/
+configs/matugen/spicetify.json
