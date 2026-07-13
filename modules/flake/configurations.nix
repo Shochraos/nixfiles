@@ -82,6 +82,7 @@ in
         "lgtv"
         "mp3tag"
         "preventsleep"
+        "wireguard"
       ]
     );
 
