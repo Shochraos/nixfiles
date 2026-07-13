@@ -20,7 +20,6 @@
           "/etc/cups"
           "/etc/lact"
           "/etc/NetworkManager/system-connections"
-          "/home/${username}"
         ];
 
         files = [
@@ -33,6 +32,61 @@
           "/etc/subuid"
           "/etc/subgid"
         ];
+
+        users.${username} = {
+          directories = [
+            "Desktop"
+            "Documents"
+            "Downloads"
+            "Music"
+            "Pictures"
+            "Videos"
+            "Repositories"
+            "Applications"
+            "Nextcloud"
+
+            {
+              directory = ".ssh";
+              mode = "0700";
+            }
+            ".claude"
+            ".electrum"
+
+            ".steam"
+            ".local/share/Steam"
+            ".cache/nvidia"
+
+            ".config/discord"
+            ".config/Vencord"
+            ".config/spotify"
+            ".config/zen"
+            ".config/Nextcloud"
+            ".config/feishin"
+            ".config/valent"
+            ".config/dconf"
+            ".config/DankMaterialShell"
+            ".config/jellyfin-mpv-shim"
+            ".config/faugus-launcher"
+            ".config/input-remapper-2"
+            ".config/feather"
+
+            ".local/share/fish"
+            ".local/share/keyrings"
+            ".local/share/zed"
+            ".local/share/opencode"
+            ".local/share/direnv"
+            ".local/share/vdirsyncer"
+            ".local/share/calendars"
+            ".local/share/DankMaterialShell"
+
+            ".local/state/DankMaterialShell"
+          ];
+
+          files = [
+            ".claude.json"
+            ".aiopylgtv.sqlite"
+          ];
+        };
       };
     };
 }
