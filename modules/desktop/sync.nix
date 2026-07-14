@@ -49,7 +49,7 @@
               collections = [
                 "personal"
                 "work"
-                "feiertage"
+                "lecturer-timetable"
               ];
               urlCommand = [
                 "cat"
