@@ -19,6 +19,8 @@
 
       host.wireguard.profiles = {
         home = {
+          extraSecrets = [ "endpoint" ];
+
           connection = {
             id = "home";
             type = "wireguard";
@@ -27,7 +29,7 @@
           };
 
           "wireguard-peer.MgkkQIkInEWcDGnK3smCD0V1F+O2/WREI+MQuA1mMU8=" = {
-            endpoint = "freunds.me:51820";
+            endpoint = "$WG_HOME_ENDPOINT";
             allowed-ips = "0.0.0.0/0;";
           };
 
@@ -41,36 +43,80 @@
           ipv6.method = "disabled";
         };
 
-        hs-fulda = {
+        uni = {
           presharedKey = true;
+          extraSecrets = [
+            "endpoint"
+            "ipv4-address"
+            "ipv4-dns"
+            "ipv6-address"
+            "ipv6-dns"
+          ];
 
           connection = {
-            id = "hs-fulda";
+            id = "uni";
             type = "wireguard";
-            interface-name = "hs-fulda";
+            interface-name = "uni";
             autoconnect = false;
           };
 
           wireguard.mtu = 1392;
 
           "wireguard-peer.E9rVjRfxl5F6amOjc5FBQ7+1minLp60LetMF/y2N3wE=" = {
-            endpoint = "eduvpn01.rz.hs-fulda.de:443";
+            endpoint = "$WG_UNI_ENDPOINT";
             allowed-ips = "0.0.0.0/0;::/0;";
           };
 
           ipv4 = {
             method = "manual";
-            address1 = "10.248.0.74/19";
-            dns = "10.0.0.53;";
+            address1 = "$WG_UNI_IPV4_ADDRESS";
+            dns = "$WG_UNI_IPV4_DNS";
             dns-search = "~;";
           };
 
           ipv6 = {
             method = "manual";
             addr-gen-mode = "default";
-            address1 = "2001:638:301:f820::4a/64";
-            dns = "2001:638:301::53;";
+            address1 = "$WG_UNI_IPV6_ADDRESS";
+            dns = "$WG_UNI_IPV6_DNS";
             dns-search = "~;";
+          };
+        };
+      };
+
+      host.wifi.profiles = {
+        ragnarok = {
+          connection = {
+            id = "Ragnarök";
+            autoconnect-priority = 100;
+          };
+
+          wifi.ssid = "Ragnarök";
+
+          wifi-security = {
+            key-mgmt = "sae";
+            pmf = 3;
+          };
+        };
+
+        eduroam = {
+          eap = true;
+          extraSecrets = [
+            "identity"
+            "anonymous-identity"
+            "domain"
+          ];
+
+          connection.autoconnect-priority = 100;
+
+          "802-1x" = {
+            eap = "peap;";
+            identity = "$WIFI_EDUROAM_IDENTITY";
+            anonymous-identity = "$WIFI_EDUROAM_ANONYMOUS_IDENTITY";
+            ca-cert = "/etc/ssl/certs/ca-bundle.crt";
+            domain-suffix-match = "$WIFI_EDUROAM_DOMAIN";
+            phase2-auth = "mschapv2";
+            system-ca-certs = false;
           };
         };
       };

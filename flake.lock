@@ -494,22 +494,6 @@
         "type": "github"
       }
     },
-    "nixfiles-private": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1783082382,
-        "narHash": "sha256-I0gj0rcyV0k+P42E8Ghnzk12p2vkUuDS40xsMEUI+2g=",
-        "ref": "refs/heads/main",
-        "rev": "290dd94d69e03d54064b96f54b95ba4745deb77b",
-        "revCount": 3,
-        "type": "git",
-        "url": "ssh://git@git.freunds.me:2222/Shochraos/nixfiles-private.git"
-      },
-      "original": {
-        "type": "git",
-        "url": "ssh://git@git.freunds.me:2222/Shochraos/nixfiles-private.git"
-      }
-    },
     "nixpkgs": {
       "locked": {
         "lastModified": 1781577229,
@@ -604,7 +588,6 @@
         "nix-index-database": "nix-index-database",
         "nix-proton-cachyos": "nix-proton-cachyos",
         "nix-your-shell": "nix-your-shell",
-        "nixfiles-private": "nixfiles-private",
         "nixpkgs": "nixpkgs_2",
         "sops-nix": "sops-nix",
         "spicetify-nix": "spicetify-nix",

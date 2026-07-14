@@ -1,6 +1,7 @@
 {
   aspects.nixos.lgtv =
     {
+      config,
       pkgs,
       lib,
       username,
@@ -11,6 +12,19 @@
     in
     {
       environment.systemPackages = with pkgs; [ wakeonlan ];
+
+      sops.secrets = {
+        "lgtv/mac" = { };
+        "lgtv/ip" = { };
+      };
+
+      sops.templates."lgtv.env" = {
+        owner = username;
+        content = ''
+          LGTV_MAC=${config.sops.placeholder."lgtv/mac"}
+          LGTV_IP=${config.sops.placeholder."lgtv/ip"}
+        '';
+      };
 
       systemd.services.wol-lgtv = {
         description = "Wake-on-LAN for LGTV";
@@ -24,7 +38,8 @@
 
         serviceConfig = {
           Type = "oneshot";
-          ExecStart = "${pkgs.wakeonlan}/bin/wakeonlan -i 192.168.30.6 60:45:e8:1e:b5:40";
+          EnvironmentFile = config.sops.templates."lgtv.env".path;
+          ExecStart = "${pkgs.wakeonlan}/bin/wakeonlan -i \${LGTV_IP} \${LGTV_MAC}";
         };
       };
 
@@ -52,7 +67,12 @@
     };
 
   aspects.home.lgtv =
-    { pkgs, username, ... }:
+    {
+      osConfig,
+      pkgs,
+      username,
+      ...
+    }:
     {
       systemd.user.services.sol-lgtv = {
         Unit = {
@@ -61,10 +81,11 @@
         };
         Service = {
           Type = "oneshot";
+          EnvironmentFile = osConfig.sops.templates."lgtv.env".path;
           ExecStart = "${pkgs.coreutils}/bin/true";
           RemainAfterExit = true;
           WorkingDirectory = "/home/${username}/Applications/bscpylgtv";
-          ExecStop = "${pkgs.direnv}/bin/direnv exec /home/${username}/Applications/bscpylgtv bscpylgtvcommand 192.168.30.6 power_off";
+          ExecStop = "${pkgs.direnv}/bin/direnv exec /home/${username}/Applications/bscpylgtv bscpylgtvcommand \${LGTV_IP} power_off";
         };
         Install = {
           WantedBy = [ "graphical-session.target" ];

@@ -23,6 +23,7 @@ let
     "shell"
     "remotes"
     "wireguard"
+    "wifi"
   ];
 
   desktop = base ++ [

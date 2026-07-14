@@ -15,6 +15,8 @@
       keyVar = name: "WG_${envName name}_KEY";
       pskVar = name: "WG_${envName name}_PSK";
       hasPsk = name: profiles.${name}.presharedKey or false;
+      extrasFor = name: profiles.${name}.extraSecrets or [ ];
+      extraVar = name: extra: "WG_${envName name}_${envName extra}";
     in
     {
       config = lib.mkIf (profiles != { }) {
@@ -23,6 +25,7 @@
             name:
             [ (lib.nameValuePair (secretFor name) { }) ]
             ++ lib.optional (hasPsk name) (lib.nameValuePair "${secretFor name}-psk" { })
+            ++ map (extra: lib.nameValuePair "${secretFor name}-${extra}" { }) (extrasFor name)
           ) profileNames
         );
 
@@ -33,6 +36,9 @@
             ++ lib.optional (hasPsk name) "${pskVar name}=${
               config.sops.placeholder."${secretFor name}-psk"
             }"
+            ++ map (extra: "${extraVar name extra}=${
+              config.sops.placeholder."${secretFor name}-${extra}"
+            }") (extrasFor name)
           ) profileNames
         );
 
@@ -42,9 +48,15 @@
           profiles = lib.mapAttrs (
             name: profile:
             let
-              withKey = lib.recursiveUpdate (removeAttrs profile [ "presharedKey" ]) {
-                wireguard.private-key = "$" + keyVar name;
-              };
+              withKey =
+                lib.recursiveUpdate
+                  (removeAttrs profile [
+                    "presharedKey"
+                    "extraSecrets"
+                  ])
+                  {
+                    wireguard.private-key = "$" + keyVar name;
+                  };
               addPsk =
                 section: value:
                 if lib.hasPrefix "wireguard-peer." section then
