@@ -31,6 +31,13 @@
       services.vdirsyncer.enable = true;
       programs.khal = {
         enable = true;
+        locale = {
+          dateformat = "%Y-%m-%d";
+          timeformat = "%H:%M";
+          datetimeformat = "%Y-%m-%d %H:%M";
+          longdateformat = "%Y-%m-%d";
+          longdatetimeformat = "%Y-%m-%d %H:%M";
+        };
         settings = {
           default.default_calendar = "personal";
         };

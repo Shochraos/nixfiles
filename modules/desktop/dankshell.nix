@@ -1,6 +1,44 @@
 {
   aspects.nixos.dankshell =
-    { username, ... }:
+    { config, username, ... }:
+    let
+      pluginSettings = {
+        calculator.enabled = true;
+        dankKDEConnect.enabled = true;
+        simpleAudioControl.enabled = true;
+        claudeUsage.enabled = true;
+        discordVoice = {
+          enabled = true;
+          maxBarAvatars = 10;
+        };
+
+        khalCalendar = {
+          enabled = true;
+          calendarFilter = "";
+          vdirBasePath = "/home/${username}/.local/share/calendars/nextcloud";
+
+          lookAheadDays = 7;
+          refreshInterval = 5;
+
+          showLocation = true;
+          showCalendarName = true;
+
+          notificationsEnabled = true;
+          notifyMinutes = 15;
+        };
+
+        tasks = {
+          enabled = true;
+          caldavUsername = "Shochraos";
+          caldavCalendar = "Personal";
+          caldavCalendars = "Work";
+          refreshInterval = "5";
+          caldavSSLVerify = true;
+          caldavURL = "@DMS_CALDAV_URL@";
+          caldavPassword = "@DMS_CALDAV_PASS@";
+        };
+      };
+    in
     {
       services.displayManager.defaultSession = "hyprland-uwsm";
       services.displayManager.dms-greeter = {
@@ -26,10 +64,23 @@
       users.users.${username} = {
         extraGroups = [ "greeter" ];
       };
+
+      sops.templates."dms-plugin-settings.json" = {
+        owner = username;
+        content =
+          builtins.replaceStrings
+            [ "@DMS_CALDAV_URL@" "@DMS_CALDAV_PASS@" ]
+            [
+              config.sops.placeholder."calendar/nextcloud-url"
+              config.sops.placeholder."calendar/nextcloud-pass"
+            ]
+            (builtins.toJSON pluginSettings);
+      };
     };
 
   aspects.home.dankshell =
     {
+      config,
       inputs,
       osConfig,
       pkgs,
@@ -67,10 +118,11 @@
         inputs.danksearch.homeModules.dsearch
       ];
 
-      # Claude Usage and DiscordVoice
-      home.packages = [ 
-        pkgs.jq 
-        pkgs.python3
+      home.packages = [
+        # Claude Usage
+        pkgs.jq
+        # DiscordVoice and Tasks (caldav)
+        (pkgs.python3.withPackages (ps: with ps; [ caldav httpx urllib3 ]))
       ];
 
       xdg.autostart.enable = true;
@@ -88,19 +140,16 @@
         enableAudioWavelength = false;
         enableCalendarEvents = true;
 
-        managePluginSettings = true;
+        managePluginSettings = false;
 
         plugins = {
           calculator.enable = true;
           dankKDEConnect.enable = true;
           simpleAudioControl.enable = true;
           claudeUsage.enable = true;
-          discordVoice = {
-            enable = true;
-            settings.maxBarAvatars = 10;
-          };
-
-          #dcalUpcoming.enable = true;
+          discordVoice.enable = true;
+          tasks.enable = true;
+          khalCalendar.enable = true;
         };
 
         settings = {
@@ -177,6 +226,9 @@
           hyprlandOutputSettings = osConfig.host.dms.hyprlandOutputSettings;
         };
       };
+
+      xdg.configFile."DankMaterialShell/plugin_settings.json".source =
+        config.lib.file.mkOutOfStoreSymlink osConfig.sops.templates."dms-plugin-settings.json".path;
 
       programs.dsearch = {
         enable = true;
