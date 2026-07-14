@@ -43,7 +43,15 @@ in
         profiles = mkOption {
           type = types.attrsOf types.anything;
           default = { };
-          description = "NetworkManager WireGuard profiles for this host (keyfile sections, without key material). Each profile reads its private key from the sops secret `wireguard/<host>/<profile>`; setting `presharedKey = true` on a profile additionally injects `wireguard/<host>/<profile>-psk` into its peer sections.";
+          description = "NetworkManager WireGuard profiles for this host (keyfile sections, without key material). Each profile reads its private key from the sops secret `wireguard/<host>/<profile>`; setting `presharedKey = true` on a profile additionally injects `wireguard/<host>/<profile>-psk` into its peer sections. Suffixes listed in `extraSecrets` load `wireguard/<host>/<profile>-<suffix>` as `$WG_<PROFILE>_<SUFFIX>` for referencing in any field.";
+        };
+      };
+
+      wifi = {
+        profiles = mkOption {
+          type = types.attrsOf types.anything;
+          default = { };
+          description = "NetworkManager Wi-Fi profiles for this host (keyfile sections, without key material). `connection.id` and `wifi.ssid` default to the attribute name. Each profile reads its PSK from the host-independent sops secret `wifi/<profile>`; setting `eap = true` injects the secret as the `802-1x` password instead, and `open = true` skips secrets entirely. Suffixes listed in `extraSecrets` load `wifi/<profile>-<suffix>` as `$WIFI_<PROFILE>_<SUFFIX>` for referencing in any field.";
         };
       };
 

@@ -2,14 +2,9 @@
   description = "Dendritic NixOS Flake";
 
   inputs = {
-    ### Repositories and private Inputs ###
+    ### Repositories ###
     nixpkgs = {
       url = "github:NixOS/nixpkgs/nixos-unstable";
-    };
-
-    nixfiles-private = {
-      url = "git+ssh://git@git.freunds.me:2222/Shochraos/nixfiles-private.git";
-      flake = false;
     };
 
     ### Nix Utilities

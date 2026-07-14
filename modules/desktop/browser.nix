@@ -1,14 +1,157 @@
 {
-  aspects.nixos.browser = {
-    programs.firefox.enable = false;
-  };
+  aspects.nixos.browser =
+    {
+      config,
+      lib,
+      systemname,
+      username,
+      ...
+    }:
+    let
+      cookiesSecret = "zen/allowed-cookies/${lib.toLower systemname}";
+      cookiesMarker = "@ALLOWED_COOKIES@";
+
+      policies = {
+        ExtensionSettings =
+          builtins.mapAttrs
+            (_: pluginId: {
+              install_url = "https://addons.mozilla.org/firefox/downloads/latest/${pluginId}/latest.xpi";
+              installation_mode = "force_installed";
+            })
+            {
+              "uBlock0@raymondhill.net" = "ublock-origin";
+              "sponsorBlocker@ajay.app" = "sponsorblock";
+              "firefox@tampermonkey.net" = "tampermonkey";
+              "CanvasBlocker@kkapsner.de" = "canvasblocker";
+              "@testpilot-containers" = "multi-account-containers";
+              "78272b6fa58f4a1abaac99321d503a20@proton.me" = "proton-pass";
+            };
+
+        SearchEngines = {
+          Default = "DuckDuckGo";
+          PreventInstalls = false;
+          Remove = [
+            "Google"
+            "Bing"
+            "Amazon.com"
+            "eBay"
+            "Twitter"
+            "Wikipedia"
+            "Perplexity"
+            "Youtube"
+          ];
+          Add = [
+            {
+              Name = "NixPkgs";
+              URLTemplate = "https://search.nixos.org/packages?channel=unstable&query={searchTerms}";
+              Method = "GET";
+              IconURL = "https://nixos.org/favicon.ico";
+              Alias = "@np";
+            }
+          ];
+        };
+
+        Cookies = {
+          Allow = cookiesMarker;
+          Behavior = "reject-foreign";
+          Locked = true;
+        };
+
+        DNSOverHTTPS = {
+          Enabled = false;
+          Locked = true;
+        };
+
+        EnableTrackingProtection = {
+          BaselineExceptions = false;
+          Cryptomining = true;
+          EmailTracking = true;
+          Fingerprinting = true;
+          Locked = true;
+          SuspectedFingerprinting = true;
+          Value = true;
+        };
+
+        FirefoxHome = {
+          Highlights = false;
+          Locked = true;
+          Pocket = false;
+          Search = true;
+          Snippets = false;
+          SponsoredPocket = false;
+          SponsoredTopSites = false;
+          TopSites = true;
+        };
+
+        FirefoxSuggest = {
+          ImprovementVideo = false;
+          Locked = true;
+          SponsoredSuggestions = false;
+          WebSuggestions = false;
+        };
+
+        GenerativeAI = {
+          Enabled = false;
+          Locked = true;
+        };
+
+        InstallAddonsPermission = {
+          Default = false;
+        };
+
+        UserMessaging = {
+          ExtensionRecommendations = false;
+          FeatureRecommendations = false;
+          Locked = true;
+          SkipOnboarding = true;
+          UrlbarInterventions = false;
+          WhatsNew = false;
+        };
+
+        AutofillAddressEnabled = true;
+        AutofillCreditCardEnabled = false;
+        BlockAboutAddons = true;
+        DisableAppUpdate = true;
+        DisableFeedbackCommands = true;
+        DisableFirefoxAccounts = true;
+        DisableFirefoxScreenshots = true;
+        DisableFirefoxStudies = true;
+        DisablePocket = true;
+        DisableSetDesktopBackground = true;
+        DisableTelemetry = true;
+        DontCheckDefaultBrowser = true;
+        HttpsOnlyMode = "force_enabled";
+        NetworkPrediction = false;
+        NoDefaultBookmarks = true;
+        OfferToSaveLogins = false;
+        OverrideFirstRunPage = "";
+        OverridePostUpdatePage = "";
+        PasswordManagerEnabled = false;
+        PostQuantumKeyAgreementEnabled = true;
+      };
+    in
+    {
+      programs.firefox.enable = false;
+
+      sops.secrets.${cookiesSecret} = { };
+
+      sops.templates."zen-policies.json" = {
+        owner = username;
+        content =
+          builtins.replaceStrings
+            [ (builtins.toJSON cookiesMarker) ]
+            [ config.sops.placeholder.${cookiesSecret} ]
+            (builtins.toJSON { inherit policies; });
+      };
+
+      environment.etc."zen/policies/policies.json".source =
+        config.sops.templates."zen-policies.json".path;
+    };
 
   aspects.home.browser =
     {
       config,
       inputs,
-      lib,
-      systemname,
       ...
     }:
     {
@@ -60,138 +203,6 @@
             "toolkit.legacyUserProfileCustomizations.stylesheets" = true;
           };
         };
-
-        policies =
-          let
-            mkExtensionSettings = builtins.mapAttrs (
-              _: pluginId: {
-                install_url = "https://addons.mozilla.org/firefox/downloads/latest/${pluginId}/latest.xpi";
-                installation_mode = "force_installed";
-              }
-            );
-
-            cookieFile = "${inputs.nixfiles-private}/${systemname}/allowed_cookies.txt";
-            allowedCookies =
-              lib.warnIf (!builtins.pathExists cookieFile)
-                "browser: ${systemname}/allowed_cookies.txt missing in nixfiles-private, cookie allowlist is empty"
-                (
-                  lib.optionals (builtins.pathExists cookieFile) (
-                    lib.lists.remove "" (lib.strings.splitString "\n" (builtins.readFile cookieFile))
-                  )
-                );
-          in
-          {
-            ExtensionSettings = mkExtensionSettings {
-              "uBlock0@raymondhill.net" = "ublock-origin";
-              "sponsorBlocker@ajay.app" = "sponsorblock";
-              "firefox@tampermonkey.net" = "tampermonkey";
-              "CanvasBlocker@kkapsner.de" = "canvasblocker";
-              "@testpilot-containers" = "multi-account-containers";
-              "78272b6fa58f4a1abaac99321d503a20@proton.me" = "proton-pass";
-            };
-
-            SearchEngines = {
-              Default = "DuckDuckGo";
-              PreventInstalls = false;
-              Remove = [
-                "Google"
-                "Bing"
-                "Amazon.com"
-                "eBay"
-                "Twitter"
-                "Wikipedia"
-                "Perplexity"
-                "Youtube"
-              ];
-              Add = [
-                {
-                  Name = "NixPkgs";
-                  URLTemplate = "https://search.nixos.org/packages?channel=unstable&query={searchTerms}";
-                  Method = "GET";
-                  IconURL = "https://nixos.org/favicon.ico";
-                  Alias = "@np";
-                }
-              ];
-            };
-
-            Cookies = {
-              Allow = allowedCookies;
-              Behavior = "reject-foreign";
-              Locked = true;
-            };
-
-            DNSOverHTTPS = {
-              Enabled = false;
-              Locked = true;
-            };
-
-            EnableTrackingProtection = {
-              BaselineExceptions = false;
-              Cryptomining = true;
-              EmailTracking = true;
-              Fingerprinting = true;
-              Locked = true;
-              SuspectedFingerprinting = true;
-              Value = true;
-            };
-
-            FirefoxHome = {
-              Highlights = false;
-              Locked = true;
-              Pocket = false;
-              Search = true;
-              Snippets = false;
-              SponsoredPocket = false;
-              SponsoredTopSites = false;
-              TopSites = true;
-            };
-
-            FirefoxSuggest = {
-              ImprovementVideo = false;
-              Locked = true;
-              SponsoredSuggestions = false;
-              WebSuggestions = false;
-            };
-
-            GenerativeAI = {
-              Enabled = false;
-              Locked = true;
-            };
-
-            InstallAddonsPermission = {
-              Default = false;
-            };
-
-            UserMessaging = {
-              ExtensionRecommendations = false;
-              FeatureRecommendations = false;
-              Locked = true;
-              SkipOnboarding = true;
-              UrlbarInterventions = false;
-              WhatsNew = false;
-            };
-
-            AutofillAddressEnabled = true;
-            AutofillCreditCardEnabled = false;
-            BlockAboutAddons = true;
-            DisableAppUpdate = true;
-            DisableFeedbackCommands = true;
-            DisableFirefoxAccounts = true;
-            DisableFirefoxScreenshots = true;
-            DisableFirefoxStudies = true;
-            DisablePocket = true;
-            DisableSetDesktopBackground = true;
-            DisableTelemetry = true;
-            DontCheckDefaultBrowser = true;
-            HttpsOnlyMode = "force_enabled";
-            NetworkPrediction = false;
-            NoDefaultBookmarks = true;
-            OfferToSaveLogins = false;
-            OverrideFirstRunPage = "";
-            OverridePostUpdatePage = "";
-            PasswordManagerEnabled = false;
-            PostQuantumKeyAgreementEnabled = true;
-          };
       };
     };
 }
