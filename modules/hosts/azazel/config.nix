@@ -130,7 +130,7 @@
               size = 5;
             }
             {
-              id = "workspaceSwitcher";
+              id = "clock";
               enabled = true;
             }
             {
@@ -139,8 +139,13 @@
               size = 15;
             }
             {
-              id = "clock";
+              id = "workspaceSwitcher";
               enabled = true;
+            }
+            {
+              id = "spacer";
+              enabled = true;
+              size = 15;
             }
             {
               id = "khalCalendar";
