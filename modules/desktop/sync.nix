@@ -1,105 +1,107 @@
 {
-  aspects.nixos.sync =
-    { username, ... }:
+  den.aspects.sync =
+    { user, ... }:
     {
-      sops.secrets = {
-        "calendar/nextcloud-pass".owner = username;
-        "calendar/nextcloud-url".owner = username;
-        "calendar/uni-url".owner = username;
-      };
-    };
-
-  aspects.home.sync =
-    {
-      osConfig,
-      pkgs,
-      ...
-    }:
-    {
-      home.packages = with pkgs; [
-        nextcloud-client
-        feishin
-      ];
-
-      xdg.autostart = {
-        entries = [
-          "${pkgs.nextcloud-client}/share/applications/com.nextcloud.desktopclient.nextcloud.desktop"
-        ];
-      };
-
-      programs.vdirsyncer.enable = true;
-      services.vdirsyncer.enable = true;
-      programs.khal = {
-        enable = true;
-        locale = {
-          dateformat = "%Y-%m-%d";
-          timeformat = "%H:%M";
-          datetimeformat = "%Y-%m-%d %H:%M";
-          longdateformat = "%Y-%m-%d";
-          longdatetimeformat = "%Y-%m-%d %H:%M";
-        };
-        settings = {
-          default.default_calendar = "personal";
+      nixos = {
+        sops.secrets = {
+          "calendar/nextcloud-pass".owner = user.name;
+          "calendar/nextcloud-url".owner = user.name;
+          "calendar/uni-url".owner = user.name;
         };
       };
 
-      accounts.calendar = {
-        basePath = ".local/share/calendars";
-        accounts = {
-          nextcloud = {
-            primary = false;
-            khal.enable = true;
-            khal.type = "discover";
+      provides.to-users.homeManager =
+        {
+          osConfig,
+          pkgs,
+          ...
+        }:
+        {
+          home.packages = with pkgs; [
+            nextcloud-client
+            feishin
+          ];
 
-            vdirsyncer = {
-              enable = true;
-              collections = [
-                "personal"
-                "work"
-                "lecturer-timetable"
-              ];
-              urlCommand = [
-                "cat"
-                osConfig.sops.secrets."calendar/nextcloud-url".path
-              ];
+          xdg.autostart = {
+            entries = [
+              "${pkgs.nextcloud-client}/share/applications/com.nextcloud.desktopclient.nextcloud.desktop"
+            ];
+          };
+
+          programs.vdirsyncer.enable = true;
+          services.vdirsyncer.enable = true;
+          programs.khal = {
+            enable = true;
+            locale = {
+              dateformat = "%Y-%m-%d";
+              timeformat = "%H:%M";
+              datetimeformat = "%Y-%m-%d %H:%M";
+              longdateformat = "%Y-%m-%d";
+              longdatetimeformat = "%Y-%m-%d %H:%M";
             };
-
-            remote = {
-              type = "caldav";
-              userName = "Shochraos";
-              passwordCommand = [
-                "cat"
-                osConfig.sops.secrets."calendar/nextcloud-pass".path
-              ];
-            };
-
-            local = {
-              type = "filesystem";
-              fileExt = ".ics";
+            settings = {
+              default.default_calendar = "personal";
             };
           };
 
-          uni = {
-            primary = false;
-            khal.enable = true;
-            khal.readOnly = true;
+          accounts.calendar = {
+            basePath = ".local/share/calendars";
+            accounts = {
+              nextcloud = {
+                primary = false;
+                khal.enable = true;
+                khal.type = "discover";
 
-            vdirsyncer = {
-              enable = true;
-              urlCommand = [
-                "cat"
-                osConfig.sops.secrets."calendar/uni-url".path
-              ];
-            };
+                vdirsyncer = {
+                  enable = true;
+                  collections = [
+                    "personal"
+                    "work"
+                    "lecturer-timetable"
+                  ];
+                  urlCommand = [
+                    "cat"
+                    osConfig.sops.secrets."calendar/nextcloud-url".path
+                  ];
+                };
 
-            remote.type = "http";
+                remote = {
+                  type = "caldav";
+                  userName = "Shochraos";
+                  passwordCommand = [
+                    "cat"
+                    osConfig.sops.secrets."calendar/nextcloud-pass".path
+                  ];
+                };
 
-            local = {
-              type = "filesystem";
-              fileExt = ".ics";
+                local = {
+                  type = "filesystem";
+                  fileExt = ".ics";
+                };
+              };
+
+              uni = {
+                primary = false;
+                khal.enable = true;
+                khal.readOnly = true;
+
+                vdirsyncer = {
+                  enable = true;
+                  urlCommand = [
+                    "cat"
+                    osConfig.sops.secrets."calendar/uni-url".path
+                  ];
+                };
+
+                remote.type = "http";
+
+                local = {
+                  type = "filesystem";
+                  fileExt = ".ics";
+                };
+              };
             };
           };
         };
-      };
     };
 }

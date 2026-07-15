@@ -1,5 +1,5 @@
 {
-  aspects.home.terminal =
+  den.aspects.terminal.provides.to-users.homeManager =
     { ... }:
     {
       programs.ghostty = {

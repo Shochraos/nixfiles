@@ -1,11 +1,7 @@
+{ inputs, ... }:
 {
-  aspects.nixos.boot =
-    {
-      inputs,
-      lib,
-      pkgs,
-      ...
-    }:
+  den.aspects.boot.nixos =
+    { lib, pkgs, ... }:
     {
       imports = [ inputs.lanzaboote.nixosModules.lanzaboote ];
 
@@ -18,7 +14,7 @@
       };
 
       boot.loader.efi.canTouchEfiVariables = true;
-      
+
       boot.kernelPackages = pkgs.linuxPackages_latest;
     };
 }

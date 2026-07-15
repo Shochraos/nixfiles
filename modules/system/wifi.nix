@@ -1,5 +1,5 @@
 {
-  aspects.nixos.wifi =
+  den.aspects.wifi.nixos =
     {
       config,
       lib,

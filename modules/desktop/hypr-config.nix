@@ -1,5 +1,5 @@
 {
-  aspects.nixos.hyprland =
+  den.aspects.hyprland.nixos =
     { pkgs, ... }:
     {
       environment.sessionVariables.NIXOS_OZONE_WL = "1";
@@ -46,7 +46,7 @@
       };
     };
 
-  aspects.home.hyprland =
+  den.aspects.hyprland.provides.to-users.homeManager =
     {
       lib,
       config,

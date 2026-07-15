@@ -1,5 +1,5 @@
 {
-  aspects.nixos.fonts =
+  den.aspects.fonts.nixos =
     { pkgs, ... }:
     {
       fonts.packages = with pkgs; [
@@ -8,7 +8,7 @@
       ];
     };
 
-  aspects.home.fonts = {
+  den.aspects.fonts.provides.to-users.homeManager = {
     fonts.fontconfig.enable = true;
   };
 }

@@ -1,5 +1,5 @@
 {
-  aspects.nixos.preventsleep =
+  den.aspects.preventsleep.nixos =
     { ... }:
     {
       systemd.targets = {

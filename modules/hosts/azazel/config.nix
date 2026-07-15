@@ -1,5 +1,5 @@
 {
-  aspects.nixos.azazel =
+  den.aspects.azazel.nixos =
     {
       lib,
       ...
@@ -259,7 +259,7 @@
       };
     };
 
-  aspects.home.azazel =
+  den.aspects.azazel.provides.to-users.homeManager =
     { pkgs, ... }:
     {
       home.stateVersion = "25.05";

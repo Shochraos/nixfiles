@@ -1,5 +1,5 @@
 {
-  aspects.nixos.solas =
+  den.aspects.solas.nixos =
     {
       lib,
       ...
@@ -332,7 +332,7 @@
       };
     };
 
-  aspects.home.solas =
+  den.aspects.solas.provides.to-users.homeManager =
     { pkgs, ... }:
     {
       home.stateVersion = "25.05";

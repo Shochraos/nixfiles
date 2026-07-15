@@ -1,5 +1,5 @@
 {
-  aspects.nixos.bluetooth =
+  den.aspects.bluetooth.nixos =
     { ... }:
     {
       hardware.bluetooth = {

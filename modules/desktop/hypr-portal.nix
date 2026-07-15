@@ -1,5 +1,5 @@
 {
-  aspects.nixos.hyprland =
+  den.aspects.hyprland.nixos =
     { pkgs, ... }:
     {
       xdg.portal = {

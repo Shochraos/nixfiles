@@ -1,5 +1,5 @@
 {
-  aspects.nixos.azazel =
+  den.aspects.azazel.nixos =
     {
       config,
       lib,

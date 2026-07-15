@@ -1,5 +1,5 @@
 {
-  aspects.home.ai =
+  den.aspects.ai.provides.to-users.homeManager =
     { config, pkgs, ... }:
     let
       llama-cpp = pkgs.llama-cpp.override { cudaSupport = true; };
