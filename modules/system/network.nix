@@ -1,8 +1,10 @@
 {
-  aspects.nixos.network =
-    { systemname, ... }:
+  den.aspects.network =
+    { host, ... }:
     {
-      networking.networkmanager.enable = true;
-      networking.hostName = systemname;
+      nixos = {
+        networking.networkmanager.enable = true;
+        networking.hostName = host.name;
+      };
     };
 }

@@ -4,7 +4,7 @@ let
   anyList = types.listOf types.anything;
 in
 {
-  aspects.nixos.hostOptions = {
+  den.aspects.hostOptions.nixos = {
     options.host = {
       hyprland = {
         input = mkOption {

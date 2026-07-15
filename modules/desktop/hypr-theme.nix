@@ -1,96 +1,103 @@
+{ inputs, ... }:
 {
-  aspects.nixos.hyprland =
+  den.aspects.hyprland =
+    { host, ... }:
     {
-      pkgs,
-      config,
-      ...
-    }:
-    {
-      environment.systemPackages = with pkgs; [ 
-        bibata-cursors 
-        papirus-icon-theme
-      ];
+      nixos =
+        {
+          pkgs,
+          config,
+          ...
+        }:
+        {
+          imports = [ inputs.stylix.nixosModules.stylix ];
 
-      stylix = {
-        enable = true;
-        base16Scheme = "${pkgs.base16-schemes}/share/themes/chalk.yaml";
-        autoEnable = false;
+          environment.systemPackages = with pkgs; [
+            bibata-cursors
+            papirus-icon-theme
+          ];
 
-        cursor = {
-          package = pkgs.bibata-cursors;
-          name = "Bibata-Modern-Classic";
-          size = 24;
+          stylix = {
+            enable = true;
+            base16Scheme = "${pkgs.base16-schemes}/share/themes/chalk.yaml";
+            autoEnable = false;
+
+            cursor = {
+              package = pkgs.bibata-cursors;
+              name = "Bibata-Modern-Classic";
+              size = 24;
+            };
+
+            fonts = {
+              serif = config.stylix.fonts.sansSerif;
+
+              sansSerif = {
+                package = pkgs.overpass;
+                name = "Overpass";
+              };
+
+              monospace = {
+                package = pkgs.nerd-fonts.overpass;
+                name = "OverpassM Nerd Font Mono";
+              };
+
+              emoji = {
+                package = pkgs.noto-fonts-color-emoji;
+                name = "Noto Color Emoji";
+              };
+            };
+
+            icons = {
+              enable = true;
+              package = pkgs.papirus-icon-theme;
+              dark = "Papirus-Dark";
+              light = "Papirus-Light";
+            };
+          };
+          programs.dconf.enable = true;
         };
 
-        fonts = {
-          serif = config.stylix.fonts.sansSerif;
+      provides.to-users.homeManager =
+        { pkgs, ... }:
+        {
+          home.pointerCursor.enable = true;
 
-          sansSerif = {
-            package = pkgs.overpass;
-            name = "Overpass";
+          xdg.configFile."matugen/config.toml".text = ''
+            [config]
+            [templates.spotify]
+            input_path = '~/Repositories/nixfiles/assets/templates/spicetify.json.j2'
+            output_path = '~/Repositories/nixfiles/configs/matugen/spicetify-${host.name}.json'
+
+            [templates.vesktop]
+            input_path = '~/Repositories/nixfiles/assets/templates/discord.css'
+            output_path = '~/.config/Vencord/themes/matugen.css'
+
+            [templates.steam]
+            input_path = '~/Repositories/nixfiles/assets/templates/steam.css'
+            output_path = '~/.steam/steam/millennium/themes/simply-dark/colors.css'
+          '';
+
+          home.packages = with pkgs; [
+            adw-gtk3
+            overpass
+            nerd-fonts.overpass
+          ];
+
+          dconf.settings = {
+            "org/gnome/desktop/interface" = {
+              gtk-theme = "adw-gtk3-dark";
+              color-scheme = "prefer-dark";
+              icon-theme = "Papirus-Dark";
+            };
           };
 
-          monospace = {
-            package = pkgs.nerd-fonts.overpass;
-            name = "OverpassM Nerd Font Mono";
+          qt = {
+            enable = true;
+            platformTheme.name = "qtct";
           };
 
-          emoji = {
-            package = pkgs.noto-fonts-color-emoji;
-            name = "Noto Color Emoji";
-          };
+          stylix.targets.zed.fonts.enable = true;
+          stylix.targets.gtk.fonts.enable = true;
         };
-
-        icons = {
-          enable = true;
-          package = pkgs.papirus-icon-theme;
-          dark = "Papirus-Dark";
-          light = "Papirus-Light";
-        };
-      };
-      programs.dconf.enable = true;
-    };
-
-  aspects.home.hyprland =
-    { pkgs, systemname, ... }:
-    {
-      home.pointerCursor.enable = true;
-
-      xdg.configFile."matugen/config.toml".text = ''
-        [config]
-        [templates.spotify]
-        input_path = '~/Repositories/nixfiles/assets/templates/spicetify.json.j2'
-        output_path = '~/Repositories/nixfiles/configs/matugen/spicetify-${systemname}.json'
-
-        [templates.vesktop]
-        input_path = '~/Repositories/nixfiles/assets/templates/discord.css'
-        output_path = '~/.config/Vencord/themes/matugen.css'
-
-        [templates.steam]
-        input_path = '~/Repositories/nixfiles/assets/templates/steam.css'
-        output_path = '~/.steam/steam/millennium/themes/simply-dark/colors.css'
-      '';
-
-      home.packages = with pkgs; [
-        adw-gtk3
-        overpass
-        nerd-fonts.overpass
-      ];
-
-      dconf.settings = {
-        "org/gnome/desktop/interface" = {
-          gtk-theme = "adw-gtk3-dark";
-          color-scheme = "prefer-dark";
-          icon-theme = "Papirus-Dark";
-        };
-      };
-
-      qt = {
-        enable = true;
-        platformTheme.name = "qtct";
-      };
-
-      stylix.targets.zed.fonts.enable = true;
-      stylix.targets.gtk.fonts.enable = true;
     };
 }

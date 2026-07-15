@@ -15,6 +15,8 @@
 
     import-tree.url = "github:vic/import-tree";
 
+    den.url = "github:denful/den";
+
     home-manager = {
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -63,7 +65,6 @@
       inputs.flake-parts.follows = "flake-parts";
     };
 
-
     ### Miscellaneous ###
     zen-browser = {
       url = "github:0xc000022070/zen-browser-flake";
@@ -94,17 +95,8 @@
 
   outputs =
     inputs@{ flake-parts, import-tree, ... }:
-    flake-parts.lib.mkFlake { inherit inputs; } (
-      { lib, ... }:
-      {
-        imports = [ (import-tree ./modules) ];
-
-        options.aspects = lib.mkOption {
-          type = lib.types.lazyAttrsOf (lib.types.lazyAttrsOf lib.types.deferredModule);
-          default = { };
-        };
-
-        config.systems = [ "x86_64-linux" ];
-      }
-    );
+    flake-parts.lib.mkFlake { inherit inputs; } {
+      imports = [ (import-tree ./modules) ];
+      systems = [ "x86_64-linux" ];
+    };
 }

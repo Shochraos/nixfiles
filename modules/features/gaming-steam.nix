@@ -1,12 +1,10 @@
+{ inputs, ... }:
 {
-  aspects.nixos.gaming =
-    {
-      inputs,
-      pkgs,
-      ...
-    }:
+  den.aspects.gaming.nixos =
+    { pkgs, ... }:
     let
-      proton-cachyos = inputs.nix-proton-cachyos.packages.${pkgs.stdenv.hostPlatform.system}.proton-cachyos;
+      proton-cachyos =
+        inputs.nix-proton-cachyos.packages.${pkgs.stdenv.hostPlatform.system}.proton-cachyos;
       dw-proton = inputs.nix-dw-proton.packages.${pkgs.stdenv.hostPlatform.system}.dw-proton;
     in
     {
@@ -23,7 +21,7 @@
       };
     };
 
-  aspects.home.gaming =
+  den.aspects.gaming.provides.to-users.homeManager =
     { pkgs, ... }:
     {
       home.sessionVariables = {

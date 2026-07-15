@@ -1,5 +1,5 @@
 {
-  aspects.home.mic-mute =
+  den.aspects.mic-mute.provides.to-users.homeManager =
     { pkgs, ... }:
     let
       mic-mute = pkgs.writeShellScript "mic-mute.sh" (builtins.readFile ../../assets/scripts/mic-mute.sh);

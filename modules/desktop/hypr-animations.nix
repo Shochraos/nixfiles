@@ -1,5 +1,5 @@
 {
-  aspects.home.hyprland = {
+  den.aspects.hyprland.provides.to-users.homeManager = {
     wayland.windowManager.hyprland.settings = {
       curve = [
         {
