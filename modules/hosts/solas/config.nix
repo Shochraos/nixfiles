@@ -252,13 +252,13 @@
                 enabled = true;
               }
               {
-                id = "runningApps";
-                enabled = true;
-              }
-              {
                 id = "spacer";
                 enabled = true;
                 size = 15;
+              }
+              {
+                id = "khalCalendar";
+                enabled = true;
               }
               {
                 id = "notificationButton";
@@ -272,10 +272,6 @@
                 id = "dankKDEConnect";
                 enabled = true;
               }
-              {
-                id = "claudeUsage";
-                enabled = true;
-              }
             ];
 
             centerWidgets = [
@@ -286,6 +282,15 @@
             ];
 
             rightWidgets = [
+              {
+                id = "claudeUsage";
+                enabled = true;
+              }
+              {
+                id = "spacer";
+                enabled = true;
+                size = 15;
+              }
               {
                 id = "battery";
                 enabled = true;
