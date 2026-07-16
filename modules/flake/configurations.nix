@@ -80,7 +80,6 @@ in
         "remote-mounts"
         "virtualization"
         "gamechat"
-        "inputremapper"
         "lgtv"
         "mp3tag"
         "preventsleep"
