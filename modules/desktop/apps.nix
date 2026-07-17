@@ -4,7 +4,7 @@
     { host, ... }:
     {
       provides.to-users.homeManager =
-        { pkgs, ... }:
+        { pkgs, osConfig, ... }:
         {
           imports = [ inputs.spicetify-nix.homeManagerModules.default ];
 
@@ -26,7 +26,7 @@
               enabledSnippets = [
                 ''
                   html, body, #main, .Root, [class*="encore-"] {
-                      font-family: 'Overpass', sans-serif !important;
+                      font-family: '${osConfig.stylix.fonts.sansSerif.name}', sans-serif !important;
                   }
 
                   .encore-icon, .icon, svg {
