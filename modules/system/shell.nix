@@ -19,17 +19,17 @@
             '';
 
             shellAliases = {
-              ls = "eza -1 -h -l --icons --no-user --group-directories-first -F $argv";
-              la = "eza -1 -h -l --icons -a --no-user --group-directories-first -F $argv";
-              lr = "eza -1 -h -l --icons -a -R --no-user --group-directories-first -F $argv";
-              nix-shell = "nix-your-shell fish nix-shell -- $argv";
-              nix-develop = "nix-your-shell fish nix-develop -- $argv";
+              ls = "eza -1 -h -l --icons --no-user --group-directories-first -F";
+              la = "eza -1 -h -l --icons -a --no-user --group-directories-first -F";
+              lr = "eza -1 -h -l --icons -a -R --no-user --group-directories-first -F";
+              nix-shell = "nix-your-shell fish nix-shell --";
+              nix-develop = "nix-your-shell fish nix-develop --";
 
               nh-switch = "nh os switch --ask";
               nh-boot = "nh os boot --ask";
               nh-update = "nh os boot -u --ask";
 
-              copy = "dms cl copy $argv";
+              copy = "dms cl copy";
               paste = "dms cl paste";
             };
           };
@@ -43,9 +43,9 @@
               '';
 
               add_newline = true;
-              palette = "foo";
+              palette = "main";
 
-              palettes.foo = {
+              palettes.main = {
                 arrow = "#353535";
                 os = "#C60C34";
                 directory = "#FF5B2E";

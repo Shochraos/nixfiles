@@ -1,9 +1,14 @@
+{ lib, ... }:
 {
   den.aspects.remotes =
     { host, user, ... }:
+    let
+      hostKey = "/home/${user.name}/.ssh/${lib.toLower host.name}";
+      gitKey = "${hostKey}-git";
+    in
     {
       nixos =
-        { config, lib, ... }:
+        { config, ... }:
         {
           sops.secrets = {
             "ssh/hosts".owner = user.name;
@@ -17,18 +22,18 @@
             content = ''
               Host ${config.sops.placeholder."ssh/uni-git"}
                 AddKeysToAgent yes
-                IdentityFile /home/${user.name}/.ssh/${lib.toLower host.name}-git
+                IdentityFile ${gitKey}
 
               Host ${config.sops.placeholder."ssh/private-git"}
                 AddKeysToAgent yes
-                IdentityFile /home/${user.name}/.ssh/${lib.toLower host.name}-git
+                IdentityFile ${gitKey}
                 Port 2222
             '';
           };
         };
 
       provides.to-users.homeManager =
-        { lib, osConfig, ... }:
+        { osConfig, ... }:
         {
           programs.git = {
             enable = true;
@@ -55,24 +60,24 @@
             settings = {
               "github.com" = {
                 AddKeysToAgent = "yes";
-                IdentityFile = "/home/${user.name}/.ssh/${lib.toLower host.name}-git";
+                IdentityFile = gitKey;
               };
               "codeberg.org" = {
                 AddKeysToAgent = "yes";
-                IdentityFile = "/home/${user.name}/.ssh/${lib.toLower host.name}-git";
+                IdentityFile = gitKey;
               };
 
               "astaroth" = {
                 forwardAgent = true;
                 AddKeysToAgent = "yes";
-                IdentityFile = "/home/${user.name}/.ssh/${lib.toLower host.name}";
+                IdentityFile = hostKey;
                 HostName = "192.168.10.2";
                 User = "root";
               };
 
               "*" = {
                 AddKeysToAgent = "yes";
-                IdentityFile = "/home/${user.name}/.ssh/${lib.toLower host.name}";
+                IdentityFile = hostKey;
               };
             };
           };

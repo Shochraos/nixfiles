@@ -17,53 +17,28 @@
             key_file = /home/${user.name}/.ssh/${lib.toLower host.name}
           '';
 
-          fileSystems."/mnt/astaroth/appdata" = {
-            device = "astaroth:/mnt/user/appdata";
-            fsType = "rclone";
-            options = [
-              "nodev"
-              "nofail"
-              "allow_other"
-              "args2env"
-              "config=/etc/rclone-mnt.conf"
-            ];
-          };
-
-          fileSystems."/mnt/astaroth/backups" = {
-            device = "astaroth:/mnt/user/backups";
-            fsType = "rclone";
-            options = [
-              "nodev"
-              "nofail"
-              "allow_other"
-              "args2env"
-              "config=/etc/rclone-mnt.conf"
-            ];
-          };
-
-          fileSystems."/mnt/astaroth/data" = {
-            device = "astaroth:/mnt/user/data";
-            fsType = "rclone";
-            options = [
-              "nodev"
-              "nofail"
-              "allow_other"
-              "args2env"
-              "config=/etc/rclone-mnt.conf"
-            ];
-          };
-
-          fileSystems."/mnt/astaroth/misc" = {
-            device = "astaroth:/mnt/user/misc";
-            fsType = "rclone";
-            options = [
-              "nodev"
-              "nofail"
-              "allow_other"
-              "args2env"
-              "config=/etc/rclone-mnt.conf"
-            ];
-          };
+          fileSystems = lib.listToAttrs (
+            map
+              (share:
+                lib.nameValuePair "/mnt/astaroth/${share}" {
+                  device = "astaroth:/mnt/user/${share}";
+                  fsType = "rclone";
+                  options = [
+                    "nodev"
+                    "nofail"
+                    "allow_other"
+                    "args2env"
+                    "config=/etc/rclone-mnt.conf"
+                  ];
+                }
+              )
+              [
+                "appdata"
+                "backups"
+                "data"
+                "misc"
+              ]
+          );
         };
     };
 }
