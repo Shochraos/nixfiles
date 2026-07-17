@@ -11,10 +11,10 @@
             dankKDEConnect.enabled = true;
             simpleAudioControl.enabled = true;
             claudeUsage.enabled = true;
-            #discordVoice = {
-            #  enabled = true;
-            #  maxBarAvatars = 10;
-            #};
+            discordVoice = {
+              enabled = true;
+              maxBarAvatars = 10;
+            };
 
             khalCalendar = {
               enabled = true;
@@ -90,6 +90,7 @@
       provides.to-users.homeManager =
         {
           config,
+          lib,
           osConfig,
           pkgs,
           ...
@@ -161,7 +162,10 @@
               dankKDEConnect.enable = true;
               simpleAudioControl.enable = true;
               claudeUsage.enable = true;
-              #discordVoice.enable = true;
+              discordVoice = {
+                enable = true;
+                src = lib.mkForce inputs.dms-discord-widget;
+              };
               tasks.enable = true;
               khalCalendar.enable = true;
             };
