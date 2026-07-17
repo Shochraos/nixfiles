@@ -1,6 +1,6 @@
 {
   den.aspects.editor =
-    { host, user, ... }:
+    { host, ... }:
     {
       nixos =
         { pkgs, ... }:
