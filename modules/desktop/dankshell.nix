@@ -11,10 +11,10 @@
             dankKDEConnect.enabled = true;
             simpleAudioControl.enabled = true;
             claudeUsage.enabled = true;
-            discordVoice = {
-              enabled = true;
-              maxBarAvatars = 10;
-            };
+            #discordVoice = {
+            #  enabled = true;
+            #  maxBarAvatars = 10;
+            #};
 
             khalCalendar = {
               enabled = true;
@@ -156,7 +156,7 @@
               dankKDEConnect.enable = true;
               simpleAudioControl.enable = true;
               claudeUsage.enable = true;
-              discordVoice.enable = true;
+              #discordVoice.enable = true;
               tasks.enable = true;
               khalCalendar.enable = true;
             };
