@@ -17,6 +17,11 @@
             papirus-icon-theme
           ];
 
+          fonts.packages = with pkgs; [
+            noto-fonts-cjk-sans
+            noto-fonts-cjk-serif
+          ];
+
           stylix = {
             enable = true;
             base16Scheme = "${pkgs.base16-schemes}/share/themes/chalk.yaml";
@@ -34,11 +39,6 @@
             };
 
             fonts = {
-              packages = with pkgs; [
-                noto-fonts-cjk-sans
-                noto-fonts-cjk-serif
-              ];
-
               serif = config.stylix.fonts.sansSerif;
 
               sansSerif = {
