@@ -13,25 +13,29 @@ The configuration is built on the **dendritic pattern**: every module is a [`fla
 
 ### The aspect system
 
-The core abstraction is an **aspect**: a named, deferred NixOS or home-manager module.
+Host assembly is done by [denful/den](https://github.com/denful/den). Its core abstraction is a **den aspect**: a named bundle of per-class modules (NixOS on one side, home-manager on the other).
 
-1. **`flake.nix`** declares `options.aspects` as a two-level attrset of deferred modules: `aspects.<class>.<name>`, where `class` is `nixos` or `home`.
-
-2. **Every module under `modules/`** contributes by setting `aspects.nixos.<name>` and/or `aspects.home.<name>` to a module function. A single file commonly defines *both* the system and home sides of one feature:
+1. **Every module under `modules/`** contributes by setting `den.aspects.<name>`. A single file commonly defines *both* the system and home sides of one feature; aspects that need context are written as a function over `{ host, user }`:
 
    ```nix
    {
-     aspects.nixos.user = { username, pkgs, ... }: { /* NixOS config */ };
-     aspects.home.user  = { username, ... }:        { /* home-manager config */ };
+     den.aspects.foo =
+       { host, user, ... }:
+       {
+         nixos = { pkgs, ... }: { /* NixOS config */ };
+         provides.to-users.homeManager = { pkgs, ... }: { /* home-manager config */ };
+       };
    }
    ```
 
-   These definitions are only *registered* — nothing is activated until a host selects the aspect by name.
+   These definitions are only *registered* — nothing is activated until an aspect is reachable from a host's includes graph.
 
-3. **`modules/flake/configurations.nix`** assembles the hosts. It defines `base` and `desktop` name lists, then builds each `nixosSystem` by resolving the selected names into their matching `aspects.nixos.<name>` / `aspects.home.<name>` modules and wiring in stylix and home-manager.
+2. **`modules/flake/den.nix`** assembles everything. It declares the hosts (`den.hosts.x86_64-linux.{Azazel,Solas}`, each with its user and an explicit host aspect) and the includes graph: `base` (core system aspects) is included by `desktop` (Hyprland, DankMaterialShell, apps, …), which is included by the per-host aspects `azazel` / `solas` alongside their opt-in features. Includes are **value references** (`den.aspects.<name>`), so a typo fails evaluation immediately instead of silently applying nothing.
+
+3. **den wires home-manager automatically**: config from `provides.to-users.homeManager` lands in `home-manager.users.<name>`, with `osConfig` available in home modules. There is no hand-written glue between the system and home sides.
 
 > [!TIP]
-> **Adding a feature is two steps:** (a) create a module file under `modules/` defining `aspects.{nixos,home}.<name>`, and (b) add `"<name>"` to the appropriate list (`base`, `desktop`, or a host's extra list) in `configurations.nix`. Forgetting step (b) means the file evaluates but the aspect is never applied.
+> **Adding a feature is two steps:** (a) create a module file under `modules/` defining `den.aspects.<name>`, and (b) add `<name>` to the appropriate includes list (`base`, `desktop`, or a host's list) in `modules/flake/den.nix`. Forgetting step (b) means the file evaluates but the aspect is never applied.
 
 ### Host-specific overrides
 
@@ -39,15 +43,15 @@ Rather than forking shared modules per host, `modules/flake/options.nix` defines
 
 ## Directory layout
 
-- `./flake.nix` — entry-point; declares `options.aspects` and auto-imports the `modules/` tree.
-- `./modules/flake/` — the assembly logic (`configurations.nix`, `options.nix`). Start here to understand the wiring.
-- `./modules/system/` — base OS aspects (`boot`, `nix`, `network`, `audio`, `user`, `terminal`, …).
-- `./modules/desktop/` — Hyprland (`hypr-*`), the DankMaterialShell shell (`dankshell`), browser, apps.
+- `./flake.nix` — entry-point; auto-imports the `modules/` tree via `import-tree`.
+- `./modules/flake/` — the assembly logic (`den.nix`, `options.nix`). Start here to understand the wiring.
+- `./modules/system/` — base OS aspects (`boot`, `nix`, `network`, `audio`, `shell`, `terminal`, …); included via `base`.
+- `./modules/desktop/` — Hyprland (`hypr-*`), the DankMaterialShell shell (`dankshell`), browser, apps; included via `desktop`.
 - `./modules/features/` — opt-in aspects added per host (`gaming-*`, `ai`, `virtualization`, `media`, …).
 - `./modules/hosts/<host>/` — `config.nix` (host overrides + `host.*` settings), `hardware.nix`, `filesystems.nix`.
-- `./packages/` — local derivations consumed via `pkgs.callPackage`.
 - `./configs/` — raw config files for tools without a home-manager module.
 - `./assets/` — icons and static assets referenced by modules.
+- `./secrets/` — [sops-nix](https://github.com/Mic92/sops-nix)-encrypted secrets.
 
 ## Common commands
 
