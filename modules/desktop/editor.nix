@@ -10,7 +10,12 @@
         };
 
       provides.to-users.homeManager =
-        { config, pkgs, ... }:
+        {
+          config,
+          osConfig,
+          pkgs,
+          ...
+        }:
         {
           xdg.autostart = {
             entries = [
@@ -37,14 +42,14 @@
                       command = [ "nixfmt" ];
                     };
                     nixpkgs = {
-                      expr = "import (builtins.getFlake \"/home/${user.name}/Repositories/nixfiles\").inputs.nixpkgs";
+                      expr = "import (builtins.getFlake \"${osConfig.host.flakeDir}\").inputs.nixpkgs";
                     };
                     options = {
                       nixos = {
-                        expr = "(builtins.getFlake \"/home/${user.name}/Repositories/nixfiles\").nixosConfigurations.${host.name}.options";
+                        expr = "(builtins.getFlake \"${osConfig.host.flakeDir}\").nixosConfigurations.${host.name}.options";
                       };
                       home-manager = {
-                        expr = "(builtins.getFlake \"/home/${user.name}/Repositories/nixfiles\").nixosConfigurations.${host.name}.options.home-manager.users.type.getSubOptions []";
+                        expr = "(builtins.getFlake \"${osConfig.host.flakeDir}\").nixosConfigurations.${host.name}.options.home-manager.users.type.getSubOptions []";
                       };
                     };
                   };

@@ -68,22 +68,27 @@
         };
 
       provides.to-users.homeManager =
-        { config, pkgs, ... }:
+        {
+          config,
+          osConfig,
+          pkgs,
+          ...
+        }:
         {
           home.pointerCursor.enable = true;
 
           xdg.configFile."matugen/config.toml".text = ''
             [config]
             [templates.spotify]
-            input_path = '~/Repositories/nixfiles/assets/templates/spicetify.json.j2'
-            output_path = '~/Repositories/nixfiles/configs/matugen/spicetify-${host.name}.json'
+            input_path = '${osConfig.host.flakeDir}/assets/templates/spicetify.json.j2'
+            output_path = '${osConfig.host.flakeDir}/configs/matugen/spicetify-${host.name}.json'
 
             [templates.vesktop]
-            input_path = '~/Repositories/nixfiles/assets/templates/discord.css'
+            input_path = '${osConfig.host.flakeDir}/assets/templates/discord.css'
             output_path = '~/.config/Vencord/themes/matugen.css'
 
             [templates.steam]
-            input_path = '~/Repositories/nixfiles/assets/templates/steam.css'
+            input_path = '${osConfig.host.flakeDir}/assets/templates/steam.css'
             output_path = '~/.steam/steam/millennium/themes/simply-dark/colors.css'
           '';
 

@@ -22,9 +22,5 @@
           programs.fish.enable = true;
         };
 
-      homeManager = {
-        home.username = user.name;
-        home.homeDirectory = "/home/${user.name}";
-      };
     };
 }

@@ -260,7 +260,7 @@
     };
 
   den.aspects.azazel.provides.to-users.homeManager =
-    { pkgs, ... }:
+    { config, pkgs, ... }:
     {
       home.stateVersion = "25.05";
 
@@ -271,8 +271,8 @@
 
       xdg.autostart = {
         entries = [
-          "${pkgs.discord.desktopItem}/share/applications/discord.desktop"
-          "${pkgs.spotify}/share/applications/spotify.desktop"
+          "${(pkgs.discord.override { withVencord = true; }).desktopItem}/share/applications/discord.desktop"
+          "${config.programs.spicetify.spicedSpotify}/share/applications/spotify.desktop"
         ];
       };
     };

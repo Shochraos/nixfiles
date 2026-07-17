@@ -69,6 +69,11 @@
             extraGroups = [ "greeter" ];
           };
 
+          sops.secrets = {
+            "calendar/nextcloud-url".owner = user.name;
+            "calendar/nextcloud-pass".owner = user.name;
+          };
+
           sops.templates."dms-plugin-settings.json" = {
             owner = user.name;
             content =

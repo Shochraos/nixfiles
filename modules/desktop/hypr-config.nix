@@ -40,7 +40,7 @@
           "image/jpeg" = "org.gnome.Loupe.desktop";
           "image/png" = "org.gnome.Loupe.desktop";
           "video/mp4" = "mpv.desktop";
-          "video/mkv" = "mpv.desktop";
+          "video/x-matroska" = "mpv.desktop";
           "text/plain" = "org.gnome.TextEditor.desktop";
         };
       };
@@ -82,8 +82,8 @@
         settings = {
           config = lib.recursiveUpdate {
             input = lib.recursiveUpdate {
-              kb_layout = "us";
-              kb_variant = "altgr-intl";
+              kb_layout = osConfig.services.xserver.xkb.layout;
+              kb_variant = osConfig.services.xserver.xkb.variant;
             } osConfig.host.hyprland.input;
 
             misc = {

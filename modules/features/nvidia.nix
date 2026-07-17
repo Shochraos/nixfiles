@@ -1,5 +1,5 @@
 {
-  den.aspects.gaming.nixos =
+  den.aspects.nvidia.nixos =
     {
       config,
       pkgs,
@@ -27,7 +27,7 @@
       };
     };
 
-  den.aspects.gaming.provides.to-users.homeManager = {
+  den.aspects.nvidia.provides.to-users.homeManager = {
     home.sessionVariables = {
       "LIBVA_DRIVER_NAME" = "nvidia";
       "__GLX_VENDOR_LIBRARY_NAME" = "nvidia";

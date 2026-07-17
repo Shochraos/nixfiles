@@ -6,6 +6,12 @@ in
 {
   den.aspects.hostOptions.nixos = {
     options.host = {
+      flakeDir = mkOption {
+        type = types.str;
+        default = "/home/shochraos/Repositories/nixfiles";
+        description = "Absolute path to this flake's checkout on the host.";
+      };
+
       hyprland = {
         input = mkOption {
           type = types.attrsOf types.anything;

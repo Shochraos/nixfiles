@@ -31,7 +31,7 @@
       };
 
       provides.to-users.homeManager =
-        { pkgs, ... }:
+        { osConfig, pkgs, ... }:
         {
           imports = [ inputs.nix-index-database.homeModules.default ];
 
@@ -43,7 +43,7 @@
 
           programs.nh = {
             enable = true;
-            flake = "/home/${user.name}/Repositories/nixfiles";
+            flake = osConfig.host.flakeDir;
             clean.enable = true;
             clean.extraArgs = "--keep-since 7d --keep 10";
           };

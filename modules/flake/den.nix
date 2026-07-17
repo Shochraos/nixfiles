@@ -18,7 +18,6 @@
     network
     audio
     scheduling
-    terminal
     shell
     remotes
     wireguard
@@ -28,6 +27,7 @@
   den.aspects.desktop.includes = with den.aspects; [
     base
     hyprland
+    terminal
     dankshell
     browser
     editor
@@ -41,6 +41,7 @@
   den.aspects.azazel.includes = with den.aspects; [
     desktop
     cpu-amd
+    nvidia
     gaming
     ai
     media
