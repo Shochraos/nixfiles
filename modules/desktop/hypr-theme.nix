@@ -96,8 +96,16 @@
             platformTheme.name = "qtct";
           };
 
-          stylix.targets.zed.fonts.enable = true;
-          stylix.targets.gtk.fonts.enable = true;
+          stylix.targets = {
+            gtk = {
+              enable = true;
+              colors.enable = false;
+            };
+            zed = {
+              enable = true;
+              colors.enable = false;
+            };
+          };
         };
     };
 }
