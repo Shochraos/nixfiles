@@ -17,7 +17,6 @@
     locale
     network
     audio
-    fonts
     scheduling
     terminal
     shell

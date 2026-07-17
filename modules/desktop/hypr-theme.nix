@@ -34,6 +34,11 @@
             };
 
             fonts = {
+              packages = with pkgs; [
+                noto-fonts-cjk-sans
+                noto-fonts-cjk-serif
+              ];
+
               serif = config.stylix.fonts.sansSerif;
 
               sansSerif = {
@@ -83,6 +88,8 @@
           '';
 
           home.packages = with pkgs; [ adw-gtk3 ];
+
+          fonts.fontconfig.enable = true;
 
           dconf.settings = {
             "org/gnome/desktop/interface" = {
