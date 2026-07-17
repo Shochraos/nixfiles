@@ -213,7 +213,7 @@
               cornerRadius = 16;
               hyprlandLayoutGapsOverride = -2;
 
-              iconThemeDark = "Papirus-Dark";
+              iconThemeDark = osConfig.stylix.icons.dark;
 
               controlCenterShowMicPercent = false;
               osdPowerProfileEnabled = false;

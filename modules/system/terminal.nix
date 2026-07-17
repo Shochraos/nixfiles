@@ -10,7 +10,7 @@
           background-opacity = 0.5;
           background-blur = true;
           font-family = osConfig.stylix.fonts.monospace.name;
-          font-size = 12;
+          font-size = osConfig.stylix.fonts.sizes.terminal;
         };
       };
     };
