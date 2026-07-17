@@ -22,6 +22,11 @@
             base16Scheme = "${pkgs.base16-schemes}/share/themes/chalk.yaml";
             autoEnable = false;
 
+            targets = {
+              font-packages.enable = true;
+              fontconfig.enable = true;
+            };
+
             cursor = {
               package = pkgs.bibata-cursors;
               name = "Bibata-Modern-Classic";
@@ -58,7 +63,7 @@
         };
 
       provides.to-users.homeManager =
-        { pkgs, ... }:
+        { config, pkgs, ... }:
         {
           home.pointerCursor.enable = true;
 
@@ -77,17 +82,15 @@
             output_path = '~/.steam/steam/millennium/themes/simply-dark/colors.css'
           '';
 
-          home.packages = with pkgs; [
-            adw-gtk3
-            overpass
-            nerd-fonts.overpass
-          ];
+          home.packages = with pkgs; [ adw-gtk3 ];
 
           dconf.settings = {
             "org/gnome/desktop/interface" = {
               gtk-theme = "adw-gtk3-dark";
               color-scheme = "prefer-dark";
-              icon-theme = "Papirus-Dark";
+              icon-theme = config.stylix.icons.dark;
+              font-name = "${config.stylix.fonts.sansSerif.name} ${toString config.stylix.fonts.sizes.applications}";
+              monospace-font-name = "${config.stylix.fonts.monospace.name} ${toString config.stylix.fonts.sizes.applications}";
             };
           };
 
@@ -97,6 +100,8 @@
           };
 
           stylix.targets = {
+            font-packages.enable = true;
+            fontconfig.enable = true;
             gtk = {
               enable = true;
               colors.enable = false;

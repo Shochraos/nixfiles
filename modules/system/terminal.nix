@@ -1,6 +1,6 @@
 {
   den.aspects.terminal.provides.to-users.homeManager =
-    { ... }:
+    { osConfig, ... }:
     {
       programs.ghostty = {
         enable = true;
@@ -9,7 +9,7 @@
           background = "000000";
           background-opacity = 0.5;
           background-blur = true;
-          font-family = "OverpassM Nerd Font Mono";
+          font-family = osConfig.stylix.fonts.monospace.name;
           font-size = 12;
         };
       };
