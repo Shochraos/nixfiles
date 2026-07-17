@@ -1,5 +1,5 @@
 {
-  aspects.nixos.audio =
+  den.aspects.audio.nixos =
     { pkgs, ... }:
     {
       services.pulseaudio.enable = false;

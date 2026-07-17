@@ -1,22 +1,26 @@
 {
-  aspects.nixos.printing =
-    { pkgs, username, ... }:
+  den.aspects.printing =
+    { user, ... }:
     {
-      services = {
-        printing.enable = true;
-        avahi = {
-          enable = true;
-          nssmdns4 = true;
+      nixos =
+        { pkgs, ... }:
+        {
+          services = {
+            printing.enable = true;
+            avahi = {
+              enable = true;
+              nssmdns4 = true;
+            };
+          };
+
+          hardware.sane.enable = true;
+
+          users.groups.lp.members = [ user.name ];
+          users.groups.scanner.members = [ user.name ];
+
+          environment.systemPackages = with pkgs; [
+            simple-scan
+          ];
         };
-      };
-
-      hardware.sane.enable = true;
-
-      users.groups.lp.members = [ username ];
-      users.groups.scanner.members = [ username ];
-
-      environment.systemPackages = with pkgs; [
-        simple-scan
-      ];
     };
 }

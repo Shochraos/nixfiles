@@ -1,5 +1,5 @@
 {
-  aspects.home.gaming = {
+  den.aspects.gaming.provides.to-users.homeManager = {
     programs.mangohud = {
       enable = true;
       settings = {

@@ -1,5 +1,5 @@
 {
-  aspects.nixos.scheduling =
+  den.aspects.scheduling.nixos =
     { pkgs, ... }:
     {
       services.scx = {

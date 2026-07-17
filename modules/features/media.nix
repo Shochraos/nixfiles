@@ -1,5 +1,5 @@
 {
-  aspects.home.media =
+  den.aspects.media.provides.to-users.homeManager =
     { pkgs, ... }:
     {
       home.packages = with pkgs; [ jellyfin-mpv-shim ];

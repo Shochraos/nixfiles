@@ -1,5 +1,5 @@
 {
-  aspects.nixos.gamechat =
+  den.aspects.gamechat.nixos =
     {
       pkgs,
       lib,
@@ -51,7 +51,7 @@
       ];
     };
 
-  aspects.home.gamechat =
+  den.aspects.gamechat.provides.to-users.homeManager =
     { pkgs, ... }:
     let
       gamechat_mix = pkgs.writeShellScript "gamechat_mix.sh" (

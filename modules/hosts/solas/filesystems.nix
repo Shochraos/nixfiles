@@ -1,5 +1,5 @@
 {
-  aspects.nixos.solas = {
+  den.aspects.solas.nixos = {
     fileSystems."/" = {
       device = "/dev/disk/by-uuid/f9880bef-0450-49c6-a537-40d11cb91550";
       fsType = "ext4";

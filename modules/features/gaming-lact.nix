@@ -1,5 +1,5 @@
 {
-  aspects.nixos.gaming =
+  den.aspects.gaming.nixos =
     { pkgs, ... }:
     {
       environment.systemPackages = with pkgs; [ lact ];
