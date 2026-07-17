@@ -82,6 +82,7 @@
     {
       config,
       inputs,
+      lib,
       osConfig,
       pkgs,
       ...
@@ -147,7 +148,10 @@
           dankKDEConnect.enable = true;
           simpleAudioControl.enable = true;
           claudeUsage.enable = true;
-          discordVoice.enable = true;
+          discordVoice = {
+            enable = true;
+            src = lib.mkForce inputs.dms-discord-widget;
+          };
           tasks.enable = true;
           khalCalendar.enable = true;
         };
