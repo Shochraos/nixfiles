@@ -1,5 +1,5 @@
 {
-  aspects.nixos.azazel = {
+  den.aspects.azazel.nixos = {
     fileSystems."/" = {
       device = "/dev/disk/by-uuid/4c651ae6-5cff-446f-a8f0-323a9f047f90";
       fsType = "ext4";

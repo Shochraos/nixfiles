@@ -1,5 +1,5 @@
 {
-  aspects.nixos.fingerprint =
+  den.aspects.fingerprint.nixos =
     { ... }:
     {
       services.fprintd.enable = true;

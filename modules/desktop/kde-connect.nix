@@ -1,5 +1,5 @@
 {
-  aspects.nixos.kde-connect =
+  den.aspects.kde-connect.nixos =
     { pkgs, ... }:
     {
       programs.kdeconnect = {
@@ -8,7 +8,7 @@
       };
     };
 
-  aspects.home.kde-connect =
+  den.aspects.kde-connect.provides.to-users.homeManager =
     { pkgs, ... }:
     {
       systemd.user.services.valent = {

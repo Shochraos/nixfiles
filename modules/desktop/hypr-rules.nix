@@ -1,6 +1,9 @@
 {
-  aspects.home.hyprland =
+  den.aspects.hyprland.provides.to-users.homeManager =
     { osConfig, ... }:
+    let
+      dmsModals = "^(dms:(clipboard|file-browser|settings|spotlight|bluetooth-pairing|color-picker|hyprkeybinds|network-info|network-info-wired|notification-center-modal|polkit|power-menu|process-list-modal|wifi-password|confirm-modal|modal))$";
+    in
     {
       wayland.windowManager.hyprland.settings = {
         window_rule = [
@@ -24,12 +27,6 @@
           }
           {
             match = {
-              class = "^(Discord)$";
-            };
-            float = true;
-          }
-          {
-            match = {
               class = "^(com.nextcloud.desktopclient.nextcloud)$";
             };
             float = true;
@@ -47,7 +44,7 @@
           }
           {
             match = {
-              namespace = "^(dms:(clipboard|file-browser|settings|spotlight|bluetooth-pairing|color-picker|hyprkeybinds|network-info|network-info-wired|notification-center-modal|polkit|power-menu|process-list-modal|wifi-password|confirm-modal|modal))$";
+              namespace = dmsModals;
             };
             dim_around = 1;
           }
@@ -65,7 +62,7 @@
           }
           {
             match = {
-              namespace = "^(dms:(clipboard|file-browser|settings|spotlight|bluetooth-pairing|color-picker|hyprkeybinds|network-info|network-info-wired|notification-center-modal|polkit|power-menu|process-list-modal|wifi-password|confirm-modal|modal))$";
+              namespace = dmsModals;
             };
             animation = "popin 80%";
           }

@@ -1,18 +1,17 @@
 {
-  aspects.nixos.virtualization =
-    { username, ... }:
+  den.aspects.virtualization =
+    { user, ... }:
     {
-      programs.virt-manager.enable = true;
+      nixos = {
+        programs.virt-manager.enable = true;
 
-      users.groups.libvirtd.members = [ username ];
+        users.groups.libvirtd.members = [ user.name ];
 
-      virtualisation.libvirtd.enable = true;
+        virtualisation.libvirtd.enable = true;
 
-      virtualisation.spiceUSBRedirection.enable = true;
+        virtualisation.spiceUSBRedirection.enable = true;
 
-      virtualisation.vswitch.enable = true;
-
-      users.groups.frrvty = { };
-      users.users.root.extraGroups = [ "frrvty" ];
+        virtualisation.vswitch.enable = true;
+      };
     };
 }

@@ -1,5 +1,5 @@
 {
-  aspects.nixos.solas =
+  den.aspects.solas.nixos =
     {
       config,
       lib,
