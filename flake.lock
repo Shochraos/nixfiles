@@ -171,6 +171,22 @@
         "type": "github"
       }
     },
+    "dms-discord-widget": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1784320332,
+        "narHash": "sha256-gfWCmjPm8hjAne1m4D5oprxdw5NeYZ3zipGpGI9RG4I=",
+        "owner": "Shochraos",
+        "repo": "dms-discord-widget",
+        "rev": "6e482f9358c6cd5b4fb994bec275812a5935f6d9",
+        "type": "github"
+      },
+      "original": {
+        "owner": "Shochraos",
+        "repo": "dms-discord-widget",
+        "type": "github"
+      }
+    },
     "dms-plugin-registry": {
       "inputs": {
         "nixpkgs": [
@@ -594,6 +610,7 @@
         "danksearch": "danksearch",
         "den": "den",
         "dms": "dms",
+        "dms-discord-widget": "dms-discord-widget",
         "dms-plugin-registry": "dms-plugin-registry",
         "flake-parts": "flake-parts",
         "home-manager": "home-manager",

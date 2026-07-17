@@ -54,6 +54,11 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    dms-discord-widget = {
+      url = "github:Shochraos/dms-discord-widget";
+      flake = false;
+    };
+
     danksearch = {
       url = "github:AvengeMedia/danksearch";
       inputs.nixpkgs.follows = "nixpkgs";
