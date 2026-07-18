@@ -174,11 +174,11 @@
     "dms-discord-widget": {
       "flake": false,
       "locked": {
-        "lastModified": 1784320332,
-        "narHash": "sha256-gfWCmjPm8hjAne1m4D5oprxdw5NeYZ3zipGpGI9RG4I=",
+        "lastModified": 1784327302,
+        "narHash": "sha256-El77+iyms2xm3UMokbE7SQ+JK3/h++mmBOioLRlUYhE=",
         "owner": "Shochraos",
         "repo": "dms-discord-widget",
-        "rev": "6e482f9358c6cd5b4fb994bec275812a5935f6d9",
+        "rev": "389e0a3c72ee3539b42a4bf3a95a20e1ba6d8ac9",
         "type": "github"
       },
       "original": {
@@ -194,11 +194,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1784166545,
-        "narHash": "sha256-xXKXaXWym1HR4gd0pT4Wb8/lmgVaR08iAHoMLFT9okk=",
+        "lastModified": 1784341230,
+        "narHash": "sha256-2QxkI52zrEdPPAlE5R71lqBeZxXuHwGAYl3ILCFtTjo=",
         "owner": "AvengeMedia",
         "repo": "dms-plugin-registry",
-        "rev": "3448e30e19ff96a180febdfde791399b48736cc7",
+        "rev": "1463198cb6d23211ee45cc6fe21acc75aa4e77b8",
         "type": "github"
       },
       "original": {
