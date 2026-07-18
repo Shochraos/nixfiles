@@ -3,93 +3,35 @@
   den.aspects.dankshell =
     { user, ... }:
     {
-      nixos =
-        { config, ... }:
-        let
-          pluginSettings = {
-            calculator.enabled = true;
-            dankKDEConnect.enabled = true;
-            simpleAudioControl.enabled = true;
-            claudeUsage.enabled = true;
-            discordVoice = {
-              enabled = true;
-              maxBarAvatars = 10;
-            };
+      nixos = {
+        services.displayManager.defaultSession = "hyprland-uwsm";
+        services.displayManager.dms-greeter = {
+          enable = true;
+          configHome = "/home/${user.name}";
 
-            khalCalendar = {
-              enabled = true;
-              calendarFilter = "";
-              vdirBasePath = "/home/${user.name}/.local/share/calendars/nextcloud";
+          compositor = {
+            name = "hyprland";
+            customConfig = ''
+              env = XCURSOR_THEME,Bibata-Modern-Classic
+              env = XCURSOR_SIZE,24
 
-              lookAheadDays = 7;
-              refreshInterval = 5;
-
-              showLocation = true;
-              showCalendarName = true;
-
-              notificationsEnabled = true;
-              notifyMinutes = 15;
-            };
-
-            tasks = {
-              enabled = true;
-              caldavUsername = "Shochraos";
-              caldavCalendar = "Personal";
-              caldavCalendars = "Work";
-              refreshInterval = "5";
-              caldavSSLVerify = true;
-              caldavURL = "@DMS_CALDAV_URL@";
-              caldavPassword = "@DMS_CALDAV_PASS@";
-            };
-          };
-        in
-        {
-          services.displayManager.defaultSession = "hyprland-uwsm";
-          services.displayManager.dms-greeter = {
-            enable = true;
-            configHome = "/home/${user.name}";
-
-            compositor = {
-              name = "hyprland";
-              customConfig = ''
-                env = XCURSOR_THEME,Bibata-Modern-Classic
-                env = XCURSOR_SIZE,24
-
-                misc:disable_hyprland_logo = true
-                misc:disable_splash_rendering = true
-                misc:force_default_wallpaper = 0
-                misc:background_color = rgb(000000)
-              '';
-            };
-          };
-
-          services.accounts-daemon.enable = true;
-
-          users.users.${user.name} = {
-            extraGroups = [ "greeter" ];
-          };
-
-          sops.secrets = {
-            "calendar/nextcloud-url".owner = user.name;
-            "calendar/nextcloud-pass".owner = user.name;
-          };
-
-          sops.templates."dms-plugin-settings.json" = {
-            owner = user.name;
-            content =
-              builtins.replaceStrings
-                [ "@DMS_CALDAV_URL@" "@DMS_CALDAV_PASS@" ]
-                [
-                  config.sops.placeholder."calendar/nextcloud-url"
-                  config.sops.placeholder."calendar/nextcloud-pass"
-                ]
-                (builtins.toJSON pluginSettings);
+              misc:disable_hyprland_logo = true
+              misc:disable_splash_rendering = true
+              misc:force_default_wallpaper = 0
+              misc:background_color = rgb(000000)
+            '';
           };
         };
 
+        services.accounts-daemon.enable = true;
+
+        users.users.${user.name} = {
+          extraGroups = [ "greeter" ];
+        };
+      };
+
       provides.to-users.homeManager =
         {
-          config,
           lib,
           osConfig,
           pkgs,
@@ -130,14 +72,8 @@
           home.packages = [
             # Claude Usage
             pkgs.jq
-            # DiscordVoice and Tasks (caldav)
-            (pkgs.python3.withPackages (
-              ps: with ps; [
-                caldav
-                httpx
-                urllib3
-              ]
-            ))
+            # DiscordVoice
+            pkgs.python3
           ];
 
           xdg.autostart.enable = true;
@@ -155,8 +91,6 @@
             enableAudioWavelength = false;
             enableCalendarEvents = true;
 
-            managePluginSettings = false;
-
             plugins = {
               calculator.enable = true;
               dankKDEConnect.enable = true;
@@ -165,9 +99,24 @@
               discordVoice = {
                 enable = true;
                 src = lib.mkForce inputs.dms-discord-widget;
+                settings.maxBarAvatars = 10;
               };
-              tasks.enable = true;
-              khalCalendar.enable = true;
+              khalCalendar = {
+                enable = true;
+                settings = {
+                  calendarFilter = "";
+                  vdirBasePath = "/home/${user.name}/.local/share/calendars/nextcloud";
+
+                  lookAheadDays = 7;
+                  refreshInterval = 5;
+
+                  showLocation = true;
+                  showCalendarName = true;
+
+                  notificationsEnabled = true;
+                  notifyMinutes = 15;
+                };
+              };
             };
 
             settings = {
@@ -244,10 +193,6 @@
               hyprlandOutputSettings = osConfig.host.dms.hyprlandOutputSettings;
             };
           };
-
-          xdg.configFile."DankMaterialShell/plugin_settings.json".source =
-            config.lib.file.mkOutOfStoreSymlink
-              osConfig.sops.templates."dms-plugin-settings.json".path;
 
           programs.dsearch = {
             enable = true;
