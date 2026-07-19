@@ -30,6 +30,19 @@
 
           programs.vdirsyncer.enable = true;
           services.vdirsyncer.enable = true;
+
+          programs.todoman = {
+            enable = true;
+            glob = "nextcloud/[pw]*";
+            extraConfig = ''
+              date_format = "%Y-%m-%d"
+              time_format = "%H:%M"
+              dt_separator = " "
+              default_list = "personal"
+              default_due = 0
+              humanize = True
+            '';
+          };
           programs.khal = {
             enable = true;
             locale = {
