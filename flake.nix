@@ -59,6 +59,11 @@
       flake = false;
     };
 
+    dms-taskman-plugin = {
+      url = "github:Shochraos/dms-taskman-plugin";
+      flake = false;
+    };
+
     danksearch = {
       url = "github:AvengeMedia/danksearch";
       inputs.nixpkgs.follows = "nixpkgs";
