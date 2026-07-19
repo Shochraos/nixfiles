@@ -96,7 +96,12 @@
 
             general = {
               gaps_in = 5;
-              gaps_out = 5;
+              gaps_out = {
+                top = 5;
+                right = 14;
+                bottom = 14;
+                left = 14;
+              };
               border_size = 1;
               col = {
                 inactive_border = "rgba(00000000)";
