@@ -117,6 +117,11 @@
                   notifyMinutes = 15;
                 };
               };
+
+              dankTodoman = {
+                enable = true;
+                src = inputs.dms-taskman-plugin;
+              };
             };
 
             settings = {

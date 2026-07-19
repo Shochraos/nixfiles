@@ -174,6 +174,10 @@
                 enabled = true;
               }
               {
+                id = "dankTodoman";
+                enabled = true;
+              }
+              {
                 id = "tasks";
                 enabled = true;
               }

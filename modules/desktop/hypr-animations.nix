@@ -80,6 +80,12 @@
           bezier = "curveMenu";
           style = "popin 80%";
         }
+        {
+          leaf = "fade";
+          enabled = true;
+          speed = 2.5;
+          bezier = "curveMenu";
+        }
       ];
     };
   };

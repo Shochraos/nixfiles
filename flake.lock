@@ -207,6 +207,22 @@
         "type": "github"
       }
     },
+    "dms-taskman-plugin": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1784498514,
+        "narHash": "sha256-LaC9rkgCb+tghju9QJpHst6pqtV2+JGrjfyYq5jmHqo=",
+        "owner": "Shochraos",
+        "repo": "dms-taskman-plugin",
+        "rev": "ed88f99301cc8ce8ba1769cb2c0c7522135513a7",
+        "type": "github"
+      },
+      "original": {
+        "owner": "Shochraos",
+        "repo": "dms-taskman-plugin",
+        "type": "github"
+      }
+    },
     "firefox-gnome-theme": {
       "flake": false,
       "locked": {
@@ -612,6 +628,7 @@
         "dms": "dms",
         "dms-discord-widget": "dms-discord-widget",
         "dms-plugin-registry": "dms-plugin-registry",
+        "dms-taskman-plugin": "dms-taskman-plugin",
         "flake-parts": "flake-parts",
         "home-manager": "home-manager",
         "import-tree": "import-tree",
