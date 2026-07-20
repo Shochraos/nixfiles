@@ -32,7 +32,6 @@
 
       provides.to-users.homeManager =
         {
-          lib,
           osConfig,
           pkgs,
           ...
@@ -96,9 +95,9 @@
               dankKDEConnect.enable = true;
               simpleAudioControl.enable = true;
               claudeUsage.enable = true;
+              dankTodoman.enable = true;
               discordVoice = {
                 enable = true;
-                src = lib.mkForce inputs.dms-discord-widget;
                 settings.maxBarAvatars = 10;
               };
               khalCalendar = {
@@ -116,11 +115,6 @@
                   notificationsEnabled = true;
                   notifyMinutes = 15;
                 };
-              };
-
-              dankTodoman = {
-                enable = true;
-                src = inputs.dms-taskman-plugin;
               };
             };
 
