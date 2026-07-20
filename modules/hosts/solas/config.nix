@@ -261,15 +261,7 @@
                 enabled = true;
               }
               {
-                id = "notificationButton";
-                enabled = true;
-              }
-              {
-                id = "clipboard";
-                enabled = true;
-              }
-              {
-                id = "dankKDEConnect";
+                id = "dankTodoman";
                 enabled = true;
               }
             ];
@@ -296,14 +288,16 @@
                 enabled = true;
               }
               {
-                id = "cpuUsage";
+                id = "notificationButton";
                 enabled = true;
-                minimumWidth = true;
               }
               {
-                id = "cpuTemp";
+                id = "clipboard";
                 enabled = true;
-                minimumWidth = true;
+              }
+              {
+                id = "dankKDEConnect";
+                enabled = true;
               }
               {
                 id = "vpn";
