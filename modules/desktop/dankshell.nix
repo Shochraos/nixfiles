@@ -155,12 +155,13 @@
 
               popupTransparency = 0.5;
 
-              animationSpeed = 0;
-              syncComponentAnimationSpeeds = false;
-              popoutAnimationSpeed = 0;
-              modalAnimationSpeed = 0;
+              animationSpeed = 4;
+              customAnimationDuration = 325;
+              syncComponentAnimationSpeeds = true;
+              animationVariant = 1;
+              motionEffect = 1;
 
-              modalDarkenBackground = false;
+              modalDarkenBackground = true;
 
               m3ElevationEnabled = false;
               modalElevationEnabled = false;
