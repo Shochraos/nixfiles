@@ -62,28 +62,28 @@
         {
           leaf = "windows";
           enabled = true;
-          speed = 2.5;
+          speed = 3.5;
           bezier = "curveWindow";
           style = "slide";
         }
         {
           leaf = "workspaces";
           enabled = true;
-          speed = 2.5;
+          speed = 3.5;
           bezier = "curveWorkspace";
           style = "slidevert";
         }
         {
           leaf = "layers";
           enabled = true;
-          speed = 2.5;
+          speed = 3.5;
           bezier = "curveMenu";
           style = "popin 80%";
         }
         {
           leaf = "fade";
           enabled = true;
-          speed = 2.5;
+          speed = 3.5;
           bezier = "curveMenu";
         }
       ];

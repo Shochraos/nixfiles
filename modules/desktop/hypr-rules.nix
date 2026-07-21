@@ -1,9 +1,6 @@
 {
   den.aspects.hyprland.provides.to-users.homeManager =
     { osConfig, ... }:
-    let
-      dmsModals = "^(dms:(clipboard|file-browser|settings|spotlight|bluetooth-pairing|color-picker|hyprkeybinds|network-info|network-info-wired|notification-center-modal|polkit|power-menu|process-list-modal|wifi-password|confirm-modal|modal))$";
-    in
     {
       wayland.windowManager.hyprland.settings = {
         window_rule = [
@@ -44,27 +41,9 @@
           }
           {
             match = {
-              namespace = dmsModals;
-            };
-            dim_around = 1;
-          }
-          {
-            match = {
-              namespace = "^(dms:bar)$";
+              namespace = "^(dms:(bar|app-launcher|control-center|clipboard-popout|battery|vpn|dash|notification-center-popout|process-list-popout|popout|plugins:.*|plugins:plugin|clipboard|file-browser|settings|spotlight|bluetooth-pairing|color-picker|hyprkeybinds|network-info|network-info-wired|notification-center-modal|polkit|power-menu|process-list-modal|wifi-password|confirm-modal|modal))$";
             };
             no_anim = true;
-          }
-          {
-            match = {
-              namespace = "^(dms:(app-launcher|control-center|clipboard-popout|battery|vpn|dash|notification-center-popout|process-list-popout|popout|plugins:.*|plugins:plugin))$";
-            };
-            animation = "slide top";
-          }
-          {
-            match = {
-              namespace = dmsModals;
-            };
-            animation = "popin 80%";
           }
         ];
       };
