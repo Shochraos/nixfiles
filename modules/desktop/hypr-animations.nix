@@ -73,19 +73,6 @@
           bezier = "curveWorkspace";
           style = "slidevert";
         }
-        {
-          leaf = "layers";
-          enabled = true;
-          speed = 3.5;
-          bezier = "curveMenu";
-          style = "popin 80%";
-        }
-        {
-          leaf = "fade";
-          enabled = true;
-          speed = 3.5;
-          bezier = "curveMenu";
-        }
       ];
     };
   };
