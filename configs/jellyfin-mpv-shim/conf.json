@@ -97,7 +97,7 @@
     "sync_speed_attempts": 3,
     "sync_speed_time": 1000,
     "thumbnail_enable": true,
-    "thumbnail_osc_builtin": true,
+    "thumbnail_osc_builtin": false,
     "thumbnail_preferred_size": 320,
     "tls_client_cert": null,
     "tls_client_key": null,

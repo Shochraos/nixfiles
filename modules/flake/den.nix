@@ -43,7 +43,7 @@
     cpu-amd
     nvidia
     gaming
-    ai
+    #ai
     media
     remote-mounts
     virtualization
