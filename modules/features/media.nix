@@ -9,10 +9,14 @@
 
         config = {
           vo = "gpu-next";
+          osc = "no";
+          border = "no";
         };
 
         scripts = with pkgs; [
           mpvScripts.uosc
+          mpvScripts.thumbfast
+          mpvScripts.mpris
         ];
 
         scriptOpts = {
@@ -22,6 +26,10 @@
 
             font_scale = 1.5;
             font_bold = true;
+          };
+
+          thumbfast = {
+            network = "yes";
           };
         };
       };
