@@ -23,10 +23,17 @@
 
   den.aspects.gaming.provides.to-users.homeManager =
     { pkgs, ... }:
+    let
+      proton-cachyos =
+        inputs.nix-proton-cachyos.packages.${pkgs.stdenv.hostPlatform.system}.proton-cachyos;
+      dw-proton = inputs.nix-dw-proton.packages.${pkgs.stdenv.hostPlatform.system}.dw-proton;
+    in
     {
       home.sessionVariables = {
         PROTON_DLSS_UPGRADE = "1";
         VKD3D_CONFIG = "descriptor_heap";
+        STEAM_EXTRA_COMPAT_TOOLS_PATHS =
+          "${proton-cachyos}/share/steam/compatibilitytools.d:${dw-proton}/share/steam/compatibilitytools.d";
       };
 
       xdg.autostart = {
