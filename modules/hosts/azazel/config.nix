@@ -141,6 +141,7 @@
         hyprlandOutputSettings = {
           "HDMI-A-1" = {
             vrrFullscreenOnly = true;
+            bitdepth = 10;
           };
         };
         barConfigs = [
