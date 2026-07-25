@@ -106,16 +106,6 @@
           }
           {
             match = {
-              class = "^(endfield.exe)$";
-              title = "^(Form)$";
-            };
-            float = true;
-            suppress_event = "maximize fullscreen activatefocus";
-            fullscreen_state = "0 0";
-            workspace = "3 silent";
-          }
-          {
-            match = {
               class = "^(XTerm)$";
             };
             float = true;
