@@ -106,6 +106,12 @@
           }
           {
             match = {
+              class = "^(steam_app_\\d+)$";
+            };
+            float = true;
+          }
+          {
+            match = {
               class = "^(XTerm)$";
             };
             float = true;
@@ -132,6 +138,8 @@
           "HDMI-A-1" = {
             vrrFullscreenOnly = true;
             bitdepth = 10;
+            supportsHdr = true;
+            supportsWideColor = true;
           };
         };
         barConfigs = [

@@ -9,6 +9,7 @@
 
         config = {
           vo = "gpu-next";
+          target-colorspace-hint = "yes";
           osc = "no";
           border = "no";
         };
