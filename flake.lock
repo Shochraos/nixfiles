@@ -474,11 +474,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1784169167,
-        "narHash": "sha256-CiKSUUJMnMUlqw7MQRK2cogO0JOY0XEi/aUPjYryyAA=",
+        "lastModified": 1784946909,
+        "narHash": "sha256-OEzrMvCee7AYV8b4Ablp+tM7qC6jIGPZ4j7CjVokLGY=",
         "owner": "Shochraos",
         "repo": "nix-proton-cachyos",
-        "rev": "7a02a8a5ae10aedc083d930d6aeda5718d370355",
+        "rev": "33df3aef90cb488ccc3d37c58d4cdad65870d1f1",
         "type": "github"
       },
       "original": {
