@@ -28,6 +28,12 @@
             };
             float = true;
           }
+          {
+            match = {
+              class = "^(steam_app_\\d+)$";
+            };
+            float = true;
+          }
         ]
         ++ osConfig.host.hyprland.windowRules;
 

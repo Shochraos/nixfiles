@@ -37,6 +37,12 @@
           }
           {
             _args = [
+              "SUPER + CTRL + Q"
+              (lua "hl.dsp.window.kill()")
+            ];
+          }
+          {
+            _args = [
               "SUPER + CTRL + F"
               (lua "hl.dsp.window.fullscreen()")
             ];
