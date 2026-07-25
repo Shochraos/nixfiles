@@ -94,6 +94,10 @@
               disable_splash_rendering = true;
             };
 
+            render = {
+              direct_scanout = 2;
+            };
+
             general = {
               gaps_in = 5;
               gaps_out = {
