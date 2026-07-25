@@ -155,6 +155,8 @@
 
               popupTransparency = 0.5;
 
+              blurEnabled = true;
+
               animationSpeed = 4;
               customAnimationDuration = 325;
               syncComponentAnimationSpeeds = true;
