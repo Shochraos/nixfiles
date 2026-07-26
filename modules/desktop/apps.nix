@@ -4,15 +4,18 @@
     { host, ... }:
     {
       provides.to-users.homeManager =
-        { pkgs, osConfig, ... }:
+        {
+          lib,
+          pkgs,
+          osConfig,
+          ...
+        }:
         {
           imports = [ inputs.spicetify-nix.homeManagerModules.default ];
 
           home.packages = with pkgs; [
             (discord.override { withVencord = true; })
             anki
-            claude-code
-            inputs.omp-nix.packages.${pkgs.stdenv.hostPlatform.system}.default
             libreoffice-qt-fresh
             pdfarranger
           ];
@@ -20,6 +23,7 @@
           programs.spicetify =
             let
               spicePkgs = inputs.spicetify-nix.legacyPackages.${pkgs.stdenv.hostPlatform.system};
+              matugenScheme = ../../configs/matugen/spicetify-${host.name}.json;
             in
             {
               enable = true;
@@ -35,8 +39,8 @@
                   }
                 ''
               ];
-              customColorScheme = builtins.fromJSON (
-                builtins.readFile ../../configs/matugen/spicetify-${host.name}.json
+              customColorScheme = lib.optionalAttrs (builtins.pathExists matugenScheme) (
+                builtins.fromJSON (builtins.readFile matugenScheme)
               );
             };
         };
