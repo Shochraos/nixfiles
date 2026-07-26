@@ -74,25 +74,59 @@
           pkgs,
           ...
         }:
+        let
+          themeSync = pkgs.writeShellApplication {
+            name = "theme-sync";
+            runtimeInputs = with pkgs; [
+              coreutils
+              diffutils
+              git
+              jq
+            ];
+            text = ''
+              src="$HOME/.local/state/matugen/spicetify-${host.name}.json"
+              dst="${osConfig.host.flakeDir}/configs/matugen/spicetify-${host.name}.json"
+
+              if [ ! -f "$src" ]; then exit 0; fi
+
+              if ! jq -e 'type=="object" and length>0 and all(.[]; test("^[0-9a-fA-F]{6}$"))' "$src" >/dev/null 2>&1; then
+                echo "theme-sync: $src incomplete or malformed, keeping current theme" >&2
+                exit 0
+              fi
+
+              if cmp -s "$src" "$dst"; then exit 0; fi
+
+              new=0
+              [ -e "$dst" ] || new=1
+              mkdir -p "$(dirname "$dst")"
+              cp "$src" "$dst"
+              [ "$new" = 0 ] || git -C "${osConfig.host.flakeDir}" add --intent-to-add -- "$dst"
+              echo "theme-sync: updated $dst"
+            '';
+          };
+        in
         {
           home.pointerCursor.enable = true;
 
           xdg.configFile."matugen/config.toml".text = ''
             [config]
             [templates.spotify]
-            input_path = '${osConfig.host.flakeDir}/assets/templates/spicetify.json.j2'
-            output_path = '${osConfig.host.flakeDir}/configs/matugen/spicetify-${host.name}.json'
+            input_path = '${../../assets/templates/spicetify.json.j2}'
+            output_path = '~/.local/state/matugen/spicetify-${host.name}.json'
 
             [templates.vesktop]
-            input_path = '${osConfig.host.flakeDir}/assets/templates/discord.css'
+            input_path = '${../../assets/templates/discord.css}'
             output_path = '~/.config/Vencord/themes/matugen.css'
 
             [templates.steam]
-            input_path = '${osConfig.host.flakeDir}/assets/templates/steam.css'
+            input_path = '${../../assets/templates/steam.css}'
             output_path = '~/.steam/steam/millennium/themes/simply-dark/colors.css'
           '';
 
-          home.packages = with pkgs; [ adw-gtk3 ];
+          home.packages = [
+            pkgs.adw-gtk3
+            themeSync
+          ];
 
           fonts.fontconfig.enable = true;
 

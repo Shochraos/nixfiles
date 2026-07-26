@@ -26,9 +26,9 @@
               nix-shell = "nix-your-shell fish nix-shell --";
               nix-develop = "nix-your-shell fish nix-develop --";
 
-              nh-switch = "nh os switch --ask";
-              nh-boot = "nh os boot --ask";
-              nh-update = "nh os boot -u --ask";
+              nh-switch = "theme-sync && nh os switch --ask";
+              nh-boot = "theme-sync && nh os boot --ask";
+              nh-update = "theme-sync && nh os boot -u --ask";
 
               copy = "dms cl copy";
               paste = "dms cl paste";

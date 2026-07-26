@@ -16,15 +16,15 @@
         };
 
     provides.tools.provides.to-users.homeManager =
-      { pkgs, ... }:
+      { config, pkgs, ... }:
       let
-        omp = inputs.omp-nix.packages.${pkgs.stdenv.hostPlatform.system}.default.overrideAttrs (old: {
+        oh-my-pi = inputs.omp-nix.packages.${pkgs.stdenv.hostPlatform.system}.default.overrideAttrs (old: {
           nativeBuildInputs = (old.nativeBuildInputs or [ ]) ++ [ pkgs.patchelf ];
           dontFixup = true;
           postInstall = (old.postInstall or "") + ''
             unwrapped=$(sed -n "s/^export BUN_SELF_EXE='\(.*\)'$/\1/p" $out/bin/omp)
             test -x "$unwrapped" || {
-              echo "omp override: could not locate the unwrapped binary in the omp-nix wrapper" >&2
+              echo "oh-my-pi override: could not locate the unwrapped binary in the omp-nix wrapper" >&2
               exit 1
             }
             rm $out/bin/omp
@@ -35,12 +35,30 @@
               --prefix LD_LIBRARY_PATH : ${lib.makeLibraryPath [ pkgs.stdenv.cc.cc.lib ]}
           '';
         });
+
+        overlay = (pkgs.formats.yaml { }).generate "oh-my-pi-config.yml" {
+          modelRoles = {
+            default = "anthropic/claude-opus-5:high";
+            advisor = "anthropic/claude-opus-4-8:high";
+            tiny = "anthropic/claude-sonnet-5:medium";
+          };
+          memory.backend = "mnemopi";
+          mnemopi.polyphonicRecall = true;
+          autolearn.enabled = true;
+          providers.memoryModel = "online";
+        };
+
+        overlayPath = "${config.home.homeDirectory}/.omp/agent/nix-config.yml";
       in
       {
         home.packages = [
           pkgs.claude-code
-          omp
+          oh-my-pi
         ];
+
+        home.file.".omp/agent/nix-config.yml".source = overlay;
+
+        home.sessionVariables.PI_CONFIG_FILES = overlayPath;
       };
 
     provides.local.provides.to-users.homeManager =
