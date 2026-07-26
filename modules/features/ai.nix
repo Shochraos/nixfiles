@@ -79,13 +79,13 @@
         host.hyprland.keybinds = [
           {
             _args = [
-              "ALT + C"
+              "ALT + B"
               (lua "hl.dsp.exec_cmd('${voxtype} record start')")
             ];
           }
           {
             _args = [
-              "ALT + C"
+              "ALT + B"
               (lua "hl.dsp.exec_cmd('${voxtype} record stop')")
               { release = true; }
             ];
