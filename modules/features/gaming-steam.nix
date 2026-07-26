@@ -51,6 +51,7 @@
       home.sessionVariables = {
         PROTON_ENABLE_WAYLAND = "1";
         PROTON_DLSS_UPGRADE = "1";
+        PROTON_VKD3D_LOWLATENCY = "1";
         VKD3D_CONFIG = "descriptor_heap";
         STEAM_EXTRA_COMPAT_TOOLS_PATHS =
           "${proton-cachyos}/share/steam/compatibilitytools.d:${dw-proton}/share/steam/compatibilitytools.d";
