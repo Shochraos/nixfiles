@@ -15,6 +15,30 @@
           includes = [ self.tools ] ++ lib.optional (args.local or false) self.local;
         };
 
+    provides.tools.nixos =
+      { pkgs, ... }:
+      let
+        lua = lib.generators.mkLuaInline;
+        voxtype = lib.getExe pkgs.voxtype-vulkan;
+      in
+      {
+        host.hyprland.keybinds = [
+          {
+            _args = [
+              "ALT + C"
+              (lua "hl.dsp.exec_cmd('${voxtype} record start')")
+            ];
+          }
+          {
+            _args = [
+              "ALT + C"
+              (lua "hl.dsp.exec_cmd('${voxtype} record stop')")
+              { release = true; }
+            ];
+          }
+        ];
+      };
+
     provides.tools.provides.to-users.homeManager =
       { config, pkgs, ... }:
       let
@@ -49,16 +73,88 @@
         };
 
         overlayPath = "${config.home.homeDirectory}/.omp/agent/nix-config.yml";
+
+        whisperModel = pkgs.fetchurl {
+          url = "https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-large-v3-turbo.bin";
+          hash = "sha256-H8cPd0046xaZk6w5Huo1fvR8iHV+9y7llDh5t+jivGk=";
+        };
+
+        transcriptCapture = pkgs.writeShellApplication {
+          name = "voxtype-transcript-capture";
+          runtimeInputs = [ pkgs.coreutils ];
+          text = ''
+            state_dir="''${XDG_STATE_HOME:-$HOME/.local/state}/voxtype"
+            mkdir -p "$state_dir"
+            exec tee "$state_dir/activity-overlay-last.txt"
+          '';
+        };
+
+        voxtypeSettings = (pkgs.formats.toml { }).generate "voxtype-config.toml" {
+          hotkey.enabled = false;
+
+          audio = {
+            device = "default";
+            sample_rate = 16000;
+            max_duration_secs = 60;
+          };
+
+          whisper = {
+            model = "${whisperModel}";
+            language = [
+              "en"
+              "de"
+            ];
+            translate = false;
+            context_window_optimization = false;
+          };
+
+          output = {
+            mode = "type";
+            fallback_to_clipboard = true;
+
+            post_process = {
+              command = lib.getExe transcriptCapture;
+              timeout_ms = 2000;
+            };
+          };
+        };
       in
       {
         home.packages = [
           pkgs.claude-code
+          pkgs.voxtype-vulkan
           oh-my-pi
         ];
 
         home.file.".omp/agent/nix-config.yml".source = overlay;
 
         home.sessionVariables.PI_CONFIG_FILES = overlayPath;
+
+        xdg.configFile."voxtype/config.toml".source = voxtypeSettings;
+
+        systemd.user.services.voxtype = {
+          Unit = {
+            Description = "Voxtype push-to-talk voice-to-text daemon";
+            PartOf = [ "graphical-session.target" ];
+            Wants = [ "pipewire-pulse.service" ];
+            After = [
+              "graphical-session.target"
+              "pipewire.service"
+              "pipewire-pulse.service"
+            ];
+          };
+
+          Service = {
+            Type = "simple";
+            ExecStart = "${lib.getExe pkgs.voxtype-vulkan} -q -c ${voxtypeSettings} daemon";
+            Restart = "on-failure";
+            RestartSec = 5;
+          };
+
+          Install = {
+            WantedBy = [ "graphical-session.target" ];
+          };
+        };
       };
 
     provides.local.provides.to-users.homeManager =
