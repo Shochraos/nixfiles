@@ -4,40 +4,24 @@
     __functor =
       self: args:
       let
-        unknown = if builtins.isAttrs args then builtins.attrNames (removeAttrs args [ "local" ]) else [ ];
+        allowed = [
+          "local"
+          "stt"
+        ];
+        unknown = if builtins.isAttrs args then builtins.attrNames (removeAttrs args allowed) else [ ];
       in
       if !builtins.isAttrs args then
-        throw "den.aspects.ai must be called with an argument set, e.g. (ai { local = true; })"
+        throw "den.aspects.ai must be called with an argument set, e.g. (ai { stt = true; })"
       else if unknown != [ ] then
-        throw "den.aspects.ai: unknown argument(s) ${lib.concatStringsSep ", " unknown} — expected only 'local'"
+        throw "den.aspects.ai: unknown argument(s) ${lib.concatStringsSep ", " unknown} — expected only ${lib.concatStringsSep ", " allowed}"
       else
         {
-          includes = [ self.tools ] ++ lib.optional (args.local or false) self.local;
+          includes = [
+            self.tools
+          ]
+          ++ lib.optional (args.local or false) self.local
+          ++ lib.optional (args.stt or false) self.stt;
         };
-
-    provides.tools.nixos =
-      { pkgs, ... }:
-      let
-        lua = lib.generators.mkLuaInline;
-        voxtype = lib.getExe pkgs.voxtype-vulkan;
-      in
-      {
-        host.hyprland.keybinds = [
-          {
-            _args = [
-              "ALT + C"
-              (lua "hl.dsp.exec_cmd('${voxtype} record start')")
-            ];
-          }
-          {
-            _args = [
-              "ALT + C"
-              (lua "hl.dsp.exec_cmd('${voxtype} record stop')")
-              { release = true; }
-            ];
-          }
-        ];
-      };
 
     provides.tools.provides.to-users.homeManager =
       { config, pkgs, ... }:
@@ -73,7 +57,47 @@
         };
 
         overlayPath = "${config.home.homeDirectory}/.omp/agent/nix-config.yml";
+      in
+      {
+        home.packages = [
+          pkgs.claude-code
+          oh-my-pi
+        ];
 
+        home.file.".omp/agent/nix-config.yml".source = overlay;
+
+        home.sessionVariables.PI_CONFIG_FILES = overlayPath;
+      };
+
+    provides.stt.nixos =
+      { pkgs, ... }:
+      let
+        lua = lib.generators.mkLuaInline;
+        voxtype = lib.getExe pkgs.voxtype-vulkan;
+      in
+      {
+        host.hyprland.keybinds = [
+          {
+            _args = [
+              "ALT + C"
+              (lua "hl.dsp.exec_cmd('${voxtype} record start')")
+            ];
+          }
+          {
+            _args = [
+              "ALT + C"
+              (lua "hl.dsp.exec_cmd('${voxtype} record stop')")
+              { release = true; }
+            ];
+          }
+        ];
+
+        host.dms.plugins.voxtypeActivityOverlay.enable = true;
+      };
+
+    provides.stt.provides.to-users.homeManager =
+      { pkgs, ... }:
+      let
         whisperModel = pkgs.fetchurl {
           url = "https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-large-v3-turbo.bin";
           hash = "sha256-H8cPd0046xaZk6w5Huo1fvR8iHV+9y7llDh5t+jivGk=";
@@ -118,19 +142,18 @@
             };
           };
         };
+
+        overlayPlugin =
+          inputs.dms-plugin-registry.packages.${pkgs.stdenv.hostPlatform.system}.voxtypeActivityOverlay;
       in
       {
-        home.packages = [
-          pkgs.claude-code
-          pkgs.voxtype-vulkan
-          oh-my-pi
-        ];
+        home.packages = [ pkgs.voxtype-vulkan ];
 
-        home.file.".omp/agent/nix-config.yml".source = overlay;
-
-        home.sessionVariables.PI_CONFIG_FILES = overlayPath;
-
-        xdg.configFile."voxtype/config.toml".source = voxtypeSettings;
+        xdg.configFile = {
+          "voxtype/config.toml".source = voxtypeSettings;
+          "cava/dms-voxtype-activity-overlay.ini".source =
+            "${overlayPlugin}/config/cava/dms-voxtype-activity-overlay.ini";
+        };
 
         systemd.user.services.voxtype = {
           Unit = {

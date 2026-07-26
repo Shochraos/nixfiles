@@ -77,6 +77,11 @@ in
           default = { };
           description = "DMS Hyprland Output settings for this host.";
         };
+        plugins = mkOption {
+          type = types.attrsOf types.anything;
+          default = { };
+          description = "DMS plugins contributed by feature aspects, merged over the shared plugin set in dankshell.nix. Lets a feature enable its own plugin without depending on the dankshell aspect being present.";
+        };
       };
     };
   };

@@ -32,7 +32,6 @@
 
       provides.to-users.homeManager =
         {
-          config,
           osConfig,
           pkgs,
           ...
@@ -78,9 +77,6 @@
 
           xdg.autostart.enable = true;
 
-          xdg.configFile."cava/dms-voxtype-activity-overlay.ini".source =
-            "${config.programs.dank-material-shell.plugins.voxtypeActivityOverlay.src}/config/cava/dms-voxtype-activity-overlay.ini";
-
           programs.dank-material-shell = {
             enable = true;
             systemd = {
@@ -100,7 +96,6 @@
               simpleAudioControl.enable = true;
               claudeUsage.enable = true;
               dankTodoman.enable = true;
-              voxtypeActivityOverlay.enable = true;
               discordVoice = {
                 enable = true;
                 settings.maxBarAvatars = 10;
@@ -121,7 +116,8 @@
                   notifyMinutes = 15;
                 };
               };
-            };
+            }
+            // osConfig.host.dms.plugins;
 
             settings = {
               clipboardSettings = {
