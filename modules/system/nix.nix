@@ -55,10 +55,6 @@
           };
 
           programs.fish = {
-            interactiveShellInit = ''
-              direnv hook fish | source
-            '';
-
             functions = {
               denv = {
                 body = ''

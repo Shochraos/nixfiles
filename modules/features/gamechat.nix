@@ -63,12 +63,15 @@
         Unit = {
           Description = "Dynamically sorts audio streams into sinks to independently manage volume";
           PartOf = [ "graphical-session.target" ];
+          Wants = [ "pipewire-pulse.service" ];
+          After = [ "pipewire-pulse.service" ];
         };
 
         Service = {
           Type = "simple";
           ExecStart = "${gamechat_mix}";
           Restart = "always";
+          RestartSec = 5;
         };
 
         Install = {
