@@ -43,7 +43,10 @@
     cpu-amd
     nvidia
     gaming
-    (ai { local = false; })
+    (ai {
+      local = false;
+      stt = true;
+    })
     media
     remote-mounts
     virtualization
@@ -59,7 +62,10 @@
     fingerprint
     virtualization
     mic-mute
-    (ai { local = false; })
+    (ai {
+      local = false;
+      stt = false;
+    })
   ];
 
   den.hosts.x86_64-linux.Azazel = {
