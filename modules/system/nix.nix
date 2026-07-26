@@ -7,7 +7,7 @@
         nix = {
           settings.trusted-users = [
             "root"
-            "${user.name}"
+            user.name
           ];
 
           settings.experimental-features = [

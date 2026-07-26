@@ -129,8 +129,6 @@
           };
         in
         {
-          programs.firefox.enable = false;
-
           sops.secrets.${cookiesSecret} = { };
 
           sops.templates."zen-policies.json" = {
