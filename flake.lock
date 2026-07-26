@@ -568,6 +568,26 @@
         "type": "github"
       }
     },
+    "omp-nix": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1784945536,
+        "narHash": "sha256-pq+KVzxMryPor/PqDhjrkh2JAfZTObJpN3nDeHA3ww8=",
+        "owner": "yuxqiu",
+        "repo": "omp-nix",
+        "rev": "e291fa24cc11f6ab987fb6d999f4be7e19e2ae82",
+        "type": "github"
+      },
+      "original": {
+        "owner": "yuxqiu",
+        "repo": "omp-nix",
+        "type": "github"
+      }
+    },
     "pre-commit": {
       "inputs": {
         "flake-compat": "flake-compat_2",
@@ -607,6 +627,7 @@
         "nix-proton-cachyos": "nix-proton-cachyos",
         "nix-your-shell": "nix-your-shell",
         "nixpkgs": "nixpkgs_2",
+        "omp-nix": "omp-nix",
         "sops-nix": "sops-nix",
         "spicetify-nix": "spicetify-nix",
         "stylix": "stylix",

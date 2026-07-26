@@ -77,6 +77,11 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    omp-nix = {
+      url = "github:yuxqiu/omp-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     ### Gaming ###
     millennium = {
       url = "github:SteamClientHomebrew/Millennium/?dir=packages/nix";

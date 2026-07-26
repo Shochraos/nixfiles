@@ -12,6 +12,7 @@
             (discord.override { withVencord = true; })
             anki
             claude-code
+            inputs.omp-nix.packages.${pkgs.stdenv.hostPlatform.system}.default
             libreoffice-qt-fresh
             pdfarranger
           ];
