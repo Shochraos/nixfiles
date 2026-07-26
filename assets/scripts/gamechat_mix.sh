@@ -1,10 +1,27 @@
 #!/usr/bin/env bash
 set -u
 
-# HARDWARE SINK
 DISCORD_SINK="${DISCORD_SINK:-discord_sink}"
 CATCHALL_SINK="${CATCHALL_SINK:-catchall_sink}"
-HW_SINK="name__sink"
+HW_SINK="${HW_SINK:-}"
+
+sink_exists(){
+    pactl list short sinks 2>/dev/null | awk -v s="${1:-}" '$2==s {found=1} END{exit !found}'
+}
+
+resolve_hw_sink(){
+    if [[ -n "$HW_SINK" ]]; then
+        printf '%s' "$HW_SINK"
+        return 0
+    fi
+    local d
+    d=$(pactl get-default-sink 2>/dev/null || true)
+    if [[ -z "$d" || "$d" == "$DISCORD_SINK" || "$d" == "$CATCHALL_SINK" ]]; then
+        d=$(pactl list short sinks 2>/dev/null \
+            | awk -v a="$DISCORD_SINK" -v b="$CATCHALL_SINK" '$2!=a && $2!=b {print $2; exit}')
+    fi
+    printf '%s' "$d"
+}
 
 find_module_for_sink(){
     local sink_name="${1:-}"
@@ -42,8 +59,33 @@ ensure_remap_sink(){
             pactl unload-module "$mid" >/dev/null 2>&1
         fi
     fi
-    pactl load-module module-remap-sink sink_name="$name" master="$hw" sink_properties=device.description="$desc" >/dev/null 2>&1
+    if ! pactl load-module module-remap-sink sink_name="$name" master="$hw" \
+            sink_properties=device.description="$desc" >/dev/null 2>&1; then
+        echo "gamechat: failed to create remap sink '$name' on master '$hw'" >&2
+        return 1
+    fi
     sleep 0.05
+    return 2
+}
+
+sync_sinks(){
+    local hw created=0
+    hw=$(resolve_hw_sink)
+    if [[ -z "$hw" ]] || ! sink_exists "$hw"; then
+        echo "gamechat: no usable master sink (HW_SINK='${HW_SINK}')" >&2
+        return 1
+    fi
+
+    ensure_remap_sink "$DISCORD_SINK" "$hw" "Discord"
+    [[ $? -eq 2 ]] && created=1
+    ensure_remap_sink "$CATCHALL_SINK" "$hw" "All Other Audio"
+    [[ $? -eq 2 ]] && created=1
+
+    if [[ $created -eq 1 ]]; then
+        sleep 0.15
+        pactl set-sink-volume "$DISCORD_SINK" 50% >/dev/null 2>&1
+        pactl set-sink-volume "$CATCHALL_SINK" 50% >/dev/null 2>&1
+    fi
     return 0
 }
 
@@ -57,7 +99,8 @@ inspect_sink_input(){
     local id="${1:-}"
     if [[ -z "$id" ]]; then printf '\n'; return; fi
     pactl list sink-inputs 2>/dev/null | awk -v id="$id" '
-      $1=="Sink" && $2=="Input" && $3=="#"id {found=1}
+      $1=="Sink" && $2=="Input" && $3=="#"id {found=1; next}
+      found && $1=="Sink" && $2=="Input" {exit}
       found {
         if (/node.name/ && nodename=="") {
             line=$0; sub(/.*node.name[ \t]*=[ \t]*/, "", line); gsub(/^[ \t]*"/, "", line); gsub(/"[ \t]*$/, "", line); nodename=line
@@ -106,20 +149,17 @@ route_once(){
 }
 
 # MAIN
-ensure_remap_sink "$DISCORD_SINK" "$HW_SINK" "Discord"
-ensure_remap_sink "$CATCHALL_SINK" "$HW_SINK" "All Other Audio"
-
-sleep 0.15
-
-# INITIAL VOLUME LEVELS
-pactl set-sink-volume "$DISCORD_SINK" 50%
-pactl set-sink-volume "$CATCHALL_SINK" 50%
-
+sync_sinks || exit 1
 route_once
 
 pactl subscribe 2>/dev/null | while read -r L; do
-    if echo "$L" | grep -q "sink-input"; then
-        sleep 0.05
-        route_once
-    fi
+    case "$L" in
+        *"on sink-input"*)
+            sleep 0.05
+            route_once
+            ;;
+        *"on server"*)
+            sync_sinks && route_once
+            ;;
+    esac
 done
