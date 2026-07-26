@@ -2,12 +2,7 @@
   den.aspects.editor =
     { host, ... }:
     {
-      nixos =
-        { pkgs, ... }:
-        {
-          programs.nix-ld.enable = true;
-          environment.systemPackages = [ pkgs.nixfmt ];
-        };
+      nixos.programs.nix-ld.enable = true;
 
       provides.to-users.homeManager =
         {
@@ -28,7 +23,10 @@
               "nix"
               "csv"
             ];
-            extraPackages = with pkgs; [ nixd ];
+            extraPackages = with pkgs; [
+              nixd
+              nixfmt
+            ];
             userSettings = {
               theme = {
                 mode = "system";
@@ -42,7 +40,7 @@
                       command = [ "nixfmt" ];
                     };
                     nixpkgs = {
-                      expr = "import (builtins.getFlake \"${osConfig.host.flakeDir}\").inputs.nixpkgs";
+                      expr = "import (builtins.getFlake \"${osConfig.host.flakeDir}\").inputs.nixpkgs { }";
                     };
                     options = {
                       nixos = {
