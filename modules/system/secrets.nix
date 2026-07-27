@@ -1,31 +1,27 @@
 { inputs, ... }:
 {
-  den.aspects.secrets =
-    { host, user, ... }:
+  den.aspects.secrets.nixos =
+    { config, ... }:
     {
-      nixos =
-        { lib, ... }:
-        {
-          imports = [ inputs.sops-nix.nixosModules.sops ];
+      imports = [ inputs.sops-nix.nixosModules.sops ];
 
-          sops = {
-            defaultSopsFile = ../../secrets/secrets.yaml;
+      sops = {
+        defaultSopsFile = ../../secrets/secrets.yaml;
 
-            age.sshKeyPaths = [ "/home/${user.name}/.ssh/${lib.toLower host.name}" ];
+        age.sshKeyPaths = [ config.host.sshKey ];
 
-            secrets."user-password-hash".neededForUsers = true;
-          };
-        };
+        secrets."user-password-hash".neededForUsers = true;
+      };
+    };
 
-      provides.to-users.homeManager =
-        { lib, pkgs, ... }:
-        {
-          home.packages = [
-            pkgs.sops
-            pkgs.ssh-to-age
-          ];
+  den.aspects.secrets.provides.to-users.homeManager =
+    { osConfig, pkgs, ... }:
+    {
+      home.packages = [
+        pkgs.sops
+        pkgs.ssh-to-age
+      ];
 
-          home.sessionVariables.SOPS_AGE_KEY_CMD = "ssh-to-age -private-key -i /home/${user.name}/.ssh/${lib.toLower host.name}";
-        };
+      home.sessionVariables.SOPS_AGE_KEY_CMD = "ssh-to-age -private-key -i ${osConfig.host.sshKey}";
     };
 }

@@ -149,6 +149,8 @@
         ];
       };
 
+      host.hdrOutput = "HDMI-A-1";
+
       host.dms = {
         hyprlandOutputSettings = {
           "HDMI-A-1" = {
