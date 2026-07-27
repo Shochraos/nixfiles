@@ -1,7 +1,19 @@
 {
   den.aspects.hdr.provides.to-users.homeManager =
-    { osConfig, pkgs, ... }:
+    {
+      lib,
+      osConfig,
+      pkgs,
+      ...
+    }:
     let
+      hdrOutputs = lib.attrNames (lib.filterAttrs (_: output: output.hdr) osConfig.host.outputs);
+      hdrOutput =
+        if lib.length hdrOutputs == 1 then
+          lib.head hdrOutputs
+        else
+          throw "hdr aspect: expected exactly one host.outputs entry with hdr = true, got ${toString (lib.length hdrOutputs)}";
+
       hdr-set = pkgs.writeShellApplication {
         name = "hdr-set";
         runtimeInputs = with pkgs; [
@@ -10,7 +22,7 @@
         ];
         text = ''
           out="$HOME/.config/hypr/dms/outputs.lua"
-          line='hl.monitor({ output = "${osConfig.host.hdrOutput}", cm = "hdr", min_luminance = 0, max_luminance = 750, max_avg_luminance = 400 })'
+          line='hl.monitor({ output = "${hdrOutput}", cm = "hdr", min_luminance = 0, max_luminance = 750, max_avg_luminance = 400 })'
 
           reload() { hyprctl reload >/dev/null 2>&1 || true; }
 

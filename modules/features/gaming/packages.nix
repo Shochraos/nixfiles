@@ -20,7 +20,7 @@
             name = "SamRewritten";
             exec = "samrewritten %U";
             terminal = false;
-            icon = "${../../assets/icons/samrewritten.png}";
+            icon = "${../../../assets/icons/samrewritten.png}";
           };
 
           ironymodmanager = {
@@ -28,7 +28,7 @@
             exec = "direnv exec ${config.home.homeDirectory}/Applications/ironymodmanager/IronyModManager";
             terminal = false;
             startupNotify = false;
-            icon = "${../../assets/icons/ironymodmanager.png}";
+            icon = "${../../../assets/icons/ironymodmanager.png}";
           };
         };
       };

@@ -111,15 +111,15 @@
           xdg.configFile."matugen/config.toml".text = ''
             [config]
             [templates.spotify]
-            input_path = '${../../assets/templates/spicetify.json.j2}'
+            input_path = '${../../../assets/templates/spicetify.json.j2}'
             output_path = '~/.local/state/matugen/spicetify-${host.name}.json'
 
             [templates.vesktop]
-            input_path = '${../../assets/templates/discord.css}'
+            input_path = '${../../../assets/templates/discord.css}'
             output_path = '~/.config/Vencord/themes/matugen.css'
 
             [templates.steam]
-            input_path = '${../../assets/templates/steam.css}'
+            input_path = '${../../../assets/templates/steam.css}'
             output_path = '~/.steam/steam/millennium/themes/simply-dark/colors.css'
           '';
 

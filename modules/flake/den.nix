@@ -27,7 +27,7 @@
   den.aspects.gaming.includes = with den.aspects; [ hdr ];
   den.aspects.media.includes = with den.aspects; [ hdr ];
 
-  den.aspects.desktop.includes = with den.aspects; [
+  den.aspects.graphical.includes = with den.aspects; [
     base
     hyprland
     terminal
@@ -42,6 +42,7 @@
   ];
 
   den.aspects.azazel.includes = with den.aspects; [
+    graphical
     desktop
     cpu-amd
     nvidia
@@ -56,11 +57,11 @@
     gamechat
     lgtv
     mp3tag
-    preventsleep
   ];
 
   den.aspects.solas.includes = with den.aspects; [
-    desktop
+    graphical
+    laptop
     cpu-amd
     fingerprint
     virtualization

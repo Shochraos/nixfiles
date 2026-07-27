@@ -10,13 +10,6 @@
     {
       system.stateVersion = "25.05";
 
-      services.upower.enable = true;
-      services.fwupd.enable = true;
-
-      systemd.network.wait-online.enable = false;
-
-      hardware.alsa.enablePersistence = true;
-
       host.wireguard.profiles = {
         home = {
           extraSecrets = [ "endpoint" ];
@@ -228,13 +221,10 @@
         ];
       };
 
+      host.outputs."eDP-1".bitdepth = 10;
+
       host.dms = {
         powerMenuActions = [ "suspend" ];
-        hyprlandOutputSettings = {
-          "eDP-1" = {
-            bitdepth = 10;
-          };
-        };
         barConfigs = [
           {
             leftWidgets = [
