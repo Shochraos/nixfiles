@@ -7,44 +7,36 @@
     }:
     let
       lua = lib.generators.mkLuaInline;
-      gamechat_chat = pkgs.writeShellScriptBin "gamechat_chat" (
-        builtins.readFile ../../assets/scripts/gamechat_chat.sh
-      );
-      gamechat_game = pkgs.writeShellScriptBin "gamechat_game" (
-        builtins.readFile ../../assets/scripts/gamechat_game.sh
-      );
-      gamechat_reset = pkgs.writeShellScriptBin "gamechat_reset" (
-        builtins.readFile ../../assets/scripts/gamechat_reset.sh
+      gamechat_balance = pkgs.writeShellScriptBin "gamechat_balance" (
+        builtins.readFile ../../assets/scripts/gamechat_balance.sh
       );
     in
     {
       services.pipewire.pulse.enable = true;
       environment.systemPackages = with pkgs; [
         pulseaudio
-        gamechat_chat
-        gamechat_game
-        gamechat_reset
+        gamechat_balance
       ];
 
       host.hyprland.keybinds = [
         {
           _args = [
             "code:195"
-            (lua "hl.dsp.exec_cmd('gamechat_game')")
+            (lua "hl.dsp.exec_cmd('gamechat_balance game')")
             { release = true; }
           ];
         }
         {
           _args = [
             "code:196"
-            (lua "hl.dsp.exec_cmd('gamechat_chat')")
+            (lua "hl.dsp.exec_cmd('gamechat_balance chat')")
             { release = true; }
           ];
         }
         {
           _args = [
             "code:197"
-            (lua "hl.dsp.exec_cmd('gamechat_reset')")
+            (lua "hl.dsp.exec_cmd('gamechat_balance reset')")
             { release = true; }
           ];
         }
