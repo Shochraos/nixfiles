@@ -69,7 +69,12 @@
         };
 
       provides.to-users.homeManager =
-        { osConfig, pkgs, ... }:
+        {
+          config,
+          osConfig,
+          pkgs,
+          ...
+        }:
         {
           systemd.user.services.sol-lgtv = {
             Unit = {
@@ -81,8 +86,8 @@
               EnvironmentFile = osConfig.sops.templates."lgtv.env".path;
               ExecStart = "${pkgs.coreutils}/bin/true";
               RemainAfterExit = true;
-              WorkingDirectory = "/home/${user.name}/Applications/bscpylgtv";
-              ExecStop = "${pkgs.direnv}/bin/direnv exec /home/${user.name}/Applications/bscpylgtv bscpylgtvcommand \${LGTV_IP} power_off";
+              WorkingDirectory = "${config.home.homeDirectory}/Applications/bscpylgtv";
+              ExecStop = "${pkgs.direnv}/bin/direnv exec ${config.home.homeDirectory}/Applications/bscpylgtv bscpylgtvcommand \${LGTV_IP} power_off";
             };
             Install = {
               WantedBy = [ "graphical-session.target" ];

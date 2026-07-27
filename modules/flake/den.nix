@@ -24,6 +24,9 @@
     wifi
   ];
 
+  den.aspects.gaming.includes = with den.aspects; [ hdr ];
+  den.aspects.media.includes = with den.aspects; [ hdr ];
+
   den.aspects.desktop.includes = with den.aspects; [
     base
     hyprland

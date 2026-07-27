@@ -1,14 +1,12 @@
-{ lib, ... }:
 {
   den.aspects.remotes =
-    { host, user, ... }:
-    let
-      hostKey = "/home/${user.name}/.ssh/${lib.toLower host.name}";
-      gitKey = "${hostKey}-git";
-    in
+    { user, ... }:
     {
       nixos =
         { config, ... }:
+        let
+          gitKey = "${config.host.sshKey}-git";
+        in
         {
           sops.secrets = {
             "ssh/hosts".owner = user.name;
@@ -33,14 +31,18 @@
         };
 
       provides.to-users.homeManager =
-        { osConfig, ... }:
+        { config, osConfig, ... }:
+        let
+          hostKey = osConfig.host.sshKey;
+          gitKey = "${hostKey}-git";
+        in
         {
           programs.git = {
             enable = true;
             settings = {
               user.name = "Shochraos";
               user.email = "github@shonline.slmail.me";
-              core.excludesfile = "/home/${user.name}/.gitignore";
+              core.excludesfile = "${config.home.homeDirectory}/.gitignore";
               init.defaultBranch = "main";
             };
             includes = [

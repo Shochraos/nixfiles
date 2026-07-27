@@ -2,26 +2,7 @@
   den.aspects.media.provides.to-users.homeManager =
     { pkgs, ... }:
     {
-      home.packages = with pkgs; [
-        jellyfin-mpv-shim
-        (writeShellScriptBin "hdr-set" ''
-          set -u
-          OUT="$HOME/.config/hypr/dms/outputs.lua"
-          LINE='hl.monitor({ output = "HDMI-A-1", cm = "hdr", min_luminance = 0, max_luminance = 750, max_avg_luminance = 400 })'
-          case "''${1:-}" in
-            on)
-              grep -qxF "$LINE" "$OUT" 2>/dev/null || printf '\n%s\n' "$LINE" >> "$OUT"
-              hyprctl reload >/dev/null 2>&1
-              ;;
-            off)
-              if [ -f "$OUT" ] && grep -qxF "$LINE" "$OUT"; then
-                grep -vxF "$LINE" "$OUT" > "$OUT.tmp" && mv "$OUT.tmp" "$OUT"
-                hyprctl reload >/dev/null 2>&1
-              fi
-              ;;
-          esac
-        '')
-      ];
+      home.packages = [ pkgs.jellyfin-mpv-shim ];
 
       programs.mpv = {
         enable = true;

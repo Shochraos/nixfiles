@@ -3,35 +3,38 @@
   den.aspects.dankshell =
     { user, ... }:
     {
-      nixos = {
-        services.displayManager.defaultSession = "hyprland-uwsm";
-        services.displayManager.dms-greeter = {
-          enable = true;
-          configHome = "/home/${user.name}";
+      nixos =
+        { config, ... }:
+        {
+          services.displayManager.defaultSession = "hyprland-uwsm";
+          services.displayManager.dms-greeter = {
+            enable = true;
+            configHome = config.users.users.${user.name}.home;
 
-          compositor = {
-            name = "hyprland";
-            customConfig = ''
-              env = XCURSOR_THEME,Bibata-Modern-Classic
-              env = XCURSOR_SIZE,24
+            compositor = {
+              name = "hyprland";
+              customConfig = ''
+                env = XCURSOR_THEME,Bibata-Modern-Classic
+                env = XCURSOR_SIZE,24
 
-              misc:disable_hyprland_logo = true
-              misc:disable_splash_rendering = true
-              misc:force_default_wallpaper = 0
-              misc:background_color = rgb(000000)
-            '';
+                misc:disable_hyprland_logo = true
+                misc:disable_splash_rendering = true
+                misc:force_default_wallpaper = 0
+                misc:background_color = rgb(000000)
+              '';
+            };
+          };
+
+          services.accounts-daemon.enable = true;
+
+          users.users.${user.name} = {
+            extraGroups = [ "greeter" ];
           };
         };
 
-        services.accounts-daemon.enable = true;
-
-        users.users.${user.name} = {
-          extraGroups = [ "greeter" ];
-        };
-      };
-
       provides.to-users.homeManager =
         {
+          config,
           osConfig,
           pkgs,
           ...
@@ -104,7 +107,7 @@
                 enable = true;
                 settings = {
                   calendarFilter = "";
-                  vdirBasePath = "/home/${user.name}/.local/share/calendars/nextcloud";
+                  vdirBasePath = "${config.home.homeDirectory}/.local/share/calendars/nextcloud";
 
                   lookAheadDays = 7;
                   refreshInterval = 5;
