@@ -149,17 +149,14 @@
         ];
       };
 
-      host.hdrOutput = "HDMI-A-1";
+      host.outputs."HDMI-A-1" = {
+        hdr = true;
+        wideColor = true;
+        vrrFullscreenOnly = true;
+        bitdepth = 10;
+      };
 
       host.dms = {
-        hyprlandOutputSettings = {
-          "HDMI-A-1" = {
-            vrrFullscreenOnly = true;
-            bitdepth = 10;
-            supportsHdr = true;
-            supportsWideColor = true;
-          };
-        };
         barConfigs = [
           {
             leftWidgets = [

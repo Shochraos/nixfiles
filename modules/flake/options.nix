@@ -23,9 +23,40 @@ in
               description = "Private SSH key identifying this host. Doubles as the sops age identity and as the default identity for outbound SSH.";
             };
 
-            hdrOutput = mkOption {
-              type = types.str;
-              description = "Hyprland output name that HDR is toggled on. Has no default: any host including an aspect that drives HDR must name its own display.";
+            outputs = mkOption {
+              default = { };
+              type = types.attrsOf (
+                types.submodule {
+                  options = {
+                    hdr = mkOption {
+                      type = types.bool;
+                      default = false;
+                      description = "Output is HDR-capable. Advertised to DMS as `supportsHdr` and used as the target of `hdr-set`.";
+                    };
+                    wideColor = mkOption {
+                      type = types.bool;
+                      default = false;
+                      description = "Output covers a wide colour gamut. Advertised to DMS as `supportsWideColor`.";
+                    };
+                    vrrFullscreenOnly = mkOption {
+                      type = types.bool;
+                      default = false;
+                      description = "Restrict variable refresh rate to fullscreen surfaces.";
+                    };
+                    bitdepth = mkOption {
+                      type = types.nullOr (
+                        types.enum [
+                          8
+                          10
+                        ]
+                      );
+                      default = null;
+                      description = "Colour depth per channel. Null leaves the compositor default.";
+                    };
+                  };
+                }
+              );
+              description = "Physical outputs of this host, keyed by Hyprland output name. Consumed by dankshell (which derives the DMS output settings) and by the hdr aspect (which drives the single entry with `hdr = true`).";
             };
 
             hyprland = {
@@ -87,11 +118,6 @@ in
                 type = anyList;
                 default = [ ];
                 description = "DMS bar layout for this host. Each entry is merged over the shared bar defaults in dankshell.nix, so hosts usually only set the widget lists.";
-              };
-              hyprlandOutputSettings = mkOption {
-                type = types.attrsOf types.anything;
-                default = { };
-                description = "DMS Hyprland Output settings for this host.";
               };
               plugins = mkOption {
                 type = types.attrsOf types.anything;

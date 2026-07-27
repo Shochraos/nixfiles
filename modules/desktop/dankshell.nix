@@ -35,6 +35,7 @@
       provides.to-users.homeManager =
         {
           config,
+          lib,
           osConfig,
           pkgs,
           ...
@@ -197,7 +198,13 @@
 
               barConfigs = map (bar: barDefaults // bar) osConfig.host.dms.barConfigs;
 
-              hyprlandOutputSettings = osConfig.host.dms.hyprlandOutputSettings;
+              hyprlandOutputSettings = lib.mapAttrs (
+                _: output:
+                lib.optionalAttrs (output.bitdepth != null) { inherit (output) bitdepth; }
+                // lib.optionalAttrs output.vrrFullscreenOnly { vrrFullscreenOnly = true; }
+                // lib.optionalAttrs output.hdr { supportsHdr = true; }
+                // lib.optionalAttrs output.wideColor { supportsWideColor = true; }
+              ) osConfig.host.outputs;
             };
           };
 
