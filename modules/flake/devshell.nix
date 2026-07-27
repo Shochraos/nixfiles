@@ -1,9 +1,10 @@
 {
   perSystem =
-    { pkgs, ... }:
+    { config, pkgs, ... }:
     {
       devShells.default = pkgs.mkShellNoCC {
         packages = [
+          config.treefmt.build.wrapper
           pkgs.nixd
           pkgs.nixfmt
           pkgs.shellcheck
