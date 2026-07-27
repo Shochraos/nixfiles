@@ -50,9 +50,10 @@
             advisor = "anthropic/claude-opus-4-8:high";
             tiny = "anthropic/claude-sonnet-5:medium";
           };
+          advisor.enabled = true;
+          autolearn.enabled = true;
           memory.backend = "mnemopi";
           mnemopi.polyphonicRecall = true;
-          autolearn.enabled = true;
           providers.memoryModel = "online";
         };
 
