@@ -23,11 +23,11 @@
           secret = "${secretFor name}-${extra}";
           var = "WIFI_${envName name}_${envName extra}";
         }) (profiles.${name}.extraSecrets or [ ]);
-      secretEntries = lib.concatMap secretsFor profileNames;
+      secretEntries = builtins.concatMap secretsFor profileNames;
     in
     {
       config = lib.mkIf (profiles != { }) {
-        sops.secrets = lib.listToAttrs (map (e: lib.nameValuePair e.secret { }) secretEntries);
+        sops.secrets = builtins.listToAttrs (map (e: lib.nameValuePair e.secret { }) secretEntries);
 
         sops.templates."wifi.env".content = lib.concatLines (
           map (e: "${e.var}=${config.sops.placeholder.${e.secret}}") secretEntries
@@ -36,7 +36,7 @@
         networking.networkmanager.ensureProfiles = {
           environmentFiles = lib.mkIf (secretEntries != [ ]) [ config.sops.templates."wifi.env".path ];
 
-          profiles = lib.mapAttrs (
+          profiles = builtins.mapAttrs (
             name: profile:
             let
               defaults = {

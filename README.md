@@ -41,6 +41,12 @@ Host assembly is done by [denful/den](https://github.com/denful/den). Its core a
 
 Rather than forking shared modules per host, `modules/flake/options.nix` defines `host.*` NixOS options (e.g. `host.hyprland.*`, `host.dms.*`). Host modules *set* these, and shared home modules *read* them through `osConfig`.
 
+### Secrets
+
+Secrets live under `./secrets/`, [sops-nix](https://github.com/Mic92/sops-nix)-encrypted and decrypted at activation using the host's age identity (`host.sshKey`). Most consumers read a secret *path* at runtime. A few need the value spliced into text that Nix builds at **evaluation** time, where a path is useless; those use `sops.templates` with `config.sops.placeholder.<name>`, which renders the file under `/run/secrets/rendered/`.
+
+One template carries a **format contract worth knowing before you edit the secret**: `zen/allowed-cookies/<host>` is spliced into a JSON *value* position in Zen's `policies.json`, so it must decrypt to a **JSON array of origin strings**. Anything else produces invalid JSON, and Zen then discards every policy in the file — including the tracking-protection settings. An activation check warns when the rendered file breaks the contract, so a bad secret is noisy rather than silent.
+
 ## Directory layout
 
 - `./flake.nix` — entry-point; auto-imports the `modules/` tree via `import-tree`.

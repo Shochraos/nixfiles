@@ -7,12 +7,12 @@
       ...
     }:
     let
-      hdrOutputs = lib.attrNames (lib.filterAttrs (_: output: output.hdr) osConfig.host.outputs);
+      hdrOutputs = builtins.attrNames (lib.filterAttrs (_: output: output.hdr) osConfig.host.outputs);
       hdrOutput =
-        if lib.length hdrOutputs == 1 then
-          lib.head hdrOutputs
+        if builtins.length hdrOutputs == 1 then
+          builtins.head hdrOutputs
         else
-          throw "hdr aspect: expected exactly one host.outputs entry with hdr = true, got ${toString (lib.length hdrOutputs)}";
+          throw "hdr aspect: expected exactly one host.outputs entry with hdr = true, got ${toString (builtins.length hdrOutputs)}";
 
       hdr-set = pkgs.writeShellApplication {
         name = "hdr-set";

@@ -198,7 +198,7 @@
 
               barConfigs = map (bar: barDefaults // bar) osConfig.host.dms.barConfigs;
 
-              hyprlandOutputSettings = lib.mapAttrs (
+              hyprlandOutputSettings = builtins.mapAttrs (
                 _: output:
                 lib.optionalAttrs (output.bitdepth != null) { inherit (output) bitdepth; }
                 // lib.optionalAttrs output.vrrFullscreenOnly { vrrFullscreenOnly = true; }

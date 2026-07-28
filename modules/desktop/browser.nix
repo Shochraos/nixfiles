@@ -4,7 +4,12 @@
     { host, user, ... }:
     {
       nixos =
-        { config, lib, ... }:
+        {
+          config,
+          lib,
+          pkgs,
+          ...
+        }:
         let
           cookiesSecret = "zen/allowed-cookies/${lib.toLower host.name}";
           cookiesMarker = "@ALLOWED_COOKIES@";
@@ -142,6 +147,18 @@
 
           environment.etc."zen/policies/policies.json".source =
             config.sops.templates."zen-policies.json".path;
+
+          system.activationScripts.zenPoliciesContract = {
+            deps = [ "setupSecrets" ];
+            text = ''
+              if ! ${pkgs.jq}/bin/jq -e '.policies.Cookies.Allow | type == "array"' \
+                ${config.sops.templates."zen-policies.json".path} >/dev/null 2>&1; then
+                echo "warning: sops secret ${cookiesSecret} must decrypt to a JSON array of origin strings; ${
+                  config.sops.templates."zen-policies.json".path
+                } has no array at .policies.Cookies.Allow, so Zen will discard every policy in it" >&2
+              fi
+            '';
+          };
         };
 
       provides.to-users.homeManager =
