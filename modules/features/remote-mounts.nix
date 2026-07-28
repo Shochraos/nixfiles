@@ -11,10 +11,12 @@
         rclone
         rsync
       ];
-      environment.etc."rclone-mnt.conf".text = ''
+      sops.secrets."astaroth/ip" = { };
+
+      sops.templates."rclone-mnt.conf".content = ''
         [astaroth]
         type = sftp
-        host = 192.168.10.2
+        host = ${config.sops.placeholder."astaroth/ip"}
         user = root
         key_file = ${config.host.sshKey}
       '';
@@ -31,7 +33,7 @@
                 "nofail"
                 "allow_other"
                 "args2env"
-                "config=/etc/rclone-mnt.conf"
+                "config=${config.sops.templates."rclone-mnt.conf".path}"
               ];
             }
           )

@@ -12,10 +12,11 @@
             "ssh/hosts".owner = user.name;
             "ssh/private-git" = { };
             "ssh/uni-git" = { };
+            "astaroth/ip" = { };
             "git/url-rewrites".owner = user.name;
           };
 
-          sops.templates."ssh-git-hosts" = {
+          sops.templates."ssh-secret-hosts" = {
             owner = user.name;
             content = ''
               Host ${config.sops.placeholder."ssh/uni-git"}
@@ -26,6 +27,13 @@
                 AddKeysToAgent yes
                 IdentityFile ${gitKey}
                 Port 2222
+
+              Host astaroth
+                AddKeysToAgent yes
+                ForwardAgent yes
+                HostName ${config.sops.placeholder."astaroth/ip"}
+                IdentityFile ${config.host.sshKey}
+                User root
             '';
           };
         };
@@ -56,7 +64,7 @@
 
             includes = [
               osConfig.sops.secrets."ssh/hosts".path
-              osConfig.sops.templates."ssh-git-hosts".path
+              osConfig.sops.templates."ssh-secret-hosts".path
             ];
 
             settings = {
@@ -67,14 +75,6 @@
               "codeberg.org" = {
                 AddKeysToAgent = "yes";
                 IdentityFile = gitKey;
-              };
-
-              "astaroth" = {
-                forwardAgent = true;
-                AddKeysToAgent = "yes";
-                IdentityFile = hostKey;
-                HostName = "192.168.10.2";
-                User = "root";
               };
 
               "*" = {

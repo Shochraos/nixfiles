@@ -140,13 +140,13 @@
           }
           {
             _args = [
-              "code:201"
+              "code:202"
               (lua "hl.dsp.exec_cmd('dms screenshot --no-file')")
             ];
           }
           {
             _args = [
-              "code:202"
+              "SUPER + code:202"
               (lua "hl.dsp.exec_cmd('dms screenshot')")
             ];
           }
