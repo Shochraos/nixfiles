@@ -1,0 +1,72 @@
+name: check
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 5 * * 1"
+
+concurrency:
+  group: check-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  flake-check:
+    name: nix flake check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Install Nix with flakes enabled
+        uses: cachix/install-nix-action@v31
+        with:
+          extra_nix_config: |
+            accept-flake-config = true
+            experimental-features = nix-command flakes
+
+      - name: Run flake checks (treefmt gate plus output evaluation)
+        run: nix flake check --print-build-logs
+
+  build:
+    name: build ${{ matrix.host }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        host: [Azazel, Solas]
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Reclaim runner disk for a full desktop closure
+        run: |
+          sudo rm -rf \
+            /usr/share/dotnet \
+            /usr/local/lib/android \
+            /opt/ghc \
+            /usr/local/share/boost \
+            /usr/local/lib/node_modules \
+            "${AGENT_TOOLSDIRECTORY:-/opt/hostedtoolcache}"
+          df -h /
+
+      - name: Install Nix with flakes enabled
+        uses: cachix/install-nix-action@v31
+        with:
+          extra_nix_config: |
+            accept-flake-config = true
+            experimental-features = nix-command flakes
+
+      - name: Evaluate full module tree to a derivation path
+        run: |
+          nix eval --raw \
+            ".#nixosConfigurations.${{ matrix.host }}.config.system.build.toplevel.drvPath"
+          echo
+
+      - name: Build system toplevel
+        run: |
+          nix build --no-link --print-out-paths --print-build-logs \
+            ".#nixosConfigurations.${{ matrix.host }}.config.system.build.toplevel"

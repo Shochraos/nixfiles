@@ -1,0 +1,63 @@
+name: format
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: format-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  nixfmt:
+    name: flag formatting drift
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Install Nix with flakes enabled
+        uses: cachix/install-nix-action@v31
+        with:
+          extra_nix_config: |
+            accept-flake-config = true
+            experimental-features = nix-command flakes
+
+      - name: Apply the repository formatter in place
+        run: nix fmt
+
+      - name: Annotate every file the formatter rewrote
+        run: |
+          if git diff --quiet; then
+            echo "All files already match the repository formatter." \
+              >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+
+          {
+            echo "## Formatting drift"
+            echo
+            echo "The following files do not match \`nix fmt\`. Run it locally and commit the result."
+            echo
+            echo '| file |'
+            echo '| --- |'
+            git diff --name-only | sed 's|^|\| `|; s|$|` \||'
+            echo
+            echo '<details><summary>Full diff</summary>'
+            echo
+            echo '```diff'
+            git diff
+            echo '```'
+            echo
+            echo '</details>'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          git diff --name-only | while read -r file; do
+            echo "::error file=${file},title=Unformatted::${file} does not match nix fmt"
+          done
+
+          exit 1
