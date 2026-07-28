@@ -1,4 +1,9 @@
-{ inputs, lib, ... }:
+{
+  inputs,
+  lib,
+  den,
+  ...
+}:
 {
   den.aspects.ai = {
     __functor =
@@ -22,6 +27,8 @@
           ++ lib.optional (args.local or false) self.local
           ++ lib.optional (args.stt or false) self.stt;
         };
+
+    provides.tools.includes = [ (den.batteries.unfree [ "claude-code" ]) ];
 
     provides.tools.provides.to-users.homeManager =
       { config, pkgs, ... }:
@@ -48,12 +55,17 @@
           modelRoles = {
             default = "anthropic/claude-opus-5:high";
             advisor = "anthropic/claude-opus-4-8:high";
-            tiny = "anthropic/claude-sonnet-5:medium";
+            tiny = "anthropic/claude-haiku-4-5:medium";
+            smol = "anthropic/claude-haiku-4-5:medium";
           };
           advisor.enabled = true;
           autolearn.enabled = true;
           memory.backend = "mnemopi";
           mnemopi.polyphonicRecall = true;
+          mnemopi.enhancedRecall = true;
+          mnemopi.autoRetain = false;
+          mnemopi.recallLimit = 24;
+          mnemopi.proactiveLinking = true;
           providers.memoryModel = "online";
         };
 
@@ -80,13 +92,13 @@
         host.hyprland.keybinds = [
           {
             _args = [
-              "code:194"
+              "code:201"
               (lua "hl.dsp.exec_cmd('${voxtype} record start')")
             ];
           }
           {
             _args = [
-              "code:194"
+              "code:201"
               (lua "hl.dsp.exec_cmd('${voxtype} record stop')")
               { release = true; }
             ];

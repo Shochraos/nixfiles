@@ -24,8 +24,21 @@
     wifi
   ];
 
-  den.aspects.gaming.includes = with den.aspects; [ hdr ];
+  den.aspects.gaming.includes = with den.aspects; [
+    hdr
+    (den.batteries.unfree [
+      "steam"
+      "steam-unwrapped"
+    ])
+  ];
   den.aspects.media.includes = with den.aspects; [ hdr ];
+  den.aspects.apps.includes = [
+    (den.batteries.unfree [
+      "discord"
+      "spotify"
+    ])
+  ];
+  den.aspects.nvidia.includes = [ (den.batteries.unfree [ "nvidia-x11" ]) ];
 
   den.aspects.graphical.includes = with den.aspects; [
     base

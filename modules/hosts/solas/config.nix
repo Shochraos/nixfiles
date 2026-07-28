@@ -10,6 +10,8 @@
     {
       system.stateVersion = "25.05";
 
+      host.flakeDir = "/home/shochraos/Repositories/nixfiles";
+
       host.wireguard.profiles = {
         home = {
           extraSecrets = [ "endpoint" ];

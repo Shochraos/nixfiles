@@ -15,13 +15,9 @@
             "flakes"
           ];
           settings.download-buffer-size = 524288000;
-          settings.auto-optimise-store = true;
+          optimise.automatic = true;
 
           channel.enable = false;
-        };
-
-        nixpkgs.config = {
-          allowUnfree = true;
         };
 
         home-manager = {

@@ -28,14 +28,14 @@ Host assembly is done by [denful/den](https://github.com/denful/den). Its core a
    }
    ```
 
-   These definitions are only *registered* — nothing is activated until an aspect is reachable from a host's includes graph.
+   These definitions are only *registered*. An aspect becomes active in one of two ways: it is reachable from a host's includes graph, **or** its name matches an entity den resolves automatically — `den.hosts.<sys>.<H>.users.<u>` defaults to `den.aspects.<u>` (`nix/lib/entities/_types.nix`), and a missing one only produces a `lib.warn`. That is why the user aspect `shochraos` applies without appearing in any `includes` list.
 
-2. **`modules/flake/den.nix`** assembles everything. It declares the hosts (`den.hosts.x86_64-linux.{Azazel,Solas}`, each with its user and an explicit host aspect) and the includes graph: `base` (core system aspects) is included by `desktop` (Hyprland, DankMaterialShell, apps, …), which is included by the per-host aspects `azazel` / `solas` alongside their opt-in features. Includes are **value references** (`den.aspects.<name>`), so a typo fails evaluation immediately instead of silently applying nothing.
+2. **`modules/flake/den.nix`** assembles everything. It declares the hosts (`den.hosts.x86_64-linux.{Azazel,Solas}`, each with its user and an explicit host aspect) and the includes graph: `base` (core system aspects) is included by `graphical` (Hyprland, DankMaterialShell, terminal, browser, apps, …), which is included by the per-host aspects `azazel` / `solas` alongside exactly one form-factor aspect (`desktop` or `laptop`) and their opt-in features. Includes are **value references** (`den.aspects.<name>`), so a typo fails evaluation immediately instead of silently applying nothing.
 
 3. **den wires home-manager automatically**: config from `provides.to-users.homeManager` lands in `home-manager.users.<name>`, with `osConfig` available in home modules. There is no hand-written glue between the system and home sides.
 
 > [!TIP]
-> **Adding a feature is two steps:** (a) create a module file under `modules/` defining `den.aspects.<name>`, and (b) add `<name>` to the appropriate includes list (`base`, `desktop`, or a host's list) in `modules/flake/den.nix`. Forgetting step (b) means the file evaluates but the aspect is never applied.
+> **Adding a feature is two steps:** (a) create a module file under `modules/` defining `den.aspects.<name>`, and (b) add `<name>` to the appropriate includes list (`base`, `graphical`, or a host's list) in `modules/flake/den.nix`. Forgetting step (b) means the file evaluates but the aspect is never applied — **unless** its name is one den resolves automatically for an entity (see above), in which case it applies with no `includes` entry at all. Note also that a new file is invisible to `import-tree` until it is git-tracked: run `git add -N` on it before evaluating.
 
 ### Host-specific overrides
 
@@ -45,9 +45,10 @@ Rather than forking shared modules per host, `modules/flake/options.nix` defines
 
 - `./flake.nix` — entry-point; auto-imports the `modules/` tree via `import-tree`.
 - `./modules/flake/` — the assembly logic (`den.nix`, `options.nix`). Start here to understand the wiring.
-- `./modules/system/` — base OS aspects (`boot`, `nix`, `network`, `audio`, `shell`, `terminal`, …); included via `base`.
-- `./modules/desktop/` — Hyprland (`hypr-*`), the DankMaterialShell shell (`dankshell`), browser, apps; included via `desktop`.
-- `./modules/features/` — opt-in aspects added per host (`gaming-*`, `ai`, `virtualization`, `media`, …).
+- `./modules/system/` — base OS aspects (`boot`, `nix`, `network`, `audio`, `shell`, `scheduling`, …) plus the form-factor aspects `desktop` / `laptop`; included via `base` or directly by a host.
+- `./modules/users/` — per-user aspects, one file per user named after that user (`shochraos.nix`). Resolved by **name**, not through `includes`.
+- `./modules/desktop/` — Hyprland (`hyprland/`), the DankMaterialShell shell (`dankshell`), terminal, browser, apps; included via `graphical`.
+- `./modules/features/` — opt-in aspects added per host (`gaming/`, `ai`, `virtualization`, `media`, …).
 - `./modules/hosts/<host>/` — `config.nix` (host overrides + `host.*` settings), `hardware.nix`, `filesystems.nix`.
 - `./configs/` — raw config files for tools without a home-manager module.
 - `./assets/` — icons and static assets referenced by modules.
