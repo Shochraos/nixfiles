@@ -21,7 +21,7 @@
         key_file = ${config.host.sshKey}
       '';
 
-      fileSystems = lib.listToAttrs (
+      fileSystems = builtins.listToAttrs (
         map
           (
             share:

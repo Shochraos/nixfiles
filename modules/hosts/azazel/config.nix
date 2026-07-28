@@ -12,48 +12,6 @@
 
       host.flakeDir = "/home/shochraos/Repositories/nixfiles";
 
-      host.wireguard.profiles = {
-        uni = {
-          presharedKey = true;
-          extraSecrets = [
-            "endpoint"
-            "ipv4-address"
-            "ipv4-dns"
-            "ipv6-address"
-            "ipv6-dns"
-          ];
-
-          connection = {
-            id = "uni";
-            type = "wireguard";
-            interface-name = "uni";
-            autoconnect = false;
-          };
-
-          wireguard.mtu = 1392;
-
-          "wireguard-peer.E9rVjRfxl5F6amOjc5FBQ7+1minLp60LetMF/y2N3wE=" = {
-            endpoint = "$WG_UNI_ENDPOINT";
-            allowed-ips = "0.0.0.0/0;::/0;";
-          };
-
-          ipv4 = {
-            method = "manual";
-            address1 = "$WG_UNI_IPV4_ADDRESS";
-            dns = "$WG_UNI_IPV4_DNS";
-            dns-search = "~;";
-          };
-
-          ipv6 = {
-            method = "manual";
-            addr-gen-mode = "default";
-            address1 = "$WG_UNI_IPV6_ADDRESS";
-            dns = "$WG_UNI_IPV6_DNS";
-            dns-search = "~;";
-          };
-        };
-      };
-
       host.hyprland = {
         input = {
           accel_profile = "flat";

@@ -18,8 +18,8 @@
         in
         {
           config = lib.mkIf (profiles != { }) {
-            sops.secrets = lib.listToAttrs (
-              lib.concatMap (
+            sops.secrets = builtins.listToAttrs (
+              builtins.concatMap (
                 name:
                 [ (lib.nameValuePair (secretFor name) { }) ]
                 ++ lib.optional (hasPsk name) (lib.nameValuePair "${secretFor name}-psk" { })
@@ -28,7 +28,7 @@
             );
 
             sops.templates."wireguard.env".content = lib.concatLines (
-              lib.concatMap (
+              builtins.concatMap (
                 name:
                 [ "${keyVar name}=${config.sops.placeholder.${secretFor name}}" ]
                 ++ lib.optional (hasPsk name) "${pskVar name}=${config.sops.placeholder."${secretFor name}-psk"}"
@@ -41,7 +41,7 @@
             networking.networkmanager.ensureProfiles = {
               environmentFiles = [ config.sops.templates."wireguard.env".path ];
 
-              profiles = lib.mapAttrs (
+              profiles = builtins.mapAttrs (
                 name: profile:
                 let
                   withKey =
@@ -64,7 +64,7 @@
                     else
                       value;
                 in
-                if hasPsk name then lib.mapAttrs addPsk withKey else withKey
+                if hasPsk name then builtins.mapAttrs addPsk withKey else withKey
               ) profiles;
             };
           };
