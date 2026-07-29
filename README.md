@@ -56,6 +56,7 @@ One template carries a **format contract worth knowing before you edit the secre
 - `./modules/desktop/` — Hyprland (`hyprland/`), the DankMaterialShell shell (`dankshell`), terminal, browser, apps; included via `graphical`.
 - `./modules/features/` — opt-in aspects added per host (`gaming/`, `ai`, `virtualization`, `media`, …).
 - `./modules/hosts/<host>/` — `config.nix` (host overrides + `host.*` settings), `hardware.nix`, `filesystems.nix`.
+- `./pkgs/<name>/package.nix` — packages nixpkgs does not carry, as ordinary `callPackage` expressions. These are **not** flake-parts modules, so `import-tree` ignores them; each is reached by a named overlay declared in the aspect that owns it (see `mp3tag`, `lgtv`, `gaming/packages`), which is also what keeps an unfree allowlist scoped to the aspect that needs it.
 - `./configs/` — raw config files for tools without a home-manager module.
 - `./assets/` — icons and static assets referenced by modules.
 - `./secrets/` — [sops-nix](https://github.com/Mic92/sops-nix)-encrypted secrets.
