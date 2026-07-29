@@ -65,7 +65,7 @@
           mnemopi.enhancedRecall = true;
           mnemopi.autoRetain = false;
           mnemopi.recallLimit = 24;
-          mnemopi.proactiveLinking = true;
+          mnemopi.proactiveLinking = false;
           providers.memoryModel = "online";
         };
 
