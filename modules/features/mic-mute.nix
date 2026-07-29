@@ -1,8 +1,18 @@
+{ inputs, ... }:
 {
   den.aspects.mic-mute.provides.to-users.homeManager =
-    { pkgs, ... }:
+    { lib, pkgs, ... }:
     let
-      mic-mute = pkgs.writeShellScript "mic-mute.sh" (builtins.readFile ../../assets/scripts/mic-mute.sh);
+      mic-mute = pkgs.writeShellApplication {
+        name = "mic-mute";
+        runtimeInputs = [
+          inputs.dms.packages.${pkgs.stdenv.hostPlatform.system}.dms-shell
+          pkgs.coreutils
+          pkgs.gnugrep
+          pkgs.wireplumber
+        ];
+        text = builtins.readFile ../../assets/scripts/mic-mute.sh;
+      };
     in
     {
       systemd.user.services.micmute-led = {
@@ -13,7 +23,7 @@
 
         Service = {
           Type = "simple";
-          ExecStart = "${mic-mute}";
+          ExecStart = lib.getExe mic-mute;
           Restart = "always";
         };
 

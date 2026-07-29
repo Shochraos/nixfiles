@@ -1,3 +1,8 @@
+let
+  bscpylgtvOverlay = final: _prev: {
+    bscpylgtv = final.callPackage ../../pkgs/bscpylgtv/package.nix { };
+  };
+in
 {
   den.aspects.lgtv =
     { user, ... }:
@@ -13,6 +18,8 @@
           lua = lib.generators.mkLuaInline;
         in
         {
+          nixpkgs.overlays = [ bscpylgtvOverlay ];
+
           environment.systemPackages = with pkgs; [ wakeonlan ];
 
           sops.secrets = {
@@ -70,7 +77,7 @@
 
       provides.to-users.homeManager =
         {
-          config,
+          lib,
           osConfig,
           pkgs,
           ...
@@ -84,10 +91,9 @@
             Service = {
               Type = "oneshot";
               EnvironmentFile = osConfig.sops.templates."lgtv.env".path;
-              ExecStart = "${pkgs.coreutils}/bin/true";
+              ExecStart = "${lib.getExe' pkgs.coreutils "true"}";
               RemainAfterExit = true;
-              WorkingDirectory = "${config.home.homeDirectory}/Applications/bscpylgtv";
-              ExecStop = "${pkgs.direnv}/bin/direnv exec ${config.home.homeDirectory}/Applications/bscpylgtv bscpylgtvcommand \${LGTV_IP} power_off";
+              ExecStop = "${lib.getExe pkgs.bscpylgtv} \${LGTV_IP} power_off";
             };
             Install = {
               WantedBy = [ "graphical-session.target" ];

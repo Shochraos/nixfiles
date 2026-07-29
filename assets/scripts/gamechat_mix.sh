@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-set -u
 
 DISCORD_SINK="${DISCORD_SINK:-discord_sink}"
 CATCHALL_SINK="${CATCHALL_SINK:-catchall_sink}"

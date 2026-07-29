@@ -7,9 +7,14 @@
     }:
     let
       lua = lib.generators.mkLuaInline;
-      gamechat_balance = pkgs.writeShellScriptBin "gamechat_balance" (
-        builtins.readFile ../../assets/scripts/gamechat_balance.sh
-      );
+      gamechat_balance = pkgs.writeShellApplication {
+        name = "gamechat_balance";
+        runtimeInputs = with pkgs; [
+          gawk
+          pulseaudio
+        ];
+        text = builtins.readFile ../../assets/scripts/gamechat_balance.sh;
+      };
     in
     {
       services.pipewire.pulse.enable = true;
@@ -44,11 +49,19 @@
     };
 
   den.aspects.gamechat.provides.to-users.homeManager =
-    { pkgs, ... }:
+    { lib, pkgs, ... }:
     let
-      gamechat_mix = pkgs.writeShellScript "gamechat_mix.sh" (
-        builtins.readFile ../../assets/scripts/gamechat_mix.sh
-      );
+      gamechat_mix = pkgs.writeShellApplication {
+        name = "gamechat_mix";
+        runtimeInputs = with pkgs; [
+          coreutils
+          gawk
+          gnused
+          pulseaudio
+        ];
+        bashOptions = [ "nounset" ];
+        text = builtins.readFile ../../assets/scripts/gamechat_mix.sh;
+      };
     in
     {
       systemd.user.services.gamechat-mix = {
@@ -61,7 +74,7 @@
 
         Service = {
           Type = "simple";
-          ExecStart = "${gamechat_mix}";
+          ExecStart = lib.getExe gamechat_mix;
           Restart = "always";
           RestartSec = 5;
         };
