@@ -13,7 +13,7 @@ adjust_volume() {
   local change="$2"
 
   # Get current volume of first channel (left)
-  current=$(pactl get-sink-volume "$sink" | awk '{print $5}' | head -n 1 | tr -d '%')
+  current=$(pactl get-sink-volume "$sink" | awk 'NR==1 { gsub(/%/, "", $5); print $5 }')
   new=$((current + change))
 
   # Clamp between 0 and 100

@@ -7,10 +7,6 @@
       url = "github:NixOS/nixpkgs/nixos-unstable";
     };
 
-    nixpkgs-small = {
-      url = "github:NixOS/nixpkgs/nixos-unstable-small";
-    };
-
     ### Nix Utilities
     flake-parts = {
       url = "github:hercules-ci/flake-parts";

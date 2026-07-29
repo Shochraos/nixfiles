@@ -195,9 +195,14 @@
       };
 
     provides.local.provides.to-users.homeManager =
-      { config, pkgs, ... }:
+      { lib, pkgs, ... }:
       let
         llama-cpp = pkgs.llama-cpp.override { cudaSupport = true; };
+
+        qwenModel = pkgs.fetchurl {
+          url = "https://huggingface.co/unsloth/Qwen3.6-35B-A3B-GGUF/resolve/main/Qwen3.6-35B-A3B-UD-Q5_K_XL.gguf";
+          hash = lib.fakeHash;
+        };
       in
       {
         home.packages = [ llama-cpp ];
@@ -211,7 +216,7 @@
             };
             Service = {
               Type = "simple";
-              ExecStart = "${llama-cpp}/bin/llama-server --model ${config.home.homeDirectory}/Models/Qwen3.6-35B-A3B-UD-Q5_K_XL.gguf --port 8081 --jinja -ctk q8_0 -ctv q8_0 -c 262144 -n 32768 --temp 0.6 --top-p 0.95 --top-k 20 --presence-penalty 0.0 --min-p 0.0";
+              ExecStart = "${lib.getExe' llama-cpp "llama-server"} --model ${qwenModel} --port 8081 --jinja -ctk q8_0 -ctv q8_0 -c 262144 -n 32768 --temp 0.6 --top-p 0.95 --top-k 20 --presence-penalty 0.0 --min-p 0.0";
               Restart = "on-failure";
               RestartSec = 5;
             };
@@ -225,8 +230,9 @@
             };
             Service = {
               Type = "simple";
-              Environment = "DATA_DIR=${config.home.homeDirectory}/Applications/open-webui";
-              ExecStart = "${pkgs.open-webui}/bin/open-webui serve";
+              StateDirectory = "open-webui";
+              Environment = "DATA_DIR=%S/open-webui";
+              ExecStart = "${lib.getExe pkgs.open-webui} serve";
               Restart = "on-failure";
               RestartSec = 5;
             };
