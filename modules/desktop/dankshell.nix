@@ -102,7 +102,6 @@
               calculator.enable = true;
               dankKDEConnect.enable = true;
               simpleAudioControl.enable = true;
-              claudeUsage.enable = true;
               dankTodoman.enable = true;
               discordVoice = {
                 enable = true;

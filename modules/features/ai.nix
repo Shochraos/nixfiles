@@ -74,7 +74,6 @@
       in
       {
         home.packages = [
-          pkgs.claude-code
           oh-my-pi
         ];
 
