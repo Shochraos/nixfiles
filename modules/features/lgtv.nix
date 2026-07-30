@@ -16,6 +16,7 @@ in
         }:
         let
           lua = lib.generators.mkLuaInline;
+          systemctl = lib.getExe' pkgs.systemd "systemctl";
         in
         {
           nixpkgs.overlays = [ bscpylgtvOverlay ];
@@ -48,7 +49,7 @@ in
             serviceConfig = {
               Type = "oneshot";
               EnvironmentFile = config.sops.templates."lgtv.env".path;
-              ExecStart = "${pkgs.wakeonlan}/bin/wakeonlan -i \${LGTV_IP} \${LGTV_MAC}";
+              ExecStart = "${lib.getExe pkgs.wakeonlan} -i \${LGTV_IP} \${LGTV_MAC}";
             };
           };
 
@@ -57,7 +58,7 @@ in
               users = [ user.name ];
               commands = [
                 {
-                  command = "${pkgs.systemd}/bin/systemctl start wol-lgtv.service";
+                  command = "${systemctl} start wol-lgtv.service";
                   options = [ "NOPASSWD" ];
                 }
               ];
@@ -68,7 +69,7 @@ in
             {
               _args = [
                 "SUPER + ALT + Home"
-                (lua "hl.dsp.exec_cmd('sudo ${pkgs.systemd}/bin/systemctl start wol-lgtv.service')")
+                (lua "hl.dsp.exec_cmd('sudo ${systemctl} start wol-lgtv.service')")
                 { locked = true; }
               ];
             }

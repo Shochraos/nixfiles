@@ -151,7 +151,7 @@
           system.activationScripts.zenPoliciesContract = {
             deps = [ "setupSecrets" ];
             text = ''
-              if ! ${pkgs.jq}/bin/jq -e '.policies.Cookies.Allow | type == "array"' \
+              if ! ${lib.getExe pkgs.jq} -e '.policies.Cookies.Allow | type == "array"' \
                 ${config.sops.templates."zen-policies.json".path} >/dev/null 2>&1; then
                 echo "warning: sops secret ${cookiesSecret} must decrypt to a JSON array of origin strings; ${
                   config.sops.templates."zen-policies.json".path

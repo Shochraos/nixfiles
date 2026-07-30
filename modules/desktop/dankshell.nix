@@ -14,13 +14,17 @@
             compositor = {
               name = "hyprland";
               customConfig = ''
-                env = XCURSOR_THEME,Bibata-Modern-Classic
-                env = XCURSOR_SIZE,24
+                hl.env("XCURSOR_THEME", "Bibata-Modern-Classic")
+                hl.env("XCURSOR_SIZE", "24")
 
-                misc:disable_hyprland_logo = true
-                misc:disable_splash_rendering = true
-                misc:force_default_wallpaper = 0
-                misc:background_color = rgb(000000)
+                hl.config({
+                  misc = {
+                    disable_hyprland_logo = true,
+                    disable_splash_rendering = true,
+                    force_default_wallpaper = 0,
+                    background_color = "rgb(000000)",
+                  },
+                })
               '';
             };
           };
