@@ -9,7 +9,7 @@
     };
 
   den.aspects.kde-connect.provides.to-users.homeManager =
-    { pkgs, ... }:
+    { lib, pkgs, ... }:
     {
       systemd.user.services.valent = {
         Unit = {
@@ -17,7 +17,7 @@
           PartOf = [ "graphical-session.target" ];
         };
         Service = {
-          ExecStart = "${pkgs.valent}/bin/valent --gapplication-service";
+          ExecStart = "${lib.getExe pkgs.valent} --gapplication-service";
           Restart = "on-failure";
         };
         Install = {
