@@ -22,7 +22,7 @@
         ];
         text = ''
           out="$HOME/.config/hypr/dms/outputs.lua"
-          line='hl.monitor({ output = "${hdrOutput}", cm = "hdr", min_luminance = 0, max_luminance = 750, max_avg_luminance = 400 })'
+          line='hl.monitor({ output = "${hdrOutput}", cm = "hdredid" })'
 
           reload() { hyprctl reload >/dev/null 2>&1 || true; }
 
