@@ -192,10 +192,6 @@
                 size = 15;
               }
               {
-                id = "claudeUsage";
-                enabled = true;
-              }
-              {
                 id = "cpuUsage";
                 enabled = true;
                 minimumWidth = true;

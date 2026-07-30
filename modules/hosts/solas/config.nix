@@ -227,10 +227,6 @@
 
             rightWidgets = [
               {
-                id = "claudeUsage";
-                enabled = true;
-              }
-              {
                 id = "spacer";
                 enabled = true;
                 size = 15;
