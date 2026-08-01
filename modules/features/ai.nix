@@ -1,7 +1,6 @@
 {
   inputs,
   lib,
-  den,
   ...
 }:
 {
@@ -27,8 +26,6 @@
           ++ lib.optional (args.local or false) self.local
           ++ lib.optional (args.stt or false) self.stt;
         };
-
-    provides.tools.includes = [ (den.batteries.unfree [ "claude-code" ]) ];
 
     provides.tools.provides.to-users.homeManager =
       { config, pkgs, ... }:
