@@ -3,13 +3,12 @@
     { user, ... }:
     {
       nixos =
-        { pkgs, config, ... }:
+        { config, ... }:
         {
           users.mutableUsers = false;
 
           users.users.${user.name} = {
             isNormalUser = true;
-            shell = pkgs.fish;
             hashedPasswordFile = config.sops.secrets."user-password-hash".path;
             extraGroups = [
               "wheel"
@@ -18,8 +17,6 @@
           };
 
           users.users.root.hashedPasswordFile = config.sops.secrets."user-password-hash".path;
-
-          programs.fish.enable = true;
         };
 
     };

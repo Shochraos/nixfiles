@@ -228,6 +228,26 @@
         "type": "github"
       }
     },
+    "flyline": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1785779433,
+        "narHash": "sha256-0GE/n4A/2QEUrQWznIgsXr8mptc2FUny8S+CiAts548=",
+        "owner": "HalFrgrd",
+        "repo": "flyline",
+        "rev": "dfa283dd5704b734458c363973d9d466c4b4a3f6",
+        "type": "github"
+      },
+      "original": {
+        "owner": "HalFrgrd",
+        "repo": "flyline",
+        "type": "github"
+      }
+    },
     "fromYaml": {
       "flake": false,
       "locked": {
@@ -549,6 +569,7 @@
         "dms": "dms",
         "dms-plugin-registry": "dms-plugin-registry",
         "flake-parts": "flake-parts",
+        "flyline": "flyline",
         "home-manager": "home-manager",
         "import-tree": "import-tree",
         "lanzaboote": "lanzaboote",

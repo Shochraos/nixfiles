@@ -82,6 +82,11 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    flyline = {
+      url = "github:HalFrgrd/flyline";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     ### Gaming ###
     millennium = {
       url = "github:SteamClientHomebrew/Millennium/?dir=packages/nix";
