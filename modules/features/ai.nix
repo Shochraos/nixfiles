@@ -51,7 +51,7 @@
         overlay = (pkgs.formats.yaml { }).generate "oh-my-pi-config.yml" {
           modelRoles = {
             default = "anthropic/claude-opus-5:high";
-            advisor = "anthropic/claude-opus-4-6:high";
+            advisor = "anthropic/claude-opus-4-8:high";
             tiny = "anthropic/claude-haiku-4-5:medium";
             smol = "anthropic/claude-haiku-4-5:medium";
           };

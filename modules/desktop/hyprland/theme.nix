@@ -108,20 +108,26 @@
         {
           home.pointerCursor.enable = true;
 
-          xdg.configFile."matugen/config.toml".text = ''
-            [config]
-            [templates.spotify]
-            input_path = '${../../../assets/templates/spicetify.json.j2}'
-            output_path = '~/.local/state/matugen/spicetify-${host.name}.json'
+          xdg.configFile."matugen/config.toml".source = (pkgs.formats.toml { }).generate "matugen-config" {
+            config = { };
+            templates = {
+              spotify = {
+                input_path = ../../../assets/templates/spicetify.json.j2;
+                output_path = "~/.local/state/matugen/spicetify-${host.name}.json";
+              };
 
-            [templates.vesktop]
-            input_path = '${../../../assets/templates/discord.css}'
-            output_path = '~/.config/Vencord/themes/matugen.css'
+              vesktop = {
+                input_path = ../../../assets/templates/discord.css;
+                output_path = "~/.config/Vencord/themes/matugen.css";
+              };
 
-            [templates.steam]
-            input_path = '${../../../assets/templates/steam.css}'
-            output_path = '~/.steam/steam/millennium/themes/simply-dark/colors.css'
-          '';
+              steam = {
+                input_path = ../../../assets/templates/steam.css;
+                output_path = "~/.steam/steam/millennium/themes/simply-dark/colors.css";
+              };
+            }
+            // osConfig.host.matugen.templates;
+          };
 
           home.packages = [
             pkgs.adw-gtk3
