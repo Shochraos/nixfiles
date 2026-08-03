@@ -126,6 +126,14 @@ in
                 description = "DMS plugins contributed by feature aspects, merged over the shared plugin set in dankshell.nix. Lets a feature enable its own plugin without depending on the dankshell aspect being present.";
               };
             };
+
+            matugen = {
+              templates = mkOption {
+                type = attrsetTable;
+                default = { };
+                description = "matugen templates contributed by feature aspects, merged over the shared template set in the hyprland theme aspect. Lets a feature theme itself from the live palette without depending on the hyprland aspect being present.";
+              };
+            };
           };
         };
     };

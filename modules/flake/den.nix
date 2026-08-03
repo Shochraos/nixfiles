@@ -64,6 +64,7 @@
       local = false;
       stt = true;
     })
+    irc
     media
     remote-mounts
     virtualization
