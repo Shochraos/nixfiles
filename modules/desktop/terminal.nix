@@ -4,7 +4,6 @@
     {
       programs.ghostty = {
         enable = true;
-        enableFishIntegration = true;
         settings = {
           background = "000000";
           background-opacity = 0.5;

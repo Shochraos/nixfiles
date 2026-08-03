@@ -1,9 +1,13 @@
+{ inputs, ... }:
 {
   den.aspects.shell =
     { user, ... }:
     {
       provides.to-users.homeManager =
         { pkgs, ... }:
+        let
+          flyline = pkgs.callPackage "${inputs.flyline}/nix/package.nix" { };
+        in
         {
           home.packages = with pkgs; [
             eza
@@ -11,20 +15,13 @@
             btop
           ];
 
-          programs.fish = {
+          programs.bash = {
             enable = true;
-
-            interactiveShellInit = ''
-              set fish_greeting
-              fish_vi_key_bindings
-            '';
 
             shellAliases = {
               ls = "eza -1 -h -l --icons --no-user --group-directories-first -F";
               la = "eza -1 -h -l --icons -a --no-user --group-directories-first -F";
               lr = "eza -1 -h -l --icons -a -R --no-user --group-directories-first -F";
-              nix-shell = "nix-your-shell fish nix-shell --";
-              nix-develop = "nix-your-shell fish nix-develop --";
 
               nh-switch = "theme-sync && nh os switch --ask";
               nh-boot = "theme-sync && nh os boot --ask";
@@ -33,6 +30,11 @@
               copy = "dms cl copy";
               paste = "dms cl paste";
             };
+
+            initExtra = ''
+              enable -f ${flyline}/lib/libflyline.so flyline
+              flyline set-style inline-suggestion="dim italic"
+            '';
           };
 
           programs.starship = {
