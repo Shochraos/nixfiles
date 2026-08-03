@@ -14,7 +14,7 @@
           imports = [ inputs.spicetify-nix.homeManagerModules.default ];
 
           home.packages = with pkgs; [
-            (discord.override { withVencord = true; })Thank you.
+            (discord.override { withVencord = true; })
             libreoffice-qt-fresh
             pdfarranger
           ];
