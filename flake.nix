@@ -101,6 +101,11 @@
       url = "github:shochraos/nix-dw-proton";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    game-chat-mix = {
+      url = "github:Shochraos/game-chat-mix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =

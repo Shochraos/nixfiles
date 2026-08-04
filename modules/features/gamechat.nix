@@ -1,3 +1,4 @@
+{ inputs, ... }:
 {
   den.aspects.gamechat.nixos =
     {
@@ -7,14 +8,8 @@
     }:
     let
       lua = lib.generators.mkLuaInline;
-      gamechat_balance = pkgs.writeShellApplication {
-        name = "gamechat_balance";
-        runtimeInputs = with pkgs; [
-          gawk
-          pulseaudio
-        ];
-        text = builtins.readFile ../../assets/scripts/gamechat_balance.sh;
-      };
+      gamechat_balance =
+        inputs.game-chat-mix.packages.${pkgs.stdenv.hostPlatform.system}.gamechat_balance;
     in
     {
       services.pipewire.pulse.enable = true;
@@ -51,17 +46,7 @@
   den.aspects.gamechat.provides.to-users.homeManager =
     { lib, pkgs, ... }:
     let
-      gamechat_mix = pkgs.writeShellApplication {
-        name = "gamechat_mix";
-        runtimeInputs = with pkgs; [
-          coreutils
-          gawk
-          gnused
-          pulseaudio
-        ];
-        bashOptions = [ "nounset" ];
-        text = builtins.readFile ../../assets/scripts/gamechat_mix.sh;
-      };
+      gamechat_mix = inputs.game-chat-mix.packages.${pkgs.stdenv.hostPlatform.system}.gamechat_mix;
     in
     {
       systemd.user.services.gamechat-mix = {
