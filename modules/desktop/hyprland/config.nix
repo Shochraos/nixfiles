@@ -1,20 +1,7 @@
-let
-  hyprlandGlazeRelaxOverlay = _final: prev: {
-    hyprland = prev.hyprland.overrideAttrs (old: {
-      postPatch = ''
-        substituteInPlace CMakeLists.txt start/CMakeLists.txt hyprpm/CMakeLists.txt \
-          --replace-fail "glaze 7...<8" "glaze"
-      ''
-      + old.postPatch;
-    });
-  };
-in
 {
   den.aspects.hyprland.nixos =
     { pkgs, ... }:
     {
-      nixpkgs.overlays = [ hyprlandGlazeRelaxOverlay ];
-
       environment.sessionVariables.NIXOS_OZONE_WL = "1";
 
       programs.hyprland = {
