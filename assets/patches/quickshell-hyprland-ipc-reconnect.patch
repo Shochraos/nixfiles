@@ -1,0 +1,61 @@
+diff --git a/src/wayland/hyprland/ipc/connection.cpp b/src/wayland/hyprland/ipc/connection.cpp
+index 0c98e35..9ddb1bc 100644
+--- a/src/wayland/hyprland/ipc/connection.cpp
++++ b/src/wayland/hyprland/ipc/connection.cpp
+@@ -17,6 +17,7 @@
+ #include <qproperty.h>
+ #include <qqml.h>
+ #include <qtenvironmentvariables.h>
++#include <qtimer.h>
+ #include <qtmetamacros.h>
+ #include <qtypes.h>
+ #include <qvariant.h>
+@@ -35,6 +36,8 @@ namespace qs::hyprland::ipc {
+ namespace {
+ QS_LOGGING_CATEGORY(logHyprlandIpc, "quickshell.hyprland.ipc", QtWarningMsg);
+ QS_LOGGING_CATEGORY(logHyprlandIpcEvents, "quickshell.hyprland.ipc.events", QtWarningMsg);
++
++constexpr int RECONNECT_DELAY_MS = 1000;
+ } // namespace
+ 
+ HyprlandIpc::HyprlandIpc() {
+@@ -109,8 +112,24 @@ void HyprlandIpc::eventSocketStateChanged(QLocalSocket::LocalSocketState state)
+ 		this->eventReader.setDevice(&this->eventSocket);
+ 		qCInfo(logHyprlandIpc) << "Hyprland event socket connected.";
+ 		emit this->connected();
+-	} else if (state == QLocalSocket::UnconnectedState && this->valid) {
+-		qCWarning(logHyprlandIpc) << "Hyprland event socket disconnected.";
++
++		if (this->reconnecting) {
++			this->reconnecting = false;
++			this->refreshMonitors(true);
++			this->refreshWorkspaces(true);
++			this->refreshToplevels();
++		}
++
++		this->everConnected = true;
++	} else if (state == QLocalSocket::UnconnectedState && this->everConnected) {
++		if (this->valid) qCWarning(logHyprlandIpc) << "Hyprland event socket disconnected.";
++
++		this->reconnecting = true;
++
++		QTimer::singleShot(RECONNECT_DELAY_MS, this, [this]() {
++			qCInfo(logHyprlandIpc) << "Reconnecting to hyprland event socket.";
++			this->eventSocket.connectToServer(this->mEventSocketPath, QLocalSocket::ReadOnly);
++		});
+ 	}
+ 
+ 	this->valid = state == QLocalSocket::ConnectedState;
+diff --git a/src/wayland/hyprland/ipc/connection.hpp b/src/wayland/hyprland/ipc/connection.hpp
+index c617c04..f6f6380 100644
+--- a/src/wayland/hyprland/ipc/connection.hpp
++++ b/src/wayland/hyprland/ipc/connection.hpp
+@@ -147,6 +147,8 @@ private:
+ 	QString mRequestSocketPath;
+ 	QString mEventSocketPath;
+ 	bool valid = false;
++	bool everConnected = false;
++	bool reconnecting = false;
+ 	bool requestingMonitors = false;
+ 	bool requestingWorkspaces = false;
+ 	bool requestingToplevels = false;

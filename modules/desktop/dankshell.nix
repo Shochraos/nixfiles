@@ -1,4 +1,11 @@
 { inputs, ... }:
+let
+  quickshellIpcReconnectOverlay = _final: prev: {
+    quickshell = prev.quickshell.overrideAttrs (old: {
+      patches = (old.patches or [ ]) ++ [ ../../assets/patches/quickshell-hyprland-ipc-reconnect.patch ];
+    });
+  };
+in
 {
   den.aspects.dankshell =
     { user, ... }:
@@ -6,6 +13,8 @@
       nixos =
         { config, ... }:
         {
+          nixpkgs.overlays = [ quickshellIpcReconnectOverlay ];
+
           services.displayManager.defaultSession = "hyprland-uwsm";
           services.displayManager.dms-greeter = {
             enable = true;
