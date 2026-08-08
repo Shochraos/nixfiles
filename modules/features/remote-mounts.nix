@@ -29,6 +29,7 @@
               device = "astaroth:/mnt/user/${share}";
               fsType = "rclone";
               options = [
+                "_netdev"
                 "nodev"
                 "nofail"
                 "allow_other"
