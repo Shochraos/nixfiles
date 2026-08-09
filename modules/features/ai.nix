@@ -52,6 +52,10 @@
           src = inputs.superpowers;
         };
 
+        vendored-skills = pkgs.callPackage ../../pkgs/vendored-skills/package.nix {
+          inherit (inputs) nixos-skill vercel-skills wshobson-agents;
+        };
+
         overlay = (pkgs.formats.yaml { }).generate "oh-my-pi-config.yml" {
           modelRoles = {
             default = "anthropic/claude-opus-5:high";
@@ -69,7 +73,10 @@
           mnemopi.recallLimit = 24;
           mnemopi.proactiveLinking = false;
           providers.memoryModel = "online";
-          skills.customDirectories = [ "${superpowers-skills}" ];
+          skills.customDirectories = [
+            "${superpowers-skills}"
+            "${vendored-skills}"
+          ];
         };
 
         overlayPath = "${config.home.homeDirectory}/.omp/agent/nix-config.yml";
