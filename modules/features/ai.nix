@@ -48,6 +48,10 @@
           '';
         });
 
+        superpowers-skills = pkgs.callPackage ../../pkgs/superpowers-skills/package.nix {
+          src = inputs.superpowers;
+        };
+
         overlay = (pkgs.formats.yaml { }).generate "oh-my-pi-config.yml" {
           modelRoles = {
             default = "anthropic/claude-opus-5:high";
@@ -65,18 +69,38 @@
           mnemopi.recallLimit = 24;
           mnemopi.proactiveLinking = false;
           providers.memoryModel = "online";
+          skills.customDirectories = [ "${superpowers-skills}" ];
         };
 
         overlayPath = "${config.home.homeDirectory}/.omp/agent/nix-config.yml";
+
+        rulesDir = ../../assets/omp/rules;
+
+        ruleFiles =
+          lib.mapAttrs'
+            (name: _: {
+              name = ".omp/agent/rules/${name}";
+              value.source = rulesDir + "/${name}";
+            })
+            (
+              lib.filterAttrs (name: type: type == "regular" && lib.hasSuffix ".md" name) (
+                builtins.readDir rulesDir
+              )
+            );
       in
       {
         home.packages = [
           oh-my-pi
         ];
 
-        home.file.".omp/agent/nix-config.yml".source = overlay;
+        home.file = {
+          ".omp/agent/nix-config.yml".source = overlay;
+        }
+        // ruleFiles;
 
         home.sessionVariables.PI_CONFIG_FILES = overlayPath;
+
+        home.sessionVariables.SUPERPOWERS_DISABLE_TELEMETRY = "1";
       };
 
     provides.stt.nixos =

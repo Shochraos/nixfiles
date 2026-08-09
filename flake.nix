@@ -82,6 +82,11 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    superpowers = {
+      url = "github:obra/superpowers";
+      flake = false;
+    };
+
     flyline = {
       url = "github:HalFrgrd/flyline";
       inputs.nixpkgs.follows = "nixpkgs";
