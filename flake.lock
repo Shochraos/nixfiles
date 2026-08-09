@@ -482,6 +482,22 @@
         "type": "github"
       }
     },
+    "nixos-skill": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1786256328,
+        "narHash": "sha256-97qJ1yvmXdPOHIARY7ZRdCnOAfqc5PpdN/Mg8SRTTfg=",
+        "owner": "marceloeatworld",
+        "repo": "nixos-ai-skill",
+        "rev": "c9b25a6a9e5b9ad9f84cc8753d0021a5a251d4d8",
+        "type": "github"
+      },
+      "original": {
+        "owner": "marceloeatworld",
+        "repo": "nixos-ai-skill",
+        "type": "github"
+      }
+    },
     "nixpkgs": {
       "locked": {
         "lastModified": 1781577229,
@@ -598,6 +614,7 @@
         "nix-dw-proton": "nix-dw-proton",
         "nix-index-database": "nix-index-database",
         "nix-proton-cachyos": "nix-proton-cachyos",
+        "nixos-skill": "nixos-skill",
         "nixpkgs": "nixpkgs_2",
         "omp-nix": "omp-nix",
         "sops-nix": "sops-nix",
@@ -605,6 +622,8 @@
         "stylix": "stylix",
         "superpowers": "superpowers",
         "treefmt-nix": "treefmt-nix",
+        "vercel-skills": "vercel-skills",
+        "wshobson-agents": "wshobson-agents",
         "zen-browser": "zen-browser"
       }
     },
@@ -833,6 +852,38 @@
       "original": {
         "owner": "numtide",
         "repo": "treefmt-nix",
+        "type": "github"
+      }
+    },
+    "vercel-skills": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1786141830,
+        "narHash": "sha256-PLt/ECv/rg9viV6JzfEoBfBo+ELsMpcXfS6OZ4saDhk=",
+        "owner": "vercel-labs",
+        "repo": "skills",
+        "rev": "941a7bcfeca4bf07913b9fb6f8ed81f20ff5297c",
+        "type": "github"
+      },
+      "original": {
+        "owner": "vercel-labs",
+        "repo": "skills",
+        "type": "github"
+      }
+    },
+    "wshobson-agents": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1784409919,
+        "narHash": "sha256-/7pBdX0uJcKM0ihcSvcrP2Ae9aTK688GBhgaSNesXRU=",
+        "owner": "wshobson",
+        "repo": "agents",
+        "rev": "c4b82b0ad771190355eb8e204b1329732a18449a",
+        "type": "github"
+      },
+      "original": {
+        "owner": "wshobson",
+        "repo": "agents",
         "type": "github"
       }
     },

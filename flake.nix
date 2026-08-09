@@ -82,14 +82,30 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    flyline = {
+      url = "github:HalFrgrd/flyline";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    ### Agent Skills ###
     superpowers = {
       url = "github:obra/superpowers";
       flake = false;
     };
 
-    flyline = {
-      url = "github:HalFrgrd/flyline";
-      inputs.nixpkgs.follows = "nixpkgs";
+    nixos-skill = {
+      url = "github:marceloeatworld/nixos-ai-skill";
+      flake = false;
+    };
+
+    vercel-skills = {
+      url = "github:vercel-labs/skills";
+      flake = false;
+    };
+
+    wshobson-agents = {
+      url = "github:wshobson/agents";
+      flake = false;
     };
 
     ### Gaming ###
