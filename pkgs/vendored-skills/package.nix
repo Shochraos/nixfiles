@@ -43,9 +43,9 @@ let
     "git add"
     "git commit"
     "git push"
-    "`(\\.\\./)?references/"
-    "\\]\\(\\.\\./[a-z0-9-]+/SKILL\\.md\\)"
-    "references/release-process\\.md"
+    "(^|[^/])references/"
+    "\\]\\(\\.\\./"
+    "release-process"
   ];
 
   bannedEverywhere = [
