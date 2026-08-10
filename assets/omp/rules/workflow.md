@@ -15,6 +15,10 @@ The chain runs brainstorming -> writing-plans and stops there.
 - Never write a commit step into a plan.
 - A git worktree is opt-in. Do not create one unless asked.
 - Execute with the native `task` and `todo` tools.
+- A new dependency means the flake is updated in the same change: tooling into
+  `devShells.default`, a runtime input into `packages.default`. Never install
+  one ad hoc or globally. Language-level libraries the project already tracks
+  in its own manifest or lockfile stay there.
 - Verification means the verification gate this project already defines, run
   and read before any claim of success, not a generic test command.
 - Finishing means: formatter, project checks, then bring `.omp/AGENTS.md` and
