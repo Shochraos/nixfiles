@@ -15,42 +15,115 @@ let
     "references/release-process.md"
   ];
 
-  excisions = {
-    "nixos/SKILL.md" = ''
-      ### Release Process
+  rewrites = {
+    "nixos/SKILL.md" = [
+      {
+        from = ''
+          ### Release Process
 
-      | Topic | File |
-      |-------|------|
-      | NixOS release process, roles, branch-off, beta, freeze | **`references/release-process.md`** |
+          | Topic | File |
+          |-------|------|
+          | NixOS release process, roles, branch-off, beta, freeze | **`references/release-process.md`** |
 
-    '';
+        '';
+        to = "";
+      }
+    ];
 
-    "uv-package-manager/references/advanced-patterns.md" = ''
+    "uv-package-manager/references/advanced-patterns.md" = [
+      {
+        from = ''
 
-      # Commit updated files
-      git add pyproject.toml uv.lock
-      git commit -m "Add new-package dependency"
-    '';
+          # Commit updated files
+          git add pyproject.toml uv.lock
+          git commit -m "Add new-package dependency"'';
+        to = "";
+      }
+    ];
+
+    "python-design-patterns/SKILL.md" = [
+      {
+        from = "[python-project-setup](../python-project-setup/SKILL.md)";
+        to = "[python-project-structure](../python-project-structure/SKILL.md)";
+      }
+    ];
+
+    "find-skills/SKILL.md" = [
+      {
+        from = ''
+          - `npx skills add <package>` - Install a skill from GitHub or other sources
+          - `npx skills update` - Update all installed skills
+        '';
+        to = "";
+      }
+      {
+        from = "3. The install command they can run";
+        to = "3. The source repository and the skill's path inside it";
+      }
+      {
+        from = ''
+          To install it:
+          npx skills add vercel-labs/agent-skills@react-best-practices
+        '';
+        to = ''
+          Source: vercel-labs/agent-skills, skill path react-best-practices
+        '';
+      }
+      {
+        from = ''
+          ### Step 6: Offer to Install
+
+          If the user wants to proceed, you can install the skill for them:
+
+          ```bash
+          npx skills add <owner/repo@skill> -g -y
+          ```
+
+          The `-g` flag installs globally (user-level) and `-y` skips confirmation prompts.'';
+        to = ''
+          ### Step 6: Hand the Source Over, Do Not Install
+
+          Skills here are vendored declaratively. The `skills` CLI installer writes into a
+          directory nothing reads and leaves unmanaged state behind, so never invoke it.
+          Report the source repository and the skill's path inside it, and offer to add that
+          repository as an input so the skill is built into the skills package.'';
+      }
+      {
+        from = "3. Suggest the user could create their own skill with `npx skills init`";
+        to = "3. Offer to capture the workflow as a managed skill instead";
+      }
+      {
+        from = ''
+          If this is something you do often, you could create your own skill:
+          npx skills init my-xyz-skill'';
+        to = "If this is something you do often, I can capture it as a managed skill.";
+      }
+    ];
   };
 
-  applyExcisions = lib.concatLines (
+  applyRewrites = lib.concatLines (
     lib.mapAttrsToList (
-      file: text: "substituteInPlace $out/${file} --replace-fail ${lib.escapeShellArg text} ${lib.escapeShellArg ""}"
-    ) excisions
+      file: subs:
+      lib.concatStringsSep " \\\n" (
+        [ "substituteInPlace $out/${file}" ]
+        ++ map (s: "  --replace-fail ${lib.escapeShellArg s.from} ${lib.escapeShellArg s.to}") subs
+      )
+    ) rewrites
   );
-
-  bannedInSkillFiles = [
-    "git add"
-    "git commit"
-    "git push"
-    "(^|[^/])references/"
-    "\\]\\(\\.\\./"
-    "release-process"
-  ];
 
   bannedEverywhere = [
     "git commit"
     "git push"
+    "npx skills add"
+    "npx skills init"
+    "npx skills update"
+    "(^|[^/])references/"
+  ];
+
+  bannedInSkillFiles = [
+    "git add"
+    "\\]\\(\\.\\./"
+    "release-process"
   ];
 
   gate = include: patterns: ''
@@ -65,7 +138,7 @@ in
 runCommandLocal "vendored-skills"
   {
     meta = {
-      description = "Third-party agent skills vendored verbatim, with sibling paths normalised to skill:// URLs";
+      description = "Third-party agent skills, with sibling paths normalised to skill:// URLs and imperative install steps removed";
       platforms = lib.platforms.all;
     };
   }
@@ -79,17 +152,27 @@ runCommandLocal "vendored-skills"
     chmod -R u+w $out
 
     rm -rf ${lib.concatMapStringsSep " " (f: "$out/nixos/${f}") droppedNixosFiles}
-    ${applyExcisions}
+    ${applyRewrites}
 
     for dir in $out/*/; do
       name=$(basename "$dir")
       [ -f "$dir/SKILL.md" ] || continue
-      sed -i -E \
-        -e "s#\`(\.\./)?references/#\`skill://$name/references/#g" \
-        -e 's#\]\(\.\./([a-z0-9-]+)/SKILL\.md\)#](skill://\1)#g' \
-        "$dir/SKILL.md"
+      find "$dir" -name '*.md' -exec sed -i -E \
+        -e "s#\]\(\.\./([A-Za-z0-9_-]+)/SKILL\.md\)#](skill://\1)#g" \
+        -e "s#(\.\./)+references/#skill://$name/references/#g" \
+        -e "s#(^|[^/])references/#\1skill://$name/references/#g" \
+        {} +
     done
 
-    ${gate "SKILL.md" bannedInSkillFiles}
     ${gate "*.md" bannedEverywhere}
+    ${gate "SKILL.md" bannedInSkillFiles}
+
+    unresolved=0
+    for target in $(grep -rhoE 'skill://[A-Za-z0-9_./-]+' --include='*.md' $out | sort -u); do
+      [ -e "$out/''${target#skill://}" ] && continue
+      echo "vendored-skills: '$target' resolves to nothing:" >&2
+      grep -rnF --include='*.md' -- "$target" $out >&2
+      unresolved=1
+    done
+    [ "$unresolved" -eq 0 ]
   ''
