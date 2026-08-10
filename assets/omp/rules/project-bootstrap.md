@@ -36,10 +36,27 @@ subdirectory.
   `~/.omp/agent/RULES.md` exists; never create that user-level file, it would
   shadow every project's `RULES.md`.
 
+## Flake
+
+Every new project also gets a `flake.nix` at the repository root providing both
+halves, not just one:
+
+- **`devShells.default`** — every tool the project is developed with:
+  interpreter or compiler, package manager, formatter, linter, test runner,
+  language server. Dev tooling lives here and nowhere else; never install it
+  globally or ad hoc.
+- **`packages.default`** — the project itself, so `nix build` works.
+
+Add an `.envrc` containing `use flake`, otherwise the devShell exists but
+nothing enters it.
+
+Flakes only see git-tracked files, so `git add -N` each new file before
+evaluating — an untracked `flake.nix` is invisible to `nix build`.
+
 ## Gitignore
 
-Add `.omp/` to `.gitignore`, creating the file if it does not exist. Do not
-commit the change; report it.
+Add `.omp/`, `.direnv/` and `result*` to `.gitignore`, creating the file if it
+does not exist. Do not commit the change; report it.
 
 ## Maintenance
 
