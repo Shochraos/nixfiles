@@ -10,7 +10,6 @@
   den.schema.user.classes = lib.mkDefault [ "homeManager" ];
 
   den.aspects.base.includes = with den.aspects; [
-    hostOptions
     boot
     secrets
     nix

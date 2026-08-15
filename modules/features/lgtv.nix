@@ -1,6 +1,7 @@
+{ config, ... }:
 let
   bscpylgtvOverlay = final: _prev: {
-    bscpylgtv = final.callPackage ../../pkgs/bscpylgtv/package.nix { };
+    bscpylgtv = final.callPackage config.packageSources.bscpylgtv { };
   };
 in
 {

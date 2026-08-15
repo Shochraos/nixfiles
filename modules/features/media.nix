@@ -1,3 +1,7 @@
+{ config, ... }:
+let
+  inherit (config) assets;
+in
 {
   den.aspects.media.provides.to-users.homeManager =
     { pkgs, ... }:
@@ -41,7 +45,7 @@
         ];
       };
 
-      xdg.configFile."jellyfin-mpv-shim/conf.json".source = ../../configs/jellyfin-mpv-shim/conf.json;
+      xdg.configFile."jellyfin-mpv-shim/conf.json".source = assets.jellyfinMpvShimConfig;
 
       xdg.configFile."mpv/scripts/auto-hdr.lua".text = ''
         local mp = require 'mp'

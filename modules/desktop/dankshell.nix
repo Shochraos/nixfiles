@@ -1,8 +1,8 @@
-{ inputs, ... }:
+{ inputs, config, ... }:
 let
   quickshellIpcReconnectOverlay = _final: prev: {
     quickshell = prev.quickshell.overrideAttrs (old: {
-      patches = (old.patches or [ ]) ++ [ ../../assets/patches/quickshell-hyprland-ipc-reconnect.patch ];
+      patches = (old.patches or [ ]) ++ [ config.assets.quickshellIpcReconnectPatch ];
     });
   };
 in
