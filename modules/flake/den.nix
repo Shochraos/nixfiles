@@ -71,6 +71,7 @@
     gamechat
     lgtv
     mp3tag
+    macros
   ];
 
   den.aspects.solas.includes = with den.aspects; [
