@@ -1,4 +1,7 @@
-{ lib, ... }:
+{ lib, config, ... }:
+let
+  inherit (config) assets;
+in
 {
   den.aspects.irc =
     { user, ... }:
@@ -23,7 +26,7 @@
           };
 
           host.matugen.templates.halloy = {
-            input_path = ../../assets/templates/halloy.toml;
+            input_path = assets.halloyTemplate;
             output_path = "~/.config/halloy/themes/matugen.toml";
           };
         };

@@ -1,4 +1,7 @@
-{ inputs, ... }:
+{ inputs, config, ... }:
+let
+  inherit (config) assets;
+in
 {
   den.aspects.secrets.nixos =
     { config, ... }:
@@ -6,7 +9,7 @@
       imports = [ inputs.sops-nix.nixosModules.sops ];
 
       sops = {
-        defaultSopsFile = ../../secrets/secrets.yaml;
+        defaultSopsFile = assets.sopsFile;
 
         age.sshKeyPaths = [ config.host.sshKey ];
 

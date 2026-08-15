@@ -1,6 +1,9 @@
+{ config, ... }:
 let
+  inherit (config) assets;
+
   ironyModManagerOverlay = final: _prev: {
-    irony-mod-manager = final.callPackage ../../../pkgs/irony-mod-manager/package.nix { };
+    irony-mod-manager = final.callPackage config.packageSources.ironyModManager { };
   };
 in
 {
@@ -28,7 +31,7 @@ in
             name = "SamRewritten";
             exec = "samrewritten %U";
             terminal = false;
-            icon = "${../../../assets/icons/samrewritten.png}";
+            icon = "${assets.samrewrittenIcon}";
           };
 
           ironymodmanager = {
@@ -36,7 +39,7 @@ in
             exec = "IronyModManager";
             terminal = false;
             startupNotify = false;
-            icon = "${../../../assets/icons/ironymodmanager.png}";
+            icon = "${assets.ironyModManagerIcon}";
           };
         };
       };

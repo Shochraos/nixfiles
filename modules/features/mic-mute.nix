@@ -1,4 +1,7 @@
-{ inputs, ... }:
+{ inputs, config, ... }:
+let
+  inherit (config) assets;
+in
 {
   den.aspects.mic-mute.provides.to-users.homeManager =
     { lib, pkgs, ... }:
@@ -11,7 +14,7 @@
           pkgs.gnugrep
           pkgs.wireplumber
         ];
-        text = builtins.readFile ../../assets/scripts/mic-mute.sh;
+        text = builtins.readFile assets.micMuteScript;
       };
     in
     {

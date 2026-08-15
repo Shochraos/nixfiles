@@ -1,4 +1,7 @@
-{ inputs, ... }:
+{ inputs, config, ... }:
+let
+  inherit (config) assets;
+in
 {
   den.aspects.apps =
     { host, ... }:
@@ -22,7 +25,7 @@
           programs.spicetify =
             let
               spicePkgs = inputs.spicetify-nix.legacyPackages.${pkgs.stdenv.hostPlatform.system};
-              matugenScheme = ../../configs/matugen/spicetify-${host.name}.json;
+              matugenScheme = assets.matugenSchemes + "/spicetify-${host.name}.json";
             in
             {
               enable = true;

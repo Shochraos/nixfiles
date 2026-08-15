@@ -1,4 +1,7 @@
-{ inputs, ... }:
+{ inputs, config, ... }:
+let
+  inherit (config) assets;
+in
 {
   den.aspects.hyprland =
     { host, ... }:
@@ -112,17 +115,17 @@
             config = { };
             templates = {
               spotify = {
-                input_path = ../../../assets/templates/spicetify.json.j2;
+                input_path = assets.spicetifyTemplate;
                 output_path = "~/.local/state/matugen/spicetify-${host.name}.json";
               };
 
               vesktop = {
-                input_path = ../../../assets/templates/discord.css;
+                input_path = assets.discordTemplate;
                 output_path = "~/.config/Vencord/themes/matugen.css";
               };
 
               steam = {
-                input_path = ../../../assets/templates/steam.css;
+                input_path = assets.steamTemplate;
                 output_path = "~/.steam/steam/millennium/themes/simply-dark/colors.css";
               };
             }

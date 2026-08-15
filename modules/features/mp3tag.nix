@@ -1,7 +1,9 @@
-{ den, ... }:
+{ den, config, ... }:
 let
+  inherit (config) assets;
+
   mp3tagOverlay = final: _prev: {
-    mp3tag = final.callPackage ../../pkgs/mp3tag/package.nix { };
+    mp3tag = final.callPackage config.packageSources.mp3tag { };
   };
 in
 {
@@ -21,7 +23,7 @@ in
             exec = "mp3tag";
             terminal = false;
             startupNotify = false;
-            icon = "${../../assets/icons/mp3tag.png}";
+            icon = "${assets.mp3tagIcon}";
           };
         };
       };

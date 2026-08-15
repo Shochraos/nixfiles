@@ -1,8 +1,12 @@
 {
   inputs,
   lib,
+  config,
   ...
 }:
+let
+  inherit (config) assets packageSources;
+in
 {
   den.aspects.ai = {
     __functor =
@@ -48,11 +52,11 @@
           '';
         });
 
-        superpowers-skills = pkgs.callPackage ../../pkgs/superpowers-skills/package.nix {
+        superpowers-skills = pkgs.callPackage packageSources.superpowersSkills {
           src = inputs.superpowers;
         };
 
-        vendored-skills = pkgs.callPackage ../../pkgs/vendored-skills/package.nix {
+        vendored-skills = pkgs.callPackage packageSources.vendoredSkills {
           inherit (inputs) nixos-skill vercel-skills wshobson-agents;
         };
 
@@ -81,7 +85,7 @@
 
         overlayPath = "${config.home.homeDirectory}/.omp/agent/nix-config.yml";
 
-        rulesDir = ../../assets/omp/rules;
+        rulesDir = assets.ompRules;
 
         ruleFiles =
           lib.mapAttrs'

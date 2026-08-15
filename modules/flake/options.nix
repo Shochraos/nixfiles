@@ -1,4 +1,4 @@
-{ lib, ... }:
+{ den, lib, ... }:
 let
   inherit (lib) mkOption types;
   openAttrs = types.attrsOf types.anything;
@@ -6,6 +6,8 @@ let
   attrsetTable = types.attrsOf openAttrs;
 in
 {
+  den.default.includes = [ den.aspects.hostOptions ];
+
   den.aspects.hostOptions =
     { host, user, ... }:
     {
