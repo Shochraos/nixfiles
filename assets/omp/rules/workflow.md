@@ -4,9 +4,30 @@ alwaysApply: true
 
 # Design workflow
 
-Before a new subsystem, an interface change, or work spanning more than one
-module: `recall` first, then read the project's own record of prior decisions,
-then invoke `skill://brainstorming`.
+Run this gate on EVERY task, before the first edit or write, and state the
+verdict in one line: `Design gate: brainstorming <needed|skipped> — <reason>`.
+Not running it is itself a violation; a wrong verdict is recoverable, an
+unstated one is not.
+
+Needed when any of these holds:
+
+- a new file, module, aspect, dependency, or subsystem
+- an interface, option, or schema change
+- a behaviour change, or work touching more than one module
+- the request admits two reasonable readings
+- you are about to decide anything the user did not specify: naming, scope,
+  defaults, which host or target, the meaning of an ambiguous phrase
+
+Skipped only for read-only investigation, a mechanical single-file fix with no
+design choice, continuing an already-approved plan, or on the user's say-so.
+
+Judge scope, never difficulty. "Small", "two files" and "clear request" are not
+exemptions — `skill://brainstorming` carries a HARD-GATE that holds regardless
+of perceived simplicity, so if you are weighing how hard the work is you are
+answering the wrong question.
+
+When needed: `recall` first, then read the project's own record of prior
+decisions, then invoke `skill://brainstorming`.
 
 The chain runs brainstorming -> writing-plans and stops there.
 
