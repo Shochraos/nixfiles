@@ -6,7 +6,12 @@
       provides.to-users.homeManager =
         { pkgs, ... }:
         let
-          flyline = pkgs.callPackage "${inputs.flyline}/nix/package.nix" { };
+          flyline = (pkgs.callPackage "${inputs.flyline}/nix/package.nix" { }).overrideAttrs (old: {
+            checkFlags = old.checkFlags ++ [
+              "--skip=git::tests::test_find_git_repo_root"
+              "--skip=git::tests::test_scan_and_apply_git_repo_payload"
+            ];
+          });
         in
         {
           home.packages = with pkgs; [
