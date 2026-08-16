@@ -19,8 +19,14 @@
           host.hyprland.keybinds = [
             {
               _args = [
-                "CTRL + ALT + R"
-                (lua "hl.dsp.exec_cmd('${config.host.flakeDir}/assets/scripts/macro-w-escape.sh')")
+                "CTRL + ALT + H"
+                (lua "hl.dsp.exec_cmd('${config.host.flakeDir}/assets/scripts/macro-w-escape-14min.sh')")
+              ];
+            }
+            {
+              _args = [
+                "CTRL + ALT + P"
+                (lua "hl.dsp.exec_cmd('${config.host.flakeDir}/assets/scripts/macro-key-sequence.sh')")
               ];
             }
           ];
