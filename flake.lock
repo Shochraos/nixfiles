@@ -271,11 +271,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1786903493,
-        "narHash": "sha256-U7D1EtgTzYxv+GpQAgHywWKtbZWyL3sItI5hUfFLpEc=",
+        "lastModified": 1786911109,
+        "narHash": "sha256-tT/ycMyOlPELHQ8IPY0qLtuqywwyGHaOngPmwyJaIQg=",
         "owner": "Shochraos",
         "repo": "game-chat-mix",
-        "rev": "795070bdfa2435dbef225655c6c1458b6f0b4012",
+        "rev": "a69b44134acddf49a6ed698c82e1658f3812ae96",
         "type": "github"
       },
       "original": {
