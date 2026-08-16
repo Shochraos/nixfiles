@@ -15,6 +15,7 @@
             "flakes"
           ];
           settings.download-buffer-size = 524288000;
+          settings.sync-before-registering = true;
           optimise.automatic = true;
 
           channel.enable = false;
