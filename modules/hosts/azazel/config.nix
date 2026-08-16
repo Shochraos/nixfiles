@@ -245,7 +245,7 @@
 
       xdg.autostart = {
         entries = [
-          "${(pkgs.discord.override { withVencord = true; }).desktopItem}/share/applications/discord.desktop"
+          "${pkgs.discord.override { withVencord = true; }}/share/applications/discord.desktop"
           "${config.programs.spicetify.spicedSpotify}/share/applications/spotify.desktop"
         ];
       };

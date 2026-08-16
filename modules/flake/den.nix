@@ -34,6 +34,7 @@
   den.aspects.apps.includes = [
     (den.batteries.unfree [
       "discord"
+      "discord-unwrapped"
       "spotify"
     ])
   ];
