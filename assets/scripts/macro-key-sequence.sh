@@ -88,12 +88,12 @@ while true; do
   slow "$KEY_RIGHT"
   slow "$KEY_DOWN"
   slow "$KEY_ENTER"
-  sleep 5
+  sleep 8
   slow "$KEY_ENTER"
   slow "$KEY_ENTER"
   slow "$KEY_ENTER"
   slow "$KEY_ENTER"
-  sleep 5
+  sleep 8
   slow "$KEY_ESC"
   slow "$KEY_D"
   slow "$KEY_DOWN"
