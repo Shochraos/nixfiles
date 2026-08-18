@@ -35,19 +35,14 @@ in
       { config, pkgs, ... }:
       let
         oh-my-pi = inputs.omp-nix.packages.${pkgs.stdenv.hostPlatform.system}.default.overrideAttrs (old: {
-          nativeBuildInputs = (old.nativeBuildInputs or [ ]) ++ [ pkgs.patchelf ];
-          dontFixup = true;
           postInstall = (old.postInstall or "") + ''
-            unwrapped=$(sed -n "s/^export BUN_SELF_EXE='\(.*\)'$/\1/p" $out/bin/omp)
-            test -x "$unwrapped" || {
-              echo "oh-my-pi override: could not locate the unwrapped binary in the omp-nix wrapper" >&2
+            if head -c 2 $out/bin/omp | grep -q '#!'; then
+              echo "oh-my-pi override: omp-nix ships a wrapper again, so this override double-wraps it" >&2
               exit 1
-            }
-            rm $out/bin/omp
-            install -Dm755 "$unwrapped" $out/libexec/omp
-            patchelf --set-interpreter ${pkgs.stdenv.cc.bintools.dynamicLinker} $out/libexec/omp
+            fi
+            mkdir -p $out/libexec
+            mv $out/bin/omp $out/libexec/omp
             makeWrapper $out/libexec/omp $out/bin/omp \
-              --set BUN_SELF_EXE $out/libexec/omp \
               --prefix LD_LIBRARY_PATH : ${lib.makeLibraryPath [ pkgs.stdenv.cc.cc.lib ]}
           '';
         });

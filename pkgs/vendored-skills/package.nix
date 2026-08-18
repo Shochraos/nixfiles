@@ -41,13 +41,6 @@ let
       }
     ];
 
-    "python-design-patterns/SKILL.md" = [
-      {
-        from = "[python-project-setup](../python-project-setup/SKILL.md)";
-        to = "[python-project-structure](../python-project-structure/SKILL.md)";
-      }
-    ];
-
     "find-skills/SKILL.md" = [
       {
         from = ''
