@@ -62,6 +62,65 @@ in
               description = "Physical outputs of this host, keyed by Hyprland output name. Consumed by dankshell (which derives the DMS output settings) and by the hdr aspect (which drives the single entry with `hdr = true`).";
             };
 
+            audio = {
+              equalizers = mkOption {
+                default = { };
+                type = types.attrsOf (
+                  types.submodule {
+                    options = {
+                      target = mkOption {
+                        type = types.attrsOf types.str;
+                        description = "WirePlumber smart-filter match rules. Every key must equal the property of the same name on the target node, so `api.alsa.card.name` survives an ALSA profile change that would rename `node.name`.";
+                      };
+                      preamp = mkOption {
+                        type = types.number;
+                        default = 0.0;
+                        description = "Broadband gain in dB applied ahead of the bands, sized against the largest positive band gain so boosts cannot clip. Emitted as a `bq_lowshelf` above Nyquist, which the biquad collapses to a constant gain.";
+                      };
+                      bands = mkOption {
+                        type = types.listOf (
+                          types.submodule {
+                            options = {
+                              type = mkOption {
+                                type = types.enum [
+                                  "bq_lowshelf"
+                                  "bq_peaking"
+                                  "bq_highshelf"
+                                  "bq_lowpass"
+                                  "bq_highpass"
+                                  "bq_bandpass"
+                                  "bq_notch"
+                                  "bq_allpass"
+                                ];
+                                description = "Builtin biquad label for this band.";
+                              };
+                              freq = mkOption {
+                                type = types.number;
+                                description = "Centre or corner frequency in Hz.";
+                              };
+                              gain = mkOption {
+                                type = types.number;
+                                default = 0.0;
+                                description = "Band gain in dB.";
+                              };
+                              q = mkOption {
+                                type = types.number;
+                                default = 0.707;
+                                description = "Band Q.";
+                              };
+                            };
+                          }
+                        );
+                        default = [ ];
+                        description = "Bands applied in series, each emitted as its own biquad node named `eq_band_<n>` so its Freq, Q and Gain stay live-settable with `pw-cli set-param <capture node> Props`.";
+                      };
+                    };
+                  }
+                );
+                description = "Playback equalizers for this host, keyed by filter name. Each entry becomes a PipeWire filter-chain that WirePlumber inserts in front of the matched device, so every stream reaching that device is equalised without the filter ever becoming a default sink.";
+              };
+            };
+
             hyprland = {
               input = mkOption {
                 type = openAttrs;
