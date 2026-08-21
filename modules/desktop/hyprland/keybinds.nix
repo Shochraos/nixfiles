@@ -116,13 +116,37 @@
           {
             _args = [
               "SUPER + CTRL + SHIFT + left"
-              (lua "hl.dsp.window.move({ workspace = '-1' })")
+              (lua "hl.dsp.window.move({ workspace = 'm-1' })")
             ];
           }
           {
             _args = [
               "SUPER + CTRL + SHIFT + right"
-              (lua "hl.dsp.window.move({ workspace = '+1' })")
+              (lua "hl.dsp.window.move({ workspace = 'm+1' })")
+            ];
+          }
+          {
+            _args = [
+              "SUPER + ALT + left"
+              (lua "hl.dsp.focus({ monitor = '-1' })")
+            ];
+          }
+          {
+            _args = [
+              "SUPER + ALT + right"
+              (lua "hl.dsp.focus({ monitor = '+1' })")
+            ];
+          }
+          {
+            _args = [
+              "SUPER + ALT + SHIFT + left"
+              (lua "hl.dsp.window.move({ monitor = '-1' })")
+            ];
+          }
+          {
+            _args = [
+              "SUPER + ALT + SHIFT + right"
+              (lua "hl.dsp.window.move({ monitor = '+1' })")
             ];
           }
           {

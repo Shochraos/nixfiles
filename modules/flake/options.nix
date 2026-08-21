@@ -31,6 +31,11 @@ in
               type = types.attrsOf (
                 types.submodule {
                   options = {
+                    primary = mkOption {
+                      type = types.bool;
+                      default = false;
+                      description = "Output is this host's primary display. At most one entry may set it. Consumed by dankshell, which pins the bar to it; with no primary the bar spans every output.";
+                    };
                     hdr = mkOption {
                       type = types.bool;
                       default = false;
@@ -56,10 +61,30 @@ in
                       default = null;
                       description = "Colour depth per channel. Null leaves the compositor default.";
                     };
+                    mode = mkOption {
+                      type = types.nullOr types.str;
+                      default = null;
+                      description = "Resolution and refresh rate as Hyprland spells it, e.g. `3840x2160@143.988`. Null leaves the field to whatever DMS last wrote.";
+                    };
+                    position = mkOption {
+                      type = types.nullOr types.str;
+                      default = null;
+                      description = "Logical position of this output's top-left corner, e.g. `220x1798`. Null leaves the field to whatever DMS last wrote.";
+                    };
+                    scale = mkOption {
+                      type = types.nullOr types.str;
+                      default = null;
+                      description = "Fractional scale as a string, e.g. `0.80078125`. Hyprland snaps a scale that does not divide the mode into whole logical pixels, so use the value it reports rather than the one you asked for. Null leaves the field to whatever DMS last wrote.";
+                    };
+                    workspaces = mkOption {
+                      type = types.listOf types.ints.positive;
+                      default = [ ];
+                      description = "Workspaces that live on this output. Each becomes a persistent `workspace_rule` bound to it, which is what makes the monitor-relative `m+1`/`m-1` cycle wrap within this output alone. The first entry is that output's default workspace.";
+                    };
                   };
                 }
               );
-              description = "Physical outputs of this host, keyed by Hyprland output name. Consumed by dankshell (which derives the DMS output settings) and by the hdr aspect (which drives the single entry with `hdr = true`).";
+              description = "Physical outputs of this host, keyed by Hyprland output name. Consumed by dankshell (which derives the DMS output settings), by the hdr aspect (which drives the single entry with `hdr = true`) and by the hyprland aspect (which pins the geometry Hyprland cannot be told through DMS, and binds each output's workspaces to it).";
             };
 
             audio = {
