@@ -16,28 +16,18 @@
         input = {
           accel_profile = "flat";
         };
-        workspaceRules = [
-          {
-            workspace = "4";
-            persistent = true;
-          }
-          {
-            workspace = "5";
-            persistent = true;
-          }
-        ];
         windowRules = [
           {
             match = {
               class = "^(zen-beta)$";
             };
-            workspace = "2 silent";
+            workspace = "4 silent";
           }
           {
             match = {
               class = "^(dev.zed.Zed)$";
             };
-            workspace = "3 silent";
+            workspace = "2 silent";
           }
           {
             match = {
@@ -69,6 +59,7 @@
               class = "^(steam_app_\\d+)$";
             };
             float = true;
+            workspace = "1";
           }
           {
             match = {
@@ -110,10 +101,29 @@
       };
 
       host.outputs."HDMI-A-1" = {
+        primary = true;
         hdr = true;
         wideColor = true;
         vrrFullscreenOnly = true;
         bitdepth = 10;
+        mode = "3840x2160@143.988";
+        scale = "1";
+        workspaces = [
+          1
+          2
+          3
+        ];
+      };
+
+      host.outputs."DP-1" = {
+        vrrFullscreenOnly = true;
+        bitdepth = 10;
+        mode = "3440x1440@144.000";
+        scale = "1";
+        workspaces = [
+          4
+          5
+        ];
       };
 
       host.audio.equalizers.dx3 = {

@@ -54,6 +54,17 @@ in
           ...
         }:
         let
+          primaryOutputs = builtins.attrNames (
+            lib.filterAttrs (_: output: output.primary) osConfig.host.outputs
+          );
+          barScreens =
+            if builtins.length primaryOutputs > 1 then
+              throw "dankshell: at most one host.outputs entry may set primary = true, got ${toString (builtins.length primaryOutputs)}"
+            else if primaryOutputs == [ ] then
+              [ "all" ]
+            else
+              primaryOutputs;
+
           barDefaults = {
             id = "default";
             name = "Main Bar";
@@ -69,7 +80,7 @@ in
             popupGapsAuto = false;
             popupGapsManual = 6;
 
-            screenPreferences = [ "all" ];
+            screenPreferences = barScreens;
 
             borderEnabled = false;
             widgetOutlineEnabled = true;
@@ -148,6 +159,7 @@ in
               soundsEnabled = false;
               audioVisualizerEnabled = false;
 
+              notificationFocusedMonitor = true;
               notificationPopupPosition = 3;
               notificationHistoryMaxCount = 20;
               notificationHistoryMaxAgeDays = 1;

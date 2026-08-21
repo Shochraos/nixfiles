@@ -183,7 +183,14 @@
         ];
       };
 
-      host.outputs."eDP-1".bitdepth = 10;
+      host.outputs."eDP-1" = {
+        bitdepth = 10;
+        workspaces = [
+          1
+          2
+          3
+        ];
+      };
 
       host.dms = {
         powerMenuActions = [ "suspend" ];
