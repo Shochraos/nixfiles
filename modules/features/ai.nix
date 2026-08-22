@@ -1,4 +1,5 @@
 {
+  den,
   inputs,
   lib,
   config,
@@ -220,62 +221,61 @@ in
         };
       };
 
+    provides.local.includes = [
+      (den.batteries.unfree [
+        "cuda_cccl"
+        "cuda_compat"
+        "cuda_cudart"
+        "cuda_nvcc"
+        "cuda_nvrtc"
+        "libcublas"
+      ])
+    ];
+
     provides.local.provides.to-users.homeManager =
       { lib, pkgs, ... }:
       let
         llama-cpp = pkgs.llama-cpp.override { cudaSupport = true; };
 
         qwenModel = pkgs.fetchurl {
-          url = "https://huggingface.co/unsloth/Qwen3.6-35B-A3B-GGUF/resolve/main/Qwen3.6-35B-A3B-UD-Q5_K_XL.gguf";
-          hash = lib.fakeHash;
+          url = "https://huggingface.co/unsloth/Qwen3.8-27B-GGUF/resolve/main/Qwen3.8-27B-UD-Q5_K_XL.gguf";
+          hash = "sha256-hgEZPT1XYMN/uM4bQ6/rxp31+yTh+8WlR8MuIgAwUnY=";
         };
+
+        reasoningTokens = 65536;
+        responseTokens = 32768;
+
+        llamaServerArgs = [
+          "--model ${qwenModel}"
+          "--alias qwen3.8-27b"
+          "--port 8080"
+          "--jinja"
+          "-ctk q8_0"
+          "-ctv q8_0"
+          "-c 262144"
+          "-n ${toString (reasoningTokens + responseTokens)}"
+          "--reasoning-budget ${toString reasoningTokens}"
+          "--temp 1.0"
+          "--top-p 0.95"
+          "--top-k 20"
+          "--min-p 0.0"
+          "--presence-penalty 0.0"
+          "--repeat-penalty 1.0"
+        ];
       in
       {
         home.packages = [ llama-cpp ];
 
-        systemd.user.services = {
-          llama-server = {
-            Unit = {
-              Description = "LLaMA.cpp Inference Server";
-              After = [ "network-online.target" ];
-              PartOf = [ "llama-stack.target" ];
-            };
-            Service = {
-              Type = "simple";
-              ExecStart = "${lib.getExe' llama-cpp "llama-server"} --model ${qwenModel} --port 8081 --jinja -ctk q8_0 -ctv q8_0 -c 262144 -n 32768 --temp 0.6 --top-p 0.95 --top-k 20 --presence-penalty 0.0 --min-p 0.0";
-              Restart = "on-failure";
-              RestartSec = 5;
-            };
-          };
-
-          openwebui = {
-            Unit = {
-              Description = "Open WebUI";
-              After = [ "network-online.target" ];
-              PartOf = [ "llama-stack.target" ];
-            };
-            Service = {
-              Type = "simple";
-              StateDirectory = "open-webui";
-              Environment = "DATA_DIR=%S/open-webui";
-              ExecStart = "${lib.getExe pkgs.open-webui} serve";
-              Restart = "on-failure";
-              RestartSec = 5;
-            };
-          };
-        };
-
-        systemd.user.targets.llama-stack = {
+        systemd.user.services.llama-server = {
           Unit = {
-            Description = "LLaMA Stack";
-            Requires = [
-              "llama-server.service"
-              "openwebui.service"
-            ];
-            After = [
-              "llama-server.service"
-              "openwebui.service"
-            ];
+            Description = "LLaMA.cpp Inference Server";
+            After = [ "network-online.target" ];
+          };
+          Service = {
+            Type = "simple";
+            ExecStart = "${lib.getExe' llama-cpp "llama-server"} ${lib.concatStringsSep " " llamaServerArgs}";
+            Restart = "on-failure";
+            RestartSec = 5;
           };
         };
       };
