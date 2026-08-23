@@ -131,26 +131,30 @@
           "api.alsa.card.name" = "DX3 Pro+";
         };
         preamp = -5.0;
-        bands = [
-          {
-            type = "bq_lowshelf";
-            freq = 105.0;
-            gain = 4.3;
-            q = 0.7;
-          }
-          {
-            type = "bq_peaking";
-            freq = 89.0;
-            gain = -2.6;
-            q = 0.82;
-          }
-          {
-            type = "bq_highshelf";
-            freq = 10000.0;
-            gain = -4.5;
-            q = 0.7;
-          }
-        ];
+        default = "arya-organic";
+        presets = {
+          flat.bands = [ ];
+          arya-organic.bands = [
+            {
+              type = "bq_lowshelf";
+              freq = 105.0;
+              gain = 4.3;
+              q = 0.7;
+            }
+            {
+              type = "bq_peaking";
+              freq = 89.0;
+              gain = -2.6;
+              q = 0.82;
+            }
+            {
+              type = "bq_highshelf";
+              freq = 10000.0;
+              gain = -4.5;
+              q = 0.7;
+            }
+          ];
+        };
       };
 
       host.dms = {
