@@ -100,49 +100,63 @@ in
                       preamp = mkOption {
                         type = types.number;
                         default = 0.0;
-                        description = "Broadband gain in dB applied ahead of the bands, sized against the largest positive band gain so boosts cannot clip. Emitted as a `bq_lowshelf` above Nyquist, which the biquad collapses to a constant gain.";
+                        description = "Broadband gain in dB applied ahead of the bands of every preset, sized against the largest positive band gain so boosts cannot clip. Emitted as a `bq_lowshelf` above Nyquist, which the biquad collapses to a constant gain.";
                       };
-                      bands = mkOption {
-                        type = types.listOf (
+                      default = mkOption {
+                        type = types.str;
+                        description = "Preset loaded when nothing has been selected yet, or when the recorded selection names a preset that no longer exists. Must be a key of `presets`.";
+                      };
+                      presets = mkOption {
+                        type = types.attrsOf (
                           types.submodule {
                             options = {
-                              type = mkOption {
-                                type = types.enum [
-                                  "bq_lowshelf"
-                                  "bq_peaking"
-                                  "bq_highshelf"
-                                  "bq_lowpass"
-                                  "bq_highpass"
-                                  "bq_bandpass"
-                                  "bq_notch"
-                                  "bq_allpass"
-                                ];
-                                description = "Builtin biquad label for this band.";
-                              };
-                              freq = mkOption {
-                                type = types.number;
-                                description = "Centre or corner frequency in Hz.";
-                              };
-                              gain = mkOption {
-                                type = types.number;
-                                default = 0.0;
-                                description = "Band gain in dB.";
-                              };
-                              q = mkOption {
-                                type = types.number;
-                                default = 0.707;
-                                description = "Band Q.";
+                              bands = mkOption {
+                                type = types.listOf (
+                                  types.submodule {
+                                    options = {
+                                      type = mkOption {
+                                        type = types.enum [
+                                          "bq_lowshelf"
+                                          "bq_peaking"
+                                          "bq_highshelf"
+                                          "bq_lowpass"
+                                          "bq_highpass"
+                                          "bq_bandpass"
+                                          "bq_notch"
+                                          "bq_allpass"
+                                        ];
+                                        description = "Builtin biquad label for this band.";
+                                      };
+                                      freq = mkOption {
+                                        type = types.number;
+                                        description = "Centre or corner frequency in Hz.";
+                                      };
+                                      gain = mkOption {
+                                        type = types.number;
+                                        default = 0.0;
+                                        description = "Band gain in dB.";
+                                      };
+                                      q = mkOption {
+                                        type = types.number;
+                                        default = 0.707;
+                                        description = "Band Q.";
+                                      };
+                                    };
+                                  }
+                                );
+                                default = [ ];
+                                description = "Bands applied in series, each emitted as its own biquad node named `eq_band_<n>` so its Freq, Q and Gain stay live-settable with `pw-cli set-param <capture node> Props`.";
                               };
                             };
                           }
                         );
-                        default = [ ];
-                        description = "Bands applied in series, each emitted as its own biquad node named `eq_band_<n>` so its Freq, Q and Gain stay live-settable with `pw-cli set-param <capture node> Props`.";
+                        default = { };
+                        description = "Selectable band sets, keyed by preset name. Exactly one preset is loaded at a time, as its own standalone filter-chain process, so presets may differ freely in band count and biquad type — neither is reachable on a running graph, since a band's type is its node label and only control ports appear in `Props`. `eq` switches between them; `off` is reserved and means no filter at all.";
                       };
                     };
                   }
                 );
-                description = "Playback equalizers for this host, keyed by filter name. Each entry becomes a PipeWire filter-chain that WirePlumber inserts in front of the matched device, so every stream reaching that device is equalised without the filter ever becoming a default sink.";
+                description = "Playback equalizers for this host, keyed by filter name. Each becomes a `pipewire-eq-<name>` user service running the selected preset as a standalone filter-chain that WirePlumber inserts in front of the matched device, so every stream reaching that device is equalised without the filter ever becoming a default sink. Node names carry the filter name and not the preset name, so a switch is invisible to anything reading the graph.";
               };
             };
 
