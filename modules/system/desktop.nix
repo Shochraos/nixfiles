@@ -1,6 +1,6 @@
 {
   den.aspects.desktop.nixos = {
-    services.scx.extraArgs = [ "--performance" ];
+    services.scx.extraArgs = [ "--primary-domain=performance" ];
 
     systemd.targets = {
       "suspend".enable = false;
