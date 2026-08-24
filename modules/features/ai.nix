@@ -63,7 +63,7 @@ in
             tiny = "anthropic/claude-haiku-4-5:medium";
             smol = "anthropic/claude-haiku-4-5:medium";
           };
-          advisor.enabled = true;
+          advisor.enabled = false;
           advisor.syncBacklog = "1";
           autolearn.enabled = true;
           memory.backend = "mnemopi";
