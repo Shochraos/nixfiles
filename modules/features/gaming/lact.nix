@@ -14,6 +14,7 @@ let
     };
 
     gpus.${gpuId} = {
+      power_mizer_mode = "PreferMaximumPerformance";
       fan_control_enabled = true;
       fan_control_settings = {
         mode = "curve";
