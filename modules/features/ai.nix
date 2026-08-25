@@ -238,8 +238,8 @@ in
         llama-cpp = pkgs.llama-cpp.override { cudaSupport = true; };
 
         qwenModel = pkgs.fetchurl {
-          url = "https://huggingface.co/unsloth/Qwen3.8-27B-GGUF/resolve/main/Qwen3.8-27B-UD-Q5_K_XL.gguf";
-          hash = "sha256-hgEZPT1XYMN/uM4bQ6/rxp31+yTh+8WlR8MuIgAwUnY=";
+          url = "https://huggingface.co/unsloth/Qwen3.8-27B-GGUF/resolve/main/Qwen3.8-27B-UD-Q4_K_S.gguf";
+          hash = "sha256-dbycituihC5y8KtSAaqgcTPFAQtWYwXAkYf8vc02QBc=";
         };
 
         reasoningTokens = 65536;
@@ -250,11 +250,14 @@ in
           "--alias qwen3.8-27b"
           "--port 8080"
           "--jinja"
-          "-ctk q8_0"
-          "-ctv q8_0"
-          "-c 262144"
+          "-ctk q5_1"
+          "-ctv q5_1"
+          "-c 196608"
           "-n ${toString (reasoningTokens + responseTokens)}"
           "--reasoning-budget ${toString reasoningTokens}"
+          "--spec-type draft-mtp"
+          "-ctkd q5_1"
+          "-ctvd q5_1"
           "--temp 1.0"
           "--top-p 0.95"
           "--top-k 20"
