@@ -18,6 +18,24 @@
         gamechat_balance
       ];
 
+      services.pipewire.wireplumber.extraConfig."99-gamechat-no-volume-restore" = {
+        "stream.rules" = [
+          {
+            matches = [
+              { "node.name" = "discord_sink"; }
+              { "node.name" = "catchall_sink"; }
+            ];
+            actions.update-props."state.restore-props" = false;
+          }
+        ];
+      };
+
+      host.dms.plugins.gamechatMix = {
+        enable = true;
+        src = "${inputs.game-chat-mix}/dms";
+        settings.manageDaemon = false;
+      };
+
       host.hyprland.keybinds = [
         {
           _args = [
