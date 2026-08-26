@@ -205,6 +205,10 @@
                 id = "discordVoice";
                 enabled = true;
               }
+              {
+                id = "gamechatMix";
+                enabled = true;
+              }
             ];
 
             centerWidgets = [
