@@ -22,18 +22,24 @@
     };
 
   den.aspects.gaming.provides.to-users.homeManager =
-    { pkgs, ... }:
+    { lib, pkgs, ... }:
     let
       proton-cachyos-v3 =
         inputs.nix-proton-cachyos.packages.${pkgs.stdenv.hostPlatform.system}.proton-cachyos-v3;
       dw-proton = inputs.nix-dw-proton.packages.${pkgs.stdenv.hostPlatform.system}.dw-proton;
+      drsSettings = lib.concatStringsSep "," [
+        "ngx_dlss_sr_override=on"
+        "ngx_dlss_sr_override_render_preset_selection=render_preset_m"
+        "ngx_dlss_rr_override=on"
+        "ngx_dlss_rr_override_render_preset_selection=render_preset_f"
+      ];
     in
     {
       home.sessionVariables = {
         PROTON_ENABLE_WAYLAND = "1";
         PROTON_DLSS_UPGRADE = "1";
         PROTON_VKD3D_LOWLATENCY = "1";
-        DXVK_NVAPI_DRS_SETTINGS = "ngx_dlss_sr_override=on,ngx_dlss_sr_override_render_preset_selection=render_preset_l,ngx_dlss_rr_override=on,ngx_dlss_rr_override_render_preset_selection=render_preset_l";
+        DXVK_NVAPI_DRS_SETTINGS = drsSettings;
         VKD3D_CONFIG = "descriptor_heap";
         STEAM_EXTRA_COMPAT_TOOLS_PATHS = "${proton-cachyos-v3}/share/steam/compatibilitytools.d:${dw-proton}/share/steam/compatibilitytools.d";
       };
