@@ -271,11 +271,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1786911109,
-        "narHash": "sha256-tT/ycMyOlPELHQ8IPY0qLtuqywwyGHaOngPmwyJaIQg=",
+        "lastModified": 1787771414,
+        "narHash": "sha256-+5ZoBzcZ+EI7brcN9J359ONKtx5qeAXBTLkbKAUWJCg=",
         "owner": "Shochraos",
         "repo": "game-chat-mix",
-        "rev": "a69b44134acddf49a6ed698c82e1658f3812ae96",
+        "rev": "a0dd0c571dc235d28471478580078b81b4177911",
         "type": "github"
       },
       "original": {
@@ -711,11 +711,11 @@
         "tinted-zed": "tinted-zed"
       },
       "locked": {
-        "lastModified": 1787175104,
-        "narHash": "sha256-tzNjlb0loxeWlipvxSNAUUihloeTZoyGFhEen87yM9k=",
+        "lastModified": 1787770791,
+        "narHash": "sha256-rn3as/JqTa8mxD1VHO5OvDGFP2ObCu2A4a7eHIcPEXc=",
         "owner": "nix-community",
         "repo": "stylix",
-        "rev": "a9e5a76a1b75b137f266e4f445e1eaba82e9783e",
+        "rev": "4545e8aabd36ebcad769e87bb6ce575c1beb2e80",
         "type": "github"
       },
       "original": {
