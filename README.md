@@ -7,7 +7,20 @@ Two hosts are defined out of the box:
 - **Azazel** — desktop / gaming.
 - **Solas** — laptop.
 
-## Architecture: the dendritic pattern
+> **AI disclaimer:** Parts of this configuration and this README were written with AI assistance. Review anything you adopt before adding it to your own system.
+
+## Before you use
+
+> [!WARNING]
+> This repository is **not designed to be used as is**. It may break your system if you rebuild without adjusting it first.
+
+After cloning, you will need to:
+
+1. Replace the hardware configurations in `./modules/hosts/<host>/` with your own.
+2. Review and adjust all package selections and configurations to your liking.
+3. Update the user and host names referenced throughout the configuration.
+
+## Architecture
 
 The configuration is built on the **dendritic pattern**: every module is a [`flake-parts`](https://flake.parts) module, and the entire `./modules` tree is auto-imported via [`import-tree`](https://github.com/vic/import-tree) (see `flake.nix`). There is no central list of files to import — dropping a `.nix` file anywhere under `modules/` automatically includes it in the flake evaluation.
 
@@ -87,13 +100,6 @@ nix flake update                          # all
 nix flake lock --update-input nixpkgs     # one
 ```
 
-## Before you use
+## License
 
-> [!WARNING]
-> This repository is **not designed to be used as is**. It may break your system if you rebuild without adjusting it first.
-
-After cloning, you will need to:
-
-1. Replace the hardware configurations in `./modules/hosts/<host>/` with your own.
-2. Review and adjust all package selections and configurations to your liking.
-3. Update the user and host names referenced throughout the configuration.
+[MIT](LICENSE) © 2026 Shochraos. The license covers the code in this repository; everything under `./secrets/` and any personal data is excluded.
