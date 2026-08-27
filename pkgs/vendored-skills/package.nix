@@ -1,11 +1,17 @@
 {
   lib,
+  fetchurl,
   runCommandLocal,
   nixos-skill,
   vercel-skills,
   wshobson-agents,
 }:
 let
+  createReadmeSkill = fetchurl {
+    url = "https://raw.githubusercontent.com/github/awesome-copilot/634b92f887487fc61cddc2f61d77830e09e8f589/skills/create-readme/SKILL.md";
+    hash = "sha256-qT+RYb7zJOOhVQ/HnU8BtmCj+36txEVWd9ms5NopZaw=";
+  };
+
   droppedNixosFiles = [
     ".github"
     ".gitignore"
@@ -141,6 +147,7 @@ runCommandLocal "vendored-skills"
     cp -r ${nixos-skill} $out/nixos
     cp -r ${vercel-skills}/skills/find-skills $out/find-skills
     cp -r ${wshobson-agents}/plugins/python-development/skills/. $out/
+    install -Dm644 ${createReadmeSkill} $out/create-readme/SKILL.md
 
     chmod -R u+w $out
 

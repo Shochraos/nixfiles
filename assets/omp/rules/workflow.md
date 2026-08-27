@@ -44,10 +44,17 @@ The chain runs brainstorming -> writing-plans and stops there.
   and read before any claim of success, not a generic test command.
 - Finishing means: formatter, project checks, then bring `.omp/AGENTS.md` and
   `.omp/WATCHDOG.md` up to date in the same step as the memory write, then
-  report. Leave integration to the user.
+  refresh `README.md` with `skill://create-readme`, then report. Leave
+  integration to the user.
+- The README refresh runs after every completed coding workflow, not after
+  read-only investigation. `skill://create-readme` writes a README from
+  scratch, so treat the existing one as the baseline: keep hand-written
+  sections that are still accurate and rewrite only what this change made
+  stale. No `README.md` yet means create one.
 
 Skill handoffs are written `superpowers:<name>`; in omp the skill is `<name>`,
 so read `skill://<name>`.
 
 `skill://systematic-debugging` is a second entrypoint, for diagnosing a defect.
-It has no git steps; follow it as written.
+It has no git steps; follow it as written, then finish through the same
+Finishing bullet above, README included.
