@@ -58,10 +58,10 @@ in
 
         overlay = (pkgs.formats.yaml { }).generate "oh-my-pi-config.yml" {
           modelRoles = {
-            default = "anthropic/claude-opus-5:high";
-            advisor = "anthropic/claude-opus-4-8:high";
-            tiny = "anthropic/claude-haiku-4-5:medium";
-            smol = "anthropic/claude-haiku-4-5:medium";
+            default = "openrouter/z-ai/glm-5.3-flash:max";
+            advisor = "openrouter/moonshotai/kimi-k3:high";
+            tiny = "openrouter/z-ai/glm-5.3-flash:low";
+            smol = "openrouter/z-ai/glm-5.3-flash:low";
           };
           advisor.enabled = false;
           advisor.syncBacklog = "1";
