@@ -88,24 +88,9 @@
     };
 
     ### Agent Skills ###
-    superpowers = {
-      url = "github:obra/superpowers";
-      flake = false;
-    };
-
-    nixos-skill = {
-      url = "github:marceloeatworld/nixos-ai-skill";
-      flake = false;
-    };
-
-    vercel-skills = {
-      url = "github:vercel-labs/skills";
-      flake = false;
-    };
-
-    wshobson-agents = {
-      url = "github:wshobson/agents";
-      flake = false;
+    nix-skills = {
+      url = "github:Shochraos/nix-skills";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
 
     ### Gaming ###
