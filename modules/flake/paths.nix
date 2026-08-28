@@ -39,8 +39,6 @@ in
       bscpylgtv = ../../pkgs/bscpylgtv/package.nix;
       ironyModManager = ../../pkgs/irony-mod-manager/package.nix;
       mp3tag = ../../pkgs/mp3tag/package.nix;
-      superpowersSkills = ../../pkgs/superpowers-skills/package.nix;
-      vendoredSkills = ../../pkgs/vendored-skills/package.nix;
     };
   };
 }

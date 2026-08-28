@@ -6,7 +6,7 @@
   ...
 }:
 let
-  inherit (config) assets packageSources;
+  inherit (config) assets;
 in
 {
   den.aspects.ai = {
@@ -48,13 +48,10 @@ in
           '';
         });
 
-        superpowers-skills = pkgs.callPackage packageSources.superpowersSkills {
-          src = inputs.superpowers;
-        };
+        superpowers-skills =
+          inputs.nix-skills.packages.${pkgs.stdenv.hostPlatform.system}.superpowers-skills;
 
-        vendored-skills = pkgs.callPackage packageSources.vendoredSkills {
-          inherit (inputs) nixos-skill vercel-skills wshobson-agents;
-        };
+        vendored-skills = inputs.nix-skills.packages.${pkgs.stdenv.hostPlatform.system}.vendored-skills;
 
         overlay = (pkgs.formats.yaml { }).generate "oh-my-pi-config.yml" {
           modelRoles = {
