@@ -122,7 +122,10 @@ in
               calculator.enable = true;
               dankKDEConnect.enable = true;
               simpleAudioControl.enable = true;
-              dankTodoman.enable = true;
+              dankTodoman = {
+                enable = true;
+                settings.showNearestTask = true;
+              };
               discordVoice = {
                 enable = true;
                 settings.maxBarAvatars = 10;
