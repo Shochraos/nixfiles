@@ -53,6 +53,8 @@ in
 
         vendored-skills = inputs.nix-skills.packages.${pkgs.stdenv.hostPlatform.system}.vendored-skills;
 
+        managed-skills = inputs.nix-skills.packages.${pkgs.stdenv.hostPlatform.system}.managed-skills;
+
         overlay = (pkgs.formats.yaml { }).generate "oh-my-pi-config.yml" {
           modelRoles = {
             default = "openrouter/z-ai/glm-5.3-flash:max";
@@ -70,9 +72,11 @@ in
           mnemopi.recallLimit = 24;
           mnemopi.proactiveLinking = false;
           providers.memoryModel = "online";
+          ttsr.repeatMode = "after-gap";
           skills.customDirectories = [
             "${superpowers-skills}"
             "${vendored-skills}"
+            "${managed-skills}"
           ];
         };
 
