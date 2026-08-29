@@ -1,5 +1,21 @@
 {
   "nodes": {
+    "anthropics-skills": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1787332253,
+        "narHash": "sha256-nVid8vENmLDh7ffDqh+bJbEWtXcVltA0qa2rItmniZM=",
+        "owner": "anthropics",
+        "repo": "skills",
+        "rev": "3b3fad96af16a10759d930941b4520ba0c40edae",
+        "type": "github"
+      },
+      "original": {
+        "owner": "anthropics",
+        "repo": "skills",
+        "type": "github"
+      }
+    },
     "base16": {
       "inputs": {
         "fromYaml": "fromYaml"
@@ -484,20 +500,22 @@
     },
     "nix-skills": {
       "inputs": {
+        "anthropics-skills": "anthropics-skills",
         "nixos-skill": "nixos-skill",
         "nixpkgs": [
           "nixpkgs"
         ],
+        "qt-agent-skills": "qt-agent-skills",
         "superpowers": "superpowers",
         "vercel-skills": "vercel-skills",
         "wshobson-agents": "wshobson-agents"
       },
       "locked": {
-        "lastModified": 1787925887,
-        "narHash": "sha256-V2pfIIsz5EN1cRXVt8YeosHCcEE9Yl0k5UOhvL/MG+E=",
+        "lastModified": 1788028199,
+        "narHash": "sha256-nNNao0lBxn7/KbiTfgWn+imnaZgFyXjKu+eYX2QriMQ=",
         "owner": "Shochraos",
         "repo": "nix-skills",
-        "rev": "6dc9037f9509f103e02fca1eb65181fa589fcf52",
+        "rev": "45acbcf2bea93ba999e1882821e08cc643e1ef2d",
         "type": "github"
       },
       "original": {
@@ -619,6 +637,22 @@
       "original": {
         "owner": "cachix",
         "repo": "pre-commit-hooks.nix",
+        "type": "github"
+      }
+    },
+    "qt-agent-skills": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1783603773,
+        "narHash": "sha256-YHWVYn3m2dYV/brBlYn6nuxVV810+B4geKqfwiJuOHU=",
+        "owner": "TheQtCompanyRnD",
+        "repo": "agent-skills",
+        "rev": "71d6c10da78b9a764468ae11c86ab3bc4ca4921f",
+        "type": "github"
+      },
+      "original": {
+        "owner": "TheQtCompanyRnD",
+        "repo": "agent-skills",
         "type": "github"
       }
     },

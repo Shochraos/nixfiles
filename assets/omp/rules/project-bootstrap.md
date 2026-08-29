@@ -20,9 +20,10 @@ the nearest non-empty one and shadows the root files, so never create one in a
 subdirectory.
 
 - **`.omp/AGENTS.md`** — the project's state. What it is, how it is built, run
-  and verified, its layout and conventions, and a running ledger of non-obvious
-  findings, completed work, and designs that were rejected and why. Long
-  background belongs here; it costs context once.
+  and verified, its layout and conventions, the project's primary languages
+  for skill routing, and a running ledger of non-obvious findings, completed
+  work, and designs that were rejected and why. Long background belongs here;
+  it costs context once.
 - **`.omp/WATCHDOG.md`** — advisor-only review priorities, never injected into
   the main context. Order it as a priority ladder, because the advisor emits at
   most one note per cycle: false claims in a written record first, then silent

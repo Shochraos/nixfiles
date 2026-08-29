@@ -29,7 +29,10 @@ answering the wrong question.
 When needed: `recall` first, then read the project's own record of prior
 decisions, then invoke `skill://brainstorming`.
 
-The chain runs brainstorming -> writing-plans and stops there.
+The chain runs brainstorming -> writing-plans and stops there. A later session
+picks the plan up with `skill://executing-plans`; once a plan has been
+executed, delete its `.omp/<TOPIC>-PLAN.md` — the record lives in
+`.omp/AGENTS.md`, not in a stale plan file.
 
 - Both the spec and the plan go in one file at the repository root:
   `.omp/<TOPIC>-PLAN.md`. Never `docs/superpowers/`. Never a nested `.omp/`.
@@ -44,13 +47,15 @@ The chain runs brainstorming -> writing-plans and stops there.
   and read before any claim of success, not a generic test command.
 - Finishing means: formatter, project checks, then bring `.omp/AGENTS.md` and
   `.omp/WATCHDOG.md` up to date in the same step as the memory write, then
-  refresh `README.md` with `skill://create-readme`, then report. Leave
-  integration to the user.
+  refresh `README.md` with `skill://create-readme`, audit the refresh with a
+  `skill://avoid-ai-writing` pass, then report. Leave integration to the user.
 - The README refresh runs after every completed coding workflow, not after
   read-only investigation. `skill://create-readme` writes a README from
   scratch, so treat the existing one as the baseline: keep hand-written
   sections that are still accurate and rewrite only what this change made
-  stale. No `README.md` yet means create one.
+  stale. No `README.md` yet means create one, and every refresh is followed by
+  an audit with `skill://avoid-ai-writing` (rewrite mode) so the result does
+  not read as machine-generated.
 
 Skill handoffs are written `superpowers:<name>`; in omp the skill is `<name>`,
 so read `skill://<name>`.
@@ -58,3 +63,8 @@ so read `skill://<name>`.
 `skill://systematic-debugging` is a second entrypoint, for diagnosing a defect.
 It has no git steps; follow it as written, then finish through the same
 Finishing bullet above, README included.
+
+Skill routing: language packs load automatically — the TTSR `lang-*` rules
+inject a reminder when an edit touches a file of that language. Cross-cutting
+routing (docs, review, planning, skills authoring) lives in `rule://skills`;
+read it at task start.
