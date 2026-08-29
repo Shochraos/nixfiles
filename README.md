@@ -1,6 +1,6 @@
 # nixfiles
 
-A NixOS + [home-manager](https://github.com/nix-community/home-manager) configuration that manages and automates a complete desktop environment across multiple machines. It uses [Hyprland](https://hyprland.org) as the compositor, [DankMaterialShell](https://github.com/AvengeMedia/DankMaterialShell) — a full [Quickshell](https://quickshell.org)-based desktop shell for Wayland compositors such as Hyprland and Niri — and [stylix](https://github.com/danth/stylix) for system-wide theming.
+A NixOS + [home-manager](https://github.com/nix-community/home-manager) configuration that manages and automates a complete desktop environment across multiple machines. It uses [Hyprland](https://hyprland.org) as the compositor, [DankMaterialShell](https://github.com/AvengeMedia/DankMaterialShell) (a full [Quickshell](https://quickshell.org)-based desktop shell for Wayland compositors such as Hyprland and Niri) and [stylix](https://github.com/danth/stylix) for system-wide theming.
 
 Two hosts are defined out of the box:
 
@@ -22,7 +22,7 @@ After cloning, you will need to:
 
 ## Architecture
 
-The configuration is built on the **dendritic pattern**: every module is a [`flake-parts`](https://flake.parts) module, and the entire `./modules` tree is auto-imported via [`import-tree`](https://github.com/vic/import-tree) (see `flake.nix`). There is no central list of files to import — dropping a `.nix` file anywhere under `modules/` automatically includes it in the flake evaluation.
+The configuration is built on the **dendritic pattern**: every module is a [`flake-parts`](https://flake.parts) module, and the entire `./modules` tree is auto-imported via [`import-tree`](https://github.com/vic/import-tree) (see `flake.nix`). There is no central list of files to import: a `.nix` file dropped anywhere under `modules/` is picked up.
 
 ### The aspect system
 
@@ -41,14 +41,14 @@ Host assembly is done by [denful/den](https://github.com/denful/den). Its core a
    }
    ```
 
-   These definitions are only *registered*. An aspect becomes active in one of two ways: it is reachable from a host's includes graph, **or** its name matches an entity den resolves automatically — `den.hosts.<sys>.<H>.users.<u>` defaults to `den.aspects.<u>` (`nix/lib/entities/_types.nix`), and a missing one only produces a `lib.warn`. That is why the user aspect `shochraos` applies without appearing in any `includes` list.
+   These definitions are only *registered*. An aspect becomes active in one of two ways: it is reachable from a host's includes graph, **or** its name matches an entity den resolves automatically. `den.hosts.<sys>.<H>.users.<u>` defaults to `den.aspects.<u>` (`nix/lib/entities/_types.nix`), and a missing one only produces a `lib.warn`. That is why the user aspect `shochraos` applies without appearing in any `includes` list.
 
 2. **`modules/flake/den.nix`** assembles everything. It declares the hosts (`den.hosts.x86_64-linux.{Azazel,Solas}`, each with its user and an explicit host aspect) and the includes graph: `base` (core system aspects) is included by `graphical` (Hyprland, DankMaterialShell, terminal, browser, apps, …), which is included by the per-host aspects `azazel` / `solas` alongside exactly one form-factor aspect (`desktop` or `laptop`) and their opt-in features. Includes are **value references** (`den.aspects.<name>`), so a typo fails evaluation immediately instead of silently applying nothing.
 
 3. **den wires home-manager automatically**: config from `provides.to-users.homeManager` lands in `home-manager.users.<name>`, with `osConfig` available in home modules. There is no hand-written glue between the system and home sides.
 
 > [!TIP]
-> **Adding a feature is two steps:** (a) create a module file under `modules/` defining `den.aspects.<name>`, and (b) add `<name>` to the appropriate includes list (`base`, `graphical`, or a host's list) in `modules/flake/den.nix`. Forgetting step (b) means the file evaluates but the aspect is never applied — **unless** its name is one den resolves automatically for an entity (see above), in which case it applies with no `includes` entry at all. Note also that a new file is invisible to `import-tree` until it is git-tracked: run `git add -N` on it before evaluating.
+> **Adding a feature is two steps:** (a) create a module file under `modules/` defining `den.aspects.<name>`, and (b) add `<name>` to the appropriate includes list (`base`, `graphical`, or a host's list) in `modules/flake/den.nix`. Forgetting step (b) means the file evaluates but the aspect is never applied. If its name is one den resolves automatically for an entity (see above), it applies with no `includes` entry at all. A new file is invisible to `import-tree` until it is git-tracked: run `git add -N` on it before evaluating.
 
 ### Host-specific overrides
 
@@ -58,7 +58,7 @@ Rather than forking shared modules per host, `modules/flake/options.nix` defines
 
 Secrets live under `./secrets/`, [sops-nix](https://github.com/Mic92/sops-nix)-encrypted and decrypted at activation using the host's age identity (`host.sshKey`). Most consumers read a secret *path* at runtime. A few need the value spliced into text that Nix builds at **evaluation** time, where a path is useless; those use `sops.templates` with `config.sops.placeholder.<name>`, which renders the file under `/run/secrets/rendered/`.
 
-One template carries a **format contract worth knowing before you edit the secret**: `zen/allowed-cookies/<host>` is spliced into a JSON *value* position in Zen's `policies.json`, so it must decrypt to a **JSON array of origin strings**. Anything else produces invalid JSON, and Zen then discards every policy in the file — including the tracking-protection settings. An activation check warns when the rendered file breaks the contract, so a bad secret is noisy rather than silent.
+One template carries a **format contract worth knowing before you edit the secret**: `zen/allowed-cookies/<host>` is spliced into a JSON *value* position in Zen's `policies.json`, so it must decrypt to a **JSON array of origin strings**. Anything else produces invalid JSON, and Zen then discards every policy in the file, including the tracking-protection settings. An activation check warns when the rendered file breaks the contract, so a bad secret is noisy rather than silent.
 
 ## Directory layout
 
@@ -66,17 +66,17 @@ One template carries a **format contract worth knowing before you edit the secre
 - `./modules/flake/` — the assembly logic (`den.nix`, `options.nix`). Start here to understand the wiring.
 - `./modules/system/` — base OS aspects (`boot`, `nix`, `network`, `audio`, `shell`, `scheduling`, …) plus the form-factor aspects `desktop` / `laptop`; included via `base` or directly by a host.
 - `./modules/users/` — per-user aspects, one file per user named after that user (`shochraos.nix`). Resolved by **name**, not through `includes`.
-- `./modules/desktop/` — Hyprland (`hyprland/`), the DankMaterialShell shell (`dankshell`), terminal, browser, apps; included via `graphical`.
+- `./modules/desktop/` — Hyprland (`hyprland/`), the DankMaterialShell shell (`dankshell`), terminal, browser, editor, apps, sync, kde-connect, printing, bluetooth; included via `graphical`.
 - `./modules/features/` — opt-in aspects added per host (`gaming/`, `ai`, `virtualization`, `media`, …).
 - `./modules/hosts/<host>/` — `config.nix` (host overrides + `host.*` settings), `hardware.nix`, `filesystems.nix`.
 - `./pkgs/<name>/package.nix` — packages nixpkgs does not carry, as ordinary `callPackage` expressions. These are **not** flake-parts modules, so `import-tree` ignores them; each is reached by a named overlay declared in the aspect that owns it (see `mp3tag`, `lgtv`, `gaming/packages`), which is also what keeps an unfree allowlist scoped to the aspect that needs it.
 - `./configs/` — raw config files for tools without a home-manager module.
-- `./assets/` — icons and static assets referenced by modules.
+- `./assets/` — icons, templates, shell scripts and patches referenced or installed by modules, plus the always-on rules for the oh-my-pi coding agent (`assets/omp/rules/`).
 - `./secrets/` — [sops-nix](https://github.com/Mic92/sops-nix)-encrypted secrets.
 
 ## Common commands
 
-Rebuilds go through [`nh`](https://github.com/nix-community/nh) (the Nix helper), which is wrapped in a few shell aliases. Each alias targets the flake and the current host automatically:
+Rebuilds go through [`nh`](https://github.com/nix-community/nh) (the Nix helper), which is wrapped in a few shell aliases. Each alias regenerates the matugen theme templates first (`theme-sync`), then targets the flake and the current host automatically:
 
 ```bash
 # Build the configuration and switch to it now
@@ -92,8 +92,11 @@ nh-update
 Other useful commands:
 
 ```bash
-# Check the flake evaluates
+# Check the flake evaluates and the tree is formatted
 nix flake check
+
+# Format the tree (nixfmt, shfmt, shellcheck)
+nix fmt
 
 # Update inputs manually
 nix flake update                          # all
