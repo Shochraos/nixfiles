@@ -44,13 +44,21 @@ jobs:
 
       - name: Reclaim runner disk for a full desktop closure
         run: |
+          sudo docker image prune -af || true
           sudo rm -rf \
             /usr/share/dotnet \
-            /usr/local/lib/android \
+            /usr/share/swift \
+            /usr/local/.ghcup \
             /opt/ghc \
             /usr/local/share/boost \
             /usr/local/lib/node_modules \
+            /usr/local/share/powershell \
+            /opt/microsoft \
+            /opt/google \
+            /opt/pipx \
             "${AGENT_TOOLSDIRECTORY:-/opt/hostedtoolcache}"
+          sudo swapoff -a || true
+          sudo rm -f /mnt/swapfile
           df -h /
 
       - name: Install Nix with flakes enabled
@@ -68,5 +76,12 @@ jobs:
 
       - name: Build system toplevel
         run: |
-          nix build --no-link --print-out-paths --print-build-logs \
-            ".#nixosConfigurations.${{ matrix.host }}.config.system.build.toplevel"
+          for attempt in 1 2 3; do
+            if nix build --no-link --print-out-paths --print-build-logs \
+              ".#nixosConfigurations.${{ matrix.host }}.config.system.build.toplevel"; then
+              exit 0
+            fi
+            echo "::warning::nix build attempt ${attempt}/3 failed; retrying (already-fetched paths stay in the store)"
+            sleep 20
+          done
+          exit 1
