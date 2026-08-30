@@ -25,11 +25,6 @@ Cross-cutting skill routing. Language packs load automatically through the
   by description alone.
 - The user asks for a capability that might exist as an installable skill:
   `skill://find-skills`.
-- A fetch via `read`, `browser` or `web_search` hits a Cloudflare challenge,
-  403/503 or any anti-bot wall — or returns an empty/stub shell (JS SPA): read
-  `skill://cloudflare-bypass` and route the fetch through the Scrapling MCP
-  server. Never skip or disregard the site; the blocked URL is fetched via the
-  skill, not abandoned.
 - Feature-sized change complete, before reporting: `skill://requesting-code-review`.
 - The user gives review feedback: `skill://receiving-code-review` before
   implementing suggestions.
@@ -38,7 +33,7 @@ Cross-cutting skill routing. Language packs load automatically through the
 - Feature or bugfix in a language with a test runner: `skill://test-driven-development`.
 - Diagnosing a defect: `skill://systematic-debugging`.
 
-Self-written pack — the six managed skills, also auto-nudged by the `lang-*`
+Self-written pack — the seven managed skills, also auto-nudged by the `lang-*`
 rules where noted:
 
 - A repository moved to a new absolute path: `skill://omp-project-migration`
@@ -52,3 +47,8 @@ rules where noted:
 - DankMaterialShell plugin changes: `skill://verifying-dms-plugin-changes`.
 - End of a coding task: `skill://end-of-task-memory-update` alongside the
   retain/learn write.
+- A fetch via `read`, `browser` or `web_search` hits a Cloudflare challenge,
+  403/503 or any anti-bot wall — or returns an empty/stub shell (JS SPA): read
+  `skill://cloudflare-bypass` and route the fetch through the Scrapling MCP
+  server. Normal omp searching still happens; when a result comes back
+  blocked, follow up by fetching that URL through the skill, never dropping it.
