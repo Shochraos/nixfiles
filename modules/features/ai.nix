@@ -55,6 +55,18 @@ in
 
         managed-skills = inputs.nix-skills.packages.${pkgs.stdenv.hostPlatform.system}.managed-skills;
 
+        scrapling-runtime = inputs.nix-skills.packages.${pkgs.stdenv.hostPlatform.system}.scrapling-runtime;
+
+        mcp-config = (pkgs.formats.json { }).generate "mcp.json" {
+          "$schema" =
+            "https://raw.githubusercontent.com/can1357/oh-my-pi/main/packages/coding-agent/src/config/mcp-schema.json";
+          mcpServers.ScraplingServer = {
+            type = "stdio";
+            command = "${scrapling-runtime}/bin/scrapling-mcp";
+            timeout = 120000;
+          };
+        };
+
         overlay = (pkgs.formats.yaml { }).generate "oh-my-pi-config.yml" {
           modelRoles = {
             default = "openrouter/z-ai/glm-5.3-flash:max";
@@ -103,6 +115,7 @@ in
 
         home.file = {
           ".omp/agent/nix-config.yml".source = overlay;
+          ".omp/agent/mcp.json".source = mcp-config;
         }
         // ruleFiles;
 
