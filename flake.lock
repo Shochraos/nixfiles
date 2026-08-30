@@ -511,11 +511,11 @@
         "wshobson-agents": "wshobson-agents"
       },
       "locked": {
-        "lastModified": 1788028199,
-        "narHash": "sha256-nNNao0lBxn7/KbiTfgWn+imnaZgFyXjKu+eYX2QriMQ=",
+        "lastModified": 1788116596,
+        "narHash": "sha256-Zww8AtfOLgT3PFS1sf/X22Ge/chKe3bkUWEKixnWbI4=",
         "owner": "Shochraos",
         "repo": "nix-skills",
-        "rev": "45acbcf2bea93ba999e1882821e08cc643e1ef2d",
+        "rev": "6799002aff0e7d545926e406b99f4981fb3e8b65",
         "type": "github"
       },
       "original": {

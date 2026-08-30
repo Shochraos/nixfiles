@@ -1,8 +1,9 @@
 ---
 description: >-
-  Cross-cutting skill routing (docs, review, planning, skills authoring).
-  Read rule://skills at task start; language packs load automatically via the
-  lang-* TTSR rules.
+  Cross-cutting skill routing (docs, review, planning, skills authoring, web
+  fetching). Read rule://skills at task start; language packs load
+  automatically via the lang-* TTSR rules. A Cloudflare-blocked fetch is
+  never skipped — it routes through skill://cloudflare-bypass.
 ---
 Cross-cutting skill routing. Language packs load automatically through the
 `lang-*` TTSR rules; the tasks below need a deliberate skill pick:
@@ -17,8 +18,18 @@ Cross-cutting skill routing. Language packs load automatically through the
   (`manage_skill` delete): the nix payload then delivers it, and a second copy
   in `~/.omp/agent/managed-skills/` would be redundant. Until promotion a
   managed skill is backed by no git history.
+- A skill added to nix-skills that no `lang-*` rule auto-nudges (those fire
+  on file-type edits, so they cover only language skills) needs a trigger
+  bullet in this file's routing list in the same change — this rulebook is
+  nixfiles' routing index, and an unindexed nix-skills skill is discoverable
+  by description alone.
 - The user asks for a capability that might exist as an installable skill:
   `skill://find-skills`.
+- A fetch via `read`, `browser` or `web_search` hits a Cloudflare challenge,
+  403/503 or any anti-bot wall — or returns an empty/stub shell (JS SPA): read
+  `skill://cloudflare-bypass` and route the fetch through the Scrapling MCP
+  server. Never skip or disregard the site; the blocked URL is fetched via the
+  skill, not abandoned.
 - Feature-sized change complete, before reporting: `skill://requesting-code-review`.
 - The user gives review feedback: `skill://receiving-code-review` before
   implementing suggestions.
