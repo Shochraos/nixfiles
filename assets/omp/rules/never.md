@@ -16,3 +16,7 @@ alwaysApply: true
   write those where the language or the project uses them. Match the comment
   conventions already present in a file, and never remove a pre-existing
   comment unless asked.
+- Never run omp with a model override — no `--model` flag and no role selection
+  of any kind, not even for throwaway test queries or print-mode probes. Tests
+  use the primary model exactly as a normal session does: open omp normally
+  and leave the model alone.
