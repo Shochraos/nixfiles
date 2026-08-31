@@ -12,6 +12,8 @@
         virtualisation.spiceUSBRedirection.enable = true;
 
         virtualisation.vswitch.enable = true;
+
+        users.users.root.extraGroups = [ "frrvty" ];
       };
     };
 }
