@@ -163,11 +163,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1787930827,
-        "narHash": "sha256-WMEeohBVSKRZuUss5q0troJc8+qbM8CkMHpXBa92/iM=",
+        "lastModified": 1788154251,
+        "narHash": "sha256-82gY3/Is98y7Ibpk5JopgSZubPqPH/Ba8s56azGY5B4=",
         "owner": "AvengeMedia",
         "repo": "dms-plugin-registry",
-        "rev": "7a76e68df370d5ac504a86ec984f5fee49af73f3",
+        "rev": "900398fbc01b1d48dbd3332b8e0f817632d441dd",
         "type": "github"
       },
       "original": {
@@ -287,11 +287,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1787853696,
-        "narHash": "sha256-HuDDQuoBl80UKWbDTiMtFbWpEeMv9TyuGeZlLIkoEHY=",
+        "lastModified": 1788204051,
+        "narHash": "sha256-M9/D0AcJNvPasgneFfNgv/JjtZwjQASyTzztgWg9DoA=",
         "owner": "Shochraos",
         "repo": "game-chat-mix",
-        "rev": "2d73f5f595491d942136cd72f97593eea9c9e6e7",
+        "rev": "de693552d3cd7a6dfd817684fe250f71e49c6661",
         "type": "github"
       },
       "original": {
