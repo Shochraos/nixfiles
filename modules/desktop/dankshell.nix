@@ -147,7 +147,9 @@ in
                 };
               };
             }
-            // osConfig.host.dms.plugins;
+            // builtins.mapAttrs (
+              _: plugin: if plugin ? src then plugin // { src = lib.mkForce plugin.src; } else plugin
+            ) osConfig.host.dms.plugins;
 
             settings = {
               clipboardSettings = {

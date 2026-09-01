@@ -112,8 +112,8 @@
       url = "github:Shochraos/game-chat-mix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-  };
 
+  };
   outputs =
     inputs@{ flake-parts, import-tree, ... }:
     flake-parts.lib.mkFlake { inherit inputs; } {
