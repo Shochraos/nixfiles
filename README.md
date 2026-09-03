@@ -64,10 +64,10 @@ One template carries a **format contract worth knowing before you edit the secre
 
 - `./flake.nix` — entry-point; auto-imports the `modules/` tree via `import-tree`.
 - `./modules/flake/` — the assembly logic (`den.nix`, `options.nix`). Start here to understand the wiring.
-- `./modules/system/` — base OS aspects (`boot`, `nix`, `network`, `audio`, `shell`, `scheduling`, …) plus the form-factor aspects `desktop` / `laptop`; included via `base` or directly by a host.
+- `./modules/base/` — the aspects `base` includes verbatim (`boot`, `secrets`, `nix`, `locale`, `network`, `audio`, `scheduling`, `shell`, `remotes`, `wireguard`, `wifi`).
 - `./modules/users/` — per-user aspects, one file per user named after that user (`shochraos.nix`). Resolved by **name**, not through `includes`.
-- `./modules/desktop/` — Hyprland (`hyprland/`), the DankMaterialShell shell (`dankshell`), terminal, browser, editor, apps, sync, kde-connect, printing, bluetooth; included via `graphical`.
-- `./modules/features/` — opt-in aspects added per host (`gaming/`, `ai`, `virtualization`, `media`, …).
+- `./modules/graphical/` — what `graphical` adds on top of `base`: Hyprland (`hyprland/`), the DankMaterialShell shell (`dankshell`), terminal, browser, editor, apps, sync, kde-connect, printing, bluetooth.
+- `./modules/features/` — aspects a host or sub-bundle selects directly rather than through `base`/`graphical`: the form factors `desktop` / `laptop`, `gaming/`, `ai`, `virtualization`, `media`, …. A file's folder names the layer that includes it, so moving an aspect between layers moves the file too.
 - `./modules/hosts/<host>/` — `config.nix` (host overrides + `host.*` settings), `hardware.nix`, `filesystems.nix`.
 - `./pkgs/<name>/package.nix` — packages nixpkgs does not carry, as ordinary `callPackage` expressions. These are **not** flake-parts modules, so `import-tree` ignores them; each is reached by a named overlay declared in the aspect that owns it (see `mp3tag`, `lgtv`, `gaming/packages`), which is also what keeps an unfree allowlist scoped to the aspect that needs it.
 - `./configs/` — raw config files for tools without a home-manager module.
