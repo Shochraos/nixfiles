@@ -4,8 +4,8 @@
     { pkgs, ... }:
     let
       proton-cachyos-v3 =
-        inputs.nix-proton-cachyos.packages.${pkgs.stdenv.hostPlatform.system}.proton-cachyos-v3;
-      dw-proton = inputs.nix-dw-proton.packages.${pkgs.stdenv.hostPlatform.system}.dw-proton;
+        inputs.proton-cachyos-nix.packages.${pkgs.stdenv.hostPlatform.system}.proton-cachyos-v3;
+      dw-proton = inputs.dw-proton-nix.packages.${pkgs.stdenv.hostPlatform.system}.dw-proton;
     in
     {
       boot.kernelModules = [ "ntsync" ];
@@ -25,8 +25,8 @@
     { lib, pkgs, ... }:
     let
       proton-cachyos-v3 =
-        inputs.nix-proton-cachyos.packages.${pkgs.stdenv.hostPlatform.system}.proton-cachyos-v3;
-      dw-proton = inputs.nix-dw-proton.packages.${pkgs.stdenv.hostPlatform.system}.dw-proton;
+        inputs.proton-cachyos-nix.packages.${pkgs.stdenv.hostPlatform.system}.proton-cachyos-v3;
+      dw-proton = inputs.dw-proton-nix.packages.${pkgs.stdenv.hostPlatform.system}.dw-proton;
       drsSettings = lib.concatStringsSep "," [
         "ngx_dlss_sr_override=on"
         "ngx_dlss_sr_override_render_preset_selection=render_preset_m"

@@ -176,6 +176,26 @@
         "type": "github"
       }
     },
+    "dw-proton-nix": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1788035187,
+        "narHash": "sha256-1R6uR2egZ5j9hlZ60c/LPAnp+9/wXk+O1P13dEM48hY=",
+        "owner": "shochraos",
+        "repo": "dw-proton-nix",
+        "rev": "1bd145396ff9f89970c10c2c48b235584f13e4fd",
+        "type": "github"
+      },
+      "original": {
+        "owner": "shochraos",
+        "repo": "dw-proton-nix",
+        "type": "github"
+      }
+    },
     "firefox-gnome-theme": {
       "flake": false,
       "locked": {
@@ -418,26 +438,6 @@
         "type": "github"
       }
     },
-    "nix-dw-proton": {
-      "inputs": {
-        "nixpkgs": [
-          "nixpkgs"
-        ]
-      },
-      "locked": {
-        "lastModified": 1788035187,
-        "narHash": "sha256-1R6uR2egZ5j9hlZ60c/LPAnp+9/wXk+O1P13dEM48hY=",
-        "owner": "shochraos",
-        "repo": "nix-dw-proton",
-        "rev": "1bd145396ff9f89970c10c2c48b235584f13e4fd",
-        "type": "github"
-      },
-      "original": {
-        "owner": "shochraos",
-        "repo": "nix-dw-proton",
-        "type": "github"
-      }
-    },
     "nix-index-database": {
       "inputs": {
         "nixpkgs": [
@@ -455,26 +455,6 @@
       "original": {
         "owner": "nix-community",
         "repo": "nix-index-database",
-        "type": "github"
-      }
-    },
-    "nix-proton-cachyos": {
-      "inputs": {
-        "nixpkgs": [
-          "nixpkgs"
-        ]
-      },
-      "locked": {
-        "lastModified": 1788035156,
-        "narHash": "sha256-DTdLGDZlg5caPOKd2Qw7ACuV6+ynI2jhMP9oBC5s+jk=",
-        "owner": "Shochraos",
-        "repo": "nix-proton-cachyos",
-        "rev": "f1244731dab5ea1a57478ce29213cb47d107426a",
-        "type": "github"
-      },
-      "original": {
-        "owner": "Shochraos",
-        "repo": "nix-proton-cachyos",
         "type": "github"
       }
     },
@@ -620,6 +600,26 @@
         "type": "github"
       }
     },
+    "proton-cachyos-nix": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1788035156,
+        "narHash": "sha256-DTdLGDZlg5caPOKd2Qw7ACuV6+ynI2jhMP9oBC5s+jk=",
+        "owner": "Shochraos",
+        "repo": "proton-cachyos-nix",
+        "rev": "f1244731dab5ea1a57478ce29213cb47d107426a",
+        "type": "github"
+      },
+      "original": {
+        "owner": "Shochraos",
+        "repo": "proton-cachyos-nix",
+        "type": "github"
+      }
+    },
     "qt-agent-skills": {
       "flake": false,
       "locked": {
@@ -642,18 +642,18 @@
         "den": "den",
         "dms": "dms",
         "dms-plugin-registry": "dms-plugin-registry",
+        "dw-proton-nix": "dw-proton-nix",
         "flake-parts": "flake-parts",
         "flyline": "flyline",
         "home-manager": "home-manager",
         "import-tree": "import-tree",
         "lanzaboote": "lanzaboote",
         "millennium": "millennium",
-        "nix-dw-proton": "nix-dw-proton",
         "nix-index-database": "nix-index-database",
-        "nix-proton-cachyos": "nix-proton-cachyos",
         "nix-skills": "nix-skills",
         "nixpkgs": "nixpkgs_2",
         "omp-nix": "omp-nix",
+        "proton-cachyos-nix": "proton-cachyos-nix",
         "sops-nix": "sops-nix",
         "spicetify-nix": "spicetify-nix",
         "stylix": "stylix",
