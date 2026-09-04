@@ -88,8 +88,8 @@
     };
 
     ### Agent Skills ###
-    nix-skills = {
-      url = "github:Shochraos/nix-skills";
+    agent-skills-nix = {
+      url = "github:Shochraos/agent-skills-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 

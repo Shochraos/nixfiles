@@ -1,5 +1,31 @@
 {
   "nodes": {
+    "agent-skills-nix": {
+      "inputs": {
+        "anthropics-skills": "anthropics-skills",
+        "nixos-skill": "nixos-skill",
+        "nixpkgs": [
+          "nixpkgs"
+        ],
+        "qt-agent-skills": "qt-agent-skills",
+        "superpowers": "superpowers",
+        "vercel-skills": "vercel-skills",
+        "wshobson-agents": "wshobson-agents"
+      },
+      "locked": {
+        "lastModified": 1788177916,
+        "narHash": "sha256-fTLjMVnPWucOh6dvIzVUyIs254Onv+uytp5AJAt7Rjs=",
+        "owner": "Shochraos",
+        "repo": "agent-skills-nix",
+        "rev": "536316cec84ed89ec61f20117ccd1cf1bd1a6523",
+        "type": "github"
+      },
+      "original": {
+        "owner": "Shochraos",
+        "repo": "agent-skills-nix",
+        "type": "github"
+      }
+    },
     "anthropics-skills": {
       "flake": false,
       "locked": {
@@ -458,32 +484,6 @@
         "type": "github"
       }
     },
-    "nix-skills": {
-      "inputs": {
-        "anthropics-skills": "anthropics-skills",
-        "nixos-skill": "nixos-skill",
-        "nixpkgs": [
-          "nixpkgs"
-        ],
-        "qt-agent-skills": "qt-agent-skills",
-        "superpowers": "superpowers",
-        "vercel-skills": "vercel-skills",
-        "wshobson-agents": "wshobson-agents"
-      },
-      "locked": {
-        "lastModified": 1788177916,
-        "narHash": "sha256-fTLjMVnPWucOh6dvIzVUyIs254Onv+uytp5AJAt7Rjs=",
-        "owner": "Shochraos",
-        "repo": "nix-skills",
-        "rev": "536316cec84ed89ec61f20117ccd1cf1bd1a6523",
-        "type": "github"
-      },
-      "original": {
-        "owner": "Shochraos",
-        "repo": "nix-skills",
-        "type": "github"
-      }
-    },
     "nixos-skill": {
       "flake": false,
       "locked": {
@@ -638,6 +638,7 @@
     },
     "root": {
       "inputs": {
+        "agent-skills-nix": "agent-skills-nix",
         "danksearch": "danksearch",
         "den": "den",
         "dms": "dms",
@@ -650,7 +651,6 @@
         "lanzaboote": "lanzaboote",
         "millennium": "millennium",
         "nix-index-database": "nix-index-database",
-        "nix-skills": "nix-skills",
         "nixpkgs": "nixpkgs_2",
         "omp-nix": "omp-nix",
         "proton-cachyos-nix": "proton-cachyos-nix",
