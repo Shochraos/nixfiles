@@ -98,13 +98,13 @@
       url = "github:SteamClientHomebrew/Millennium/?dir=packages/nix";
     };
 
-    nix-proton-cachyos = {
-      url = "github:Shochraos/nix-proton-cachyos";
+    proton-cachyos-nix = {
+      url = "github:Shochraos/proton-cachyos-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    nix-dw-proton = {
-      url = "github:shochraos/nix-dw-proton";
+    dw-proton-nix = {
+      url = "github:shochraos/dw-proton-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
