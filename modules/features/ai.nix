@@ -49,13 +49,15 @@ in
         });
 
         superpowers-skills =
-          inputs.nix-skills.packages.${pkgs.stdenv.hostPlatform.system}.superpowers-skills;
+          inputs.agent-skills-nix.packages.${pkgs.stdenv.hostPlatform.system}.superpowers-skills;
 
-        vendored-skills = inputs.nix-skills.packages.${pkgs.stdenv.hostPlatform.system}.vendored-skills;
+        vendored-skills =
+          inputs.agent-skills-nix.packages.${pkgs.stdenv.hostPlatform.system}.vendored-skills;
 
-        managed-skills = inputs.nix-skills.packages.${pkgs.stdenv.hostPlatform.system}.managed-skills;
+        managed-skills = inputs.agent-skills-nix.packages.${pkgs.stdenv.hostPlatform.system}.managed-skills;
 
-        scrapling-runtime = inputs.nix-skills.packages.${pkgs.stdenv.hostPlatform.system}.scrapling-runtime;
+        scrapling-runtime =
+          inputs.agent-skills-nix.packages.${pkgs.stdenv.hostPlatform.system}.scrapling-runtime;
 
         mcp-config = (pkgs.formats.json { }).generate "mcp.json" {
           "$schema" =
@@ -83,6 +85,8 @@ in
           mnemopi.autoRetain = false;
           mnemopi.recallLimit = 24;
           mnemopi.proactiveLinking = false;
+          mnemopi.workingMemoryTtlHours = 876000;
+          mnemopi.workingMemoryLimit = 1000000;
           providers.memoryModel = "online";
           ttsr.repeatMode = "after-gap";
           skills.customDirectories = [

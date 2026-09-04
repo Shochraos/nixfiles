@@ -12,16 +12,16 @@ Cross-cutting skill routing. Language packs load automatically through the
   `skill://doc-coauthoring`.
 - Creating or updating a skill (manage_skill): read `skill://writing-skills` first.
   After the write, present the finished SKILL.md to the user and ask whether it
-  should be promoted into the nix-skills repo as a new `managed-skills` package
+  should be promoted into the agent-skills-nix repo as a new `managed-skills` package
   (alongside `superpowers-skills` and `vendored-skills`). If the user confirms,
   add it there and — once the payload is live — delete the managed copy
   (`manage_skill` delete): the nix payload then delivers it, and a second copy
   in `~/.omp/agent/managed-skills/` would be redundant. Until promotion a
   managed skill is backed by no git history.
-- A skill added to nix-skills that no `lang-*` rule auto-nudges (those fire
+- A skill added to agent-skills-nix that no `lang-*` rule auto-nudges (those fire
   on file-type edits, so they cover only language skills) needs a trigger
   bullet in this file's routing list in the same change — this rulebook is
-  nixfiles' routing index, and an unindexed nix-skills skill is discoverable
+  nixfiles' routing index, and an unindexed agent-skills-nix skill is discoverable
   by description alone.
 - The user asks for a capability that might exist as an installable skill:
   `skill://find-skills`.
