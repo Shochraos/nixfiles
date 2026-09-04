@@ -163,11 +163,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1788154251,
-        "narHash": "sha256-82gY3/Is98y7Ibpk5JopgSZubPqPH/Ba8s56azGY5B4=",
+        "lastModified": 1788518233,
+        "narHash": "sha256-PAcUe2tv+f+61cN00UcmcZl9BnqMpQ/Pgyx/ERiwXJY=",
         "owner": "AvengeMedia",
         "repo": "dms-plugin-registry",
-        "rev": "900398fbc01b1d48dbd3332b8e0f817632d441dd",
+        "rev": "0a2a80785e891603141549aa627273de0505c343",
         "type": "github"
       },
       "original": {
@@ -277,26 +277,6 @@
       "original": {
         "owner": "SenchoPens",
         "repo": "fromYaml",
-        "type": "github"
-      }
-    },
-    "game-chat-mix": {
-      "inputs": {
-        "nixpkgs": [
-          "nixpkgs"
-        ]
-      },
-      "locked": {
-        "lastModified": 1788204051,
-        "narHash": "sha256-M9/D0AcJNvPasgneFfNgv/JjtZwjQASyTzztgWg9DoA=",
-        "owner": "Shochraos",
-        "repo": "game-chat-mix",
-        "rev": "de693552d3cd7a6dfd817684fe250f71e49c6661",
-        "type": "github"
-      },
-      "original": {
-        "owner": "Shochraos",
-        "repo": "game-chat-mix",
         "type": "github"
       }
     },
@@ -664,7 +644,6 @@
         "dms-plugin-registry": "dms-plugin-registry",
         "flake-parts": "flake-parts",
         "flyline": "flyline",
-        "game-chat-mix": "game-chat-mix",
         "home-manager": "home-manager",
         "import-tree": "import-tree",
         "lanzaboote": "lanzaboote",

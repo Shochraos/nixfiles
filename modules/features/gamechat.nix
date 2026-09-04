@@ -1,4 +1,4 @@
-{ inputs, ... }:
+{ ... }:
 {
   den.aspects.gamechat.nixos =
     {
@@ -8,7 +8,6 @@
     }:
     let
       lua = lib.generators.mkLuaInline;
-      dms_plugin = inputs.game-chat-mix.packages.${pkgs.stdenv.hostPlatform.system}.dms_plugin;
     in
     {
       services.pipewire.pulse.enable = true;
@@ -30,7 +29,6 @@
 
       host.dms.plugins.gamechatMix = {
         enable = true;
-        src = lib.mkForce "${dms_plugin}";
       };
 
       host.hyprland.keybinds = [
