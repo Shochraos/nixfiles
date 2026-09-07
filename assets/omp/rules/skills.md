@@ -3,7 +3,9 @@ description: >-
   Cross-cutting skill routing (docs, review, planning, skills authoring, web
   fetching). Read rule://skills at task start; language packs load
   automatically via the lang-* TTSR rules. A Cloudflare-blocked fetch is
-  never skipped — it routes through skill://cloudflare-bypass.
+  never skipped — it routes through skill://cloudflare-bypass. Creating or
+  updating a managed skill requires offering its promotion into the
+  agent-skills-nix repo (rule://skills).
 ---
 Cross-cutting skill routing. Language packs load automatically through the
 `lang-*` TTSR rules; the tasks below need a deliberate skill pick:
@@ -14,10 +16,10 @@ Cross-cutting skill routing. Language packs load automatically through the
   After the write, present the finished SKILL.md to the user and ask whether it
   should be promoted into the agent-skills-nix repo as a new `managed-skills` package
   (alongside `superpowers-skills` and `vendored-skills`). If the user confirms,
-  add it there and — once the payload is live — delete the managed copy
-  (`manage_skill` delete): the nix payload then delivers it, and a second copy
-  in `~/.omp/agent/managed-skills/` would be redundant. Until promotion a
-  managed skill is backed by no git history.
+  add it there and delete the managed copy (`manage_skill` delete) in the same
+  change — the repo is then the single source of truth, and a second copy in
+  `~/.omp/agent/managed-skills/` would drift. Until promotion a managed skill
+  is backed by no git history.
 - A skill added to agent-skills-nix that no `lang-*` rule auto-nudges (those fire
   on file-type edits, so they cover only language skills) needs a trigger
   bullet in this file's routing list in the same change — this rulebook is
@@ -33,7 +35,7 @@ Cross-cutting skill routing. Language packs load automatically through the
 - Feature or bugfix in a language with a test runner: `skill://test-driven-development`.
 - Diagnosing a defect: `skill://systematic-debugging`.
 
-Self-written pack — the seven managed skills, also auto-nudged by the `lang-*`
+Self-written pack — the eight managed skills, also auto-nudged by the `lang-*`
 rules where noted:
 
 - A repository moved to a new absolute path: `skill://omp-project-migration`
@@ -52,3 +54,5 @@ rules where noted:
   `skill://cloudflare-bypass` and route the fetch through the Scrapling MCP
   server. Normal omp searching still happens; when a result comes back
   blocked, follow up by fetching that URL through the skill, never dropping it.
+- Measuring per-netns kernel FIB events or routing convergence in netns or
+  Mininet labs: `skill://kernel-route-monitor-measurement`.
