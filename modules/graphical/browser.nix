@@ -247,6 +247,7 @@
                 ShowTrayIcon = true;
                 MinimizeOnStartup = true;
                 MinimizeOnClose = true;
+                ShowExpiredEntriesOnDatabaseUnlock = false;
               };
               Security = {
                 IconDownloadFallback = true;
