@@ -27,7 +27,7 @@
                   "firefox@tampermonkey.net" = "tampermonkey";
                   "CanvasBlocker@kkapsner.de" = "canvasblocker";
                   "@testpilot-containers" = "multi-account-containers";
-                  "78272b6fa58f4a1abaac99321d503a20@proton.me" = "proton-pass";
+                  "keepassxc-browser@keepassxc.org" = "keepassxc-browser";
                 };
 
             SearchEngines = {
@@ -135,6 +135,9 @@
         in
         {
           sops.secrets.${cookiesSecret} = { };
+          sops.secrets."keepassxc/master-password" = {
+            owner = user.name;
+          };
 
           sops.templates."zen-policies.json" = {
             owner = user.name;
@@ -162,7 +165,23 @@
         };
 
       provides.to-users.homeManager =
-        { config, ... }:
+        {
+          config,
+          lib,
+          osConfig,
+          pkgs,
+          ...
+        }:
+        let
+          database = osConfig.host.keepassxc.database;
+          keepassxcUnlock = pkgs.writeShellApplication {
+            name = "keepassxc-unlock";
+            runtimeInputs = [ pkgs.keepassxc ];
+            text = ''
+              exec keepassxc --pw-stdin ${lib.escapeShellArg database} < /run/secrets/keepassxc/master-password
+            '';
+          };
+        in
         {
           imports = [ inputs.zen-browser.homeModules.beta ];
 
@@ -174,6 +193,7 @@
 
           programs.zen-browser = {
             enable = true;
+            nativeMessagingHosts = [ pkgs.keepassxc ];
 
             profiles."Nix-Zen" = {
               isDefault = true;
@@ -212,6 +232,36 @@
                 "toolkit.legacyUserProfileCustomizations.stylesheets" = true;
               };
             };
+          };
+
+          programs.keepassxc = {
+            enable = true;
+            autostart = database == null;
+            settings = lib.recursiveUpdate {
+              Browser = {
+                Enabled = true;
+                UpdateBinaryPath = false;
+              };
+              GUI = {
+                ApplicationTheme = "dark";
+                ShowTrayIcon = true;
+                MinimizeOnStartup = true;
+                MinimizeOnClose = true;
+              };
+              Security = {
+                IconDownloadFallback = true;
+              };
+            } osConfig.host.keepassxc.settings;
+          };
+          xdg.configFile."autostart/org.keepassxc.KeePassXC.desktop" = lib.mkIf (database != null) {
+            text = ''
+              [Desktop Entry]
+              Type=Application
+              Name=KeePassXC
+              Exec=${lib.getExe keepassxcUnlock}
+              Icon=keepassxc
+              Terminal=false
+            '';
           };
         };
     };

@@ -276,6 +276,12 @@
           }
         ];
       };
+
+      host.keepassxc.database = "/mnt/nextcloud/Security/KeePass/Vault.kdbx";
+      host.keepassxc.settings.Security = {
+        LockDatabaseIdle = false;
+        LockDatabaseScreenLock = false;
+      };
     };
 
   den.aspects.azazel.provides.to-users.homeManager =
