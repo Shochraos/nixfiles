@@ -48,6 +48,7 @@
     browser
     editor
     apps
+    mail
     sync
     kde-connect
     printing
