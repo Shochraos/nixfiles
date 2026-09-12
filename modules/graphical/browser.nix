@@ -176,9 +176,22 @@
           database = osConfig.host.keepassxc.database;
           keepassxcUnlock = pkgs.writeShellApplication {
             name = "keepassxc-unlock";
-            runtimeInputs = [ pkgs.keepassxc ];
+            runtimeInputs = [
+              pkgs.keepassxc
+              pkgs.coreutils
+              pkgs.gnugrep
+            ];
             text = ''
-              exec keepassxc --pw-stdin ${lib.escapeShellArg database} < /run/secrets/keepassxc/master-password
+              db=${lib.escapeShellArg database}
+              state_file="''${XDG_CACHE_HOME:-$HOME/.cache}/keepassxc/keepassxc.ini"
+              if [ -f "$state_file" ] && grep -q '^ListViewState=' "$state_file"; then
+                exec keepassxc --pw-stdin "$db" < /run/secrets/keepassxc/master-password
+              fi
+              keepassxc --pw-stdin "$db" < /run/secrets/keepassxc/master-password &
+              app=$!
+              sleep 8
+              keepassxc "$db" >/dev/null 2>&1 || true
+              wait "$app"
             '';
           };
         in
@@ -238,6 +251,9 @@
             enable = true;
             autostart = database == null;
             settings = lib.recursiveUpdate {
+              General = {
+                ConfigVersion = 2;
+              };
               Browser = {
                 Enabled = true;
                 UpdateBinaryPath = false;
