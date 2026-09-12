@@ -234,6 +234,19 @@ in
                 description = "matugen templates contributed by feature aspects, merged over the shared template set in the hyprland theme aspect. Lets a feature theme itself from the live palette without depending on the hyprland aspect being present.";
               };
             };
+
+            keepassxc = {
+              database = mkOption {
+                type = types.nullOr types.str;
+                default = null;
+                description = "Absolute path of the .kdbx database unlocked automatically at login through --pw-stdin from the sops secret keepassxc/master-password; null keeps the stock autostart entry.";
+              };
+              settings = mkOption {
+                type = attrsetTable;
+                default = { };
+                description = "keepassxc.ini settings sections for this host, deep-merged over the shared sections in the browser aspect (host keys win on conflict).";
+              };
+            };
           };
         };
     };
