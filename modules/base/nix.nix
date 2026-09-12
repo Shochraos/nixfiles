@@ -16,7 +16,7 @@
           ];
           settings.download-buffer-size = 524288000;
           settings.sync-before-registering = true;
-          optimise.automatic = true;
+          settings.auto-optimise-store = true;
 
           channel.enable = false;
         };

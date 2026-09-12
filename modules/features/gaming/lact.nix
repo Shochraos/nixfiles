@@ -2,7 +2,7 @@ let
   gpuId = "10DE:2684-1458:40E4-0000:01:00.0";
 
   settings = {
-    version = 6;
+    version = 7;
     apply_settings_timer = 5;
     auto_switch_profiles = false;
     current_profile = null;
