@@ -72,11 +72,8 @@ in
         overlaySettings = {
           modelRoles = {
             default = "commandcode/deepseek/deepseek-v4.1-flash";
-            advisor = "commandcode/z-ai/glm-5.3-flash:high";
-            tiny = "openrouter/z-ai/glm-5.3-flash:low";
-            smol = "openrouter/z-ai/glm-5.3-flash:low";
           };
-          advisor.enabled = true;
+          advisor.enabled = false;
           advisor.syncBacklog = "3";
           autolearn.enabled = true;
           memory.backend = "mnemopi";
