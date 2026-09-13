@@ -2,5 +2,6 @@ CLAUDE.md
 .claude/
 .direnv/
 .omp/
+.pre-commit-config.yaml
 result
 result-*

@@ -78,7 +78,9 @@ One template carries a **format contract worth knowing before you edit the secre
 
 ## Testing
 
-`nix flake check` runs four checks: `treefmt`, a unit suite, and one behaviour check per shipped script.
+`nix flake check` runs five checks: `treefmt`, a unit suite, one behaviour check per shipped script, and a `pre-commit` check that runs the same two hooks a commit does.
+
+Two of them also run at commit time. Entering the devshell installs a `pre-commit` hook — `cd` into the repo with direnv active, or `nix develop` once per clone — and after that `git commit` checks the staged files against treefmt and runs the unit suite before the commit is created. Both hooks run unconditionally, so a commit that stages nothing relevant still runs them. Nothing is rewritten: a formatting failure means the file needs `nix fmt`, and the commit is refused. `git commit --no-verify` bypasses both, and since hooks are per-clone and untracked, a fresh checkout has none until a devshell is entered there. CI is what enforces them.
 
 The unit suite in `./tests/` covers logic a build cannot see. That is the display derivations in `./lib/display.nix` — which monitor rules get emitted, how workspaces bind to outputs, which screen the bar pins to, which output `hdr-set` targets — plus the equalizer assertions in `./lib/audio.nix`, the `host.*` option contracts, and the argument guards on the `ai` functor. It finishes in about a fifth of a second.
 
@@ -104,7 +106,7 @@ nh-update
 Other useful commands:
 
 ```bash
-# Formatting, shellcheck, the unit suite and the per-script behaviour checks
+# Formatting, shellcheck, the unit suite, the behaviour checks and the hooks
 nix flake check
 
 # Format the tree (nixfmt, shfmt, shellcheck)
