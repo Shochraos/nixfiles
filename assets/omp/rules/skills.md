@@ -35,7 +35,7 @@ Cross-cutting skill routing. Language packs load automatically through the
 - Feature or bugfix in a language with a test runner: `skill://test-driven-development`.
 - Diagnosing a defect: `skill://systematic-debugging`.
 
-Self-written pack — the eight managed skills, also auto-nudged by the `lang-*`
+Self-written pack — the nine managed skills, also auto-nudged by the `lang-*`
 rules where noted:
 
 - A repository moved to a new absolute path: `skill://omp-project-migration`
@@ -56,3 +56,6 @@ rules where noted:
   blocked, follow up by fetching that URL through the skill, never dropping it.
 - Measuring per-netns kernel FIB events or routing convergence in netns or
   Mininet labs: `skill://kernel-route-monitor-measurement`.
+- Adding or debugging a `nix-unit` suite — in a flake-parts repo or inside a
+  derivation: `skill://nix-unit-in-flake` (wiring, the path/interpolation
+  traps, `expectedError` matching, and which contracts are worth testing).

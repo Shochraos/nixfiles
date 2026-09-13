@@ -18,7 +18,7 @@ in
 
           home.packages = with pkgs; [
             (discord.override { withVencord = true; })
-            libreoffice-qt-fresh
+            libreoffice-qt-stable
             pdfarranger
           ];
 
