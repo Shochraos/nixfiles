@@ -16,6 +16,11 @@
         input = {
           accel_profile = "flat";
         };
+        settings = {
+          misc = {
+            exit_window_retains_fullscreen = true;
+          };
+        };
         windowRules = [
           {
             match = {
@@ -60,6 +65,15 @@
             };
             float = true;
             workspace = "1";
+          }
+          {
+            match = {
+              class = "^(steam_app_2996787621)$";
+              title = "^$";
+            };
+            suppress_event = "activate activatefocus fullscreen maximize fullscreenoutput";
+            no_focus = true;
+            workspace = "special:endfieldghost silent";
           }
           {
             match = {
