@@ -1,4 +1,4 @@
-top@{ config, ... }:
+top@{ config, inputs, ... }:
 let
   inherit (config) helpers tests;
 
@@ -13,6 +13,8 @@ let
       throw "check: expected exactly one home-manager user on Azazel, got ${toString (builtins.length names)}";
 in
 {
+  imports = [ inputs.git-hooks-nix.flakeModule ];
+
   perSystem =
     { lib, pkgs, ... }:
     let
@@ -21,24 +23,43 @@ in
         lib.findFirst (
           p: (p.name or "") == name
         ) (throw "check: ${name} is not in Azazel's home.packages") azazelHome.home.packages;
+
+      unitTests = pkgs.writeShellApplication {
+        name = "unit-tests";
+        runtimeInputs = [ pkgs.nix-unit ];
+        text = ''
+          nix-unit --eval-store "''${TMPDIR:-/tmp}" \
+            --argstr nixpkgsPath ${pkgs.path} \
+            --argstr optionsPath ${tests.options} \
+            --argstr displayPath ${helpers.display} \
+            --argstr aiPath ${tests.ai} \
+            --argstr audioPath ${helpers.audio} \
+            ${tests.dir}/default.nix
+        '';
+      };
     in
     {
-      checks.unit-tests =
-        pkgs.runCommandLocal "nix-unit-suite"
-          {
-            nativeBuildInputs = [ pkgs.nix-unit ];
-          }
-          ''
-            export HOME="$TMPDIR"
-            nix-unit --eval-store "$HOME" \
-              --argstr nixpkgsPath ${pkgs.path} \
-              --argstr optionsPath ${tests.options} \
-              --argstr displayPath ${helpers.display} \
-              --argstr aiPath ${tests.ai} \
-              --argstr audioPath ${helpers.audio} \
-              ${tests.dir}/default.nix
-            touch $out
-          '';
+      packages.unit-tests = unitTests;
+
+      checks.unit-tests = pkgs.runCommandLocal "nix-unit-suite" { } ''
+        ${lib.getExe unitTests}
+        touch $out
+      '';
+
+      pre-commit.settings.hooks = {
+        treefmt = {
+          enable = true;
+          always_run = true;
+        };
+
+        unit-tests = {
+          enable = true;
+          name = "nix-unit";
+          entry = lib.getExe unitTests;
+          pass_filenames = false;
+          always_run = true;
+        };
+      };
 
       checks."scripts/hdr-set" = pkgs.runCommandLocal "check-hdr-set" { } ''
         export HOME="$TMPDIR/home"
