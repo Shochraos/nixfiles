@@ -71,13 +71,13 @@ in
 
         overlaySettings = {
           modelRoles = {
-            default = "openrouter/z-ai/glm-5.3-flash:max";
-            advisor = "openrouter/moonshotai/kimi-k3:high";
+            default = "commandcode/deepseek/deepseek-v4.1-flash";
+            advisor = "commandcode/z-ai/glm-5.3-flash:high";
             tiny = "openrouter/z-ai/glm-5.3-flash:low";
             smol = "openrouter/z-ai/glm-5.3-flash:low";
           };
-          advisor.enabled = false;
-          advisor.syncBacklog = "1";
+          advisor.enabled = true;
+          advisor.syncBacklog = "3";
           autolearn.enabled = true;
           memory.backend = "mnemopi";
           mnemopi.polyphonicRecall = true;
@@ -98,22 +98,6 @@ in
 
         overlay = (pkgs.formats.yaml { }).generate "oh-my-pi-config.yml" overlaySettings;
 
-        advisorSettings = overlaySettings // {
-          advisor.enabled = true;
-          advisor.syncBacklog = "3";
-        };
-
-        advisorOverlay = (pkgs.formats.yaml { }).generate "oh-my-pi-config-advisor.yml" advisorSettings;
-
-        omp-advisor = pkgs.writeShellApplication {
-          name = "omp-advisor";
-          runtimeInputs = [ oh-my-pi ];
-          text = ''
-            export PI_CONFIG_FILES="${config.home.homeDirectory}/.omp/agent/nix-config-advisor.yml"
-            exec omp "$@"
-          '';
-        };
-
         overlayPath = "${config.home.homeDirectory}/.omp/agent/nix-config.yml";
 
         rulesDir = assets.ompRules;
@@ -133,12 +117,10 @@ in
       {
         home.packages = [
           oh-my-pi
-          omp-advisor
         ];
 
         home.file = {
           ".omp/agent/nix-config.yml".source = overlay;
-          ".omp/agent/nix-config-advisor.yml".source = advisorOverlay;
           ".omp/agent/mcp.json".source = mcp-config;
         }
         // ruleFiles;
