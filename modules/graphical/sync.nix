@@ -67,6 +67,7 @@
 
                 vdirsyncer = {
                   enable = true;
+                  conflictResolution = "local wins";
                   collections = [
                     "personal"
                     "work"
