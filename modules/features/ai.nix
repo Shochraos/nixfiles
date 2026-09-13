@@ -72,9 +72,9 @@ in
         overlaySettings = {
           modelRoles = {
             default = "commandcode/deepseek/deepseek-v4.1-flash";
+            tiny = "commandcode/deepseek/deepseek-v4.1-flash";
+            smol = "commandcode/deepseek/deepseek-v4.1-flash";
           };
-          advisor.enabled = false;
-          advisor.syncBacklog = "3";
           autolearn.enabled = true;
           memory.backend = "mnemopi";
           mnemopi.polyphonicRecall = true;
