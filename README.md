@@ -70,9 +70,21 @@ One template carries a **format contract worth knowing before you edit the secre
 - `./modules/features/` — aspects a host or sub-bundle selects directly rather than through `base`/`graphical`: the form factors `desktop` / `laptop`, `gaming/`, `ai`, `virtualization`, `media`, …. A file's folder names the layer that includes it, so moving an aspect between layers moves the file too.
 - `./modules/hosts/<host>/` — `config.nix` (host overrides + `host.*` settings), `hardware.nix`, `filesystems.nix`.
 - `./pkgs/<name>/package.nix` — packages nixpkgs does not carry, as ordinary `callPackage` expressions. These are **not** flake-parts modules, so `import-tree` ignores them; each is reached by a named overlay declared in the aspect that owns it (see `mp3tag`, `lgtv`, `gaming/packages`), which is also what keeps an unfree allowlist scoped to the aspect that needs it.
+- `./lib/` — pure helper functions shared by aspects (`display.nix`, `audio.nix`). Also not flake-parts modules; `paths.nix` declares each under `helpers`, and both the aspects and the tests import them from there.
+- `./tests/` — the `nix-unit` suites and the script behaviour checks that `nix flake check` runs.
 - `./configs/` — raw config files for tools without a home-manager module.
 - `./assets/` — icons, templates, shell scripts and patches referenced or installed by modules, plus the always-on rules for the oh-my-pi coding agent (`assets/omp/rules/`).
 - `./secrets/` — [sops-nix](https://github.com/Mic92/sops-nix)-encrypted secrets.
+
+## Testing
+
+`nix flake check` runs four checks: `treefmt`, a unit suite, and one behaviour check per shipped script.
+
+The unit suite in `./tests/` covers logic a build cannot see. That is the display derivations in `./lib/display.nix` — which monitor rules get emitted, how workspaces bind to outputs, which screen the bar pins to, which output `hdr-set` targets — plus the equalizer assertions in `./lib/audio.nix`, the `host.*` option contracts, and the argument guards on the `ai` functor. It finishes in about a fifth of a second.
+
+The behaviour checks in `./tests/scripts/` run the shipped scripts — `hdr-set` with its `hdr` wrapper, and `eq` — against a scratch `HOME` with `hyprctl` stubbed. For `hdr-set` they pin what a build cannot: `off` removes its line, `on` is idempotent, a failing `hyprctl` is tolerated, and the wrapper restores the setting on exit while passing a child's exit status through. For `eq` they pin that a selection is recorded before the handoff to systemd, and that a preset the filter does not have is refused.
+
+Two rules govern the suite. The logic under test lives in `./lib/`, so an aspect and its test call the same function instead of two copies of it. And a test that cannot fail gets deleted rather than kept: nothing here asserts a value the host build already forces, and `keepassxc-unlock` has no test because its wrapper puts its own `keepassxc` ahead of any stub on `PATH`, leaving nothing observable short of an eight-second delay.
 
 ## Common commands
 
@@ -92,7 +104,7 @@ nh-update
 Other useful commands:
 
 ```bash
-# Check the flake evaluates and the tree is formatted
+# Formatting, shellcheck, the unit suite and the per-script behaviour checks
 nix flake check
 
 # Format the tree (nixfmt, shfmt, shellcheck)

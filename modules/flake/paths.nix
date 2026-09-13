@@ -16,6 +16,18 @@ in
       default = { };
       description = "Package definitions under `pkgs/`, resolved here so no feature file carries a relative-path literal. Consumed by `callPackage`.";
     };
+
+    helpers = mkOption {
+      type = pathTable;
+      default = { };
+      description = "Pure helper functions shared by aspects, resolved here so no aspect carries a relative-path literal.";
+    };
+
+    tests = mkOption {
+      type = pathTable;
+      default = { };
+      description = "Test suites and script test scripts, resolved here so the flake module that wires the checks carries no relative-path literal.";
+    };
   };
 
   config = {
@@ -39,6 +51,18 @@ in
       bscpylgtv = ../../pkgs/bscpylgtv/package.nix;
       ironyModManager = ../../pkgs/irony-mod-manager/package.nix;
       mp3tag = ../../pkgs/mp3tag/package.nix;
+    };
+
+    helpers = {
+      audio = ../../lib/audio.nix;
+      display = ../../lib/display.nix;
+    };
+
+    tests = {
+      ai = ../../modules/features/ai.nix;
+      dir = ../../tests;
+      options = ../../modules/flake/options.nix;
+      scripts = ../../tests/scripts;
     };
   };
 }

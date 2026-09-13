@@ -45,6 +45,13 @@ executed, delete its `.omp/<TOPIC>-PLAN.md` — the record lives in
   in its own manifest or lockfile stay there.
 - Verification means the verification gate this project already defines, run
   and read before any claim of success, not a generic test command.
+- Custom logic earns a test in the same change. A derivation that ships a
+  script (`writeShellApplication` — `hdr-set`, `theme-sync`, `mic-mute`), a
+  hand-rolled option type or default, or a merge that would silently drop a
+  key: add a case to the repo's test suite and make the project's gate run it.
+  Declarative data does not — a `host.*` value, a widget list, a keybind table
+  is proven by building the hosts, and a test that restates what `mkOption`
+  already enforces, or what the build already forces, is negative value.
 - Finishing means: formatter, project checks, then bring `.omp/AGENTS.md` and
   `.omp/WATCHDOG.md` up to date in the same step as the memory write, then
   refresh `README.md` with `skill://create-readme`, audit the refresh with a

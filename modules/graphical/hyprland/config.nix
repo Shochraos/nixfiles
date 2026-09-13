@@ -1,3 +1,8 @@
+{ config, lib, ... }:
+let
+  inherit (config) helpers;
+  display = import helpers.display { inherit lib; };
+in
 {
   den.aspects.hyprland.nixos =
     { pkgs, ... }:
@@ -53,31 +58,6 @@
     }:
     let
       lua = lib.generators.mkLuaInline;
-
-      pinnedGeometry =
-        output:
-        lib.optionalAttrs (output.mode != null) { inherit (output) mode; }
-        // lib.optionalAttrs (output.position != null) { inherit (output) position; }
-        // lib.optionalAttrs (output.scale != null) { inherit (output) scale; };
-
-      monitorRules = lib.mapAttrsToList (name: output: { output = name; } // pinnedGeometry output) (
-        lib.filterAttrs (_: output: pinnedGeometry output != { }) osConfig.host.outputs
-      );
-
-      workspaceRules = builtins.concatLists (
-        lib.mapAttrsToList (
-          name: output:
-          lib.imap0 (
-            index: workspace:
-            {
-              workspace = toString workspace;
-              monitor = name;
-              persistent = true;
-            }
-            // lib.optionalAttrs (index == 0) { default = true; }
-          ) output.workspaces
-        ) osConfig.host.outputs
-      );
     in
     {
       xdg.configFile."uwsm/env".source =
@@ -170,9 +150,10 @@
 
           gesture = osConfig.host.hyprland.gestures;
 
-          monitor = monitorRules;
+          monitor = display.monitorRules osConfig.host.outputs;
 
-          workspace_rule = workspaceRules ++ osConfig.host.hyprland.workspaceRules;
+          workspace_rule =
+            display.workspaceRules osConfig.host.outputs ++ osConfig.host.hyprland.workspaceRules;
           colors = {
             _var = lua "require('dms.colors')";
           };

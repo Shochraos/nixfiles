@@ -7,6 +7,7 @@
           config.treefmt.build.wrapper
           pkgs.nixd
           pkgs.nixfmt
+          pkgs.nix-unit
           pkgs.shellcheck
           pkgs.sops
           pkgs.ssh-to-age
