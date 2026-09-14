@@ -9,7 +9,14 @@
       hardware.graphics = {
         enable = true;
         enable32Bit = true;
+        extraPackages = [ pkgs.libglvnd ];
+        extraPackages32 = [ pkgs.pkgsi686Linux.libglvnd ];
       };
+
+      environment.sessionVariables.LD_LIBRARY_PATH = [
+        "/run/opengl-driver/lib"
+        "/run/opengl-driver-32/lib"
+      ];
 
       environment.systemPackages = with pkgs; [
         nvidia-vaapi-driver
