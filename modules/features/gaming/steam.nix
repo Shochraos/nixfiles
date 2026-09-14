@@ -22,11 +22,18 @@
     };
 
   den.aspects.gaming.provides.to-users.homeManager =
-    { lib, pkgs, ... }:
+    {
+      config,
+      lib,
+      pkgs,
+      ...
+    }:
     let
       proton-cachyos-v3 =
         inputs.proton-cachyos-nix.packages.${pkgs.stdenv.hostPlatform.system}.proton-cachyos-v3;
       dw-proton = inputs.dw-proton-nix.packages.${pkgs.stdenv.hostPlatform.system}.dw-proton;
+      libGL64 = config.lib.file.mkOutOfStoreSymlink "/run/opengl-driver/lib/libGL.so.1";
+      libGL32 = config.lib.file.mkOutOfStoreSymlink "/run/opengl-driver-32/lib/libGL.so.1";
       drsSettings = lib.concatStringsSep "," [
         "ngx_dlss_sr_override=on"
         "ngx_dlss_sr_override_render_preset_selection=render_preset_m"
@@ -48,6 +55,17 @@
         entries = [
           "${pkgs.steam}/share/applications/steam.desktop"
         ];
+      };
+
+      home.file = {
+        ".local/share/Steam/ubuntu12_64/libGL.so.1" = {
+          source = libGL64;
+          force = true;
+        };
+        ".local/share/Steam/ubuntu12_32/libGL.so.1" = {
+          source = libGL32;
+          force = true;
+        };
       };
     };
 }

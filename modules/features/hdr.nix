@@ -50,11 +50,70 @@ in
         hdr-set
         (pkgs.writeShellApplication {
           name = "hdr";
-          runtimeInputs = [ hdr-set ];
+          runtimeInputs = with pkgs; [
+            coreutils
+            gnugrep
+            jq
+            hdr-set
+          ];
           text = ''
-            trap 'hdr-set off' EXIT INT TERM
+            poll="''${HDR_POLL_INTERVAL:-1}"
+            grace="''${HDR_GRACE:-5}"
+            handoff="''${HDR_HANDOFF:-30}"
+
+            state="$(mktemp -d)"
+            before="$state/before"
+            targets="$state/targets"
+            now="$state/now"
+            rcfile="$state/rc"
+            frozen=0
+            absent_since=""
+            empty_since=""
+
+            classes() { hyprctl clients -j 2>/dev/null | jq -r '.[].class // empty' | sort -u; }
+
+            trap 'exit 130' INT TERM
+            trap 'hdr-set off; rm -rf "$state"' EXIT
+
             hdr-set on
-            "$@"
+            classes > "$before"
+            : > "$targets"
+
+            ( "$@" || rc=$?; printf '%s' "''${rc:-0}" > "$rcfile" ) &
+            child=$!
+
+            while :; do
+              classes > "$now" || true
+
+              if [ "$frozen" -eq 0 ]; then
+                comm -13 "$before" "$now" >> "$targets" 2>/dev/null || true
+                sort -u -o "$targets" "$targets"
+                if [ -s "$targets" ] && [ -f "$rcfile" ]; then
+                  frozen=1
+                fi
+              fi
+
+              if [ -s "$targets" ]; then
+                if comm -12 "$targets" "$now" 2>/dev/null | grep -q .; then
+                  absent_since=""
+                elif [ -z "$absent_since" ]; then
+                  absent_since="$SECONDS"
+                elif [ "$((SECONDS - absent_since))" -ge "$grace" ]; then
+                  break
+                fi
+              elif [ -f "$rcfile" ]; then
+                if [ -z "$empty_since" ]; then
+                  empty_since="$SECONDS"
+                elif [ "$((SECONDS - empty_since))" -ge "$handoff" ]; then
+                  break
+                fi
+              fi
+
+              sleep "$poll"
+            done
+
+            wait "$child" 2>/dev/null || true
+            exit "$(cat "$rcfile" 2>/dev/null || echo 0)"
           '';
         })
       ];

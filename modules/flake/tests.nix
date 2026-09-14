@@ -69,6 +69,8 @@ in
             pkgs.bash
             pkgs.coreutils
             pkgs.gnugrep
+            pkgs.jq
+            pkgs.util-linux
           ]
         }:${fromAzazel "hdr-set"}/bin:${fromAzazel "hdr"}/bin:''${PATH}" \
           ${pkgs.bash}/bin/bash ${tests.scripts}/hdr-set.sh
