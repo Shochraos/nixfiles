@@ -87,6 +87,32 @@ in
               description = "Physical outputs of this host, keyed by Hyprland output name. Consumed by dankshell (which derives the DMS output settings), by the hdr aspect (which drives the single entry with `hdr = true`) and by the hyprland aspect (which pins the geometry Hyprland cannot be told through DMS, and binds each output's workspaces to it).";
             };
 
+            streaming = {
+              displays = mkOption {
+                default = { };
+                type = types.attrsOf (
+                  types.submodule {
+                    options = {
+                      output = mkOption {
+                        type = types.str;
+                        description = "Hyprland output name for this display, e.g. `FRAME` or `DECK`. The display is created at compositor start under exactly this name and persists, so a screen-share client always finds it and never has to fall back to a real monitor.";
+                      };
+                      mode = mkOption {
+                        type = types.str;
+                        description = "Resolution and refresh rate as Hyprland spells it, e.g. `2560x1440@120`, applied by a monitor rule when the display is created and re-applied whenever a reload collapses it. Required: a display without one comes up at the compositor default, which is never what a streamed game should be told.";
+                      };
+                      scale = mkOption {
+                        type = types.nullOr types.str;
+                        default = null;
+                        description = "Fractional scale as a string. Null lets Hyprland pick from the mode's PPI, which at both streaming resolutions here means 2 rather than 1 — set it explicitly unless a halved logical desktop is wanted.";
+                      };
+                    };
+                  }
+                );
+                description = "Headless displays for game streaming, keyed by wrapper name: each entry produces a `<name>` launch-option wrapper and a `<name>-display` helper, and the game runs nested inside gamescope at this display's geometry. The displays themselves are declared here and created at compositor start, so a screen-share client can always find one to capture; the wrapper only focuses the monitor and records which window it started. An absent entry means that wrapper is not packaged, so presence is the switch.";
+              };
+            };
+
             audio = {
               equalizers = mkOption {
                 default = { };

@@ -112,4 +112,115 @@ in
     };
     expectedError.msg = "exactly one host.outputs entry with hdr = true, got 2";
   };
+
+  testStreamingWindowRulesEmptyWithoutDisplays = {
+    expr = display.streamingWindowRules { displays = { }; };
+    expected = [ ];
+  };
+
+  testStreamingWindowRulesMatchGamescopeOnAnyOutput = {
+    expr = display.streamingWindowRules {
+      displays = {
+        deck = {
+          output = "DECK";
+          mode = "1280x800@90";
+        };
+      };
+    };
+    expected = [
+      {
+        match = {
+          class = "^(gamescope)$";
+        };
+        fullscreen = true;
+      }
+    ];
+  };
+
+  testStreamingEnsureScriptIsNullWithoutDisplays = {
+    expr = display.streamingEnsureScript {
+      pkgs = { };
+      streaming = {
+        displays = { };
+      };
+    };
+    expected = null;
+  };
+
+  testStreamingLuaIsEmptyWithoutAScript = {
+    expr = display.streamingLua null;
+    expected = "";
+  };
+
+  testStreamingLuaRegistersStartAndReloadHooks = {
+    expr =
+      let
+        lua = display.streamingLua "/store/streaming-displays";
+        count = needle: builtins.length (lib.splitString needle lua) - 1;
+      in
+      {
+        start = count "hl.on(\"hyprland.start\"";
+        reload = count "hl.on(\"config.reloaded\"";
+        invoke = count "/store/streaming-displays/bin/streaming-displays";
+      };
+    expected = {
+      start = 1;
+      reload = 1;
+      invoke = 1;
+    };
+  };
+
+  # The displays are created at compositor start, so the script must be
+  # idempotent: it checks for the output before creating it, and always re-asserts
+  # the mode, because a reload collapses the mode without removing the output.
+  testStreamingEnsureScriptCreatesThenPinsTheMode =
+    let
+      drv = display.streamingEnsureScript {
+        pkgs = {
+          writeShellApplication = args: args;
+          gnugrep = "grep";
+          jq = "jq";
+        };
+        streaming = {
+          displays = {
+            deck = {
+              output = "DECK";
+              mode = "1280x800@90";
+              scale = "1";
+            };
+          };
+        };
+      };
+      text = drv.text;
+      has = needle: builtins.length (lib.splitString needle text) - 1 > 0;
+    in
+    {
+      expr = {
+        creates = has ''output create headless "DECK"'';
+        pins = has ''hl.monitor({ output = "DECK", mode = "1280x800@90", scale = 1 })'';
+      };
+      expected = {
+        creates = true;
+        pins = true;
+      };
+    };
+
+  testStreamingGeometrySplitsMode = {
+    expr = display.streamingGeometry { mode = "2560x1440@120"; };
+    expected = {
+      width = "2560";
+      height = "1440";
+      refresh = "120";
+    };
+  };
+
+  testStreamingGeometryRejectsAModeWithoutARefreshRate = {
+    expr = display.streamingGeometry { mode = "2560x1440"; };
+    expectedError.msg = "must be WIDTHxHEIGHT@REFRESH";
+  };
+
+  testStreamingGeometryRejectsAMalformedSize = {
+    expr = display.streamingGeometry { mode = "2560@120"; };
+    expectedError.msg = "must be WIDTHxHEIGHT@REFRESH";
+  };
 }

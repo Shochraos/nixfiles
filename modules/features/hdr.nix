@@ -61,6 +61,9 @@ in
             grace="''${HDR_GRACE:-5}"
             handoff="''${HDR_HANDOFF:-30}"
 
+            launch_ld="''${LD_LIBRARY_PATH-}"
+            unset LD_LIBRARY_PATH
+
             state="$(mktemp -d)"
             before="$state/before"
             targets="$state/targets"
@@ -79,7 +82,8 @@ in
             classes > "$before"
             : > "$targets"
 
-            ( "$@" || rc=$?; printf '%s' "''${rc:-0}" > "$rcfile" ) &
+            ( if [ -n "$launch_ld" ]; then export LD_LIBRARY_PATH="$launch_ld"; fi
+              "$@" || rc=$?; printf '%s' "''${rc:-0}" > "$rcfile" ) &
             child=$!
 
             while :; do

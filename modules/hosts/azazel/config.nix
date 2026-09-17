@@ -140,6 +140,22 @@
         ];
       };
 
+      host.streaming = {
+        displays = {
+          frame = {
+            output = "FRAME";
+            mode = "2560x1440@120";
+            scale = "1";
+          };
+
+          deck = {
+            output = "DECK";
+            mode = "1280x800@90";
+            scale = "1";
+          };
+        };
+      };
+
       host.audio.equalizers.dx3 = {
         target = {
           "api.alsa.card.name" = "DX3 Pro+";

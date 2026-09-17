@@ -13,11 +13,18 @@
       nixpkgs.overlays = [ inputs.millennium.overlays.default ];
       programs.steam = {
         enable = true;
-        package = pkgs.millennium-steam;
+        package = pkgs.millennium-steam.override {
+          extraArgs = "-pipewire";
+        };
         extraCompatPackages = [
           proton-cachyos-v3
           dw-proton
         ];
+        remotePlay.openFirewall = true;
+      };
+      programs.gamescope = {
+        enable = true;
+        capSysNice = false;
       };
     };
 

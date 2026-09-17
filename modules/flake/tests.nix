@@ -64,6 +64,7 @@ in
       checks."scripts/hdr-set" = pkgs.runCommandLocal "check-hdr-set" { } ''
         export HOME="$TMPDIR/home"
         mkdir -p "$HOME"
+        export SHADOW_LIB="${lib.getLib pkgs.glibc}/lib/libm.so.6"
         PATH="${
           lib.makeBinPath [
             pkgs.bash
@@ -93,6 +94,23 @@ in
           ]
         }:${fromAzazel "eq"}/bin:''${PATH}" \
           ${pkgs.bash}/bin/bash ${tests.scripts}/eq.sh
+        touch $out
+      '';
+      checks."scripts/streaming" = pkgs.runCommandLocal "check-streaming" { } ''
+        export HOME="$TMPDIR/home"
+        mkdir -p "$HOME"
+        export SHADOW_LIB="${lib.getLib pkgs.glibc}/lib/libm.so.6"
+        PATH="${
+          lib.makeBinPath [
+            pkgs.bash
+            pkgs.coreutils
+            pkgs.gnugrep
+            pkgs.gamescope
+            pkgs.jq
+            pkgs.util-linux
+          ]
+        }:${fromAzazel "frame"}/bin:${fromAzazel "frame-display"}/bin:${fromAzazel "deck"}/bin:${fromAzazel "deck-display"}/bin:''${PATH}" \
+          ${pkgs.bash}/bin/bash ${tests.scripts}/streaming.sh
         touch $out
       '';
     };

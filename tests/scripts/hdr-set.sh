@@ -106,6 +106,35 @@ elapsed=$(($(date +%s) - start))
 [ "$(cat "$DURING")" = 1 ] ||
   fail "HDR was off while the game window was open: hdr followed the launcher's exit, not the window"
 
+# A launch option inherits LD_LIBRARY_PATH from the Steam child environment,
+# whose steam-runtime directories shadow newer Nix libraries (its 2019 libattr
+# lacks ATTR_1.3, which coreutils' mktemp requires). A wrapper that runs its own
+# tooling on that path dies at its first statement, before the game is spawned.
+# The shadow lib must be a REAL ELF: the loader skips a truncated file outright,
+# so an invalid one would not reproduce the failure at all.
+shadow="$TMPDIR/shadow"
+mkdir -p "$shadow"
+install -m 644 "$SHADOW_LIB" "$shadow/libattr.so.1"
+
+if LD_LIBRARY_PATH="$shadow" mktemp -d >/dev/null 2>&1; then
+  fail "harness no longer bites: a shadowed libattr must break mktemp"
+fi
+
+cat >"$TMPDIR/bin/write-ld" <<'WRITELD'
+#!/bin/sh
+printf '%s\n' "${LD_LIBRARY_PATH-<unset>}" >"$LD_FILE"
+WRITELD
+chmod +x "$TMPDIR/bin/write-ld"
+
+rm -f "$TMPDIR/child-ld"
+export LD_FILE="$TMPDIR/child-ld"
+LD_LIBRARY_PATH="$shadow" hdr "$TMPDIR/bin/write-ld" ||
+  fail "hdr died on a shadowed library path instead of running its own tooling"
+[ "$(cat "$LD_FILE" 2>/dev/null)" = "$shadow" ] ||
+  fail "hdr did not hand the child the inherited library path"
+[ "$(count)" = 0 ] || fail "hdr did not restore after the shadowed run"
+unset LD_FILE
+
 # A short handoff keeps the no-window case from stalling the check.
 export HDR_HANDOFF=1
 hdr false && fail "the hdr wrapper must propagate a non-zero child exit"
