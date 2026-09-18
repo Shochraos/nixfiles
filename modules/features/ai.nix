@@ -85,6 +85,7 @@ in
           mnemopi.workingMemoryTtlHours = 876000;
           mnemopi.workingMemoryLimit = 1000000;
           providers.memoryModel = "online";
+          startup.checkUpdate = false;
           ttsr.repeatMode = "after-gap";
           skills.customDirectories = [
             "${superpowers-skills}"
