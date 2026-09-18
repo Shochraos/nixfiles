@@ -150,7 +150,7 @@
 
           deck = {
             output = "DECK";
-            mode = "1280x800@90";
+            mode = "1280x720@90";
             scale = "1";
           };
         };

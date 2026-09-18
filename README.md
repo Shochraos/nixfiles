@@ -58,7 +58,7 @@ Rather than forking shared modules per host, `modules/flake/options.nix` defines
 
 Streaming to a handheld or headset over Steam Remote Play sends whatever the host displays. This desktop's real outputs are a 3440x1440 ultrawide and a 4K TV, so a client sees an aspect and pixel count nobody chose, and a game's own resolution list follows the host display.
 
-`host.streaming.displays` declares one entry per streaming client. Each entry generates two commands: a `<name>-display` helper that owns the output name and mode, and a `<name>` launch-option wrapper that runs the game. Azazel declares `frame` (2560x1440@120) and `deck` (1280x800@90). Put the wrapper in a shortcut's launch options in place of `%command%`:
+`host.streaming.displays` declares one entry per streaming client. Each entry generates two commands: a `<name>-display` helper that owns the output name and mode, and a `<name>` launch-option wrapper that runs the game. Azazel declares `frame` (2560x1440@120) and `deck` (1280x720@90). Put the wrapper in a shortcut's launch options in place of `%command%`:
 
 ```
 deck %command%
@@ -97,6 +97,24 @@ Steam Remote Play hosting has to be enabled once, under Steam's Settings → Rem
 The portal needs a patch. In `xdg-desktop-portal-hyprland` 1.4.1, the out-of-buffers branch of the screencopy frame callback renegotiates the stream, which re-enters `PW_STREAM_STATE_STREAMING` synchronously and installs a fresh frame callback that the branch then destroys. A live stream is left that never receives another frame. Every retry also reallocates the buffer pool, so one late buffer costs a full renegotiation, Steam's capture size flaps, and its mmap on the freed pool fails with `EBADF`. Three upstream commits fix this, none in a release yet, so `assets/patches/xdph-screencopy-buffer-reuse.patch` back-ports all three and `portal.nix` applies them with an overlay.
 
 HDR is unavailable: Steam Remote Play's HDR pass-through is documented for Windows hosts only, so both wrappers stay 8-bit SDR. The Deck OLED's panel is HDR-capable, but the limit is the host OS, not the client.
+
+### Herdr
+
+`modules/graphical/terminal.nix` declares Herdr's configuration through home-manager's `programs.herdr`, which renders `settings` to `$XDG_CONFIG_HOME/herdr/config.toml` and reloads a running server whenever the file changes.
+
+The package comes from nixpkgs, so shell completions and Herdr's agent skill file arrive with it, and updates ride the normal nixpkgs bump. A flake input tracking upstream releases was tried and removed. It builds from source, so it is absent from the binary cache, and it ships the bare binary without those two extras.
+
+That config is a store path, so Herdr's settings UI cannot write to it. Sidebar geometry and session state live in `~/.config/herdr/session.json` and `$XDG_STATE_HOME/herdr/`, and both stay writable. Change theme, sound, notifications, or sidebar rows here instead, and the reload hook applies them to a running server.
+
+`xdg.configFile."herdr/config.toml".force = true` is load-bearing. Herdr writes that file itself on first run, and home-manager refuses to replace a regular file it does not own, which aborts the whole activation.
+
+Two settings are deliberate. `terminal.shell_mode = "login"` makes pane shells source `~/.profile`, the source of `PI_CONFIG_FILES` and `NH_FLAKE`; a session started without those two would otherwise hand panes an environment missing both. `update.version_check = false` disables a background version check that can never succeed: Herdr detects a `/nix/store` executable path and refuses to self-update.
+
+Notification delivery uses Herdr's `system` backend, which shells out to `notify-send`, so the aspect installs `libnotify`. Herdr treats a missing `notify-send` as a silent no-op, not an error.
+
+One Herdr client starts with the session. An `hl.on("hyprland.start", …)` hook in the same aspect runs `hl.exec_cmd("ghostty -e herdr", { workspace = "2" })`, so the compositor opens it on workspace 2 and it does not reappear on `hyprctl reload`.
+
+The second argument is a **per-exec rule**, not a window rule. Hyprland attaches it to that spawned process alone, matched through the `HL_EXEC_RULE_TOKEN` the child inherits, and unregisters it as soon as one window matches. Terminals you open later are untouched, and nothing is left in `window_rule` to match `ghostty` as a class.
 
 ### Secrets
 

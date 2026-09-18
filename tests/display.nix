@@ -123,7 +123,7 @@ in
       displays = {
         deck = {
           output = "DECK";
-          mode = "1280x800@90";
+          mode = "1280x720@90";
         };
       };
     };
@@ -170,9 +170,6 @@ in
     };
   };
 
-  # The displays are created at compositor start, so the script must be
-  # idempotent: it checks for the output before creating it, and always re-asserts
-  # the mode, because a reload collapses the mode without removing the output.
   testStreamingEnsureScriptCreatesThenPinsTheMode =
     let
       drv = display.streamingEnsureScript {
@@ -185,7 +182,7 @@ in
           displays = {
             deck = {
               output = "DECK";
-              mode = "1280x800@90";
+              mode = "1280x720@90";
               scale = "1";
             };
           };
@@ -197,7 +194,7 @@ in
     {
       expr = {
         creates = has ''output create headless "DECK"'';
-        pins = has ''hl.monitor({ output = "DECK", mode = "1280x800@90", scale = 1 })'';
+        pins = has ''hl.monitor({ output = "DECK", mode = "1280x720@90", scale = 1 })'';
       };
       expected = {
         creates = true;

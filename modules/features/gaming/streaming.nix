@@ -42,21 +42,16 @@ in
                 hyprctl monitors -j 2>/dev/null | jq -r --arg o "${output}" '.[] | select(.name == $o) | .id'
               }
 
-              # The gamescope we started, if the compositor placed it somewhere
-              # other than this display. Matched by pid — the wrapper records the
-              # pid it spawned and Hyprland reports the same pid for the toplevel
-              # — so a gamescope the user launched by hand is never touched, which
-              # a class match could not distinguish.
               misplaced_gamescope() {
-                local pid our
-                pid="$(cat "$1" 2>/dev/null || true)"
-                [ -n "$pid" ] || return 0
-                our="$(our_monitor_id)"
-                [ -n "$our" ] || return 0
+                local launched_pid our_monitor
+                launched_pid="$(cat "$1" 2>/dev/null || true)"
+                [ -n "$launched_pid" ] || return 0
+                our_monitor="$(our_monitor_id)"
+                [ -n "$our_monitor" ] || return 0
                 hyprctl clients -j 2>/dev/null |
-                  jq -r --argjson pid "$pid" --argjson our "$our" '
+                  jq -r --argjson launched_pid "$launched_pid" --argjson our_monitor "$our_monitor" '
                     .[]
-                    | select(.pid == $pid and .monitor != $our)
+                    | select(.pid == $launched_pid and .monitor != $our_monitor)
                     | .address'
               }
 
@@ -68,9 +63,6 @@ in
                   hyprctl eval 'hl.dispatch(hl.dsp.focus({ monitor = "${output}" }))' >/dev/null 2>&1 || true
                   ;;
                 snapshot)
-                  # Remember what had focus so it can be handed back on exit; the
-                  # display is headless, so leaving focus there strands input on an
-                  # empty workspace with no window to click and no key reachable.
                   hyprctl activewindow -j 2>/dev/null | jq -r '.address // empty' > "$2/focus-addr" || true
                   hyprctl monitors -j 2>/dev/null | jq -r '[.[] | select(.focused)][0].name // empty' > "$2/focus-mon" || true
                   ;;
@@ -167,11 +159,6 @@ in
               classes > "$before"
               : > "$targets"
 
-              # gamescope segfaults on a natural shutdown, so its own status is
-              # meaningless; ${name}-record captures the wrapped command's real
-              # one inside. --keep-alive keeps gamescope alive across a launcher
-              # that forks the game and exits, and Proton's Wayland path is off
-              # because that is what ignores the virtual output in the first place.
               ( if [ -n "$launch_ld" ]; then export LD_LIBRARY_PATH="$launch_ld"; fi
                 MANGOHUD=0 PROTON_ENABLE_WAYLAND=0 "$gamescope_cmd" \
                   -w ${width} -h ${height} -W ${width} -H ${height} -r ${refresh} \

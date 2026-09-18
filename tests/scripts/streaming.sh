@@ -15,10 +15,6 @@ export GAMESCOPE_PID_FILE="$TMPDIR/gamescope.pid"
 export GAMESCOPE_LOG="$TMPDIR/gamescope.log"
 mkdir -p "$XDG_RUNTIME_DIR"
 
-# The displays are permanent and created by the compositor, so `output` must never
-# be called by a wrapper: a client that creates or destroys one would fight the
-# config that declared it. The stub therefore FAILS the test if either verb
-# appears, rather than silently tolerating it.
 cat >"$TMPDIR/bin/hyprctl" <<'STUB'
 #!/bin/sh
 printf '%s\n' "$*" >>"$HYPRCTL_LOG"
@@ -74,11 +70,6 @@ esac
 STUB
 chmod +x "$TMPDIR/bin/hyprctl"
 
-# gamescope always segfaults on a natural shutdown, so a stub that exits non-zero
-# is the faithful stand-in: the wrapper must never surface it. --keep-alive is
-# modelled because the real flag keeps gamescope's own process alive when a
-# launcher forks the game and exits — but NOT after the inner client is gone, so
-# the stub spins only while its child still exists and always honours SIGTERM.
 cat >"$TMPDIR/bin/gamescope" <<'GS'
 #!/bin/sh
 printf '%s\n' "$*" >>"$GAMESCOPE_LOG"
@@ -103,8 +94,6 @@ GS
 chmod +x "$TMPDIR/bin/gamescope"
 
 export PATH="$TMPDIR/bin:$PATH"
-# The wrapper's runtimeInputs put the real gamescope ahead of PATH, so the stub
-# is selected through the wrapper's own override seam rather than by shadowing.
 export STREAM_GAMESCOPE="$TMPDIR/bin/gamescope"
 
 reset_state() {
@@ -133,15 +122,12 @@ check_round_trip() {
     fail "$name never dispatched focus onto $output"
   grep -qxF "$output" "$MONITORS" || fail "$name removed its permanent display from the monitor list"
 
-  # The displays are declared by the compositor config, so a wrapper that created
-  # or destroyed one would be fighting the declaration.
   grep -q '^output ' "$HYPRCTL_LOG" && fail "$name called hyprctl output — displays are permanent"
 
   reset_state
   if "$name" false; then fail "$name propagated a zero exit from a failing child"; fi
   grep -qxF "$output" "$MONITORS" || fail "$name removed its display after a failing child"
 
-  # A missing display is a misconfiguration, not something to paper over.
   reset_state
   printf 'HDMI-A-1\nDP-1\n' >"$MONITORS"
   if "$name" true 2>/dev/null; then
@@ -150,16 +136,12 @@ check_round_trip() {
 }
 
 check_round_trip frame FRAME "2560x1440@120"
-check_round_trip deck DECK "1280x800@90"
+check_round_trip deck DECK "1280x720@90"
 
-# The game must run inside gamescope at the display's own geometry, with the
-# compositor env the user validated: Proton's Wayland path is what ignores the
-# virtual output in the first place, so it is switched off for the child and the
-# overlay is left to gamescope's own --mangoapp rather than mangohud's.
 reset_state
 deck true || fail "deck must run"
 gs_args=$(cat "$GAMESCOPE_LOG")
-for expected in "-w 1280" "-h 800" "-W 1280" "-H 800" "-r 90" "--keep-alive" "--mangoapp"; do
+for expected in "-w 1280" "-h 720" "-W 1280" "-H 720" "-r 90" "--keep-alive" "--mangoapp"; do
   # shellcheck disable=SC2076
   case "$gs_args" in
   *"$expected"*) ;;
@@ -198,8 +180,6 @@ for expected in "-w 2560" "-h 1440" "-W 2560" "-H 1440" "-r 120"; do
   esac
 done
 
-# gamescope segfaults on every natural shutdown, so its status says nothing about
-# the game. The wrapped command writes its own, and that is what Steam must see.
 reset_state
 cat >"$TMPDIR/bin/exit-code" <<'EXITCODE'
 #!/bin/sh
@@ -217,12 +197,6 @@ set -e
 reset_state
 deck true || fail "deck must report success for a zero-exit child despite gamescope crashing"
 
-# A launch option inherits LD_LIBRARY_PATH from the Steam child environment,
-# whose steam-runtime directories shadow newer Nix libraries (its 2019 libattr
-# lacks ATTR_1.3, which coreutils' mktemp requires). A wrapper that runs its own
-# tooling on that path dies at its first statement, before the game is spawned.
-# The shadow lib must be a REAL ELF: the loader skips a truncated file outright,
-# so an invalid one would not reproduce the failure at all.
 shadow="$TMPDIR/shadow"
 mkdir -p "$shadow"
 install -m 644 "$SHADOW_LIB" "$shadow/libattr.so.1"
@@ -249,7 +223,6 @@ for name in frame deck; do
 done
 unset LD_FILE
 
-# The lock: a second streaming wrapper must refuse rather than fight.
 reset_state
 cat >"$TMPDIR/bin/hold-lock" <<'HOLDER'
 #!/bin/sh
@@ -270,8 +243,6 @@ fi
 kill "$holder" 2>/dev/null || true
 wait "$holder" 2>/dev/null || true
 
-# The bug class hdr was rewritten for: a launcher that exits at once must not end
-# the session before the game window has appeared and gone.
 reset_state
 cat >"$TMPDIR/bin/game" <<'GAME'
 #!/bin/sh
@@ -294,14 +265,10 @@ elapsed=$(($(date +%s) - start))
 [ "$elapsed" -ge 5 ] ||
   fail "frame tore down when the launcher exited instead of following the game window (${elapsed}s)"
 
-# The poll loop must consult the display on every tick: that read is what heals a
-# hyprctl reload mid-session. `|| true` is load-bearing — grep -c exits 1 on a
-# zero count, and under `set -e` that kills the script before the message prints.
 ensures=$(grep -c 'monitors -j' "$HYPRCTL_LOG" || true)
 [ "$ensures" -ge 3 ] ||
   fail "frame did not poll the display while running (${ensures} state reads)"
 
-# ensure must be conditional: a healthy display costs reads, never writes.
 reset_state
 deck sleep 3 &
 steady_pid=$!
@@ -313,8 +280,6 @@ wait "$steady_pid" 2>/dev/null || true
 [ "$steady_evals" -eq 0 ] ||
   fail "ensure re-evaluated on a healthy display (${steady_evals} evals) — a healthy tick must be reads and no writes"
 
-# ensure must actually heal: a reload collapses the mode, and the next tick has to
-# restore it. This is the reason the display survives a reload at all.
 reset_state
 printf 'HDMI-A-1\nDP-1\nDECK\n' >"$MONITORS"
 deck sleep 3 &
@@ -324,19 +289,10 @@ printf '{}\n' >"$MODES"
 sleep 1.5
 drifted_mode=$(jq -r '."DECK" // "none"' "$MODES")
 wait "$drift_pid" 2>/dev/null || true
-[ "$drifted_mode" = "1280x800@90" ] ||
+[ "$drifted_mode" = "1280x720@90" ] ||
   fail "ensure did not heal the mode after drift (got ${drifted_mode})"
 
-# The focus steal: the compositor places a new toplevel on whichever monitor has
-# focus at map time, so anything that takes focus during the ~2s launch (the share
-# picker, Steam) lands the game on a real monitor while the portal captures the
-# virtual one — which is what the user saw as a 1280x536 letterbox inside 1280x800.
 reset_state
-# The gamescope window appears mid-run already parked on HDMI-A-1 (monitor 0)
-# while the wrapper's display is DECK — the misplacement a focus steal causes.
-# The class list is driven by a detached helper so the wrapped child exits at once
-# and records its status before the wrapper tears the session down; driving it from
-# the wrapped child itself races the teardown and reports gamescope's own crash.
 cat >"$TMPDIR/bin/mislay-games" <<'MISLAYGAMES'
 #!/bin/sh
 printf 'spotify\ngamescope\n' >"$CLIENTS"
@@ -357,8 +313,6 @@ grep -q "address:0x2" "$HYPRCTL_LOG" ||
 grep -q "monitor = 'DECK'" "$HYPRCTL_LOG" ||
   fail "deck re-placed the game without naming its own display"
 
-# Re-placing must be idempotent: once the window sits on DECK, later ticks must not
-# keep moving it. A game window that is already correct costs zero writes.
 reset_state
 cat >"$TMPDIR/bin/settled-games" <<'SETTLEDGAMES'
 #!/bin/sh
@@ -379,31 +333,24 @@ settled_moves=$(grep -c 'window.move' "$HYPRCTL_LOG" || true)
 [ "$settled_moves" -eq 0 ] ||
   fail "deck re-placed an already-correct game window (${settled_moves} moves)"
 
-# The stranded-focus bug: the wrapper focuses its headless display, which has no
-# windows, so leaving focus there kills input (no window to click, no key reaches
-# anywhere) and only a reboot recovered it. The pre-launch window must be handed
-# back when the session ends. The stub gives the sole client the address 0x1.
 reset_state
 printf '0x1\n' >"$ACTIVE_WINDOW"
 deck sleep 2 || fail "deck must run"
 grep -q "address:0x1" "$HYPRCTL_LOG" ||
   fail "deck did not restore focus to the window that had it before launch"
 
-# If the remembered window is gone by the time the session ends (the user closed
-# it mid-game), the wrapper must fall back to the monitor rather than doing nothing.
 reset_state
 printf '0x99\n' >"$ACTIVE_WINDOW"
 deck sleep 2 || fail "deck must run"
 grep -q 'monitor = "HDMI-A-1"' "$HYPRCTL_LOG" ||
   fail "deck did not fall back to the remembered monitor when its window was gone"
 
-# The two generated wrappers must differ only in their data.
 mask() {
   sed -E -e 's|/nix/store/[a-z0-9]{32}-|/nix/store/HASH-|g' \
     -e 's/FRAME/OUT/g' -e 's/DECK/OUT/g' \
-    -e 's/2560x1440@120/MODE/g' -e 's/1280x800@90/MODE/g' \
+    -e 's/2560x1440@120/MODE/g' -e 's/1280x720@90/MODE/g' \
     -e 's/-w 2560 -h 1440 -W 2560 -H 1440 -r 120/GEOMETRY/g' \
-    -e 's/-w 1280 -h 800 -W 1280 -H 800 -r 90/GEOMETRY/g' \
+    -e 's/-w 1280 -h 720 -W 1280 -H 720 -r 90/GEOMETRY/g' \
     -e 's/frame/DISPLAY/g' -e 's/deck/DISPLAY/g' "$1"
 }
 diff <(mask "$(command -v frame-display)") <(mask "$(command -v deck-display)") ||

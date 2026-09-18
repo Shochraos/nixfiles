@@ -14,7 +14,6 @@ fail() {
 
 count() { grep -cxF "$line" "$lua" 2>/dev/null || true; }
 
-# A real script in PATH, because the wrapper calls hyprctl in a child process.
 write_hyprctl() {
   cat >"$TMPDIR/bin/hyprctl" <<'STUB'
 #!/bin/sh
@@ -72,8 +71,6 @@ hdr-set off
 
 export HDR_POLL_INTERVAL=0.2 HDR_GRACE=1
 
-# The reported bug: a launcher that spawns the game window and exits at once
-# must not switch HDR off. HDR follows the window, not the wrapped process.
 cat >"$TMPDIR/bin/game" <<'GAME'
 #!/bin/sh
 printf 'spotify\n%s\n' "$GAME_CLASS" >"$CLIENTS"
@@ -106,12 +103,6 @@ elapsed=$(($(date +%s) - start))
 [ "$(cat "$DURING")" = 1 ] ||
   fail "HDR was off while the game window was open: hdr followed the launcher's exit, not the window"
 
-# A launch option inherits LD_LIBRARY_PATH from the Steam child environment,
-# whose steam-runtime directories shadow newer Nix libraries (its 2019 libattr
-# lacks ATTR_1.3, which coreutils' mktemp requires). A wrapper that runs its own
-# tooling on that path dies at its first statement, before the game is spawned.
-# The shadow lib must be a REAL ELF: the loader skips a truncated file outright,
-# so an invalid one would not reproduce the failure at all.
 shadow="$TMPDIR/shadow"
 mkdir -p "$shadow"
 install -m 644 "$SHADOW_LIB" "$shadow/libattr.so.1"
@@ -135,7 +126,6 @@ LD_LIBRARY_PATH="$shadow" hdr "$TMPDIR/bin/write-ld" ||
 [ "$(count)" = 0 ] || fail "hdr did not restore after the shadowed run"
 unset LD_FILE
 
-# A short handoff keeps the no-window case from stalling the check.
 export HDR_HANDOFF=1
 hdr false && fail "the hdr wrapper must propagate a non-zero child exit"
 [ "$(count)" = 0 ] || fail "the hdr wrapper did not restore after a failing child"
