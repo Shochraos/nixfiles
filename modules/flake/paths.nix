@@ -41,6 +41,7 @@ in
       mp3tagIcon = ../../assets/icons/mp3tag.png;
       ompRules = ../../assets/omp/rules;
       quickshellIpcReconnectPatch = ../../assets/patches/quickshell-hyprland-ipc-reconnect.patch;
+      xdphScreencopyBufferReusePatch = ../../assets/patches/xdph-screencopy-buffer-reuse.patch;
       samrewrittenIcon = ../../assets/icons/samrewritten.png;
       sopsFile = ../../secrets/secrets.yaml;
       spicetifyTemplate = ../../assets/templates/spicetify.json.j2;

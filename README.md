@@ -94,6 +94,8 @@ Only one wrapper can run at a time. They share a lock because a single class-onl
 
 Steam Remote Play hosting has to be enabled once, under Steam's Settings → Remote Play (`userdata/<id>/config/localconfig.vdf`, key `streaming_v2.EnableStreaming`). That file belongs to the Steam client and Nix must not own it, so this stays a UI toggle. Steam also needs its `-pipewire` flag under Wayland, which `steam.nix` sets by wrapping the package's `extraArgs`.
 
+The portal needs a patch. In `xdg-desktop-portal-hyprland` 1.4.1, the out-of-buffers branch of the screencopy frame callback renegotiates the stream, which re-enters `PW_STREAM_STATE_STREAMING` synchronously and installs a fresh frame callback that the branch then destroys. A live stream is left that never receives another frame. Every retry also reallocates the buffer pool, so one late buffer costs a full renegotiation, Steam's capture size flaps, and its mmap on the freed pool fails with `EBADF`. Three upstream commits fix this, none in a release yet, so `assets/patches/xdph-screencopy-buffer-reuse.patch` back-ports all three and `portal.nix` applies them with an overlay.
+
 HDR is unavailable: Steam Remote Play's HDR pass-through is documented for Windows hosts only, so both wrappers stay 8-bit SDR. The Deck OLED's panel is HDR-capable, but the limit is the host OS, not the client.
 
 ### Secrets
