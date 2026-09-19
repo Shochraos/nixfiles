@@ -118,5 +118,22 @@ in
         touch $out
       '';
 
+      checks."scripts/backup" = pkgs.runCommandLocal "check-backup" { } ''
+        export HOME="$TMPDIR/home"
+        export XDG_RUNTIME_DIR="$TMPDIR/run"
+        mkdir -p "$HOME" "$XDG_RUNTIME_DIR"
+        PATH="${
+          lib.makeBinPath [
+            pkgs.bash
+            pkgs.coreutils
+            pkgs.gawk
+            pkgs.gnugrep
+            pkgs.util-linux
+          ]
+        }:${fromAzazel "backup"}/bin:''${PATH}" \
+          ${pkgs.bash}/bin/bash ${tests.scripts}/backup.sh
+        touch $out
+      '';
+
     };
 }

@@ -72,6 +72,7 @@
     gamechat
     lgtv
     mp3tag
+    backup
   ];
 
   den.aspects.solas.includes = with den.aspects; [

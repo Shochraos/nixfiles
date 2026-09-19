@@ -312,6 +312,15 @@
         LockDatabaseIdle = false;
         LockDatabaseScreenLock = false;
       };
+
+      host.backup = {
+        repo = "ssh://storagebox/./security";
+        paths = [ "/mnt/nextcloud/Security" ];
+        excludes = [
+          "*.sync_*"
+          "*.sync-conflict-*"
+        ];
+      };
     };
 
   den.aspects.azazel.provides.to-users.homeManager =

@@ -273,6 +273,23 @@ in
                 description = "keepassxc.ini settings sections for this host, deep-merged over the shared sections in the browser aspect (host keys win on conflict).";
               };
             };
+
+            backup = {
+              repo = mkOption {
+                type = types.str;
+                description = "Borg repository URL this host backs up to. Consumed by the backup aspect as services.borgbackup.jobs.backup.repo.";
+              };
+              paths = mkOption {
+                type = types.listOf types.str;
+                default = [ ];
+                description = "Absolute source paths included in every archive.";
+              };
+              excludes = mkOption {
+                type = types.listOf types.str;
+                default = [ ];
+                description = "Borg exclude patterns applied to every archive, in borg's default fnmatch style, where each pattern is matched against the whole archived path.";
+              };
+            };
           };
         };
     };
