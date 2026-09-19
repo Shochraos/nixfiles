@@ -56,7 +56,7 @@ in
     };
 
     tests = {
-      ai = ../../modules/features/ai.nix;
+      ai = ../../modules/features/ai/default.nix;
       dir = ../../tests;
       options = ../../modules/flake/options.nix;
       scripts = ../../tests/scripts;

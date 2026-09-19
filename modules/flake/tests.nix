@@ -1,6 +1,6 @@
 top@{ config, inputs, ... }:
 let
-  inherit (config) helpers tests;
+  inherit (config) tests;
 
   azazelHome =
     let

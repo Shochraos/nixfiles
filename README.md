@@ -118,7 +118,7 @@ The second argument is a **per-exec rule**, not a window rule. Hyprland attaches
 
 ### Hermes
 
-`modules/features/ai.nix` declares [Hermes Agent](https://github.com/NousResearch/hermes-agent), Nous Research's general-purpose agent, in the same block that owns oh-my-pi. The intent is a second agent for work that writes no code: same provider, same model, and only the parts of the oh-my-pi setup that are not coding.
+`modules/features/ai/harness.nix` declares [Hermes Agent](https://github.com/NousResearch/hermes-agent), Nous Research's general-purpose agent, in the same block that owns oh-my-pi. The intent is a second agent for work that writes no code: same provider, same model, and only the parts of the oh-my-pi setup that are not coding.
 
 The flake input is pinned to the release tag `v2026.9.14` instead of tracking `main`, because upstream documents its flake and modules as Tier 2 and warns that commits to `main` may break them. The cost of the pin is that a version bump is a manual edit plus `nix flake lock`.
 
