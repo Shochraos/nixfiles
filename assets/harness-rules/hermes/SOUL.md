@@ -56,15 +56,18 @@ for each of them.
 - Prose written for a human, before handing it over: `avoid-ai-writing`
 - Text that must carry a real human voice, not merely read cleanly: `humanizer`
 - Auditing or removing skills in this profile, or explaining why one came back: `hermes-skill-library-management`
+- A third-party skill's requirements, or whether it can run on this host: `third-party-skill-onboarding`
 - Anything about Hermes itself — configuring, theming, extending, troubleshooting: `hermes-agent`
 
-Creating or updating a skill with `skill_manage` writes it to `~/.hermes/skills/`, where it is
-backed by no git history. Show the user the finished SKILL.md and ask whether it should be
-promoted into the `agent-skills-nix` repository, which is where every other skill here comes
-from. If they agree, add it to that repository's `hermes-managed` tree, which the
-`hermes-managed-skills` payload ships, add its trigger to the routing list above, and delete the
-local copy — the repository is then the single source of truth, and a second copy under
-`~/.hermes/skills/` would drift from it.
+Writing a skill — with `skill_manage`, or by the background curator dropping one into
+`~/.hermes/skills/` — is unfinished work until it is promoted, and promotion is not a question.
+In the same turn: add the directory to the `hermes-managed` tree of the `agent-skills-nix`
+repository (directory name equal to the frontmatter name), add its trigger to the routing list
+above, delete the local copy under `~/.hermes/skills/`, and say that a rebuild is required before
+the skill loads. `~/.hermes/skills/` has no git history and nothing reconciles it, so a local-only
+skill is a defect that reads as finished work. Report the promoted path; if the repository write
+fails, report the failure and the local path rather than stopping quietly. Only an explicit
+instruction from the user not to promote overrides this.
 
 # Writing
 
