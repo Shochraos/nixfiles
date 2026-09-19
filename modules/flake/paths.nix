@@ -34,13 +34,13 @@ in
     assets = {
       discordTemplate = ../../assets/templates/discord.css;
       halloyTemplate = ../../assets/templates/halloy.toml;
-      hermesSoul = ../../assets/hermes/SOUL.md;
+      hermesSoul = ../../assets/harness-rules/hermes/SOUL.md;
       ironyModManagerIcon = ../../assets/icons/ironymodmanager.png;
       jellyfinMpvShimConfig = ../../configs/jellyfin-mpv-shim/conf.json;
       matugenSchemes = ../../configs/matugen;
       micMuteScript = ../../assets/scripts/mic-mute.sh;
       mp3tagIcon = ../../assets/icons/mp3tag.png;
-      ompRules = ../../assets/omp/rules;
+      ompRules = ../../assets/harness-rules/omp;
       quickshellIpcReconnectPatch = ../../assets/patches/quickshell-hyprland-ipc-reconnect.patch;
       xdphScreencopyBufferReusePatch = ../../assets/patches/xdph-screencopy-buffer-reuse.patch;
       samrewrittenIcon = ../../assets/icons/samrewritten.png;

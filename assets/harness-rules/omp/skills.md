@@ -42,7 +42,7 @@ rules where noted:
   (migrate memory bank, sessions and history before resuming there).
 - Unattributed Nix eval/build warnings: `skill://tracing-nix-eval-warnings`
   (also nudged by `lang-nix`).
-- Changes to this config's omp wiring (`assets/omp/`, `modules/features/ai/`,
+- Changes to this config's omp wiring (`assets/harness-rules/omp/`, `modules/features/ai/`,
   skills packaging): `skill://omp-rule-and-skill-probe` (also nudged by `lang-nix`).
 - Bash driving pactl or PipeWire: `skill://pactl-bash-daemon` (also nudged by
   `lang-shell`).
