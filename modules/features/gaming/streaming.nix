@@ -1,8 +1,19 @@
-{ config, lib, ... }:
+{ lib, ... }:
 let
-  inherit (config) helpers;
-
-  display = import helpers.display { inherit lib; };
+  streamingGeometry =
+    display:
+    let
+      parts = lib.splitString "@" display.mode;
+      dims = lib.splitString "x" (builtins.head parts);
+    in
+    if builtins.length parts != 2 || builtins.length dims != 2 then
+      throw "streaming: mode `${display.mode}' must be WIDTHxHEIGHT@REFRESH, e.g. 2560x1440@120"
+    else
+      {
+        width = builtins.elemAt dims 0;
+        height = builtins.elemAt dims 1;
+        refresh = builtins.elemAt parts 1;
+      };
 in
 {
   den.aspects.gaming.provides.to-users.homeManager =
@@ -19,7 +30,7 @@ in
       mkWrappers =
         name: entry:
         let
-          inherit (display.streamingGeometry entry) width height refresh;
+          inherit (streamingGeometry entry) width height refresh;
 
           output = entry.output;
           mode = entry.mode;

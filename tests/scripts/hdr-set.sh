@@ -14,6 +14,8 @@ fail() {
 
 count() { grep -cxF "$line" "$lua" 2>/dev/null || true; }
 
+grep -qF "$line" "$(command -v hdr-set)" || fail "hdr-set does not target the host's single hdr output"
+
 write_hyprctl() {
   cat >"$TMPDIR/bin/hyprctl" <<'STUB'
 #!/bin/sh

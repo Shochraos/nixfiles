@@ -7,6 +7,7 @@
 }:
 let
   inherit (config) assets;
+
 in
 {
   den.aspects.ai = {
@@ -32,8 +33,28 @@ in
           ++ lib.optional (args.stt or false) self.stt;
         };
 
+    provides.tools.nixos =
+      { config, user, ... }:
+      {
+        sops.secrets."commandcode/api-key" = {
+          owner = user.name;
+        };
+
+        sops.templates."hermes.env" = {
+          owner = user.name;
+          content = ''
+            COMMANDCODE_API_KEY=${config.sops.placeholder."commandcode/api-key"}
+          '';
+        };
+      };
+
     provides.tools.provides.to-users.homeManager =
-      { config, pkgs, ... }:
+      {
+        config,
+        osConfig,
+        pkgs,
+        ...
+      }:
       let
         oh-my-pi = inputs.omp-nix.packages.${pkgs.stdenv.hostPlatform.system}.default.overrideAttrs (old: {
           postInstall = (old.postInstall or "") + ''
@@ -55,6 +76,35 @@ in
           inputs.agent-skills-nix.packages.${pkgs.stdenv.hostPlatform.system}.vendored-skills;
 
         managed-skills = inputs.agent-skills-nix.packages.${pkgs.stdenv.hostPlatform.system}.managed-skills;
+
+        hermes = inputs.hermes-agent.packages.${pkgs.stdenv.hostPlatform.system};
+
+        hermesSkills = inputs.agent-skills-nix.lib.${pkgs.stdenv.hostPlatform.system}.mkSkillset [
+          "vendored-avoid-ai-writing"
+          "managed-cloudflare-bypass"
+          "hermes-architecture-diagram"
+          "hermes-ascii-video"
+          "hermes-baoyu-infographic"
+          "hermes-claude-design"
+          "hermes-design-md"
+          "hermes-humanizer"
+          "hermes-manim-video"
+          "hermes-p5js"
+          "hermes-popular-web-designs"
+          "hermes-songwriting-and-ai-music"
+          "hermes-gif-search"
+          "hermes-songsee"
+          "hermes-youtube-content"
+          "hermes-arxiv"
+          "hermes-competitor-news-monitor"
+          "hermes-grounded-citations"
+          "hermes-llm-wiki"
+          "hermes-blocked-page-recovery"
+          "hermes-docx"
+          "hermes-pdf"
+          "hermes-xlsx"
+          "hermes-hermes-agent"
+        ];
 
         scrapling-runtime =
           inputs.agent-skills-nix.packages.${pkgs.stdenv.hostPlatform.system}.scrapling-runtime;
@@ -126,6 +176,29 @@ in
         home.sessionVariables.PI_CONFIG_FILES = overlayPath;
 
         home.sessionVariables.SUPERPOWERS_DISABLE_TELEMETRY = "1";
+
+        imports = [ inputs.hermes-agent.homeManagerModules.default ];
+
+        programs.hermes-agent.enable = true;
+
+        services.hermes-agent = {
+          enable = true;
+          package = hermes.minimal;
+          environmentFiles = [ osConfig.sops.templates."hermes.env".path ];
+          hermesHomeFiles."SOUL.md" = assets.hermesSoul;
+          mcpServers.ScraplingServer = {
+            command = "${scrapling-runtime}/bin/scrapling-mcp";
+          };
+          settings = {
+            agent.coding_context = "off";
+            model = {
+              provider = "commandcode";
+              default = "deepseek/deepseek-v4.1-flash";
+            };
+            skills.external_dirs = [ "${hermesSkills}" ];
+            updates.check = false;
+          };
+        };
       };
 
     provides.stt.nixos =

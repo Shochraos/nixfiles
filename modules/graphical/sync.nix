@@ -16,17 +16,23 @@
           pkgs,
           ...
         }:
+        let
+          desktopEntry = "com.nextcloud.desktopclient.nextcloud.desktop";
+
+          nextcloudAutostart = pkgs.runCommandLocal "nextcloud-autostart.desktop" { } ''
+            cp ${pkgs.nextcloud-client}/share/applications/${desktopEntry} $out
+            chmod u+w $out
+            substituteInPlace $out \
+              --replace-fail 'Exec=nextcloud %u' 'Exec=nextcloud --background %u'
+          '';
+        in
         {
           home.packages = with pkgs; [
             nextcloud-client
             feishin
           ];
 
-          xdg.autostart = {
-            entries = [
-              "${pkgs.nextcloud-client}/share/applications/com.nextcloud.desktopclient.nextcloud.desktop"
-            ];
-          };
+          xdg.configFile."autostart/${desktopEntry}".source = nextcloudAutostart;
 
           programs.vdirsyncer.enable = true;
           services.vdirsyncer.enable = true;

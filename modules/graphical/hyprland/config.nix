@@ -1,7 +1,33 @@
 { config, lib, ... }:
 let
-  inherit (config) helpers;
-  display = import helpers.display { inherit lib; };
+  pinnedGeometry =
+    output:
+    lib.optionalAttrs (output.mode != null) { inherit (output) mode; }
+    // lib.optionalAttrs (output.position != null) { inherit (output) position; }
+    // lib.optionalAttrs (output.scale != null) { inherit (output) scale; };
+
+  monitorRules =
+    outputs:
+    lib.mapAttrsToList (name: output: { output = name; } // pinnedGeometry output) (
+      lib.filterAttrs (_: output: pinnedGeometry output != { }) outputs
+    );
+
+  workspaceRules =
+    outputs:
+    builtins.concatLists (
+      lib.mapAttrsToList (
+        name: output:
+        lib.imap0 (
+          index: workspace:
+          {
+            workspace = toString workspace;
+            monitor = name;
+            persistent = true;
+          }
+          // lib.optionalAttrs (index == 0) { default = true; }
+        ) output.workspaces
+      ) outputs
+    );
 in
 {
   den.aspects.hyprland.nixos =
@@ -150,10 +176,9 @@ in
 
           gesture = osConfig.host.hyprland.gestures;
 
-          monitor = display.monitorRules osConfig.host.outputs;
+          monitor = monitorRules osConfig.host.outputs;
 
-          workspace_rule =
-            display.workspaceRules osConfig.host.outputs ++ osConfig.host.hyprland.workspaceRules;
+          workspace_rule = workspaceRules osConfig.host.outputs ++ osConfig.host.hyprland.workspaceRules;
           colors = {
             _var = lua "require('dms.colors')";
           };

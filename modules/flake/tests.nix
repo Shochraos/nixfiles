@@ -31,9 +31,13 @@ in
           nix-unit --eval-store "''${TMPDIR:-/tmp}" \
             --argstr nixpkgsPath ${pkgs.path} \
             --argstr optionsPath ${tests.options} \
-            --argstr displayPath ${helpers.display} \
             --argstr aiPath ${tests.ai} \
-            --argstr audioPath ${helpers.audio} \
+            --argstr audioPath ${tests.audioAspect} \
+            --argstr dankshellPath ${tests.dankshellAspect} \
+            --argstr hdrPath ${tests.hdrAspect} \
+            --argstr hyprlandConfigPath ${tests.hyprlandConfigAspect} \
+            --argstr hyprlandRulesPath ${tests.hyprlandRulesAspect} \
+            --argstr streamingPath ${tests.streamingAspect} \
             ${tests.dir}/default.nix
         '';
       };
@@ -113,5 +117,6 @@ in
           ${pkgs.bash}/bin/bash ${tests.scripts}/streaming.sh
         touch $out
       '';
+
     };
 }

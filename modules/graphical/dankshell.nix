@@ -5,8 +5,17 @@
   ...
 }:
 let
-  inherit (config) helpers;
-  display = import helpers.display { inherit lib; };
+  barScreens =
+    outputs:
+    let
+      primaryOutputs = builtins.attrNames (lib.filterAttrs (_: output: output.primary) outputs);
+    in
+    if builtins.length primaryOutputs > 1 then
+      throw "dankshell: at most one host.outputs entry may set primary = true, got ${toString (builtins.length primaryOutputs)}"
+    else if primaryOutputs == [ ] then
+      [ "all" ]
+    else
+      primaryOutputs;
 
   quickshellIpcReconnectOverlay = _final: prev: {
     quickshell = prev.quickshell.overrideAttrs (old: {
@@ -77,7 +86,7 @@ in
             popupGapsAuto = false;
             popupGapsManual = 6;
 
-            screenPreferences = display.barScreens osConfig.host.outputs;
+            screenPreferences = barScreens osConfig.host.outputs;
 
             borderEnabled = false;
             widgetOutlineEnabled = true;
@@ -158,7 +167,8 @@ in
                 clearAtStartup = true;
               };
 
-              soundsEnabled = false;
+              soundsEnabled = true;
+              muteSoundsWhenMediaPlaying = false;
               audioVisualizerEnabled = false;
 
               notificationFocusedMonitor = true;

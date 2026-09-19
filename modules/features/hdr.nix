@@ -1,7 +1,14 @@
-{ config, lib, ... }:
+{ lib, ... }:
 let
-  inherit (config) helpers;
-  display = import helpers.display { inherit lib; };
+  hdrOutputFor =
+    outputs:
+    let
+      hdrOutputs = builtins.attrNames (lib.filterAttrs (_: output: output.hdr) outputs);
+    in
+    if builtins.length hdrOutputs == 1 then
+      builtins.head hdrOutputs
+    else
+      throw "hdr aspect: expected exactly one host.outputs entry with hdr = true, got ${toString (builtins.length hdrOutputs)}";
 in
 {
   den.aspects.hdr.provides.to-users.homeManager =
@@ -11,7 +18,7 @@ in
       ...
     }:
     let
-      hdrOutput = display.hdrOutput osConfig.host.outputs;
+      hdrOutput = hdrOutputFor osConfig.host.outputs;
 
       hdr-set = pkgs.writeShellApplication {
         name = "hdr-set";

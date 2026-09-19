@@ -1,6 +1,9 @@
-{ lib, audioPath }:
+{ harness, audioPath }:
 let
-  audio = import audioPath { inherit lib; };
+  aspect = harness.nixos audioPath [
+    "audio"
+    "nixos"
+  ];
 
   preset = {
     bands = [ ];
@@ -22,7 +25,10 @@ let
       inherit default presets;
     };
 
-  verdicts = equalizers: map (a: a.assertion) (audio.assertionsFor equalizers);
+  verdicts =
+    equalizers:
+    map (a: a.assertion)
+      (aspect (harness.aspectArgs { host.audio.equalizers = equalizers; })).assertions;
 in
 {
   testEqualizerAssertionsAllHold = {

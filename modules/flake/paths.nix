@@ -34,6 +34,7 @@ in
     assets = {
       discordTemplate = ../../assets/templates/discord.css;
       halloyTemplate = ../../assets/templates/halloy.toml;
+      hermesSoul = ../../assets/hermes/SOUL.md;
       ironyModManagerIcon = ../../assets/icons/ironymodmanager.png;
       jellyfinMpvShimConfig = ../../configs/jellyfin-mpv-shim/conf.json;
       matugenSchemes = ../../configs/matugen;
@@ -54,16 +55,17 @@ in
       mp3tag = ../../pkgs/mp3tag/package.nix;
     };
 
-    helpers = {
-      audio = ../../lib/audio.nix;
-      display = ../../lib/display.nix;
-    };
-
     tests = {
       ai = ../../modules/features/ai.nix;
       dir = ../../tests;
       options = ../../modules/flake/options.nix;
       scripts = ../../tests/scripts;
+      audioAspect = ../../modules/base/audio.nix;
+      dankshellAspect = ../../modules/graphical/dankshell.nix;
+      hdrAspect = ../../modules/features/hdr.nix;
+      hyprlandConfigAspect = ../../modules/graphical/hyprland/config.nix;
+      hyprlandRulesAspect = ../../modules/graphical/hyprland/rules.nix;
+      streamingAspect = ../../modules/features/gaming/streaming.nix;
     };
   };
 }
