@@ -35,7 +35,7 @@ Cross-cutting skill routing. Language packs load automatically through the
 - Feature or bugfix in a language with a test runner: `skill://test-driven-development`.
 - Diagnosing a defect: `skill://systematic-debugging`.
 
-Self-written pack — the nine managed skills, also auto-nudged by the `lang-*`
+Self-written pack — the ten managed skills, also auto-nudged by the `lang-*`
 rules where noted:
 
 - A repository moved to a new absolute path: `skill://omp-project-migration`
@@ -47,6 +47,11 @@ rules where noted:
 - Bash driving pactl or PipeWire: `skill://pactl-bash-daemon` (also nudged by
   `lang-shell`).
 - DankMaterialShell plugin changes: `skill://verifying-dms-plugin-changes`.
+- A Steam game, non-Steam shortcut or launch-option wrapper (`PROTON_*`, hdr,
+  gamescope, mangohud, gamemoderun, a shell script) dies instantly with exit 127
+  or exit 1, or fails only under the launch option while working from a
+  terminal: `skill://steam-launch-env-diagnosis` (the launch child's scrubbed
+  library path, steam-runtime shadowing, and the `$ORIGIN` fix).
 - End of a coding task: `skill://end-of-task-memory-update` alongside the
   retain/learn write.
 - A fetch via `read`, `browser` or `web_search` hits a Cloudflare challenge,
