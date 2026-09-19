@@ -52,13 +52,16 @@ in
         vendored-skills =
           inputs.agent-skills-nix.packages.${pkgs.stdenv.hostPlatform.system}.vendored-skills;
 
-        managed-skills = inputs.agent-skills-nix.packages.${pkgs.stdenv.hostPlatform.system}.managed-skills;
+        managed-skills =
+          inputs.agent-skills-nix.packages.${pkgs.stdenv.hostPlatform.system}.omp-managed-skills;
+
+        shared-skills = inputs.agent-skills-nix.packages.${pkgs.stdenv.hostPlatform.system}.shared-skills;
 
         hermes = inputs.hermes-agent.packages.${pkgs.stdenv.hostPlatform.system};
 
         hermesSkills = inputs.agent-skills-nix.lib.${pkgs.stdenv.hostPlatform.system}.mkSkillset [
           "vendored-avoid-ai-writing"
-          "managed-cloudflare-bypass"
+          "shared-cloudflare-bypass"
           "hermes-architecture-diagram"
           "hermes-ascii-video"
           "hermes-baoyu-infographic"
@@ -83,6 +86,9 @@ in
           "hermes-hermes-agent"
         ];
 
+        hermesManagedSkills =
+          inputs.agent-skills-nix.packages.${pkgs.stdenv.hostPlatform.system}.hermes-managed-skills;
+
         scrapling-runtime =
           inputs.agent-skills-nix.packages.${pkgs.stdenv.hostPlatform.system}.scrapling-runtime;
 
@@ -101,6 +107,7 @@ in
             default = "commandcode/deepseek/deepseek-v4.1-flash";
             tiny = "commandcode/deepseek/deepseek-v4.1-flash";
             smol = "commandcode/deepseek/deepseek-v4.1-flash";
+            vision = "commandcode/z-ai/glm-5.3-flash";
           };
           autolearn.enabled = true;
           memory.backend = "mnemopi";
@@ -118,6 +125,7 @@ in
             "${superpowers-skills}"
             "${vendored-skills}"
             "${managed-skills}"
+            "${shared-skills}"
           ];
         };
 
@@ -172,7 +180,10 @@ in
               provider = "commandcode";
               default = "deepseek/deepseek-v4.1-flash";
             };
-            skills.external_dirs = [ "${hermesSkills}" ];
+            skills.external_dirs = [
+              "${hermesSkills}"
+              "${hermesManagedSkills}"
+            ];
             updates.check = false;
           };
         };

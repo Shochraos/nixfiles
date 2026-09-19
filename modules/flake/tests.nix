@@ -50,6 +50,45 @@ in
         touch $out
       '';
 
+      checks."hermes-soul" = pkgs.runCommandLocal "check-hermes-soul" { } ''
+        export LC_ALL=C
+        soul=${config.assets.hermesSoul}
+        payloads="${lib.concatStringsSep " " azazelHome.services.hermes-agent.settings.skills.external_dirs}"
+
+        for payload in ''${payloads}; do
+          for skill in "$payload"/*/; do
+            [ -f "$skill/SKILL.md" ] || continue
+            sed -n 's/^name:[[:space:]]*//p' "$skill/SKILL.md" | sed -n 1p
+          done
+        done | sort -u > "$TMPDIR/installed"
+
+        sed -n '/^# Skills$/,/^# /{
+          s/^- .*`\([a-z0-9-][a-z0-9-]*\)`$/\1/p
+        }' "$soul" | sort -u > "$TMPDIR/routed"
+
+        if [ ! -s "$TMPDIR/routed" ]; then
+          echo "hermes-soul: no routing bullets found — the 'Skills' section of SOUL.md must list them one per line, each ending in the skill name in backticks:" >&2
+          echo '  - <when to use it>: `<skill-name>`' >&2
+          exit 1
+        fi
+
+        unknown=$(comm -23 "$TMPDIR/routed" "$TMPDIR/installed")
+        if [ -n "$unknown" ]; then
+          echo "hermes-soul: routed skills that no installed payload provides — a renamed or removed skill leaves its line silently dead:" >&2
+          echo "$unknown" >&2
+          exit 1
+        fi
+
+        unrouted=$(comm -13 "$TMPDIR/routed" "$TMPDIR/installed")
+        if [ -n "$unrouted" ]; then
+          echo "hermes-soul: installed skills with no routing bullet — add one line each to the 'Skills' section:" >&2
+          echo "$unrouted" >&2
+          exit 1
+        fi
+
+        touch $out
+      '';
+
       pre-commit.settings.hooks = {
         treefmt = {
           enable = true;
