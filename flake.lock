@@ -3,6 +3,7 @@
     "agent-skills-nix": {
       "inputs": {
         "anthropics-skills": "anthropics-skills",
+        "hermes-agent": "hermes-agent",
         "nixos-skill": "nixos-skill",
         "nixpkgs": [
           "nixpkgs"
@@ -13,11 +14,11 @@
         "wshobson-agents": "wshobson-agents"
       },
       "locked": {
-        "lastModified": 1789384300,
-        "narHash": "sha256-smcMakaM0JTV+l50yyyl5OyblnDN7Ov+4KdDvg6qsgA=",
+        "lastModified": 1789820929,
+        "narHash": "sha256-jRu+SbManPUzjhSmiiIInNcUZ2aAI2RYGGj398Suv0E=",
         "owner": "Shochraos",
         "repo": "agent-skills-nix",
-        "rev": "c84b52147644d3cbdfb16c8b7bf13fe77ca10205",
+        "rev": "a365128fd6fcaccc924d4f756dc7e554e5bd6c88",
         "type": "github"
       },
       "original": {
@@ -443,6 +444,22 @@
       }
     },
     "hermes-agent": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1789815537,
+        "narHash": "sha256-DTW8do2AR+i8SsNe4tb7a7Cg18l5Tkrwpm4CdBmCzO8=",
+        "owner": "NousResearch",
+        "repo": "hermes-agent",
+        "rev": "7c6f21a5e12ba9b1c674ec9b410fa6b8c45de4f8",
+        "type": "github"
+      },
+      "original": {
+        "owner": "NousResearch",
+        "repo": "hermes-agent",
+        "type": "github"
+      }
+    },
+    "hermes-agent_2": {
       "inputs": {
         "flake-parts": "flake-parts_2",
         "home-manager": "home-manager",
@@ -855,7 +872,7 @@
         "flake-parts": "flake-parts",
         "flyline": "flyline",
         "git-hooks-nix": "git-hooks-nix",
-        "hermes-agent": "hermes-agent",
+        "hermes-agent": "hermes-agent_2",
         "home-manager": "home-manager_2",
         "import-tree": "import-tree",
         "lanzaboote": "lanzaboote",
@@ -899,11 +916,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1789691124,
-        "narHash": "sha256-k+I+R6uwHX3VcJ7326qLV6vCahZUgsVl+i8sSU/Stxk=",
+        "lastModified": 1789815532,
+        "narHash": "sha256-/Ql9UE21iDwOU/JdPV20yZtaMpGf+iD2EhIA1aAi540=",
         "owner": "Mic92",
         "repo": "sops-nix",
-        "rev": "1e73e8f7176d65e1b55e324de099bbfff4b2c574",
+        "rev": "166fc0d3f4fcd0dfc9af102ba8e85fa5dd04e5f7",
         "type": "github"
       },
       "original": {
