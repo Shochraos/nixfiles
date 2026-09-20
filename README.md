@@ -181,6 +181,14 @@ Two of those secrets are the disaster path: the repository passphrase, and the a
 
 A failed run is visible in `systemctl --failed` and `journalctl -u borgbackup-job-backup`. Nothing notifies yet.
 
+### Wallets
+
+`modules/features/crypto.nix` installs `electrum` and `feather` on Azazel, and runs a system Tor for them. `services.tor.enable` alone starts a daemon with no SOCKS port, so the aspect also sets `client.enable` and pins `socksListenAddress.port` to 9050. That address is where Feather's compiled defaults already point.
+
+Feather ships its own Tor and unpacks a copy into `~/.config/feather/tor/` on first use. Those copies keep absolute `/nix/store` interpreter and RUNPATH entries, so after a nixpkgs bump and a garbage collection the libraries they name are gone and the bundled Tor can never start again. Feather cannot repair that itself: it reads the installed version by running that same binary, and its re-copy refuses to overwrite an existing file. So the `feather` on `PATH` is a wrapper that adds `--use-local-tor`. Feather then uses the 9050 daemon instead of unpacking one, and records that choice in its own settings on first launch.
+
+Litecoin is not covered. `electrum-ltc` is the only LTC wallet nixpkgs carries, and it cannot start on this revision. Its `electrum_ltc/util.py` calls the `asyncio.get_event_loop()` that Python 3.14 removed, and three hardware-wallet plugin dependencies pull `python-ecdsa`, which nixpkgs marks insecure (CVE-2024-23342). Upstream's last commit was in November 2022, so this needs a port rather than a version bump.
+
 ## Directory layout
 
 - `./flake.nix` — entry-point; auto-imports the `modules/` tree via `import-tree`.
@@ -188,7 +196,7 @@ A failed run is visible in `systemctl --failed` and `journalctl -u borgbackup-jo
 - `./modules/base/` — the aspects `base` includes verbatim (`boot`, `secrets`, `nix`, `locale`, `network`, `audio`, `scheduling`, `shell`, `remotes`, `wireguard`, `wifi`).
 - `./modules/users/` — per-user aspects, one file per user named after that user (`shochraos.nix`). Resolved by **name**, not through `includes`.
 - `./modules/graphical/` — what `graphical` adds on top of `base`: Hyprland (`hyprland/`), the DankMaterialShell shell (`dankshell`), terminal, browser, editor, apps, mail, sync, kde-connect, printing, bluetooth.
-- `./modules/features/` — aspects a host or sub-bundle selects directly rather than through `base`/`graphical`: the form factors `desktop` / `laptop`, `gaming/`, `ai` (both agents), `virtualization`, `media`, …. A file's folder names the layer that includes it, so moving an aspect between layers moves the file too.
+- `./modules/features/` — aspects a host or sub-bundle selects directly rather than through `base`/`graphical`: the form factors `desktop` / `laptop`, `gaming/`, `ai` (both agents), `virtualization`, `media`, `crypto`, …. A file's folder names the layer that includes it, so moving an aspect between layers moves the file too.
 - `./modules/hosts/<host>/` — `config.nix` (host overrides + `host.*` settings), `hardware.nix`, `filesystems.nix`.
 - `./pkgs/<name>/package.nix` — packages nixpkgs does not carry, as ordinary `callPackage` expressions. These are **not** flake-parts modules, so `import-tree` ignores them; each is reached by a named overlay declared in the aspect that owns it (see `mp3tag`, `lgtv`, `gaming/packages`), which is also what keeps an unfree allowlist scoped to the aspect that needs it.
 - `./tests/` — the `nix-unit` suites and the script behaviour checks that `nix flake check` runs. Each suite calls an aspect's own lambda with hand-made entity arguments and asserts on what it returns, so an aspect and its test share no helper layer that could drift from the code under test.

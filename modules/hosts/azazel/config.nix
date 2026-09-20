@@ -328,11 +328,6 @@
     {
       home.stateVersion = "25.05";
 
-      home.packages = with pkgs; [
-        feather
-        electrum
-      ];
-
       xdg.autostart = {
         entries = [
           "${pkgs.discord.override { withVencord = true; }}/share/applications/discord.desktop"

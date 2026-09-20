@@ -73,6 +73,7 @@
     lgtv
     mp3tag
     backup
+    crypto
   ];
 
   den.aspects.solas.includes = with den.aspects; [
