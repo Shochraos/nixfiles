@@ -98,6 +98,18 @@ The portal needs a patch. In `xdg-desktop-portal-hyprland` 1.4.1, the out-of-buf
 
 HDR is unavailable: Steam Remote Play's HDR pass-through is documented for Windows hosts only, so both wrappers stay 8-bit SDR. The Deck OLED's panel is HDR-capable, but the limit is the host OS, not the client.
 
+### SteamVR
+
+SteamVR raises thread priority with `sched_setscheduler`, and the kernel authorizes that through `RLIMIT_RTPRIO` rather than through a capability. A capability is unreachable from inside Steam anyway, so `steam.nix` grants the limit instead: `rtprio 95` for the user, applied by `pam_limits` at login, because it has to be in place before Steam starts. Azazel only, alongside the rest of the gaming aspect.
+
+Two independent causes make the capability unreachable. `bubblewrap` sets `PR_SET_NO_NEW_PRIVS` unconditionally, and the kernel answers by intersecting any file-granted capability away at exec, so `setcap` on anything Steam launches is inert. Entering a user namespace is the second cause: it drops whatever capabilities the process held in the initial namespace. Real-time priority and the high-priority Vulkan queue are both checks against that namespace, so neither can be satisfied from inside the sandbox.
+
+Setting `cap_sys_nice=p` on `vrcompositor-launcher` still silences SteamVR's setup prompt, because that prompt is a `getcap` check and nothing more. `steam.nix` applies the capability at boot with a oneshot unit; re-run it by hand with `systemctl start steamvr-cap-sys-nice`. Use `=p`, not the `=eip` form that `vrsetup.sh` and every forum post prescribe. The `e` bit sets the file's effective flag, which triggers secure-execution mode even though the capability itself is stripped; the loader then ignores `LD_LIBRARY_PATH` and cannot find `libcap.so.2`. No default library path on this host provides it. A SteamVR update replaces the binary and clears the capability again, so the prompt returns until the next boot or a manual re-run.
+
+Asynchronous reprojection therefore stays off. It needs a high-priority Vulkan queue, whose capability check is the initial-namespace one, so the login limit cannot help it. `enableLinuxVulkanAsync` also ships `false` and would need setting even with a working capability.
+
+`useFacetRenderer` is not in SteamVR's shipped defaults, and NVIDIA users report it helps. A home-manager activation step merges `steamvr.useFacetRenderer = true` into `~/.local/share/Steam/config/steamvr.vrsettings`. Nix edits that file in place; it must not own it, because SteamVR keeps its own `installID` and version-notice state there. Once the key is set the step does nothing. It also does nothing until SteamVR has run once and created the file.
+
 ### Herdr
 
 `modules/graphical/terminal.nix` declares Herdr's configuration through home-manager's `programs.herdr`, which renders `settings` to `$XDG_CONFIG_HOME/herdr/config.toml` and reloads a running server whenever the file changes.

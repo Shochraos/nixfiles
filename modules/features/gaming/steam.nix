@@ -28,6 +28,41 @@
       };
     };
 
+  den.aspects.gaming.provides.to-users.nixos =
+    {
+      config,
+      lib,
+      pkgs,
+      user,
+      ...
+    }:
+    let
+      vrcompositorLauncher = "${
+        config.users.users.${user.name}.home
+      }/.local/share/Steam/steamapps/common/SteamVR/bin/linux64/vrcompositor-launcher";
+    in
+    {
+      security.pam.loginLimits = [
+        {
+          domain = user.name;
+          item = "rtprio";
+          type = "-";
+          value = 95;
+        }
+      ];
+
+      systemd.services.steamvr-cap-sys-nice = {
+        description = "Give SteamVR's vrcompositor-launcher the cap_sys_nice its setup checks for";
+        wantedBy = [ "multi-user.target" ];
+        serviceConfig.Type = "oneshot";
+        script = ''
+          if [ -e ${lib.escapeShellArg vrcompositorLauncher} ]; then
+            ${lib.getExe' pkgs.libcap "setcap"} cap_sys_nice=p ${lib.escapeShellArg vrcompositorLauncher}
+          fi
+        '';
+      };
+    };
+
   den.aspects.gaming.provides.to-users.homeManager =
     {
       config,
@@ -47,8 +82,46 @@
         "ngx_dlss_rr_override=on"
         "ngx_dlss_rr_override_render_preset_selection=render_preset_f"
       ];
+
+      steamvrFacetRenderer = pkgs.writeShellApplication {
+        name = "steamvr-facet-renderer";
+        runtimeInputs = [
+          pkgs.coreutils
+          pkgs.jq
+        ];
+        text = ''
+          settings="${config.home.homeDirectory}/.local/share/Steam/config/steamvr.vrsettings"
+
+          if [ ! -f "$settings" ]; then
+            exit 0
+          fi
+
+          if ! current="$(jq -r '.steamvr.useFacetRenderer // false' "$settings" 2>/dev/null)"; then
+            echo "steamvr-facet-renderer: $settings is not valid JSON, leaving it untouched" >&2
+            exit 0
+          fi
+
+          if [ "$current" = "true" ]; then
+            exit 0
+          fi
+
+          if ! merged="$(jq '.steamvr = ((.steamvr // {}) + {useFacetRenderer: true})' "$settings" 2>/dev/null)"; then
+            echo "steamvr-facet-renderer: could not merge into $settings, leaving it untouched" >&2
+            exit 0
+          fi
+
+          merged_file="$(mktemp "''${settings}.XXXXXX")"
+          printf '%s\n' "$merged" > "$merged_file"
+          chmod --reference="$settings" "$merged_file"
+          mv "$merged_file" "$settings"
+        '';
+      };
     in
     {
+      home.activation.steamvrFacetRenderer = lib.hm.dag.entryAfter [ "writeBoundary" ] (
+        lib.getExe steamvrFacetRenderer
+      );
+
       home.sessionVariables = {
         PROTON_ENABLE_WAYLAND = "1";
         PROTON_DLSS_UPGRADE = "1";
@@ -74,5 +147,16 @@
           force = true;
         };
       };
+
+      xdg.configFile."openxr/1/active_runtime.json".text = ''
+        {
+           "file_format_version": "1.0.0",
+            "runtime": {
+            "VALVE_runtime_is_steamvr": true,
+            "library_path": "${config.home.homeDirectory}/.local/share/Steam/steamapps/common/SteamVR/bin/linux64/vrclient.so",
+            "name": "SteamVR"
+            }
+        }
+      '';
     };
 }
