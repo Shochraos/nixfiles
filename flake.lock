@@ -3,6 +3,7 @@
     "agent-skills-nix": {
       "inputs": {
         "anthropics-skills": "anthropics-skills",
+        "dbosk-skills": "dbosk-skills",
         "hermes-agent": "hermes-agent",
         "nixos-skill": "nixos-skill",
         "nixpkgs": [
@@ -14,11 +15,11 @@
         "wshobson-agents": "wshobson-agents"
       },
       "locked": {
-        "lastModified": 1789836410,
-        "narHash": "sha256-rWk29MEu/OiX3VAXbUo6lzMROMGw4PLTvNmILpKw9g8=",
+        "lastModified": 1790013094,
+        "narHash": "sha256-dJZylqsxcBFErR7ywgcV56TbnVFjnK5KUC4Zx6h+Yyo=",
         "owner": "Shochraos",
         "repo": "agent-skills-nix",
-        "rev": "bd7cf35242defd43d251b68debae966e72db3e93",
+        "rev": "46b52cfe3ece25424f11b89aeaf678a144c70e87",
         "type": "github"
       },
       "original": {
@@ -159,6 +160,22 @@
       "original": {
         "owner": "AvengeMedia",
         "repo": "danksearch",
+        "type": "github"
+      }
+    },
+    "dbosk-skills": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1789979142,
+        "narHash": "sha256-JjLM54sFkYu2tZXd/lXUoDGLOJSovb6qtkJ8FmPkhH8=",
+        "owner": "dbosk",
+        "repo": "claude-skills",
+        "rev": "59971ce8dc0bd14486218e4bc5af3ec3359a8593",
+        "type": "github"
+      },
+      "original": {
+        "owner": "dbosk",
+        "repo": "claude-skills",
         "type": "github"
       }
     },
@@ -512,11 +529,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1790002393,
-        "narHash": "sha256-K52mRzjlCKWaFf+Z3SmoxACg/UzNNR4eUiRZUe1tMs4=",
+        "lastModified": 1790010537,
+        "narHash": "sha256-rsDlQDQkCVnSkEfDTWlaFjp7vpke5taFkeTseT7DUxQ=",
         "owner": "nix-community",
         "repo": "home-manager",
-        "rev": "fae3c7589610212a87c89a968f2321d2bc823f38",
+        "rev": "a6c231d51f2a434e164020eae31de96ca0a56d65",
         "type": "github"
       },
       "original": {
