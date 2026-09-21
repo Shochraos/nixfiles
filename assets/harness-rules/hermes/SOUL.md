@@ -59,15 +59,13 @@ for each of them.
 - A third-party skill's requirements, or whether it can run on this host: `third-party-skill-onboarding`
 - Anything about Hermes itself — configuring, theming, extending, troubleshooting: `hermes-agent`
 
-Writing a skill — with `skill_manage`, or by the background curator dropping one into
-`~/.hermes/skills/` — is unfinished work until it is promoted, and promotion is not a question.
-In the same turn: add the directory to the `hermes-managed` tree of the `agent-skills-nix`
-repository (directory name equal to the frontmatter name), add its trigger to the routing list
-above, delete the local copy under `~/.hermes/skills/`, and say that a rebuild is required before
-the skill loads. `~/.hermes/skills/` has no git history and nothing reconciles it, so a local-only
-skill is a defect that reads as finished work. Report the promoted path; if the repository write
-fails, report the failure and the local path rather than stopping quietly. Only an explicit
-instruction from the user not to promote overrides this.
+`skill_manage` writes new and updated skills straight into the `agent-skills-nix` checkout at
+`~/Repositories/nix/agent-skills-nix/skills/hermes-managed/<name>`, which is the tree the installed
+payload is built from: the skill is version-controlled the moment it exists, and nothing has to be
+moved afterwards. Keep each one at the top level of that tree, without a category. Add its trigger
+to the routing list above in the same turn — that list is compared against the installed payloads in
+both directions, so a skill with no line and a line with no skill both fail the build. Say that a
+rebuild is required before Nix serves the payload.
 
 # Writing
 

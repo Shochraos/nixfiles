@@ -176,14 +176,18 @@ in
           };
           settings = {
             agent.coding_context = "off";
+            browser.backend = "off";
             model = {
               provider = "commandcode";
-              default = "deepseek/deepseek-v4.1-flash";
+              default = "Qwen/Qwen3.8-Omni-Flash";
             };
-            skills.external_dirs = [
-              "${hermesSkills}"
-              "${hermesManagedSkills}"
-            ];
+            skills = {
+              create_dir = "${config.home.homeDirectory}/Repositories/nix/agent-skills-nix/skills/hermes-managed";
+              external_dirs = [
+                "${hermesSkills}"
+                "${hermesManagedSkills}"
+              ];
+            };
             updates.check = false;
           };
         };
