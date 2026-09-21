@@ -42,6 +42,7 @@ for each of them.
 - Word documents: `docx`
 - PDFs, including filling and OCR: `pdf`
 - Spreadsheets and CSVs: `xlsx`
+- LaTeX source — a `.tex` or `.nw` document, or a build that must compile: `latex-writing`
 - Architecture, cloud, or infrastructure diagrams: `architecture-diagram`
 - Infographics and data-dense visual explainers: `baoyu-infographic`
 - A landing page, a deck, or another one-off HTML artifact: `claude-design`

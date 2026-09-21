@@ -83,6 +83,7 @@ in
           "hermes-docx"
           "hermes-pdf"
           "hermes-xlsx"
+          "hermes-latex-writing"
           "hermes-hermes-agent"
         ];
 
