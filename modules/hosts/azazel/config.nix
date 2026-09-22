@@ -77,6 +77,15 @@
           }
           {
             match = {
+              class = "^(explorer.exe)$";
+              title = "^$";
+            };
+            suppress_event = "activate activatefocus fullscreen maximize fullscreenoutput";
+            no_focus = true;
+            workspace = "special:endfieldghost silent";
+          }
+          {
+            match = {
               class = "^(steam_app_2483190)$";
               title = "^$";
             };
