@@ -84,6 +84,7 @@ in
           "hermes-pdf"
           "hermes-xlsx"
           "hermes-latex-writing"
+          "hermes-paper2agent"
           "hermes-hermes-agent"
         ];
 

@@ -15,11 +15,11 @@
         "wshobson-agents": "wshobson-agents"
       },
       "locked": {
-        "lastModified": 1790013094,
-        "narHash": "sha256-dJZylqsxcBFErR7ywgcV56TbnVFjnK5KUC4Zx6h+Yyo=",
+        "lastModified": 1790019343,
+        "narHash": "sha256-sCV++PBaQ3WflNpOO38VmeG/QKUYT1VQPmhDDP9LINY=",
         "owner": "Shochraos",
         "repo": "agent-skills-nix",
-        "rev": "46b52cfe3ece25424f11b89aeaf678a144c70e87",
+        "rev": "cbe2a8afe7870810b856b60916f34d039f8f6252",
         "type": "github"
       },
       "original": {

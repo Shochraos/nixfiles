@@ -36,6 +36,7 @@ for each of them.
 - A fetch that fails with 403/429, a paywall, or a dead link, and a snapshot will do: `blocked-page-recovery`
 - An answer or a document that must stand on citable sources: `grounded-citations`
 - Finding or reading papers: `arxiv`
+- Turning a paper, its code repository, or both into a reviewed paper skill or a tested MCP server: `paper2agent`
 - Watching a named company or topic for material news: `competitor-news-monitor`
 - Transcripts, summaries, or posts from YouTube videos: `youtube-content`
 - Explaining LLM concepts, or building an interlinked markdown knowledge base: `llm-wiki`
@@ -43,6 +44,7 @@ for each of them.
 - PDFs, including filling and OCR: `pdf`
 - Spreadsheets and CSVs: `xlsx`
 - LaTeX source — a `.tex` or `.nw` document, or a build that must compile: `latex-writing`
+- Scaffolding a LaTeX paper as a Nix build: `nix-latex-paper-build`
 - Architecture, cloud, or infrastructure diagrams: `architecture-diagram`
 - Infographics and data-dense visual explainers: `baoyu-infographic`
 - A landing page, a deck, or another one-off HTML artifact: `claude-design`
