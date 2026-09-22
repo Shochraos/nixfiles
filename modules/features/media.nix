@@ -4,9 +4,48 @@ let
 in
 {
   den.aspects.media.provides.to-users.homeManager =
-    { pkgs, ... }:
+    { pkgs, lib, ... }:
+    let
+      jellyfinSettings = pkgs.writeShellApplication {
+        name = "jellyfin-settings";
+        runtimeInputs = [
+          pkgs.coreutils
+          pkgs.jq
+        ];
+        text = ''
+          settings="''${XDG_CONFIG_HOME:-$HOME/.config}/jellyfin-mpv-shim/conf.json"
+          overlay="${assets.jellyfinMpvShimConfig}"
+
+          if [ ! -e "$settings" ]; then
+            install -Dm644 "$overlay" "$settings"
+            echo "jellyfin-settings: created $settings"
+            exit 0
+          fi
+
+          if ! jq empty "$settings" >/dev/null 2>&1; then
+            echo "jellyfin-settings: $settings is not valid JSON, leaving it untouched" >&2
+            exit 0
+          fi
+
+          if jq -e --slurpfile overlay "$overlay" \
+            '. as $live | $overlay[0] | to_entries | all(.value == $live[.key])' \
+            "$settings" >/dev/null; then
+            exit 0
+          fi
+
+          merged_file="$(mktemp "''${settings}.XXXXXX")"
+          jq -s '.[0] * .[1]' "$settings" "$overlay" > "$merged_file"
+          chmod --reference="$settings" "$merged_file"
+          mv "$merged_file" "$settings"
+          echo "jellyfin-settings: applied the nix-managed keys to $settings"
+        '';
+      };
+    in
     {
-      home.packages = [ pkgs.jellyfin-mpv-shim ];
+      home.packages = [
+        pkgs.jellyfin-mpv-shim
+        jellyfinSettings
+      ];
 
       programs.mpv = {
         enable = true;
@@ -45,7 +84,9 @@ in
         ];
       };
 
-      xdg.configFile."jellyfin-mpv-shim/conf.json".source = assets.jellyfinMpvShimConfig;
+      home.activation.jellyfinSettings = lib.hm.dag.entryAfter [ "writeBoundary" ] (
+        lib.getExe jellyfinSettings
+      );
 
       xdg.configFile."mpv/scripts/auto-hdr.lua".text = ''
         local mp = require 'mp'

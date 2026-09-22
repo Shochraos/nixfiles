@@ -191,6 +191,25 @@ Feather ships its own Tor and unpacks a copy into `~/.config/feather/tor/` on fi
 
 Litecoin is not covered. `electrum-ltc` is the only LTC wallet nixpkgs carries, and it cannot start on this revision. Its `electrum_ltc/util.py` calls the `asyncio.get_event_loop()` that Python 3.14 removed, and three hardware-wallet plugin dependencies pull `python-ecdsa`, which nixpkgs marks insecure (CVE-2024-23342). Upstream's last commit was in November 2022, so this needs a port rather than a version bump.
 
+### Jellyfin MPV Shim
+
+`modules/features/media.nix` installs the shim on Azazel. It reads `~/.config/jellyfin-mpv-shim/conf.json` once at startup, saves that file back whenever the schema moved, and writes the window geometry on exit. A save is a write to a temporary file followed by a rename onto the config path, so a home-manager symlink there survives exactly one launch: the app replaces it with a regular file, and the next switch stops with `Existing file ... would be clobbered`. Nix cannot own that path.
+
+`configs/jellyfin-mpv-shim/conf.json` is therefore not the app's configuration but the keys Nix imposes on it. The `jellyfin-settings` command merges that file into the app's own one on every activation, creating it when the app has never run, leaving every other key as the app left it, and warning rather than failing on a file it cannot parse. Run it by hand after a change made in the shim's settings UI that should not survive.
+
+| Key | Value | Why |
+| --- | --- | --- |
+| `client_uuid` | this host's device id | keeps the existing Jellyfin device, and with it the server's playback position and history |
+| `mpv_ext`, `mpv_ext_no_ovr` | `true` | the shim drives the packaged `mpv` and leaves the user's own configuration alone; `programs.mpv` in the same aspect owns `mpv.conf`, `input.conf` and the uosc, thumbfast and mpris scripts |
+| `osc_style` | `"custom"` | uosc is the OSC. Version 3.0 defaults to `mpvtk`, the shim's own playback HUD, which draws over uosc and over the library window. `custom` says the OSC is the user's, so the shim loads none and suppresses none |
+| `fullscreen` | `true` | playback takes the screen, as it did before 3.0, whose new default leaves a windowed player windowed |
+| `skip_intro_on_seek` | `true` | without a HUD, `ask` mode has no Skip button, and this is what brings the "Seek to Skip Intro" prompt back. Seeking forward inside the intro window then skips the segment, which is what that prompt always promised |
+| `start_minimized` | `true` | the app starts in the tray instead of opening its window at login. The window is one tray click away, and a second launch surfaces it too |
+
+Set `osc_style` to `mpvtk` for the new HUD instead. It is remote-navigable and carries its own Skip button, at the cost of a second set of controls on screen while uosc is installed.
+
+Version 3.0 dropped keys this configuration used to carry, and migrates each one itself: the four `skip_intro` and `skip_credits` booleans become `segment_intro` and `segment_outro`, `enable_osc` and `thumbnail_osc_builtin` collapse into `osc_style`, and display mirroring loses its switch, leaving only the window summon as `display_mirror_summon`. The app also clears `transcode_dolby_vision` on purpose, because mpv plays Dolby Vision natively now.
+
 ## Directory layout
 
 - `./flake.nix` — entry-point; auto-imports the `modules/` tree via `import-tree`.

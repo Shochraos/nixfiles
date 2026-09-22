@@ -174,5 +174,19 @@ in
         touch $out
       '';
 
+      checks."scripts/jellyfin-settings" = pkgs.runCommandLocal "check-jellyfin-settings" { } ''
+        export HOME="$TMPDIR/home"
+        mkdir -p "$HOME"
+        PATH="${
+          lib.makeBinPath [
+            pkgs.bash
+            pkgs.coreutils
+            pkgs.jq
+          ]
+        }:${fromAzazel "jellyfin-settings"}/bin:''${PATH}" \
+          ${pkgs.bash}/bin/bash ${tests.scripts}/jellyfin-settings.sh
+        touch $out
+      '';
+
     };
 }
