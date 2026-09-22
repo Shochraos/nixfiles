@@ -190,6 +190,7 @@ in
                 "${hermesManagedSkills}"
               ];
             };
+            terminal.cwd = ".";
             updates.check = false;
           };
         };
