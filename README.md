@@ -206,9 +206,12 @@ Litecoin is not covered. `electrum-ltc` is the only LTC wallet nixpkgs carries, 
 | `osc_style` | `"custom"` | uosc is the OSC. Version 3.0 defaults to `mpvtk`, the shim's own playback HUD, which draws over uosc and over the library window. `custom` says the OSC is the user's, so the shim loads none and suppresses none |
 | `fullscreen` | `true` | playback takes the screen, as it did before 3.0, whose new default leaves a windowed player windowed |
 | `skip_intro_on_seek` | `true` | without a HUD, `ask` mode has no Skip button, and this is what brings the "Seek to Skip Intro" prompt back. Seeking forward inside the intro window then skips the segment, which is what that prompt always promised |
-| `start_minimized` | `true` | the app starts in the tray instead of opening its window at login. The window is one tray click away, and a second launch surfaces it too |
+| `start_minimized` | `true` | start in the tray rather than opening the library at login, but only when the app can be reached again without a window: a registered tray, `allow_background`, or `headless`. The config key is deliberately not self-authorising, which is why the next row is load-bearing |
+| `allow_background` | `true` | closes the startup race the row above loses. The shim asks for the tray about half a second in, before DankMaterialShell has registered it, and then drops `start_minimized`. This makes a windowless start legal whether or not a tray exists. The window returns from the tray or from a second launch, and `jellyfin-mpv-shim stop` is the way out |
 
 Set `osc_style` to `mpvtk` for the new HUD instead. It is remote-navigable and carries its own Skip button, at the cost of a second set of controls on screen while uosc is installed.
+
+Both units start in the same second at login, so the shim's tray probe runs before DMS has published `org.kde.StatusNotifierWatcher`. The boot log says so: `start_minimized ignored: no system tray to restore the window from` at 17:07:05, then `tray: System tray is up` at 17:07:10. Restarting the unit by hand never shows this, because the tray already exists by then. That is how the first version of this table came to claim something the app does not do.
 
 Version 3.0 dropped keys this configuration used to carry, and migrates each one itself: the four `skip_intro` and `skip_credits` booleans become `segment_intro` and `segment_outro`, `enable_osc` and `thumbnail_osc_builtin` collapse into `osc_style`, and display mirroring loses its switch, leaving only the window summon as `display_mirror_summon`. The app also clears `transcode_dolby_vision` on purpose, because mpv plays Dolby Vision natively now.
 

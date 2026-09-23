@@ -1,4 +1,5 @@
 {
+    "allow_background": true,
     "client_uuid": "da0d3218-d79c-426b-ae6d-1857bcfc5833",
     "fullscreen": true,
     "mpv_ext": true,
