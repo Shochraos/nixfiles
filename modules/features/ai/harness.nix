@@ -106,10 +106,9 @@ in
 
         overlaySettings = {
           modelRoles = {
-            default = "commandcode/deepseek/deepseek-v4.1-flash";
+            default = "commandcode/xiaomi/mimo-v2.6-pro";
             tiny = "commandcode/deepseek/deepseek-v4.1-flash";
             smol = "commandcode/deepseek/deepseek-v4.1-flash";
-            vision = "commandcode/z-ai/glm-5.3-flash";
           };
           autolearn.enabled = true;
           memory.backend = "mnemopi";
