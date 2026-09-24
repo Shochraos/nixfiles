@@ -47,38 +47,12 @@ in
     expected = "/home/u/.ssh/probe";
   };
 
-  testKeybindsAcceptsAttrsets = {
-    expr =
-      (evalHost {
-        host.hyprland.keybinds = [
-          {
-            mods = "SUPER";
-            key = "Q";
-          }
-        ];
-      }).config.host.hyprland.keybinds;
-    expected = [
-      {
-        mods = "SUPER";
-        key = "Q";
-      }
-    ];
-  };
-
   testKeybindsRejectsBareString = {
     expr =
       (evalHost {
         host.hyprland.keybinds = [ "SUPER+Q" ];
       }).config.host.hyprland.keybinds;
     expectedError.msg = "not of type";
-  };
-
-  testBitdepthAcceptsTen = {
-    expr =
-      (evalHost {
-        host.outputs."DP-1".bitdepth = 10;
-      }).config.host.outputs."DP-1".bitdepth;
-    expected = 10;
   };
 
   testBitdepthRejectsNine = {

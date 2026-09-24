@@ -345,6 +345,27 @@ deck sleep 2 || fail "deck must run"
 grep -q 'monitor = "HDMI-A-1"' "$HYPRCTL_LOG" ||
   fail "deck did not fall back to the remembered monitor when its window was gone"
 
+printf 'HDMI-A-1\nDP-1\n' >"$MONITORS"
+: >"$HYPRCTL_LOG"
+streaming-displays
+grep -q 'output create headless DECK' "$HYPRCTL_LOG" ||
+  fail "streaming-displays did not create the missing DECK output"
+grep -q 'output create headless FRAME' "$HYPRCTL_LOG" ||
+  fail "streaming-displays did not create the missing FRAME output"
+grep -q 'output = "DECK", mode = "1280x720@90"' "$HYPRCTL_LOG" ||
+  fail "streaming-displays did not pin DECK's declared mode"
+grep -q 'output = "FRAME", mode = "2560x1440@120"' "$HYPRCTL_LOG" ||
+  fail "streaming-displays did not pin FRAME's declared mode"
+
+printf 'HDMI-A-1\nDP-1\nDECK\nFRAME\n' >"$MONITORS"
+: >"$HYPRCTL_LOG"
+streaming-displays
+if grep -q 'output create' "$HYPRCTL_LOG"; then
+  fail "streaming-displays recreated an output that was already present"
+fi
+grep -q 'output = "DECK", mode = "1280x720@90"' "$HYPRCTL_LOG" ||
+  fail "streaming-displays did not re-assert the declared mode of a present output"
+
 mask() {
   sed -E -e 's|/nix/store/[a-z0-9]{32}-|/nix/store/HASH-|g' \
     -e 's/FRAME/OUT/g' -e 's/DECK/OUT/g' \
@@ -353,6 +374,11 @@ mask() {
     -e 's/-w 1280 -h 720 -W 1280 -H 720 -r 90/GEOMETRY/g' \
     -e 's/frame/DISPLAY/g' -e 's/deck/DISPLAY/g' "$1"
 }
+for tool in frame-display deck-display frame deck; do
+  path=$(command -v "$tool") || fail "$tool is not on PATH"
+  [ -s "$path" ] || fail "$tool resolved to nothing — the generator-equivalence diff would pass vacuously"
+done
+
 diff <(mask "$(command -v frame-display)") <(mask "$(command -v deck-display)") ||
   fail "frame-display and deck-display differ beyond their data — the generator grew a branch"
 

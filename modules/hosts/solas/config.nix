@@ -10,7 +10,7 @@
     {
       system.stateVersion = "25.05";
 
-      host.flakeDir = "/home/shochraos/Repositories/nixfiles";
+      host.flakeDir = "/home/shochraos/Repositories/nix/nixfiles";
       host.keepassxc.database = "/mnt/nextcloud/Security/KeePass/Vault.kdbx";
 
       host.wireguard.profiles = {

@@ -48,7 +48,6 @@ in
         gnome-text-editor
         loupe
         evince
-        libsecret
       ];
 
       xdg.mime = {

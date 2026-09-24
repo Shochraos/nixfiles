@@ -22,8 +22,6 @@ in
         {
           nixpkgs.overlays = [ bscpylgtvOverlay ];
 
-          environment.systemPackages = with pkgs; [ wakeonlan ];
-
           sops.secrets = {
             "lgtv/mac" = { };
             "lgtv/ip" = { };

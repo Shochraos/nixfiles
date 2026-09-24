@@ -28,7 +28,7 @@
       };
 
       provides.to-users.homeManager =
-        { osConfig, pkgs, ... }:
+        { osConfig, ... }:
         {
           imports = [ inputs.nix-index-database.homeModules.default ];
 
@@ -47,8 +47,6 @@
             silent = true;
             nix-direnv.enable = true;
           };
-
-          home.packages = with pkgs; [ nix-init ];
         };
     };
 }

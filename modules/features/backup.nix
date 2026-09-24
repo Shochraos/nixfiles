@@ -139,7 +139,6 @@
         in
         {
           home.packages = [
-            pkgs.borgbackup
             cli
           ];
 

@@ -133,7 +133,6 @@ in
             pkgs.gnugrep
             pkgs.gnused
             pkgs.gawk
-            pkgs.systemd
           ]
         }:${fromAzazel "eq"}/bin:''${PATH}" \
           ${pkgs.bash}/bin/bash ${tests.scripts}/eq.sh
@@ -152,7 +151,7 @@ in
             pkgs.jq
             pkgs.util-linux
           ]
-        }:${fromAzazel "frame"}/bin:${fromAzazel "frame-display"}/bin:${fromAzazel "deck"}/bin:${fromAzazel "deck-display"}/bin:''${PATH}" \
+        }:${fromAzazel "frame"}/bin:${fromAzazel "frame-display"}/bin:${fromAzazel "deck"}/bin:${fromAzazel "deck-display"}/bin:${fromAzazel "streaming-displays"}/bin:''${PATH}" \
           ${pkgs.bash}/bin/bash ${tests.scripts}/streaming.sh
         touch $out
       '';

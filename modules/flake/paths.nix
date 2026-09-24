@@ -17,12 +17,6 @@ in
       description = "Package definitions under `pkgs/`, resolved here so no feature file carries a relative-path literal. Consumed by `callPackage`.";
     };
 
-    helpers = mkOption {
-      type = pathTable;
-      default = { };
-      description = "Pure helper functions shared by aspects, resolved here so no aspect carries a relative-path literal.";
-    };
-
     tests = mkOption {
       type = pathTable;
       default = { };

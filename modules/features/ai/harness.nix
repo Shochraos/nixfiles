@@ -180,7 +180,7 @@ in
             browser.backend = "off";
             model = {
               provider = "commandcode";
-              default = "Qwen/Qwen3.8-Omni-Flash";
+              default = "xiaomi/mimo-v2.6-pro";
             };
             skills = {
               create_dir = "${config.home.homeDirectory}/Repositories/nix/agent-skills-nix/skills/hermes-managed";

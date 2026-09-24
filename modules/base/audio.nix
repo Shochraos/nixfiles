@@ -95,7 +95,6 @@ in
 
       jsonFormat = pkgs.formats.json { };
       pipewire = lib.getExe' osConfig.services.pipewire.package "pipewire";
-      systemctl = lib.getExe' pkgs.systemd "systemctl";
 
       preampNode = equalizer: {
         type = "builtin";
@@ -248,7 +247,7 @@ in
 
           loaded_preset() {
             local value
-            if ! ${systemctl} --user is-active --quiet "pipewire-eq-$1.service"; then
+            if ! systemctl --user is-active --quiet "pipewire-eq-$1.service"; then
               printf 'off'
               return 0
             fi
@@ -325,9 +324,9 @@ in
           printf '%s\n' "$preset" > "$state_dir/$device"
 
           if [ "$preset" = off ]; then
-            ${systemctl} --user stop "pipewire-eq-$device.service"
+            systemctl --user stop "pipewire-eq-$device.service"
           else
-            ${systemctl} --user restart "pipewire-eq-$device.service"
+            systemctl --user restart "pipewire-eq-$device.service"
           fi
           printf '%s: %s\n' "$device" "$preset"
         '';

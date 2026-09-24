@@ -5,6 +5,7 @@
       devShells.default = pkgs.mkShellNoCC {
         packages = [
           config.treefmt.build.wrapper
+          pkgs.nix-init
           pkgs.nixd
           pkgs.nixfmt
           pkgs.nix-unit

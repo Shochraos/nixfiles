@@ -103,8 +103,6 @@ in
           ];
 
           home.packages = [
-            # Claude Usage
-            pkgs.jq
             # DiscordVoice
             pkgs.python3
           ];
