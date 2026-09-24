@@ -1,4 +1,8 @@
-{ harness, audioPath }:
+{
+  lib,
+  harness,
+  audioPath,
+}:
 let
   aspect = harness.nixos audioPath [
     "audio"
@@ -25,41 +29,38 @@ let
       inherit default presets;
     };
 
-  verdicts =
+  failures =
     equalizers:
-    map (a: a.assertion)
-      (aspect (harness.aspectArgs { host.audio.equalizers = equalizers; })).assertions;
+    map (a: a.message) (
+      builtins.filter (a: !a.assertion)
+        (aspect (harness.aspectArgs { host.audio.equalizers = equalizers; })).assertions
+    );
+
+  onlyFailureMentions =
+    equalizers: needle:
+    let
+      failed = failures equalizers;
+    in
+    builtins.length failed == 1 && lib.hasInfix needle (builtins.head failed);
 in
 {
   testEqualizerAssertionsAllHold = {
-    expr = verdicts { dx3 = eq { }; };
-    expected = [
-      true
-      true
-      true
-    ];
+    expr = failures { dx3 = eq { }; };
+    expected = [ ];
   };
 
   testEqualizerDefaultMustBeAPreset = {
-    expr = verdicts { dx3 = eq { default = "house"; }; };
-    expected = [
-      false
-      true
-      true
-    ];
+    expr = onlyFailureMentions { dx3 = eq { default = "house"; }; } ".default is";
+    expected = true;
   };
 
   testEqualizerNamesRejectIllegalCharacters = {
-    expr = verdicts { "dx 3" = eq { }; };
-    expected = [
-      true
-      false
-      true
-    ];
+    expr = onlyFailureMentions { "dx 3" = eq { }; } "must match [a-zA-Z0-9-]+";
+    expected = true;
   };
 
   testEqualizerRejectsReservedOffPreset = {
-    expr = verdicts {
+    expr = onlyFailureMentions {
       dx3 = eq {
         presets = {
           arya-organic = preset;
@@ -67,16 +68,12 @@ in
           off = preset;
         };
       };
-    };
-    expected = [
-      true
-      true
-      false
-    ];
+    } ''"off" is reserved'';
+    expected = true;
   };
 
   testNoEqualizersEmitNoAssertions = {
-    expr = verdicts { };
+    expr = failures { };
     expected = [ ];
   };
 }

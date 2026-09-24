@@ -47,19 +47,60 @@ in
     expected = "/home/u/.ssh/probe";
   };
 
-  testKeybindsRejectsBareString = {
+  testKeybindsRejectAMistypedArgsKey = {
     expr =
       (evalHost {
-        host.hyprland.keybinds = [ "SUPER+Q" ];
+        host.hyprland.keybinds = [ { _arg = [ "SUPER + X" ]; } ];
       }).config.host.hyprland.keybinds;
-    expectedError.msg = "not of type";
+    expectedError.msg = "_arg";
   };
 
-  testBitdepthRejectsNine = {
+  testKeybindsCarryTheirArgsUnchanged = {
     expr =
       (evalHost {
-        host.outputs."DP-1".bitdepth = 9;
-      }).config.host.outputs."DP-1".bitdepth;
-    expectedError.msg = "is not of type";
+        host.hyprland.keybinds = [
+          {
+            _args = [
+              "SUPER + X"
+              "noop"
+            ];
+          }
+        ];
+      }).config.host.hyprland.keybinds;
+    expected = [
+      {
+        _args = [
+          "SUPER + X"
+          "noop"
+        ];
+      }
+    ];
+  };
+
+  testMatugenTemplatesRejectAMisspelledKey = {
+    expr =
+      (evalHost {
+        host.matugen.templates.x = {
+          input_paht = "/tmp/template";
+          output_path = "~/out";
+        };
+      }).config.host.matugen.templates;
+    expectedError.msg = "input_paht";
+  };
+
+  testMatugenTemplatesCarryBothFields = {
+    expr =
+      (evalHost {
+        host.matugen.templates.x = {
+          input_path = "/tmp/template";
+          output_path = "~/out";
+        };
+      }).config.host.matugen.templates;
+    expected = {
+      x = {
+        input_path = "/tmp/template";
+        output_path = "~/out";
+      };
+    };
   };
 }

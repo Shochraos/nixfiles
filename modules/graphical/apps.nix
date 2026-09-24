@@ -9,6 +9,7 @@ in
       provides.to-users.homeManager =
         {
           lib,
+          config,
           pkgs,
           osConfig,
           ...
@@ -21,6 +22,15 @@ in
             libreoffice-qt-stable
             pdfarranger
           ];
+
+          xdg.autostart.entries =
+            let
+              desktopEntries = {
+                discord = "${pkgs.discord.override { withVencord = true; }}/share/applications/discord.desktop";
+                spotify = "${config.programs.spicetify.spicedSpotify}/share/applications/spotify.desktop";
+              };
+            in
+            map (name: desktopEntries.${name}) osConfig.host.autostart;
 
           programs.spicetify =
             let

@@ -12,6 +12,11 @@
 
       host.flakeDir = "/home/shochraos/Repositories/nix/nixfiles";
 
+      host.autostart = [
+        "discord"
+        "spotify"
+      ];
+
       host.hyprland = {
         input = {
           accel_profile = "flat";
@@ -332,16 +337,7 @@
       };
     };
 
-  den.aspects.azazel.provides.to-users.homeManager =
-    { config, pkgs, ... }:
-    {
-      home.stateVersion = "25.05";
-
-      xdg.autostart = {
-        entries = [
-          "${pkgs.discord.override { withVencord = true; }}/share/applications/discord.desktop"
-          "${config.programs.spicetify.spicedSpotify}/share/applications/spotify.desktop"
-        ];
-      };
-    };
+  den.aspects.azazel.provides.to-users.homeManager = _: {
+    home.stateVersion = "25.05";
+  };
 }

@@ -27,4 +27,4 @@ in
     ;
 })
 // (import ./guards.nix { inherit lib aiPath; })
-// (import ./audio.nix { inherit harness audioPath; })
+// (import ./audio.nix { inherit lib harness audioPath; })

@@ -1,9 +1,12 @@
 #!/usr/bin/env bash
 
+wpctl_cmd="${MIC_MUTE_WPCTL:-wpctl}"
+dms_cmd="${MIC_MUTE_DMS:-dms}"
+
 last_state=""
 
 get_state() {
-  wpctl get-volume @DEFAULT_AUDIO_SOURCE@ | grep -q MUTED && echo "muted" || echo "unmuted"
+  "$wpctl_cmd" get-volume @DEFAULT_AUDIO_SOURCE@ | grep -q MUTED && echo "muted" || echo "unmuted"
 }
 
 while true; do
@@ -11,9 +14,9 @@ while true; do
 
   if [[ $current_state != "$last_state" ]]; then
     if [[ $current_state == "muted" ]]; then
-      dms brightness set leds:platform::micmute 100
+      "$dms_cmd" brightness set leds:platform::micmute 100
     else
-      dms brightness set leds:platform::micmute 0
+      "$dms_cmd" brightness set leds:platform::micmute 0
     fi
 
     last_state="$current_state"

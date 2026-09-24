@@ -213,7 +213,14 @@ in
                 description = "Hyprland `window_rule` entries for this host.";
               };
               keybinds = mkOption {
-                type = attrsetList;
+                type = types.listOf (
+                  types.submodule {
+                    options._args = mkOption {
+                      type = types.listOf types.anything;
+                      description = "Positional arguments of one `hl.bind` call: the key spec, the action, and an optional flags attrset.";
+                    };
+                  }
+                );
                 default = [ ];
                 description = "Hyprland `bind` entries (from host + feature modules).";
               };
@@ -253,9 +260,33 @@ in
               };
             };
 
+            autostart = mkOption {
+              type = types.listOf (
+                types.enum [
+                  "discord"
+                  "spotify"
+                ]
+              );
+              default = [ ];
+              description = "Applications that autostart at login on this host. Each name is resolved to its desktop entry by the aspect that owns the application.";
+            };
+
             matugen = {
               templates = mkOption {
-                type = attrsetTable;
+                type = types.attrsOf (
+                  types.submodule {
+                    options = {
+                      input_path = mkOption {
+                        type = types.path;
+                        description = "Template source file matugen reads.";
+                      };
+                      output_path = mkOption {
+                        type = types.str;
+                        description = "Shell-expanded path matugen writes the rendered template to.";
+                      };
+                    };
+                  }
+                );
                 default = { };
                 description = "matugen templates contributed by feature aspects, merged over the shared template set in the hyprland theme aspect. Lets a feature theme itself from the live palette without depending on the hyprland aspect being present.";
               };

@@ -11,6 +11,16 @@ let
       homes.${builtins.head names}
     else
       throw "check: expected exactly one home-manager user on Azazel, got ${toString (builtins.length names)}";
+
+  solasHome =
+    let
+      homes = top.config.flake.nixosConfigurations.Solas.config.home-manager.users;
+      names = builtins.attrNames homes;
+    in
+    if builtins.length names == 1 then
+      homes.${builtins.head names}
+    else
+      throw "check: expected exactly one home-manager user on Solas, got ${toString (builtins.length names)}";
 in
 {
   imports = [ inputs.git-hooks-nix.flakeModule ];
@@ -23,6 +33,19 @@ in
         lib.findFirst (
           p: (p.name or "") == name
         ) (throw "check: ${name} is not in Azazel's home.packages") azazelHome.home.packages;
+
+      unitExe =
+        home: prefix:
+        let
+          units = lib.filterAttrs (name: _: lib.hasPrefix prefix name) home.systemd.user.services;
+          names = builtins.attrNames units;
+          exe =
+            if names == [ ] then
+              throw "check: no ${prefix}* user unit in the home config"
+            else
+              units.${builtins.head names}.Service.ExecStart;
+        in
+        if builtins.isList exe then builtins.head exe else exe;
 
       unitTests = pkgs.writeShellApplication {
         name = "unit-tests";
@@ -184,6 +207,58 @@ in
           ]
         }:${fromAzazel "jellyfin-settings"}/bin:''${PATH}" \
           ${pkgs.bash}/bin/bash ${tests.scripts}/jellyfin-settings.sh
+        touch $out
+      '';
+
+      checks."scripts/pipewire-eq" = pkgs.runCommandLocal "check-pipewire-eq" { } ''
+        export HOME="$TMPDIR/home"
+        export XDG_STATE_HOME="$TMPDIR/state"
+        export XDG_RUNTIME_DIR="$TMPDIR/run"
+        export RUNNER="${unitExe azazelHome "pipewire-eq-"}"
+        mkdir -p "$HOME" "$XDG_STATE_HOME" "$XDG_RUNTIME_DIR"
+        PATH="${
+          lib.makeBinPath [
+            pkgs.bash
+            pkgs.coreutils
+            pkgs.gnugrep
+            pkgs.gnused
+            pkgs.gawk
+            pkgs.jq
+            pkgs.systemd
+          ]
+        }:${fromAzazel "eq"}/bin:''${PATH}" \
+          ${pkgs.bash}/bin/bash ${tests.scripts}/pipewire-eq.sh
+        touch $out
+      '';
+
+      checks."scripts/theme-sync" = pkgs.runCommandLocal "check-theme-sync" { } ''
+        export HOME="$TMPDIR/home"
+        mkdir -p "$HOME"
+        PATH="${
+          lib.makeBinPath [
+            pkgs.bash
+            pkgs.coreutils
+            pkgs.gnugrep
+            pkgs.gnused
+            pkgs.git
+          ]
+        }:${fromAzazel "theme-sync"}/bin:''${PATH}" \
+          ${pkgs.bash}/bin/bash ${tests.scripts}/theme-sync.sh
+        touch $out
+      '';
+
+      checks."scripts/mic-mute" = pkgs.runCommandLocal "check-mic-mute" { } ''
+        export HOME="$TMPDIR/home"
+        mkdir -p "$HOME"
+        export RUNNER="${unitExe solasHome "micmute-led"}"
+        PATH="${
+          lib.makeBinPath [
+            pkgs.bash
+            pkgs.coreutils
+            pkgs.gnugrep
+          ]
+        }:''${PATH}" \
+          ${pkgs.bash}/bin/bash ${tests.scripts}/mic-mute.sh
         touch $out
       '';
 

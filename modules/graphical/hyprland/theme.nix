@@ -87,8 +87,9 @@ in
               jq
             ];
             text = ''
+              repo="''${THEME_SYNC_REPO:-${osConfig.host.flakeDir}}"
               src="$HOME/.local/state/matugen/spicetify-${host.name}.json"
-              dst="${osConfig.host.flakeDir}/configs/matugen/spicetify-${host.name}.json"
+              dst="$repo/configs/matugen/spicetify-${host.name}.json"
 
               if [ ! -f "$src" ]; then exit 0; fi
 
@@ -103,7 +104,7 @@ in
               [ -e "$dst" ] || new=1
               mkdir -p "$(dirname "$dst")"
               cp "$src" "$dst"
-              [ "$new" = 0 ] || git -C "${osConfig.host.flakeDir}" add --intent-to-add -- "$dst"
+              [ "$new" = 0 ] || git -C "$repo" add --intent-to-add -- "$dst"
               echo "theme-sync: updated $dst"
             '';
           };

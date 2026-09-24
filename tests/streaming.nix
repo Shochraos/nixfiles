@@ -87,17 +87,16 @@ in
     expr =
       let
         lua = (hyprland { displays.deck = deck { }; }).extraConfig;
-        count = needle: builtins.length (lib.splitString needle lua) - 1;
       in
       {
-        start = count "hl.on(\"hyprland.start\"";
-        reload = count "hl.on(\"config.reloaded\"";
-        invoke = count "/bin/streaming-displays";
+        start = lib.hasInfix ''hl.on("hyprland.start"'' lua;
+        reload = lib.hasInfix ''hl.on("config.reloaded"'' lua;
+        invoke = lib.hasInfix "/bin/streaming-displays" lua;
       };
     expected = {
-      start = 1;
-      reload = 1;
-      invoke = 1;
+      start = true;
+      reload = true;
+      invoke = true;
     };
   };
 

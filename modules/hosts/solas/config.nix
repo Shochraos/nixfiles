@@ -282,13 +282,7 @@
       };
     };
 
-  den.aspects.solas.provides.to-users.homeManager =
-    { pkgs, ... }:
-    {
-      home.stateVersion = "25.05";
-
-      home.packages = with pkgs; [
-        pdfpc
-      ];
-    };
+  den.aspects.solas.provides.to-users.homeManager = _: {
+    home.stateVersion = "25.05";
+  };
 }

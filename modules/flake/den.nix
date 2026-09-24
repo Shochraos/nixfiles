@@ -83,6 +83,7 @@
     fingerprint
     virtualization
     mic-mute
+    pdfpc
     (ai {
       local = false;
       stt = false;

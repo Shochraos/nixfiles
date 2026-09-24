@@ -219,7 +219,7 @@ in
             mkdir -p "$runtime_dir"
             printf '%s\n' "$preset" > "$runtime_dir/${name}"
             printf 'eq: ${name} loading %s\n' "$preset" >&2
-            exec ${pipewire} -c "$conf"
+            exec "''${PIPEWIRE:-${pipewire}}" -c "$conf"
           '';
         };
 
