@@ -5,13 +5,17 @@
       devShells.default = pkgs.mkShellNoCC {
         packages = [
           config.treefmt.build.wrapper
+          pkgs.actionlint
+          pkgs.deadnix
           pkgs.nix-init
           pkgs.nixd
           pkgs.nixfmt
           pkgs.nix-unit
           pkgs.shellcheck
+          pkgs.shfmt
           pkgs.sops
           pkgs.ssh-to-age
+          pkgs.statix
         ]
         ++ config.pre-commit.settings.enabledPackages;
 

@@ -1,16 +1,14 @@
 {
   den.aspects.crypto = {
-    nixos =
-      { ... }:
-      {
-        services.tor = {
+    nixos = _: {
+      services.tor = {
+        enable = true;
+        client = {
           enable = true;
-          client = {
-            enable = true;
-            socksListenAddress.port = 9050;
-          };
+          socksListenAddress.port = 9050;
         };
       };
+    };
 
     provides.to-users.homeManager =
       { lib, pkgs, ... }:

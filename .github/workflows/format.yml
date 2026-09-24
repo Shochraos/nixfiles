@@ -45,7 +45,7 @@ jobs:
             echo
             echo '| file |'
             echo '| --- |'
-            git diff --name-only | sed 's|^|\| `|; s|$|` \||'
+            git diff --name-only | while read -r f; do printf "| \`%s\` |\n" "$f"; done
             echo
             echo '<details><summary>Full diff</summary>'
             echo

@@ -33,9 +33,8 @@ let
 
   gamescopeRules =
     streaming:
-    builtins.filter (rule: rule.match.class or "" == "^(gamescope)$") (
-      (hyprland streaming).settings.window_rule
-    );
+    builtins.filter (rule: rule.match.class or "" == "^(gamescope)$")
+      (hyprland streaming).settings.window_rule;
 
   deck =
     extra:

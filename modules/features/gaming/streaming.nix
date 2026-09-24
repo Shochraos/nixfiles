@@ -25,15 +25,15 @@ in
     let
       inherit (osConfig.host) streaming;
 
-      displays = streaming.displays;
+      inherit (streaming) displays;
 
       mkWrappers =
         name: entry:
         let
           inherit (streamingGeometry entry) width height refresh;
 
-          output = entry.output;
-          mode = entry.mode;
+          inherit (entry) output;
+          inherit (entry) mode;
           geometry = lib.optionalString (entry.scale != null) ", scale = ${entry.scale}";
 
           displayCmd = pkgs.writeShellApplication {
