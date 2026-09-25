@@ -20,7 +20,7 @@
         "narHash": "sha256-Om0X5RAKlC964EAtEsOy+GI3T9ye50lL0JThm42ZfwQ=",
         "owner": "Shochraos",
         "repo": "agent-skills-nix",
-        "rev": "0b005ad9e8219ccdc0155e36d298fa7dcf62f9c6",
+        "rev": "18de9d842a398c7f8b6861db4f6ac360a8435ef6",
         "type": "github"
       },
       "original": {
@@ -249,7 +249,7 @@
         "narHash": "sha256-qz0x0k+dUzVqbKL2TyMJh3oybriTmnr82XQ6a6C6bwo=",
         "owner": "shochraos",
         "repo": "dw-proton-nix",
-        "rev": "bcb253d53ae0d1547ec4ee808c06c9c58c6f5c6d",
+        "rev": "e7511b649715c158019a063ec5a0c426861160b7",
         "type": "github"
       },
       "original": {
@@ -820,7 +820,7 @@
         "narHash": "sha256-178HYfFwtl6Q9I5uww+NP8D5a0OsECgW8/b8/Mdi6sg=",
         "owner": "Shochraos",
         "repo": "proton-cachyos-nix",
-        "rev": "36186bdd3394e5749e99781ef4df6353cffa7206",
+        "rev": "1810438d60d4296013a1a1aa12f478ab0c6d1f02",
         "type": "github"
       },
       "original": {
