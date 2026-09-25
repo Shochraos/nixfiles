@@ -17,6 +17,7 @@
             "git/github/email" = { };
             "git/non-github/name" = { };
             "git/non-github/email" = { };
+            "git/private-git" = { };
           };
 
           sops.templates."ssh-secret-hosts" = {
@@ -56,6 +57,32 @@
               email = ${config.sops.placeholder."git/non-github/email"}
             '';
           };
+
+          sops.templates."git-identity-includes" =
+            let
+              includeIfBlock = condition: path: ''
+                [includeIf "${condition}"]
+                  path = ${path}
+              '';
+              hostBlocks =
+                path: host:
+                builtins.concatStringsSep "" (
+                  map (condition: includeIfBlock condition path) [
+                    "hasconfig:remote.*.url:https://${host}*/**"
+                    "hasconfig:remote.*.url:git@${host}:**/*"
+                    "hasconfig:remote.*.url:ssh://git@${host}*/**"
+                  ]
+                );
+              nonGithubIdentity = config.sops.templates."git-non-github-identity".path;
+              githubIdentity = config.sops.templates."git-github-identity".path;
+            in
+            {
+              owner = user.name;
+              content =
+                hostBlocks nonGithubIdentity "codeberg.org"
+                + hostBlocks nonGithubIdentity "git-ce.rwth-aachen.de"
+                + hostBlocks githubIdentity config.sops.placeholder."git/private-git";
+            };
         };
 
       provides.to-users.homeManager =
@@ -63,22 +90,7 @@
         let
           hostKey = osConfig.host.sshKey;
           gitKey = "${hostKey}-git";
-          nonGithubHosts = [
-            "codeberg.org"
-            "git-ce.rwth-aachen.de"
-          ];
-          nonGithubIdentity = osConfig.sops.templates."git-non-github-identity".path;
           githubIdentity = osConfig.sops.templates."git-github-identity".path;
-          nonGithubIncludes = builtins.concatMap (host: [
-            {
-              condition = "hasconfig:remote.*.url:https://${host}/**";
-              path = nonGithubIdentity;
-            }
-            {
-              condition = "hasconfig:remote.*.url:git@${host}:**/*";
-              path = nonGithubIdentity;
-            }
-          ]) nonGithubHosts;
         in
         {
           programs.git = {
@@ -91,8 +103,8 @@
             includes = [
               { path = githubIdentity; }
               { path = osConfig.sops.secrets."git/url-rewrites".path; }
-            ]
-            ++ nonGithubIncludes;
+              { path = osConfig.sops.templates."git-identity-includes".path; }
+            ];
           };
 
           programs.ssh = {
