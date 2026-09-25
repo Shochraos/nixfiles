@@ -122,7 +122,7 @@ in
 
               vesktop = {
                 input_path = assets.discordTemplate;
-                output_path = "~/.config/Vencord/themes/matugen.css";
+                output_path = "~/.config/Equicord/themes/matugen.css";
               };
 
               steam = {

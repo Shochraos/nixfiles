@@ -14,19 +14,22 @@ in
           osConfig,
           ...
         }:
+        let
+          discordPkg = pkgs.discord.override { withEquicord = true; };
+        in
         {
           imports = [ inputs.spicetify-nix.homeManagerModules.default ];
 
-          home.packages = with pkgs; [
-            (discord.override { withVencord = true; })
-            libreoffice-qt-stable
-            pdfarranger
+          home.packages = [
+            discordPkg
+            pkgs.libreoffice-qt-stable
+            pkgs.pdfarranger
           ];
 
           xdg.autostart.entries =
             let
               desktopEntries = {
-                discord = "${pkgs.discord.override { withVencord = true; }}/share/applications/discord.desktop";
+                discord = "${discordPkg}/share/applications/discord.desktop";
                 spotify = "${config.programs.spicetify.spicedSpotify}/share/applications/spotify.desktop";
               };
             in
