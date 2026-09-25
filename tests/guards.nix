@@ -11,6 +11,13 @@ let
         assets = { };
       };
     }).den.aspects.ai;
+  callAi =
+    args:
+    ai.__functor {
+      tools = "tools";
+      stt = "stt";
+      local = "local";
+    } args;
 in
 {
   testAiRejectsNonAttrs = {
@@ -24,5 +31,18 @@ in
       tts = true;
     };
     expectedError.msg = "unknown argument\\(s\\) tts";
+  };
+
+  testAiIncludesToolsAndOnlyTheRequestedFeature = {
+    expr = (callAi { stt = true; }).includes;
+    expected = [
+      "tools"
+      "stt"
+    ];
+  };
+
+  testAiLeavesOutFeaturesByDefault = {
+    expr = (callAi { }).includes;
+    expected = [ "tools" ];
   };
 }

@@ -47,6 +47,9 @@ in
         in
         if builtins.isList exe then builtins.head exe else exe;
 
+      activationExe =
+        home: name: (home.home.activation.${name} or (throw "check: no ${name} activation entry")).data;
+
       unitTests = pkgs.writeShellApplication {
         name = "unit-tests";
         runtimeInputs = [ pkgs.nix-unit ];
@@ -259,6 +262,21 @@ in
           ]
         }:''${PATH}" \
           ${pkgs.bash}/bin/bash ${tests.scripts}/mic-mute.sh
+        touch $out
+      '';
+
+      checks."scripts/steamvr-facet-renderer" = pkgs.runCommandLocal "check-steamvr-facet-renderer" { } ''
+        export HOME="$TMPDIR/home"
+        mkdir -p "$HOME"
+        PATH="${
+          lib.makeBinPath [
+            pkgs.bash
+            pkgs.coreutils
+            pkgs.gnugrep
+            pkgs.jq
+          ]
+        }:$(dirname ${activationExe azazelHome "steamvrFacetRenderer"}):''${PATH}" \
+          ${pkgs.bash}/bin/bash ${tests.scripts}/steamvr-facet-renderer.sh
         touch $out
       '';
 

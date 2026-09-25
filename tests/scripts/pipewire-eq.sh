@@ -40,9 +40,13 @@ conf=$(sed -n 's/^-c \(.*\)$/\1/p' "$PIPEWIRE_LOG")
 [ -f "$conf" ] || fail "the runner pointed pipewire at a missing conf: $conf"
 jq -e 'type == "object"' "$conf" >/dev/null || fail "the generated conf is not a JSON object: $conf"
 grep -q "effect_input.$device" "$conf" || fail "the conf does not build the $device filter: $conf"
+grep -q '"preamp"' "$conf" || fail "the conf carries no preamp node: $conf"
+grep -q 'filter.smart.target' "$conf" || fail "the conf does not name a smart-filter target: $conf"
 [ "$(cat "$runtime")" = "$default" ] ||
   fail "the runtime record should hold the default, got: $(cat "$runtime")"
 
+seen="$TMPDIR/seen-confs"
+: >"$seen"
 read -ra preset_list <<<"$presets"
 for preset in "${preset_list[@]}"; do
   : >"$PIPEWIRE_LOG"
@@ -52,6 +56,11 @@ for preset in "${preset_list[@]}"; do
   grep -q "loading $preset\$" <<<"$err" || fail "preset '$preset' was not loaded: $err"
   [ "$(cat "$runtime")" = "$preset" ] ||
     fail "the runtime record did not follow '$preset': $(cat "$runtime")"
+  preset_conf=$(sed -n 's/^-c \(.*\)$/\1/p' "$PIPEWIRE_LOG")
+  if grep -qxF "$preset_conf" "$seen"; then
+    fail "preset '$preset' reused another preset's graph: $preset_conf"
+  fi
+  printf '%s\n' "$preset_conf" >>"$seen"
 done
 
 : >"$PIPEWIRE_LOG"

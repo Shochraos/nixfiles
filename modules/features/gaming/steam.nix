@@ -90,7 +90,7 @@
           pkgs.jq
         ];
         text = ''
-          settings="${config.home.homeDirectory}/.local/share/Steam/config/steamvr.vrsettings"
+          settings="''${STEAMVR_SETTINGS:-${config.home.homeDirectory}/.local/share/Steam/config/steamvr.vrsettings}"
 
           if [ ! -f "$settings" ]; then
             exit 0
