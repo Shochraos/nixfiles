@@ -126,6 +126,9 @@
         PROTON_ENABLE_WAYLAND = "1";
         PROTON_DLSS_UPGRADE = "1";
         PROTON_VKD3D_LOWLATENCY = "1";
+        PROTON_DXVK_LOWLATENCY = "1";
+        DXVK_FRAME_PACE = "low-latency-vrr";
+        VKD3D_FRAME_RATE = "137";
         DXVK_NVAPI_DRS_SETTINGS = drsSettings;
         VKD3D_CONFIG = "descriptor_heap";
         STEAM_EXTRA_COMPAT_TOOLS_PATHS = "${proton-cachyos-v3}/share/steam/compatibilitytools.d:${dw-proton}/share/steam/compatibilitytools.d";
