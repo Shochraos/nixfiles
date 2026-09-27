@@ -59,41 +59,6 @@ in
 
         hermes = inputs.hermes-agent.packages.${pkgs.stdenv.hostPlatform.system};
 
-        hermesLeash = pkgs.writeShellApplication {
-          name = "hermes-leashed";
-          runtimeInputs = [ pkgs.coreutils ];
-          text = ''
-            child="''${HERMES_LEASH_CHILD:-${lib.getExe' hermes.minimal "hermes"}}"
-            env --default-signal=INT,QUIT "$child" "$@" &
-            pid=$!
-
-            trap '
-              kill -TERM "$pid" 2>/dev/null || true
-              for _ in 1 2 3 4 5 6 7 8; do
-                kill -0 "$pid" 2>/dev/null || break
-                sleep 0.25
-              done
-              kill -KILL "$pid" 2>/dev/null || true
-              wait "$pid" 2>/dev/null || true
-              exit 143
-            ' TERM HUP
-            trap ':' INT
-
-            rc=0
-            while kill -0 "$pid" 2>/dev/null; do
-              rc=0
-              wait "$pid" || rc=$?
-            done
-            exit "$rc"
-          '';
-        };
-
-        hermesLeashed = pkgs.symlinkJoin {
-          name = "hermes";
-          paths = [ hermes.minimal ];
-          postBuild = "ln -sfT ${lib.getExe hermesLeash} $out/bin/hermes";
-        };
-
         hermesSkills = inputs.agent-skills-nix.lib.${pkgs.stdenv.hostPlatform.system}.mkSkillset [
           "vendored-avoid-ai-writing"
           "shared-cloudflare-bypass"
@@ -204,7 +169,7 @@ in
 
         services.hermes-agent = {
           enable = true;
-          package = hermesLeashed;
+          package = hermes.minimal;
           environmentFiles = [ osConfig.sops.templates."hermes.env".path ];
           hermesHomeFiles."SOUL.md" = assets.hermesSoul;
           mcpServers.ScraplingServer = {
