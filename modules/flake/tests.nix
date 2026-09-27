@@ -280,5 +280,19 @@ in
         touch $out
       '';
 
+      checks."scripts/hermes-leash" = pkgs.runCommandLocal "check-hermes-leash" { } ''
+        export HOME="$TMPDIR/home"
+        mkdir -p "$HOME"
+        PATH="${
+          lib.makeBinPath [
+            pkgs.bash
+            pkgs.coreutils
+            pkgs.gnugrep
+          ]
+        }:${fromAzazel "hermes"}/bin:''${PATH}" \
+          ${pkgs.bash}/bin/bash ${tests.scripts}/hermes-leash.sh
+        touch $out
+      '';
+
     };
 }
