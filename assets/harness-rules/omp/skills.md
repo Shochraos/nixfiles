@@ -3,9 +3,7 @@ description: >-
   Cross-cutting skill routing (docs, review, planning, skills authoring, web
   fetching). Read rule://skills at task start; language packs load
   automatically via the lang-* TTSR rules. A Cloudflare-blocked fetch is
-  never skipped — it routes through skill://cloudflare-bypass. Creating or
-  updating a managed skill requires offering its promotion into the
-  agent-skills-nix repo (rule://skills).
+  never skipped — it routes through skill://cloudflare-bypass.
 ---
 Cross-cutting skill routing. Language packs load automatically through the
 `lang-*` TTSR rules; the tasks below need a deliberate skill pick:
@@ -13,18 +11,6 @@ Cross-cutting skill routing. Language packs load automatically through the
 - Writing or restructuring user-facing docs, proposals or specs:
   `skill://doc-coauthoring`.
 - Creating or updating a skill (manage_skill): read `skill://writing-skills` first.
-  After the write, present the finished SKILL.md to the user and ask whether it
-  should be promoted into the agent-skills-nix repo as a new `managed-skills` package
-  (alongside `superpowers-skills` and `vendored-skills`). If the user confirms,
-  add it there and delete the managed copy (`manage_skill` delete) in the same
-  change — the repo is then the single source of truth, and a second copy in
-  `~/.omp/agent/managed-skills/` would drift. Until promotion a managed skill
-  is backed by no git history.
-- A skill added to agent-skills-nix that no `lang-*` rule auto-nudges (those fire
-  on file-type edits, so they cover only language skills) needs a trigger
-  bullet in this file's routing list in the same change — this rulebook is
-  nixfiles' routing index, and an unindexed agent-skills-nix skill is discoverable
-  by description alone.
 - The user asks for a capability that might exist as an installable skill:
   `skill://find-skills`.
 - Feature-sized change complete, before reporting: `skill://requesting-code-review`.

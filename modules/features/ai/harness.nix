@@ -52,9 +52,6 @@ in
         vendored-skills =
           inputs.agent-skills-nix.packages.${pkgs.stdenv.hostPlatform.system}.vendored-skills;
 
-        managed-skills =
-          inputs.agent-skills-nix.packages.${pkgs.stdenv.hostPlatform.system}.omp-managed-skills;
-
         shared-skills = inputs.agent-skills-nix.packages.${pkgs.stdenv.hostPlatform.system}.shared-skills;
 
         hermes = inputs.hermes-agent.packages.${pkgs.stdenv.hostPlatform.system};
@@ -88,9 +85,6 @@ in
           "hermes-hermes-agent"
         ];
 
-        hermesManagedSkills =
-          inputs.agent-skills-nix.packages.${pkgs.stdenv.hostPlatform.system}.hermes-managed-skills;
-
         scrapling-runtime =
           inputs.agent-skills-nix.packages.${pkgs.stdenv.hostPlatform.system}.scrapling-runtime;
 
@@ -106,7 +100,8 @@ in
 
         overlaySettings = {
           modelRoles = {
-            default = "commandcode/xiaomi/mimo-v2.6-pro";
+            default = "commandcode/z-ai/glm-5.3";
+            vision = "commandcode/z-ai/glm-5.3-flash";
             tiny = "commandcode/deepseek/deepseek-v4.1-flash";
             smol = "commandcode/deepseek/deepseek-v4.1-flash";
           };
@@ -125,7 +120,6 @@ in
           skills.customDirectories = [
             "${superpowers-skills}"
             "${vendored-skills}"
-            "${managed-skills}"
             "${shared-skills}"
           ];
         };
@@ -180,13 +174,11 @@ in
             browser.backend = "off";
             model = {
               provider = "commandcode";
-              default = "xiaomi/mimo-v2.6-pro";
+              default = "z-ai/glm-5.3-flash";
             };
             skills = {
-              create_dir = "${config.home.homeDirectory}/Repositories/nix/agent-skills-nix/skills/hermes-managed";
               external_dirs = [
                 "${hermesSkills}"
-                "${hermesManagedSkills}"
               ];
             };
             terminal.cwd = ".";

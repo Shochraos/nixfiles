@@ -44,7 +44,6 @@ for each of them.
 - PDFs, including filling and OCR: `pdf`
 - Spreadsheets and CSVs: `xlsx`
 - LaTeX source — a `.tex` or `.nw` document, or a build that must compile: `latex-writing`
-- Scaffolding a LaTeX paper as a Nix build: `nix-latex-paper-build`
 - Architecture, cloud, or infrastructure diagrams: `architecture-diagram`
 - Infographics and data-dense visual explainers: `baoyu-infographic`
 - A landing page, a deck, or another one-off HTML artifact: `claude-design`
@@ -58,17 +57,7 @@ for each of them.
 - Songwriting craft, or prompts for AI music: `songwriting-and-ai-music`
 - Prose written for a human, before handing it over: `avoid-ai-writing`
 - Text that must carry a real human voice, not merely read cleanly: `humanizer`
-- Auditing or removing skills in this profile, or explaining why one came back: `hermes-skill-library-management`
-- A third-party skill's requirements, or whether it can run on this host: `third-party-skill-onboarding`
 - Anything about Hermes itself — configuring, theming, extending, troubleshooting: `hermes-agent`
-
-`skill_manage` writes new and updated skills straight into the `agent-skills-nix` checkout at
-`~/Repositories/nix/agent-skills-nix/skills/hermes-managed/<name>`, which is the tree the installed
-payload is built from: the skill is version-controlled the moment it exists, and nothing has to be
-moved afterwards. Keep each one at the top level of that tree, without a category. Add its trigger
-to the routing list above in the same turn — that list is compared against the installed payloads in
-both directions, so a skill with no line and a line with no skill both fail the build. Say that a
-rebuild is required before Nix serves the payload.
 
 # Writing
 

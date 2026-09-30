@@ -91,22 +91,6 @@
           }
           {
             match = {
-              class = "^(steam_app_2483190)$";
-              title = "^$";
-            };
-            suppress_event = "activate activatefocus fullscreen maximize fullscreenoutput";
-            no_focus = true;
-            workspace = "special:fh6ghost silent";
-          }
-          {
-            match = {
-              class = "^(steam_app_2483190)$";
-              title = "^(Forza Horizon 6)$";
-            };
-            fullscreen = true;
-          }
-          {
-            match = {
               class = "^(XTerm)$";
             };
             float = true;
