@@ -83,6 +83,7 @@ in
           "hermes-latex-writing"
           "hermes-paper2agent"
           "hermes-hermes-agent"
+          "hermes-opencode"
         ];
 
         scrapling-runtime =
@@ -95,6 +96,21 @@ in
             type = "stdio";
             command = "${scrapling-runtime}/bin/scrapling-mcp";
             timeout = 120000;
+          };
+        };
+
+        opencodeConfig = (pkgs.formats.json { }).generate "opencode.json" {
+          "$schema" = "https://opencode.ai/config.json";
+          model = "commandcode/glm-5.3-flash";
+          autoupdate = false;
+          provider.commandcode = {
+            npm = "@ai-sdk/openai-compatible";
+            name = "CommandCode";
+            options = {
+              baseURL = "https://api.commandcode.ai/provider/v1";
+              apiKey = "{file:/run/secrets/commandcode/api-key}";
+            };
+            models."glm-5.3-flash".id = "z-ai/glm-5.3-flash";
           };
         };
 
@@ -145,6 +161,7 @@ in
       {
         home.packages = [
           oh-my-pi
+          pkgs.opencode
         ];
 
         home.file = {
@@ -153,6 +170,12 @@ in
         }
         // ruleFiles;
 
+        xdg.configFile = {
+          "opencode/AGENTS.md".source = assets.opencodeRules + "/AGENTS.md";
+          "opencode/opencode.json".source = opencodeConfig;
+          "opencode/skills".source = vendored-skills;
+        };
+
         home.sessionVariables.PI_CONFIG_FILES = overlayPath;
 
         home.sessionVariables.SUPERPOWERS_DISABLE_TELEMETRY = "1";
@@ -160,6 +183,7 @@ in
         imports = [ inputs.hermes-agent.homeManagerModules.default ];
 
         programs.hermes-agent.enable = true;
+        programs.hermes-agent.desktop.enable = true;
 
         services.hermes-agent = {
           enable = true;
@@ -170,11 +194,11 @@ in
             command = "${scrapling-runtime}/bin/scrapling-mcp";
           };
           settings = {
-            agent.coding_context = "off";
+            agent.coding_context = "auto";
             browser.backend = "off";
             model = {
               provider = "commandcode";
-              default = "z-ai/glm-5.3-flash";
+              default = "z-ai/glm-5.3";
             };
             skills = {
               external_dirs = [
