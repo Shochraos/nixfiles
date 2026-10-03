@@ -4,6 +4,8 @@
       enable = true;
       settings = {
         fps = true;
+        fps_limit = 137;
+        fps_limit_method = "late";
 
         cpu_temp = true;
         cpu_mhz = true;

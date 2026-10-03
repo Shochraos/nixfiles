@@ -14,7 +14,7 @@
       programs.steam = {
         enable = true;
         package = pkgs.millennium-steam.override {
-          extraArgs = "-pipewire";
+          extraArgs = "-pipewire-dmabuf -steamos";
         };
         extraCompatPackages = [
           proton-cachyos-v3

@@ -198,9 +198,10 @@ in
             browser.backend = "off";
             model = {
               provider = "commandcode";
-              default = "z-ai/glm-5.3";
+              default = "zai-org/GLM-5.3";
             };
             skills = {
+              create_dir = "";
               external_dirs = [
                 "${hermesSkills}"
               ];

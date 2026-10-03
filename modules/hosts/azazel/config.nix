@@ -70,6 +70,7 @@
             };
             float = true;
             workspace = "1";
+            center = true;
           }
           {
             match = {
@@ -119,6 +120,7 @@
         vrrFullscreenOnly = true;
         bitdepth = 10;
         mode = "3840x2160@143.988";
+        position = "0x1440";
         scale = "1";
         workspaces = [
           1
@@ -131,6 +133,7 @@
         vrrFullscreenOnly = true;
         bitdepth = 10;
         mode = "3440x1440@144.000";
+        position = "201x0";
         scale = "1";
         workspaces = [
           4
