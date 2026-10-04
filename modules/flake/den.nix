@@ -28,6 +28,8 @@
     (den.batteries.unfree [
       "steam"
       "steam-unwrapped"
+      "lsfg-vk"
+      "lsfg-vk-ui"
     ])
   ];
   den.aspects.media.includes = with den.aspects; [ hdr ];

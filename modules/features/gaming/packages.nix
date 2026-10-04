@@ -24,6 +24,8 @@ in
           samrewritten
           faugus-launcher
           irony-mod-manager
+          lsfg-vk
+          lsfg-vk-ui
         ];
 
         xdg.desktopEntries = {
