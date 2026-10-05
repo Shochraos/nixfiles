@@ -264,6 +264,7 @@ in
               type = types.listOf (
                 types.enum [
                   "discord"
+                  "hermes"
                   "spotify"
                 ]
               );

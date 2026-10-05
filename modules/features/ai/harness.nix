@@ -182,6 +182,8 @@ in
 
           hermes = inputs.hermes-agent.packages.${pkgs.stdenv.hostPlatform.system};
 
+          hermesAutostart = lib.optional (builtins.elem "hermes" osConfig.host.autostart) "${hermes.desktop}/share/applications/hermes.desktop";
+
           hermesSkills = inputs.agent-skills-nix.lib.${pkgs.stdenv.hostPlatform.system}.mkSkillset [
             "vendored-avoid-ai-writing"
             "shared-cloudflare-bypass"
@@ -312,6 +314,8 @@ in
             oh-my-pi
             pkgs.opencode
           ];
+
+          xdg.autostart.entries = hermesAutostart;
 
           home.file = {
             ".omp/agent/nix-config.yml".source = overlay;

@@ -14,6 +14,7 @@
 
       host.autostart = [
         "discord"
+        "hermes"
         "spotify"
       ];
 
@@ -44,6 +45,12 @@
               class = "^(discord)$";
             };
             workspace = "4 silent";
+          }
+          {
+            match = {
+              class = "^(hermes)$";
+            };
+            workspace = "3 silent";
           }
           {
             match = {

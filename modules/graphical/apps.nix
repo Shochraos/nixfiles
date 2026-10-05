@@ -33,7 +33,9 @@ in
                 spotify = "${config.programs.spicetify.spicedSpotify}/share/applications/spotify.desktop";
               };
             in
-            map (name: desktopEntries.${name}) osConfig.host.autostart;
+            map (name: desktopEntries.${name}) (
+              builtins.filter (name: desktopEntries ? ${name}) osConfig.host.autostart
+            );
 
           programs.spicetify =
             let
