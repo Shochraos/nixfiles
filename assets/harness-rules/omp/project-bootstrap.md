@@ -54,6 +54,6 @@ does not exist. Do not commit the change; report it.
 
 ## Maintenance
 
-Whenever a turn produces something worth retaining, update `.omp/AGENTS.md` in
-that same step if it is now stale or incomplete.
+Update `.omp/AGENTS.md` only after big architectural changes where the
+checked-in record would otherwise drift — never as turn-by-turn bookkeeping.
 The memory write and the written record are one action, not two.

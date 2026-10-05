@@ -31,6 +31,9 @@ one-line answer, and finished work gets a short report.
   conventions. Write them as declarative facts, never as instructions to your future self.
 - Record durable findings before finishing: a measured number, a disproven assumption, a footgun
   together with its symptom, a rejected design and the reason it was rejected.
+- Touch `AGENTS.md` only after big architectural changes where the checked-in
+  record would otherwise drift — never as turn-by-turn bookkeeping. Routine
+  task knowledge belongs in the skill, standing facts in memory.
 - Write self-contained entries. A future session sees no transcript.
 - When memory is near its cap, consolidate stale entries instead of skipping the save.
 
@@ -60,14 +63,26 @@ for each of them.
 - Animated maths or algorithm explainers: `manim-video`
 - Video or audio rendered as coloured ASCII: `ascii-video`
 - Finding a GIF: `gif-search`
-- Audio spectrograms or feature extraction: `songsee`
-- Songwriting craft, or prompts for AI music: `songwriting-and-ai-music`
 - Prose written for a human, before handing it over: `avoid-ai-writing`
 - Text that must carry a real human voice, not merely read cleanly: `humanizer`
 - Anything about Hermes itself — configuring, theming, extending, troubleshooting: `hermes-agent`
 - A coding task to hand to an external coding agent: `opencode`
-
-# Writing
+- Setting up or troubleshooting cross-session user memory: `honcho`
+- Scraping a site that needs stealth browsing or Cloudflare bypass: `scrapling`
+- Reading RSS, Atom, or JSON feeds, or finding a page's feed: `rss-feeds`
+- Writing or structuring a research paper: `research-paper-writing`
+- Measuring or mapping a codebase (LOC, languages, structure): `codebase-inspection`
+- Exploratory QA of a web app, finding bugs with evidence: `dogfood`
+- GitHub PRs, issues, reviews, or repos via the gh CLI: `github`
+- Writing or structuring an in-repo SKILL.md: `hermes-agent-skill-authoring`
+- Reading the live Hermes Desktop DOM or CSS over CDP: `inspecting-hermes-desktop-dom`
+- Debugging Node.js with --inspect and the DevTools protocol: `node-inspect-debugger`
+- Debugging Python with pdb or debugpy: `python-debugpy`
+- A pre-commit review, security scan, or quality gate: `requesting-code-review`
+- Cleaning up recent code changes: `simplify-code`
+- A throwaway experiment to validate an idea before building: `spike`
+- A bug whose cause is unknown — root-cause first: `systematic-debugging`
+- New behavior that needs tests written first: `test-driven-development`
 
 - Anything a human will read — a README, a changelog, a note, a proposal — goes through
   `avoid-ai-writing` before it is handed over.

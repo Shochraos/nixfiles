@@ -52,8 +52,9 @@ executed, delete its `.omp/<TOPIC>-PLAN.md` — the record lives in
   Declarative data does not — a `host.*` value, a widget list, a keybind table
   is proven by building the hosts, and a test that restates what `mkOption`
   already enforces, or what the build already forces, is negative value.
-- Finishing means: formatter, project checks, then bring `.omp/AGENTS.md` up
-  to date in the same step as the memory write, then refresh `README.md` with
+- Finishing means: formatter, project checks, then the memory write. Bring
+  `.omp/AGENTS.md` up to date only after big architectural changes where the
+  checked-in record would otherwise drift, then refresh `README.md` with
   `skill://create-readme`, audit the refresh with a `skill://avoid-ai-writing`
   pass, then report. Leave integration to the user.
 - The README refresh runs after every completed coding workflow, not after

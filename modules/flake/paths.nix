@@ -48,6 +48,7 @@ in
       bscpylgtv = ../../pkgs/bscpylgtv/package.nix;
       ironyModManager = ../../pkgs/irony-mod-manager/package.nix;
       mp3tag = ../../pkgs/mp3tag/package.nix;
+      honchoServer = ../../pkgs/honcho-server/package.nix;
     };
 
     tests = {

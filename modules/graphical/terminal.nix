@@ -4,33 +4,6 @@
     {
       home.packages = [ pkgs.libnotify ];
 
-      programs.herdr = {
-        enable = true;
-        settings = {
-          onboarding = false;
-          theme.name = "terminal";
-          terminal.shell_mode = "login";
-          update.version_check = false;
-          ui = {
-            sound.enabled = false;
-            toast.delivery = "system";
-            sidebar.agents.rows = [
-              [
-                "state_icon"
-                "workspace"
-                "tab"
-              ]
-              [
-                "agent"
-                "terminal_title_stripped"
-              ]
-            ];
-          };
-        };
-      };
-
-      xdg.configFile."herdr/config.toml".force = true;
-
       programs.ghostty = {
         enable = true;
         settings = {
@@ -41,11 +14,5 @@
           font-size = osConfig.stylix.fonts.sizes.terminal;
         };
       };
-
-      wayland.windowManager.hyprland.extraConfig = ''
-        hl.on("hyprland.start", function()
-          hl.exec_cmd("ghostty -e herdr", { workspace = "2" })
-        end)
-      '';
     };
 }
