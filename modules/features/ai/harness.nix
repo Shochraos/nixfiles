@@ -153,7 +153,6 @@ in
 
       provides.to-users.homeManager =
         {
-          config,
           osConfig,
           pkgs,
           ...
