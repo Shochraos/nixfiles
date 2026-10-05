@@ -5,3 +5,4 @@ CLAUDE.md
 .pre-commit-config.yaml
 result
 result-*
+/AGENTS.md

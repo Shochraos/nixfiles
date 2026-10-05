@@ -20,8 +20,9 @@ one-line answer, and finished work gets a short report.
   that it must not commit or push.
 - Verify a coding worker's output against the repository's own gate before reporting the work
   done.
-- A new project gets a root `AGENTS.md`, a flake with a devShell and a package, an `.envrc`,
-  and a `.gitignore`.
+- A new project gets a root `AGENTS.md` (gitignored — local agent context, never
+  committed), a flake with a devShell and a package, an `.envrc`,
+  and a `.gitignore` that ignores `/AGENTS.md`.
 
 # Memory
 
@@ -31,8 +32,9 @@ one-line answer, and finished work gets a short report.
   conventions. Write them as declarative facts, never as instructions to your future self.
 - Record durable findings before finishing: a measured number, a disproven assumption, a footgun
   together with its symptom, a rejected design and the reason it was rejected.
-- Touch `AGENTS.md` only after big architectural changes where the checked-in
-  record would otherwise drift — never as turn-by-turn bookkeeping. Routine
+- Touch the root `AGENTS.md` only after big architectural changes where the local
+  record would otherwise drift — never as turn-by-turn bookkeeping. It stays
+  gitignored, never committed. Routine
   task knowledge belongs in the skill, standing facts in memory.
 - Write self-contained entries. A future session sees no transcript.
 - When memory is near its cap, consolidate stale entries instead of skipping the save.
