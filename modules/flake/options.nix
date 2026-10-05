@@ -265,7 +265,9 @@ in
                 types.enum [
                   "discord"
                   "hermes"
+                  "jellyfin"
                   "spotify"
+                  "steam"
                 ]
               );
               default = [ ];
@@ -320,6 +322,10 @@ in
                 type = types.listOf types.str;
                 default = [ ];
                 description = "Borg exclude patterns applied to every archive, in borg's default fnmatch style, where each pattern is matched against the whole archived path.";
+              };
+              sshHostKey = mkOption {
+                type = types.str;
+                description = "Public SSH host key of the backup server as a single line, e.g. from `ssh-keyscan -p 23 -t ed25519 <host>`. No default: evaluation fails until this is set, so a changed server key fails loudly instead of being auto-trusted.";
               };
             };
           };

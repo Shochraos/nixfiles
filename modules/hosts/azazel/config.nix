@@ -15,7 +15,9 @@
       host.autostart = [
         "discord"
         "hermes"
+        "jellyfin"
         "spotify"
+        "steam"
       ];
 
       host.hyprland = {
@@ -328,6 +330,7 @@
           "*.sync_*"
           "*.sync-conflict-*"
         ];
+        sshHostKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIICf9svRenC/PLKIL9nk6K/pxQgoiFC41wTNvoIncOxs";
       };
     };
 

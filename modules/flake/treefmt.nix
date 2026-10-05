@@ -1,8 +1,16 @@
 { inputs, ... }:
 {
-  imports = [ inputs.treefmt-nix.flakeModule ];
+  imports = [
+    inputs.treefmt-nix.flakeModule
+    inputs.git-hooks-nix.flakeModule
+  ];
 
   perSystem = {
+    pre-commit.settings.hooks.treefmt = {
+      enable = true;
+      always_run = true;
+    };
+
     treefmt = {
       projectRootFile = "flake.nix";
 

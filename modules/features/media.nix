@@ -4,7 +4,12 @@ let
 in
 {
   den.aspects.media.provides.to-users.homeManager =
-    { pkgs, lib, ... }:
+    {
+      pkgs,
+      lib,
+      osConfig,
+      ...
+    }:
     let
       jellyfinSettings = pkgs.writeShellApplication {
         name = "jellyfin-settings";
@@ -47,6 +52,10 @@ in
         jellyfinSettings
       ];
 
+      xdg.autostart = {
+        entries = lib.optional (builtins.elem "jellyfin" osConfig.host.autostart) "${pkgs.jellyfin-mpv-shim}/share/applications/jellyfin-mpv-shim.desktop";
+      };
+
       programs.mpv = {
         enable = true;
 
@@ -76,12 +85,6 @@ in
             network = "yes";
           };
         };
-      };
-
-      xdg.autostart = {
-        entries = [
-          "${pkgs.jellyfin-mpv-shim}/share/applications/jellyfin-mpv-shim.desktop"
-        ];
       };
 
       home.activation.jellyfinSettings = lib.hm.dag.entryAfter [ "writeBoundary" ] (

@@ -3,13 +3,18 @@
     { user, ... }:
     {
       nixos =
-        { config, ... }:
+        { config, pkgs, ... }:
         {
           sops.secrets = {
             "backup/storagebox-host".owner = user.name;
             "backup/storagebox-user".owner = user.name;
             "backup/storagebox-ssh-key".owner = user.name;
             "backup/storagebox-passphrase".owner = user.name;
+          };
+
+          programs.ssh.knownHosts.storagebox = {
+            hostNames = [ "storagebox" ];
+            publicKey = config.host.backup.sshHostKey;
           };
 
           sops.templates."backup-storagebox-ssh" = {
@@ -21,7 +26,24 @@
                 Port 23
                 IdentityFile ${config.sops.secrets."backup/storagebox-ssh-key".path}
                 IdentitiesOnly yes
-                StrictHostKeyChecking accept-new
+                HostKeyAlias storagebox
+                StrictHostKeyChecking yes
+            '';
+          };
+
+          systemd.services.borgbackup-job-backup.onFailure = [ "borgbackup-notify.service" ];
+
+          systemd.services.borgbackup-notify = {
+            description = "Notify the user when the borg backup failed";
+            serviceConfig.Type = "oneshot";
+            script = ''
+              uid=$(id -u ${user.name})
+              for sock in /run/user/"$uid"/wayland-*; do
+                WAYLAND_DISPLAY=$(basename "$sock") XDG_RUNTIME_DIR=/run/user/"$uid" \
+                  ${pkgs.libnotify}/bin/notify-send -u critical "Borg backup failed" "See journalctl -u borgbackup-job-backup" \
+                  && break
+              done
+              echo "borgbackup-job-backup failed" >&2
             '';
           };
 
@@ -41,6 +63,7 @@
               daily = 7;
               weekly = 4;
               monthly = 6;
+              yearly = 2;
             };
             environment = {
               BORG_REMOTE_PATH = "borg-1.4";

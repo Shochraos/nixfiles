@@ -16,12 +16,6 @@ in
       default = { };
       description = "Package definitions under `pkgs/`, resolved here so no feature file carries a relative-path literal. Consumed by `callPackage`.";
     };
-
-    tests = mkOption {
-      type = pathTable;
-      default = { };
-      description = "Test suites and script test scripts, resolved here so the flake module that wires the checks carries no relative-path literal.";
-    };
   };
 
   config = {
@@ -48,19 +42,6 @@ in
       ironyModManager = ../../pkgs/irony-mod-manager/package.nix;
       mp3tag = ../../pkgs/mp3tag/package.nix;
       honchoServer = ../../pkgs/honcho-server/package.nix;
-    };
-
-    tests = {
-      ai = ../../modules/features/ai/default.nix;
-      dir = ../../tests;
-      options = ../../modules/flake/options.nix;
-      scripts = ../../tests/scripts;
-      audioAspect = ../../modules/base/audio.nix;
-      dankshellAspect = ../../modules/graphical/dankshell.nix;
-      hdrAspect = ../../modules/features/hdr.nix;
-      hyprlandConfigAspect = ../../modules/graphical/hyprland/config.nix;
-      hyprlandRulesAspect = ../../modules/graphical/hyprland/rules.nix;
-      streamingAspect = ../../modules/features/gaming/streaming.nix;
     };
   };
 }

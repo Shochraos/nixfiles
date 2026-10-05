@@ -10,7 +10,6 @@
           pkgs.nix-init
           pkgs.nixd
           pkgs.nixfmt
-          pkgs.nix-unit
           pkgs.shellcheck
           pkgs.shfmt
           pkgs.sops

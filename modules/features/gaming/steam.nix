@@ -67,6 +67,7 @@
     {
       config,
       lib,
+      osConfig,
       pkgs,
       ...
     }:
@@ -135,9 +136,7 @@
       };
 
       xdg.autostart = {
-        entries = [
-          "${pkgs.steam}/share/applications/steam.desktop"
-        ];
+        entries = lib.optional (builtins.elem "steam" osConfig.host.autostart) "${pkgs.steam}/share/applications/steam.desktop";
       };
 
       home.file = {
