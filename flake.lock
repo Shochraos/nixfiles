@@ -736,26 +736,6 @@
         "type": "github"
       }
     },
-    "omp-nix": {
-      "inputs": {
-        "nixpkgs": [
-          "nixpkgs"
-        ]
-      },
-      "locked": {
-        "lastModified": 1790912751,
-        "narHash": "sha256-kqe+ZXd6V4Fr+xYwbb6/aoHqsCv2aCcnuFDzMHn+RxA=",
-        "owner": "yuxqiu",
-        "repo": "omp-nix",
-        "rev": "886c5cb580ea8f36b6e33c8721e4002f286eb6ad",
-        "type": "github"
-      },
-      "original": {
-        "owner": "yuxqiu",
-        "repo": "omp-nix",
-        "type": "github"
-      }
-    },
     "paper2agent": {
       "flake": false,
       "locked": {
@@ -899,7 +879,6 @@
         "millennium": "millennium",
         "nix-index-database": "nix-index-database",
         "nixpkgs": "nixpkgs_2",
-        "omp-nix": "omp-nix",
         "proton-cachyos-nix": "proton-cachyos-nix",
         "sops-nix": "sops-nix",
         "spicetify-nix": "spicetify-nix",

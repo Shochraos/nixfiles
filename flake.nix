@@ -82,11 +82,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    omp-nix = {
-      url = "github:yuxqiu/omp-nix";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
     flyline = {
       url = "github:HalFrgrd/flyline";
       inputs.nixpkgs.follows = "nixpkgs";

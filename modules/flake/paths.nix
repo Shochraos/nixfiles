@@ -34,7 +34,6 @@ in
       matugenSchemes = ../../configs/matugen;
       micMuteScript = ../../assets/scripts/mic-mute.sh;
       mp3tagIcon = ../../assets/icons/mp3tag.png;
-      ompRules = ../../assets/harness-rules/omp;
       opencodeRules = ../../assets/harness-rules/opencode;
       quickshellIpcReconnectPatch = ../../assets/patches/quickshell-hyprland-ipc-reconnect.patch;
       xdphScreencopyBufferReusePatch = ../../assets/patches/xdph-screencopy-buffer-reuse.patch;

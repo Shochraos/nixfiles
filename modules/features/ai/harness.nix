@@ -159,22 +159,6 @@ in
           ...
         }:
         let
-          oh-my-pi = inputs.omp-nix.packages.${pkgs.stdenv.hostPlatform.system}.default.overrideAttrs (old: {
-            postInstall = (old.postInstall or "") + ''
-              if head -c 2 $out/bin/omp | grep -q '#!'; then
-                echo "oh-my-pi override: omp-nix ships a wrapper again, so this override double-wraps it" >&2
-                exit 1
-              fi
-              mkdir -p $out/libexec
-              mv $out/bin/omp $out/libexec/omp
-              makeWrapper $out/libexec/omp $out/bin/omp \
-                --prefix LD_LIBRARY_PATH : ${lib.makeLibraryPath [ pkgs.stdenv.cc.cc.lib ]}
-            '';
-          });
-
-          superpowers-skills =
-            inputs.agent-skills-nix.packages.${pkgs.stdenv.hostPlatform.system}.superpowers-skills;
-
           vendored-skills =
             inputs.agent-skills-nix.packages.${pkgs.stdenv.hostPlatform.system}.vendored-skills;
 
@@ -231,16 +215,6 @@ in
           scrapling-runtime =
             inputs.agent-skills-nix.packages.${pkgs.stdenv.hostPlatform.system}.scrapling-runtime;
 
-          mcp-config = (pkgs.formats.json { }).generate "mcp.json" {
-            "$schema" =
-              "https://raw.githubusercontent.com/can1357/oh-my-pi/main/packages/coding-agent/src/config/mcp-schema.json";
-            mcpServers.ScraplingServer = {
-              type = "stdio";
-              command = "${scrapling-runtime}/bin/scrapling-mcp";
-              timeout = 120000;
-            };
-          };
-
           opencodeConfig = (pkgs.formats.json { }).generate "opencode.json" {
             "$schema" = "https://opencode.ai/config.json";
             model = "opencode-go/muse-spark-1.3-contributor";
@@ -265,71 +239,19 @@ in
             };
           };
 
-          overlaySettings = {
-            modelRoles = {
-              default = "commandcode/z-ai/glm-5.3";
-              vision = "commandcode/z-ai/glm-5.3-flash";
-              tiny = "commandcode/deepseek/deepseek-v4.1-flash";
-              smol = "commandcode/deepseek/deepseek-v4.1-flash";
-            };
-            autolearn.enabled = true;
-            memory.backend = "mnemopi";
-            mnemopi.polyphonicRecall = true;
-            mnemopi.enhancedRecall = true;
-            mnemopi.autoRetain = false;
-            mnemopi.recallLimit = 24;
-            mnemopi.proactiveLinking = false;
-            mnemopi.workingMemoryTtlHours = 876000;
-            mnemopi.workingMemoryLimit = 1000000;
-            providers.memoryModel = "online";
-            startup.checkUpdate = false;
-            ttsr.repeatMode = "after-gap";
-            skills.customDirectories = [
-              "${superpowers-skills}"
-              "${vendored-skills}"
-              "${shared-skills}"
-            ];
-          };
-
-          overlay = (pkgs.formats.yaml { }).generate "oh-my-pi-config.yml" overlaySettings;
-
-          overlayPath = "${config.home.homeDirectory}/.omp/agent/nix-config.yml";
-
-          rulesDir = assets.ompRules;
-
-          ruleFiles =
-            lib.mapAttrs'
-              (name: _: {
-                name = ".omp/agent/rules/${name}";
-                value.source = rulesDir + "/${name}";
-              })
-              (
-                lib.filterAttrs (name: type: type == "regular" && lib.hasSuffix ".md" name) (
-                  builtins.readDir rulesDir
-                )
-              );
         in
         {
           home.packages = [
-            oh-my-pi
             pkgs.opencode
           ];
 
           xdg.autostart.entries = hermesAutostart;
-
-          home.file = {
-            ".omp/agent/nix-config.yml".source = overlay;
-            ".omp/agent/mcp.json".source = mcp-config;
-          }
-          // ruleFiles;
 
           xdg.configFile = {
             "opencode/AGENTS.md".source = assets.opencodeRules + "/AGENTS.md";
             "opencode/opencode.json".source = opencodeConfig;
             "opencode/skills".source = vendored-skills;
           };
-
-          home.sessionVariables.PI_CONFIG_FILES = overlayPath;
 
           home.sessionVariables.SUPERPOWERS_DISABLE_TELEMETRY = "1";
 
@@ -382,6 +304,7 @@ in
                 create_dir = "";
                 external_dirs = [
                   "${hermesSkills}"
+                  "${shared-skills}"
                 ];
               };
               terminal.cwd = ".";
