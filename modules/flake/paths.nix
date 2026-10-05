@@ -33,7 +33,7 @@ in
       xdphScreencopyBufferReusePatch = ../../assets/patches/xdph-screencopy-buffer-reuse.patch;
       samrewrittenIcon = ../../assets/icons/samrewritten.png;
       sopsFile = ../../secrets/secrets.yaml;
-      spicetifyTemplate = ../../assets/templates/spicetify.json.j2;
+      spotifastTemplate = ../../assets/templates/spotifast.json.j2;
       steamTemplate = ../../assets/templates/steam.css;
     };
 

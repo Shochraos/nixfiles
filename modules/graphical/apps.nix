@@ -1,65 +1,42 @@
-{ inputs, config, ... }:
-let
-  inherit (config) assets;
-in
+{ inputs, ... }:
 {
-  den.aspects.apps =
-    { host, ... }:
-    {
-      provides.to-users.homeManager =
-        {
-          lib,
-          config,
-          pkgs,
-          osConfig,
-          ...
-        }:
-        let
-          discordPkg = pkgs.discord.override { withEquicord = true; };
-        in
-        {
-          imports = [ inputs.spicetify-nix.homeManagerModules.default ];
+  den.aspects.apps = _: {
+    provides.to-users.homeManager =
+      {
+        pkgs,
+        osConfig,
+        ...
+      }:
+      let
+        discordPkg = pkgs.discord.override { withEquicord = true; };
+        spotifastPkg = inputs.spotifast.packages.${pkgs.stdenv.hostPlatform.system}.spotifast;
+      in
+      {
+        home.packages = [
+          discordPkg
+          spotifastPkg
+          pkgs.libreoffice-qt-stable
+          pkgs.pdfarranger
+        ];
 
-          home.packages = [
-            discordPkg
-            pkgs.libreoffice-qt-stable
-            pkgs.pdfarranger
-          ];
-
-          xdg.autostart.entries =
-            let
-              desktopEntries = {
-                discord = "${discordPkg}/share/applications/discord.desktop";
-                spotify = "${config.programs.spicetify.spicedSpotify}/share/applications/spotify.desktop";
-              };
-            in
-            map (name: desktopEntries.${name}) (
-              builtins.filter (name: desktopEntries ? ${name}) osConfig.host.autostart
-            );
-
-          programs.spicetify =
-            let
-              spicePkgs = inputs.spicetify-nix.legacyPackages.${pkgs.stdenv.hostPlatform.system};
-              matugenScheme = assets.matugenSchemes + "/spicetify-${host.name}.json";
-            in
-            {
-              enable = true;
-              theme = spicePkgs.themes.sleek;
-              enabledSnippets = [
-                ''
-                  html, body, #main, .Root, [class*="encore-"] {
-                      font-family: '${osConfig.stylix.fonts.sansSerif.name}', sans-serif !important;
-                  }
-
-                  .encore-icon, .icon, svg {
-                      font-family: unset !important;
-                  }
-                ''
-              ];
-              customColorScheme = lib.optionalAttrs (builtins.pathExists matugenScheme) (
-                builtins.fromJSON (builtins.readFile matugenScheme)
-              );
-            };
+        home.file = {
+          ".local/share/fonts/NotoSansCJK-VF.otf.ttc".source =
+            "${pkgs.noto-fonts-cjk-sans}/share/fonts/opentype/noto-cjk/NotoSansCJK-VF.otf.ttc";
+          ".local/share/fonts/NotoSansMonoCJK-VF.otf.ttc".source =
+            "${pkgs.noto-fonts-cjk-sans}/share/fonts/opentype/noto-cjk/NotoSansMonoCJK-VF.otf.ttc";
         };
-    };
+
+        xdg.autostart.entries =
+          let
+            desktopEntries = {
+              discord = "${discordPkg}/share/applications/discord.desktop";
+              spotifast = "${spotifastPkg}/share/applications/spotifast.desktop";
+            };
+          in
+          map (name: desktopEntries.${name}) (
+            builtins.filter (name: desktopEntries ? ${name}) osConfig.host.autostart
+          );
+
+      };
+  };
 }

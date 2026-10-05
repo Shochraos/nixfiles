@@ -266,7 +266,7 @@ in
                   "discord"
                   "hermes"
                   "jellyfin"
-                  "spotify"
+                  "spotifast"
                   "steam"
                 ]
               );

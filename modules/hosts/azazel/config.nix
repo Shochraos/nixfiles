@@ -16,7 +16,7 @@
         "discord"
         "hermes"
         "jellyfin"
-        "spotify"
+        "spotifast"
         "steam"
       ];
 
@@ -56,7 +56,7 @@
           }
           {
             match = {
-              class = "^(spotify)$";
+              class = "^(spotifast)$";
             };
             workspace = "5 silent";
           }

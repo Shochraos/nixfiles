@@ -37,7 +37,6 @@
     (den.batteries.unfree [
       "discord"
       "discord-unwrapped"
-      "spotify"
     ])
   ];
   den.aspects.nvidia.includes = [ (den.batteries.unfree [ "nvidia-x11" ]) ];

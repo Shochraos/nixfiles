@@ -77,9 +77,8 @@
       inputs.home-manager.follows = "home-manager";
     };
 
-    spicetify-nix = {
-      url = "github:Gerg-L/spicetify-nix";
-      inputs.nixpkgs.follows = "nixpkgs";
+    spotifast = {
+      url = "github:crmne/spotifast";
     };
 
     flyline = {

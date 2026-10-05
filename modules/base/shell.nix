@@ -23,9 +23,9 @@
               la = "eza -1 -h -l --icons -a --no-user --group-directories-first -F";
               lr = "eza -1 -h -l --icons -a -R --no-user --group-directories-first -F";
 
-              nh-switch = "theme-sync && nh os switch --ask";
-              nh-boot = "theme-sync && nh os boot --ask";
-              nh-update = "theme-sync && nh os boot -u --ask";
+              nh-switch = "nh os switch --ask";
+              nh-boot = "nh os boot --ask";
+              nh-update = "nh os boot -u --ask";
 
               copy = "dms cl copy";
               paste = "dms cl paste";
