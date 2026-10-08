@@ -24,5 +24,11 @@
           WantedBy = [ "graphical-session.target" ];
         };
       };
+
+      wayland.windowManager.hyprland.extraConfig = ''
+        hl.on("hyprland.start", function()
+          hl.exec_cmd("systemctl --user import-environment WAYLAND_DISPLAY XDG_RUNTIME_DIR DISPLAY && systemctl --user restart valent")
+        end)
+      '';
     };
 }
