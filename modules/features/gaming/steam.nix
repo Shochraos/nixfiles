@@ -14,7 +14,7 @@
       programs.steam = {
         enable = true;
         package = pkgs.millennium-steam.override {
-          extraArgs = "-pipewire-dmabuf -steamos";
+          extraArgs = "-steamos";
         };
         extraCompatPackages = [
           proton-cachyos-v3
@@ -77,6 +77,9 @@
       dw-proton = inputs.dw-proton-nix.packages.${pkgs.stdenv.hostPlatform.system}.dw-proton;
       libGL64 = config.lib.file.mkOutOfStoreSymlink "/run/opengl-driver/lib/libGL.so.1";
       libGL32 = config.lib.file.mkOutOfStoreSymlink "/run/opengl-driver-32/lib/libGL.so.1";
+      steamPkg = pkgs.millennium-steam.override {
+        extraArgs = "-steamos";
+      };
       drsSettings = lib.concatStringsSep "," [
         "ngx_dlss_sr_override=on"
         "ngx_dlss_sr_override_render_preset_selection=render_preset_m"
@@ -138,6 +141,16 @@
       xdg.autostart = {
         entries = lib.optional (builtins.elem "steam" osConfig.host.autostart) "${pkgs.steam}/share/applications/steam.desktop";
       };
+
+      xdg.dataFile."applications/steam-pipewire.desktop".text = ''
+        [Desktop Entry]
+        Name=Steam (PipeWire)
+        Exec=${steamPkg}/bin/steam -pipewire-dmabuf %U
+        Icon=steam
+        Terminal=false
+        Type=Application
+        Categories=Game;
+      '';
 
       home.file = {
         ".local/share/Steam/ubuntu12_64/libGL.so.1" = {

@@ -282,7 +282,6 @@ in
             settings = {
               agent.coding_context = "auto";
               agent.reasoning_effort = "high";
-              approvals.mode = "off";
               browser.backend = "off";
               checkpoints.enabled = true;
               model = {
