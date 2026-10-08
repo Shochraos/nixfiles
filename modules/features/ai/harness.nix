@@ -283,6 +283,7 @@ in
               agent.coding_context = "auto";
               agent.reasoning_effort = "high";
               browser.backend = "off";
+              checkpoints.enabled = true;
               model = {
                 provider = "opencode-go";
                 default = "muse-spark-1.3-contributor";
@@ -322,7 +323,7 @@ in
               curator.consolidate = true;
               compression = {
                 enabled = true;
-                threshold = 0.8;
+                threshold = 0.5;
                 threshold_tokens = null;
                 target_ratio = 0.2;
                 tail_mode = "lean";
