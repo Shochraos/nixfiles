@@ -234,7 +234,10 @@ in
                 baseURL = "https://opencode.ai/zen/go/v1";
                 apiKey = "{file:/run/secrets/opencode/opencode-go-api-key}";
               };
-              models."muse-spark-1.3-contributor".id = "muse-spark-1.3-contributor";
+              models."muse-spark-1.3-contributor" = {
+                id = "muse-spark-1.3-contributor";
+                options.reasoningEffort = "max";
+              };
             };
           };
 
@@ -281,7 +284,7 @@ in
             };
             settings = {
               agent.coding_context = "auto";
-              agent.reasoning_effort = "high";
+              agent.reasoning_effort = "max";
               browser.backend = "off";
               checkpoints.enabled = true;
               model = {
