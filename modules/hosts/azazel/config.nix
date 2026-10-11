@@ -68,7 +68,7 @@
           }
           {
             match = {
-              class = "^(steam_app_.*|stellaris)$";
+              class = "^(steam_app_.*)$";
             };
             workspace = "1 silent";
             center = true;
