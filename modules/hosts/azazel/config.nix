@@ -68,18 +68,17 @@
           }
           {
             match = {
+              class = "^(steam_app_.*|stellaris)$";
+            };
+            workspace = "1 silent";
+            center = true;
+          }
+          {
+            match = {
               class = "^(steam)$";
               title = "^(Steam Settings)$";
             };
             float = true;
-          }
-          {
-            match = {
-              class = "^(steam_app_\\d+)$";
-            };
-            float = true;
-            workspace = "1";
-            center = true;
           }
           {
             match = {
