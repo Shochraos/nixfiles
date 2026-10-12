@@ -35,6 +35,7 @@ in
       sopsFile = ../../secrets/secrets.yaml;
       spotifastTemplate = ../../assets/templates/spotifast.json.j2;
       steamTemplate = ../../assets/templates/steam.css;
+      steamAccentsTemplate = ../../assets/templates/steam-accents.css;
     };
 
     packageSources = {

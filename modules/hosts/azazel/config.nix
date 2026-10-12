@@ -206,6 +206,10 @@
                 size = 5;
               }
               {
+                id = "launcherButton";
+                enabled = true;
+              }
+              {
                 id = "clock";
                 enabled = true;
               }
@@ -229,10 +233,6 @@
               }
               {
                 id = "dankTodoman";
-                enabled = true;
-              }
-              {
-                id = "tasks";
                 enabled = true;
               }
               {
@@ -284,6 +284,12 @@
                 id = "cpuTemp";
                 enabled = true;
                 minimumWidth = true;
+              }
+              {
+                id = "gpuTemp";
+                enabled = true;
+                selectedGpuIndex = 0;
+                pciId = "10de:2684";
               }
               {
                 id = "network_speed_monitor";

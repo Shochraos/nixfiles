@@ -95,6 +95,11 @@ in
               input_path = assets.steamTemplate;
               output_path = "~/.steam/steam/millennium/themes/simply-dark/colors.css";
             };
+
+            steam-accents = {
+              input_path = assets.steamAccentsTemplate;
+              output_path = "~/.steam/steam/millennium/themes/simply-dark/accents.css";
+            };
           }
           // osConfig.host.matugen.templates;
         };

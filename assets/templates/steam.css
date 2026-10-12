@@ -19,6 +19,8 @@
     --darkerwhite: {{ colors.on_surface_variant.default.hex }};
     --darkwhite: {{ colors.on_surface.default.hex }};
     --white: {{ colors.on_primary.default.hex }};
+    --accent: {{ colors.primary.default.hex }};
+    --on-accent: {{ colors.background.default.hex }};
     --ingame: {{ colors.secondary.default.hex }};
     --online: {{ colors.tertiary.default.hex }};
     --offline: {{ colors.outline.default.hex }};

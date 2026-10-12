@@ -57,6 +57,8 @@ in
 
           services.accounts-daemon.enable = true;
 
+          security.pam.services.greetd.enableGnomeKeyring = true;
+
           users.users.${user.name} = {
             extraGroups = [ "greeter" ];
           };
@@ -89,7 +91,7 @@ in
             screenPreferences = barScreens osConfig.host.outputs;
 
             borderEnabled = false;
-            widgetOutlineEnabled = true;
+            widgetOutlineEnabled = false;
             widgetOutlineColor = "primary";
             widgetOutlineThickness = 1;
             widgetOutlineOpacity = 0.35;
@@ -179,8 +181,12 @@ in
               hyprlandResizeOnBorder = false;
 
               sortAppsAlphabetically = true;
+              appDrawerSectionViewModes = {
+                apps = "list";
+              };
               dankLauncherV2Size = "medium";
               launcherLogoMode = "os";
+              launcherLogoColorOverride = "primary";
 
               launchPrefix = "uwsm-app -- ";
 
@@ -189,13 +195,18 @@ in
 
               currentThemeName = "dynamic";
               currentThemeCategory = "dynamic";
-              matugenScheme = "scheme-fidelity";
-              widgetBackgroundColor = "sth";
+              matugenScheme = "scheme-rainbow";
+              matugenSourceMode = "colorful";
+              widgetBackgroundColor = "sc";
               widgetColorMode = "default";
 
-              popupTransparency = 0.5;
+              popupTransparency = 1;
 
               blurEnabled = true;
+              blurForegroundLayers = false;
+              blurLayerOutlineOpacity = 0;
+              blurBorderEnabled = false;
+              blurBorderOpacity = 0;
 
               animationSpeed = 4;
               customAnimationDuration = 325;

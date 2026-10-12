@@ -1,0 +1,49 @@
+/* Accent overlay for simply-dark. Rendered by matugen but references only
+   the dynamic vars from colors.css, so it follows every palette automatically.
+   Fills use the palette accent; button text uses the dark on-accent token so
+   it stays readable (white fails on light accents). */
+
+._1FnJ6dPuknQFQ2RTpKTI16 ._3ydigb6zZAjJ0JCDgHwSYA,
+._1FnJ6dPuknQFQ2RTpKTI16._3cI5TXsFX3bvpR-7EBOtxq ._3ydigb6zZAjJ0JCDgHwSYA,
+._20gjC_5pJucg8Ru-nbg_Wm {
+    background: var(--accent) !important;
+    color: var(--on-accent) !important;
+}
+
+._1FnJ6dPuknQFQ2RTpKTI16 ._3ydigb6zZAjJ0JCDgHwSYA:hover,
+._20gjC_5pJucg8Ru-nbg_Wm:hover {
+    background: var(--accent) !important;
+    color: var(--on-accent) !important;
+}
+
+._33cnXIqTRgRr49_FNXIHj6,
+._2AzIX5kl9k6JnxLfR5H4kX {
+    color: var(--on-accent) !important;
+}
+
+.DialogButton.Primary {
+    background: var(--accent) !important;
+    color: var(--on-accent) !important;
+}
+
+.DialogButton.Primary:hover {
+    background: var(--accent) !important;
+    color: var(--on-accent) !important;
+}
+
+.DialogDropDown_CurrentDisplay {
+    color: #ffffff !important;
+}
+
+.DialogDropDown svg polygon,
+._1ijTaXJJA5YWl_fW2IxcaT svg polygon {
+    fill: var(--accent) !important;
+}
+
+._7AlhCx3XGzBeIrQaCneUD._1gqEjB5QsKT_NftD1dEsdZ:not(._2cO0HdvLEGAdhosLekWsmo) ._19axKcqYRuaJ8vdYKYmtTQ {
+    color: var(--accent) !important;
+}
+
+._7AlhCx3XGzBeIrQaCneUD._1gqEjB5QsKT_NftD1dEsdZ:not(._2cO0HdvLEGAdhosLekWsmo) ._19axKcqYRuaJ8vdYKYmtTQ::after {
+    background: var(--accent) !important;
+}
