@@ -114,17 +114,41 @@ in
             content = ''
               LLM_OPENAI_API_KEY=${config.sops.placeholder."commandcode/api-key"}
               DERIVER_MODEL_CONFIG__TRANSPORT=openai
-              DERIVER_MODEL_CONFIG__MODEL=xiaomi/mimo-v2.6-pro
+              DERIVER_MODEL_CONFIG__MODEL=z-ai/glm-5.3-flash
+              DERIVER_MODEL_CONFIG__THINKING_EFFORT=high
               DERIVER_MODEL_CONFIG__OVERRIDES__BASE_URL=https://api.commandcode.ai/provider/v1
-              DIALECTIC_MODEL_CONFIG__TRANSPORT=openai
-              DIALECTIC_MODEL_CONFIG__MODEL=xiaomi/mimo-v2.6-pro
-              DIALECTIC_MODEL_CONFIG__OVERRIDES__BASE_URL=https://api.commandcode.ai/provider/v1
+              DIALECTIC_LEVELS__minimal__MODEL_CONFIG__TRANSPORT=openai
+              DIALECTIC_LEVELS__minimal__MODEL_CONFIG__MODEL=z-ai/glm-5.3-flash
+              DIALECTIC_LEVELS__minimal__MODEL_CONFIG__THINKING_EFFORT=high
+              DIALECTIC_LEVELS__minimal__MODEL_CONFIG__OVERRIDES__BASE_URL=https://api.commandcode.ai/provider/v1
+              DIALECTIC_LEVELS__low__MODEL_CONFIG__TRANSPORT=openai
+              DIALECTIC_LEVELS__low__MODEL_CONFIG__MODEL=z-ai/glm-5.3-flash
+              DIALECTIC_LEVELS__low__MODEL_CONFIG__THINKING_EFFORT=high
+              DIALECTIC_LEVELS__low__MODEL_CONFIG__OVERRIDES__BASE_URL=https://api.commandcode.ai/provider/v1
+              DIALECTIC_LEVELS__medium__MODEL_CONFIG__TRANSPORT=openai
+              DIALECTIC_LEVELS__medium__MODEL_CONFIG__MODEL=z-ai/glm-5.3-flash
+              DIALECTIC_LEVELS__medium__MODEL_CONFIG__THINKING_EFFORT=high
+              DIALECTIC_LEVELS__medium__MODEL_CONFIG__OVERRIDES__BASE_URL=https://api.commandcode.ai/provider/v1
+              DIALECTIC_LEVELS__high__MODEL_CONFIG__TRANSPORT=openai
+              DIALECTIC_LEVELS__high__MODEL_CONFIG__MODEL=z-ai/glm-5.3-flash
+              DIALECTIC_LEVELS__high__MODEL_CONFIG__THINKING_EFFORT=high
+              DIALECTIC_LEVELS__high__MODEL_CONFIG__OVERRIDES__BASE_URL=https://api.commandcode.ai/provider/v1
+              DIALECTIC_LEVELS__max__MODEL_CONFIG__TRANSPORT=openai
+              DIALECTIC_LEVELS__max__MODEL_CONFIG__MODEL=z-ai/glm-5.3-flash
+              DIALECTIC_LEVELS__max__MODEL_CONFIG__THINKING_EFFORT=high
+              DIALECTIC_LEVELS__max__MODEL_CONFIG__OVERRIDES__BASE_URL=https://api.commandcode.ai/provider/v1
               SUMMARY_MODEL_CONFIG__TRANSPORT=openai
-              SUMMARY_MODEL_CONFIG__MODEL=xiaomi/mimo-v2.6-pro
+              SUMMARY_MODEL_CONFIG__MODEL=z-ai/glm-5.3-flash
+              SUMMARY_MODEL_CONFIG__THINKING_EFFORT=high
               SUMMARY_MODEL_CONFIG__OVERRIDES__BASE_URL=https://api.commandcode.ai/provider/v1
-              DREAM_MODEL_CONFIG__TRANSPORT=openai
-              DREAM_MODEL_CONFIG__MODEL=xiaomi/mimo-v2.6-pro
-              DREAM_MODEL_CONFIG__OVERRIDES__BASE_URL=https://api.commandcode.ai/provider/v1
+              DREAM_DEDUCTION_MODEL_CONFIG__TRANSPORT=openai
+              DREAM_DEDUCTION_MODEL_CONFIG__MODEL=z-ai/glm-5.3-flash
+              DREAM_DEDUCTION_MODEL_CONFIG__THINKING_EFFORT=high
+              DREAM_DEDUCTION_MODEL_CONFIG__OVERRIDES__BASE_URL=https://api.commandcode.ai/provider/v1
+              DREAM_INDUCTION_MODEL_CONFIG__TRANSPORT=openai
+              DREAM_INDUCTION_MODEL_CONFIG__MODEL=z-ai/glm-5.3-flash
+              DREAM_INDUCTION_MODEL_CONFIG__THINKING_EFFORT=high
+              DREAM_INDUCTION_MODEL_CONFIG__OVERRIDES__BASE_URL=https://api.commandcode.ai/provider/v1
               EMBEDDING_MODEL_CONFIG__TRANSPORT=openai
               EMBEDDING_MODEL_CONFIG__MODEL=text-embedding-3-small
               EMBEDDING_MODEL_CONFIG__OVERRIDES__BASE_URL=https://api.commandcode.ai/provider/v1
@@ -197,7 +221,7 @@ in
 
           opencodeConfig = (pkgs.formats.json { }).generate "opencode.json" {
             "$schema" = "https://opencode.ai/config.json";
-            model = "commandcode/mimo-v2.6-pro";
+            model = "commandcode/glm-5.3-flash";
             autoupdate = false;
             provider.commandcode = {
               npm = "@ai-sdk/openai-compatible";
@@ -206,8 +230,8 @@ in
                 baseURL = "https://api.commandcode.ai/provider/v1";
                 apiKey = "{file:/run/secrets/commandcode/api-key}";
               };
-              models."mimo-v2.6-pro" = {
-                id = "xiaomi/mimo-v2.6-pro";
+              models."glm-5.3-flash" = {
+                id = "z-ai/glm-5.3-flash";
                 options.reasoningEffort = "xhigh";
               };
             };
@@ -261,7 +285,7 @@ in
               checkpoints.enabled = true;
               model = {
                 provider = "commandcode";
-                default = "xiaomi/mimo-v2.6-pro";
+                default = "z-ai/glm-5.3-flash";
               };
               custom_providers = [
                 {
@@ -282,7 +306,7 @@ in
               timezone = "Europe/Berlin";
               delegation = {
                 provider = "commandcode";
-                model = "xiaomi/mimo-v2.6-pro";
+                model = "z-ai/glm-5.3-flash";
               };
               lsp.install_strategy = "manual";
               memory.provider = "honcho";
