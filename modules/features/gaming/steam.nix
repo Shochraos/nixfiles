@@ -13,7 +13,9 @@
       nixpkgs.overlays = [ inputs.millennium.overlays.default ];
       programs.steam = {
         enable = true;
-        package = pkgs.millennium-steam;
+        package = pkgs.millennium-steam.override {
+          steam = pkgs.steam.override { extraArgs = "-pipewire"; };
+        };
         extraCompatPackages = [
           proton-cachyos-v3
           dw-proton
@@ -116,6 +118,15 @@
         '';
       };
 
+      remotePlayWrapper = pkgs.writeShellApplication {
+        name = "remote";
+        runtimeInputs = [ pkgs.hyprland ];
+        text = ''
+          hyprctl dispatch "hl.dsp.focus({ workspace = 1 })" >/dev/null || true
+          PROTON_ENABLE_WAYLAND=0 exec "$@"
+        '';
+      };
+
       curlWithoutSteamLibs = pkgs.writeShellApplication {
         name = "curl";
         runtimeInputs = [ pkgs.curl ];
@@ -132,7 +143,10 @@
       };
     in
     {
-      home.packages = [ curlWithoutSteamLibs ];
+      home.packages = [
+        curlWithoutSteamLibs
+        remotePlayWrapper
+      ];
 
       home.activation.steamvrFacetRenderer = lib.hm.dag.entryAfter [ "writeBoundary" ] (
         lib.getExe steamvrFacetRenderer
@@ -151,18 +165,8 @@
       };
 
       xdg.autostart = {
-        entries = lib.optional (builtins.elem "steam" osConfig.host.autostart) "${pkgs.steam}/share/applications/steam.desktop";
+        entries = lib.optional (builtins.elem "steam" osConfig.host.autostart) "${osConfig.programs.steam.package}/share/applications/steam.desktop";
       };
-
-      xdg.dataFile."applications/steam-pipewire.desktop".text = ''
-        [Desktop Entry]
-        Name=Steam (PipeWire)
-        Exec=${pkgs.millennium-steam}/bin/steam -pipewire-dmabuf %U
-        Icon=steam
-        Terminal=false
-        Type=Application
-        Categories=Game;
-      '';
 
       home.file = {
         ".local/share/Steam/ubuntu12_64/libGL.so.1" = {

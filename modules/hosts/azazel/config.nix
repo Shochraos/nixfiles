@@ -68,7 +68,7 @@
           }
           {
             match = {
-              class = "^(steam_app_.*)$";
+              class = "^(steam_app_.*|gamescope)$";
             };
             workspace = "1 silent";
             center = true;
@@ -147,22 +147,6 @@
           4
           5
         ];
-      };
-
-      host.streaming = {
-        displays = {
-          frame = {
-            output = "FRAME";
-            mode = "2560x1440@120";
-            scale = "1";
-          };
-
-          deck = {
-            output = "DECK";
-            mode = "1280x720@90";
-            scale = "1";
-          };
-        };
       };
 
       host.audio.equalizers.dx3 = {
