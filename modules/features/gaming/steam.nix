@@ -115,8 +115,25 @@
           mv "$merged_file" "$settings"
         '';
       };
+
+      curlWithoutSteamLibs = pkgs.writeShellApplication {
+        name = "curl";
+        runtimeInputs = [ pkgs.curl ];
+        text = ''
+          clean=""
+          while IFS= read -r entry; do
+            case "$entry" in
+              *pinned_libs* | *steam-runtime*) ;;
+              *) clean="''${clean}''${clean:+:}$entry" ;;
+            esac
+          done < <(printf '%s' "''${LD_LIBRARY_PATH:-}" | tr ':' '\n')
+          LD_LIBRARY_PATH="$clean" exec curl "$@"
+        '';
+      };
     in
     {
+      home.packages = [ curlWithoutSteamLibs ];
+
       home.activation.steamvrFacetRenderer = lib.hm.dag.entryAfter [ "writeBoundary" ] (
         lib.getExe steamvrFacetRenderer
       );
