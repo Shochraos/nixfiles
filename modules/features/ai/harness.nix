@@ -30,19 +30,10 @@ in
           sops.secrets."commandcode/api-key" = {
             owner = user.name;
           };
-
-          sops.secrets."hermes/opencode-go-api-key" = {
-            owner = user.name;
-          };
-
-          sops.secrets."opencode/opencode-go-api-key" = {
-            owner = user.name;
-          };
           sops.templates."hermes.env" = {
             owner = user.name;
             content = ''
               COMMANDCODE_API_KEY=${config.sops.placeholder."commandcode/api-key"}
-              OPENCODE_GO_API_KEY=${config.sops.placeholder."hermes/opencode-go-api-key"}
             '';
           };
 
@@ -121,32 +112,22 @@ in
 
           sops.templates."honcho.env" = {
             content = ''
-              LLM_OPENAI_API_KEY=${config.sops.placeholder."hermes/opencode-go-api-key"}
+              LLM_OPENAI_API_KEY=${config.sops.placeholder."commandcode/api-key"}
               DERIVER_MODEL_CONFIG__TRANSPORT=openai
-              DERIVER_MODEL_CONFIG__MODEL=muse-spark-1.3-contributor
-              DERIVER_MODEL_CONFIG__OVERRIDES__BASE_URL=https://opencode.ai/zen/go/v1
+              DERIVER_MODEL_CONFIG__MODEL=xiaomi/mimo-v2.6-pro
+              DERIVER_MODEL_CONFIG__OVERRIDES__BASE_URL=https://api.commandcode.ai/provider/v1
               DIALECTIC_MODEL_CONFIG__TRANSPORT=openai
-              DIALECTIC_MODEL_CONFIG__MODEL=muse-spark-1.3-contributor
-              DIALECTIC_MODEL_CONFIG__OVERRIDES__BASE_URL=https://opencode.ai/zen/go/v1
+              DIALECTIC_MODEL_CONFIG__MODEL=xiaomi/mimo-v2.6-pro
+              DIALECTIC_MODEL_CONFIG__OVERRIDES__BASE_URL=https://api.commandcode.ai/provider/v1
               SUMMARY_MODEL_CONFIG__TRANSPORT=openai
-              SUMMARY_MODEL_CONFIG__MODEL=muse-spark-1.3-contributor
-              SUMMARY_MODEL_CONFIG__OVERRIDES__BASE_URL=https://opencode.ai/zen/go/v1
+              SUMMARY_MODEL_CONFIG__MODEL=xiaomi/mimo-v2.6-pro
+              SUMMARY_MODEL_CONFIG__OVERRIDES__BASE_URL=https://api.commandcode.ai/provider/v1
               DREAM_MODEL_CONFIG__TRANSPORT=openai
-              DREAM_MODEL_CONFIG__MODEL=muse-spark-1.3-contributor
-              DREAM_MODEL_CONFIG__OVERRIDES__BASE_URL=https://opencode.ai/zen/go/v1
+              DREAM_MODEL_CONFIG__MODEL=xiaomi/mimo-v2.6-pro
+              DREAM_MODEL_CONFIG__OVERRIDES__BASE_URL=https://api.commandcode.ai/provider/v1
               EMBEDDING_MODEL_CONFIG__TRANSPORT=openai
               EMBEDDING_MODEL_CONFIG__MODEL=text-embedding-3-small
-              EMBEDDING_MODEL_CONFIG__OVERRIDES__BASE_URL=https://opencode.ai/zen/go/v1
-              # LLM_OPENAI_API_KEY=${config.sops.placeholder."commandcode/api-key"}
-              # DERIVER_MODEL_CONFIG__MODEL=meta/muse-spark-1.3-contributor
-              # DERIVER_MODEL_CONFIG__OVERRIDES__BASE_URL=https://api.commandcode.ai/provider/v1
-              # DIALECTIC_MODEL_CONFIG__MODEL=meta/muse-spark-1.3-contributor
-              # DIALECTIC_MODEL_CONFIG__OVERRIDES__BASE_URL=https://api.commandcode.ai/provider/v1
-              # SUMMARY_MODEL_CONFIG__MODEL=meta/muse-spark-1.3-contributor
-              # SUMMARY_MODEL_CONFIG__OVERRIDES__BASE_URL=https://api.commandcode.ai/provider/v1
-              # DREAM_MODEL_CONFIG__MODEL=meta/muse-spark-1.3-contributor
-              # DREAM_MODEL_CONFIG__OVERRIDES__BASE_URL=https://api.commandcode.ai/provider/v1
-              # EMBEDDING_MODEL_CONFIG__OVERRIDES__BASE_URL=https://api.commandcode.ai/provider/v1
+              EMBEDDING_MODEL_CONFIG__OVERRIDES__BASE_URL=https://api.commandcode.ai/provider/v1
             '';
           };
         };
@@ -216,27 +197,18 @@ in
 
           opencodeConfig = (pkgs.formats.json { }).generate "opencode.json" {
             "$schema" = "https://opencode.ai/config.json";
-            model = "opencode-go/muse-spark-1.3-contributor";
+            model = "commandcode/mimo-v2.6-pro";
             autoupdate = false;
-            # provider.commandcode = {
-            #   npm = "@ai-sdk/openai-compatible";
-            #   name = "CommandCode";
-            #   options = {
-            #     baseURL = "https://api.commandcode.ai/provider/v1";
-            #     apiKey = "{file:/run/secrets/commandcode/api-key}";
-            #   };
-            #   models."glm-5.3-flash".id = "z-ai/glm-5.3-flash";
-            # };
-            provider.opencode-go = {
-              npm = "@ai-sdk/openai";
-              name = "opencode-go";
+            provider.commandcode = {
+              npm = "@ai-sdk/openai-compatible";
+              name = "CommandCode";
               options = {
-                baseURL = "https://opencode.ai/zen/go/v1";
-                apiKey = "{file:/run/secrets/opencode/opencode-go-api-key}";
+                baseURL = "https://api.commandcode.ai/provider/v1";
+                apiKey = "{file:/run/secrets/commandcode/api-key}";
               };
-              models."muse-spark-1.3-contributor" = {
-                id = "muse-spark-1.3-contributor";
-                options.reasoningEffort = "max";
+              models."mimo-v2.6-pro" = {
+                id = "xiaomi/mimo-v2.6-pro";
+                options.reasoningEffort = "xhigh";
               };
             };
           };
@@ -284,23 +256,18 @@ in
             };
             settings = {
               agent.coding_context = "auto";
-              agent.reasoning_effort = "max";
+              agent.reasoning_effort = "xhigh";
               browser.backend = "off";
               checkpoints.enabled = true;
               model = {
-                provider = "opencode-go";
-                default = "muse-spark-1.3-contributor";
+                provider = "commandcode";
+                default = "xiaomi/mimo-v2.6-pro";
               };
-              # model = {
-              #   provider = "commandcode";
-              #   default = "zai-org/GLM-5.3";
-              # };
               custom_providers = [
                 {
-                  name = "opencode-go";
-                  base_url = "https://opencode.ai/zen/go/v1";
-                  key_env = "OPENCODE_GO_API_KEY";
-                  api_mode = "anthropic_messages";
+                  name = "commandcode";
+                  base_url = "https://api.commandcode.ai/provider/v1";
+                  key_env = "COMMANDCODE_API_KEY";
                 }
               ];
               skills = {
@@ -314,13 +281,9 @@ in
               updates.check = false;
               timezone = "Europe/Berlin";
               delegation = {
-                provider = "opencode-go";
-                model = "muse-spark-1.3-contributor";
+                provider = "commandcode";
+                model = "xiaomi/mimo-v2.6-pro";
               };
-              # delegation = {
-              #   provider = "commandcode";
-              #   model = "glm-5.3-flash";
-              # };
               lsp.install_strategy = "manual";
               memory.provider = "honcho";
               curator.consolidate = true;
