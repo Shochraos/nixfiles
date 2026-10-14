@@ -1,5 +1,4 @@
-{ inputs, ... }:
-{
+_: {
   den.aspects.apps = _: {
     provides.to-users.homeManager =
       {
@@ -9,7 +8,7 @@
       }:
       let
         discordPkg = pkgs.discord.override { withEquicord = true; };
-        spotifastPkg = inputs.spotifast.packages.${pkgs.stdenv.hostPlatform.system}.spotifast;
+        spotifastPkg = pkgs.spotifast;
       in
       {
         home.packages = [

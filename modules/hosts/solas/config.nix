@@ -10,6 +10,8 @@
     {
       system.stateVersion = "25.05";
 
+      host.autostart = [ "hermes" ];
+
       host.flakeDir = "/home/shochraos/Repositories/nix/nixfiles";
       host.keepassxc.database = "/mnt/nextcloud/Security/KeePass/Vault.kdbx";
 
@@ -103,15 +105,21 @@
         windowRules = [
           {
             match = {
-              class = "^(zen-beta)$";
+              class = "^(hermes)$";
             };
-            workspace = "3 silent";
+            workspace = "2 silent";
           }
           {
             match = {
               class = "^(dev.zed.Zed)$";
             };
-            workspace = "2 silent";
+            workspace = "3 silent";
+          }
+          {
+            match = {
+              class = "^(zen-beta)$";
+            };
+            workspace = "4 silent";
           }
           {
             match = {
@@ -195,6 +203,7 @@
           1
           2
           3
+          4
         ];
       };
 

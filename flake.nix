@@ -77,10 +77,6 @@
       inputs.home-manager.follows = "home-manager";
     };
 
-    spotifast = {
-      url = "github:crmne/spotifast";
-    };
-
     flyline = {
       url = "github:HalFrgrd/flyline";
       inputs.nixpkgs.follows = "nixpkgs";
