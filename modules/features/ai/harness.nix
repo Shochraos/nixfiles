@@ -10,9 +10,9 @@ let
 in
 {
   den.aspects.ai-harness =
-    args:
+    { host, ... }:
     let
-      commandcodeSecret = "commandcode/api-keys/${lib.toLower args.host.name}";
+      commandcodeSecret = "commandcode/api-keys/${lib.toLower host.name}";
       honchoServerOverlay = final: _prev: {
         honchoServer = final.callPackage packageSources.honchoServer { };
       };
