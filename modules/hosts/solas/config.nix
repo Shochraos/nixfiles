@@ -240,13 +240,23 @@
 
             rightWidgets = [
               {
-                id = "spacer";
+                id = "cpuUsage";
                 enabled = true;
-                size = 15;
+                minimumWidth = true;
+              }
+              {
+                id = "cpuTemp";
+                enabled = true;
+                minimumWidth = true;
               }
               {
                 id = "battery";
                 enabled = true;
+              }
+              {
+                id = "spacer";
+                enabled = true;
+                size = 15;
               }
               {
                 id = "notificationButton";
