@@ -256,20 +256,12 @@
                 enabled = true;
               }
               {
-                id = "vpn";
-                enabled = true;
-              }
-              {
                 id = "spacer";
                 enabled = true;
                 size = 15;
               }
               {
                 id = "systemTray";
-                enabled = true;
-              }
-              {
-                id = "simpleAudioControl";
                 enabled = true;
               }
               {

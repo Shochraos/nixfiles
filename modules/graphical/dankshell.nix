@@ -127,7 +127,6 @@ in
             plugins = {
               calculator.enable = true;
               dankKDEConnect.enable = true;
-              simpleAudioControl.enable = true;
               dankTodoman = {
                 enable = true;
                 settings.showNearestTask = true;
