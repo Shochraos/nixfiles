@@ -10,8 +10,9 @@ let
 in
 {
   den.aspects.ai-harness =
-    _:
+    args:
     let
+      commandcodeSecret = "commandcode/api-keys/${lib.toLower args.host.name}";
       honchoServerOverlay = final: _prev: {
         honchoServer = final.callPackage packageSources.honchoServer { };
       };
@@ -27,13 +28,14 @@ in
         {
           nixpkgs.overlays = [ honchoServerOverlay ];
 
-          sops.secrets."commandcode/api-key" = {
+          sops.secrets.${commandcodeSecret} = {
             owner = user.name;
+            path = "/run/secrets/commandcode/api-key";
           };
           sops.templates."hermes.env" = {
             owner = user.name;
             content = ''
-              COMMANDCODE_API_KEY=${config.sops.placeholder."commandcode/api-key"}
+              COMMANDCODE_API_KEY=${config.sops.placeholder.${commandcodeSecret}}
             '';
           };
 
@@ -112,7 +114,7 @@ in
 
           sops.templates."honcho.env" = {
             content = ''
-              LLM_OPENAI_API_KEY=${config.sops.placeholder."commandcode/api-key"}
+              LLM_OPENAI_API_KEY=${config.sops.placeholder.${commandcodeSecret}}
               DERIVER_MODEL_CONFIG__TRANSPORT=openai
               DERIVER_MODEL_CONFIG__MODEL=z-ai/glm-5.3-flash
               DERIVER_MODEL_CONFIG__THINKING_EFFORT=high

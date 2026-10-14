@@ -1,22 +1,33 @@
 {
   den.aspects.sync =
-    { user, ... }:
     {
-      nixos = {
-        sops.secrets = {
-          "calendar/nextcloud-pass".owner = user.name;
-          "calendar/nextcloud-url".owner = user.name;
-          "calendar/uni-url".owner = user.name;
+      user,
+      host,
+      ...
+    }:
+    {
+      nixos =
+        { lib, ... }:
+        let
+          passKey = "calendar/nextcloud-pass/${lib.toLower host.name}";
+        in
+        {
+          sops.secrets = {
+            ${passKey}.owner = user.name;
+            "calendar/nextcloud-url".owner = user.name;
+            "calendar/uni-url".owner = user.name;
+          };
         };
-      };
 
       provides.to-users.homeManager =
         {
           osConfig,
           pkgs,
+          lib,
           ...
         }:
         let
+          passKey = "calendar/nextcloud-pass/${lib.toLower host.name}";
           desktopEntry = "com.nextcloud.desktopclient.nextcloud.desktop";
 
           nextcloudAutostart = pkgs.runCommandLocal "nextcloud-autostart.desktop" { } ''
@@ -90,7 +101,7 @@
                   userName = "Shochraos";
                   passwordCommand = [
                     "cat"
-                    osConfig.sops.secrets."calendar/nextcloud-pass".path
+                    osConfig.sops.secrets.${passKey}.path
                   ];
                 };
 

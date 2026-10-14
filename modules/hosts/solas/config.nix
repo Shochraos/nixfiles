@@ -24,19 +24,24 @@
             autoconnect = false;
           };
 
-          "wireguard-peer.MgkkQIkInEWcDGnK3smCD0V1F+O2/WREI+MQuA1mMU8=" = {
+          "wireguard-peer.cPsDOh8aiCez/Up7DOAv0yUHDAMHlVKwbwOGMGHmIUU=" = {
             endpoint = "$WG_HOME_ENDPOINT";
-            allowed-ips = "0.0.0.0/0;";
+            allowed-ips = "0.0.0.0/0;::/0;";
           };
 
           ipv4 = {
             method = "manual";
-            address1 = "192.168.137.4/32";
-            dns = "192.168.1.2;";
+            address1 = "192.168.137.3/32";
+            dns = "192.168.10.254;";
             dns-search = "~;";
           };
 
-          ipv6.method = "disabled";
+          ipv6 = {
+            method = "manual";
+            address1 = "fdb2:e9bb:28b:6078::3/128";
+            dns = "fd00:10::276:55a6:3b1c:2140;";
+            dns-search = "~;";
+          };
         };
       };
 
