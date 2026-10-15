@@ -23,6 +23,7 @@ in
       discordTemplate = ../../assets/templates/discord.css;
       halloyTemplate = ../../assets/templates/halloy.toml;
       hermesSoul = ../../assets/harness-rules/hermes/SOUL.md;
+      hsFuldaEduroamCa = ../../assets/certs/hs-fulda-eduroam-ca.pem;
       ironyModManagerIcon = ../../assets/icons/ironymodmanager.png;
       jellyfinMpvShimConfig = ../../configs/jellyfin-mpv-shim/conf.json;
       matugenSchemes = ../../configs/matugen;

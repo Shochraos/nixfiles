@@ -1,10 +1,14 @@
 {
+  config,
+  lib,
+  ...
+}:
+let
+  inherit (config) assets;
+in
+{
   den.aspects.wifi.nixos =
-    {
-      config,
-      lib,
-      ...
-    }:
+    { config, ... }:
     let
       profiles = config.host.wifi.profiles;
       profileNames = builtins.attrNames profiles;
@@ -27,6 +31,8 @@
     in
     {
       config = lib.mkIf (profiles != { }) {
+        environment.etc."eduroam-certs/hs-fulda-eduroam-ca.pem".source = assets.hsFuldaEduroamCa;
+
         sops.secrets = builtins.listToAttrs (map (e: lib.nameValuePair e.secret { }) secretEntries);
 
         sops.templates."wifi.env".content = lib.concatLines (

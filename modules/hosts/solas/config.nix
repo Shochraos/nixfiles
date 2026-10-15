@@ -76,7 +76,7 @@
             eap = "peap;";
             identity = "$WIFI_EDUROAM_IDENTITY";
             anonymous-identity = "$WIFI_EDUROAM_ANONYMOUS_IDENTITY";
-            ca-cert = "/etc/ssl/certs/ca-bundle.crt";
+            ca-cert = "/etc/eduroam-certs/hs-fulda-eduroam-ca.pem";
             domain-suffix-match = "$WIFI_EDUROAM_DOMAIN";
             phase2-auth = "mschapv2";
             system-ca-certs = false;

@@ -127,10 +127,7 @@ in
             plugins = {
               calculator.enable = true;
               dankKDEConnect.enable = true;
-              dankTodoman = {
-                enable = true;
-                settings.showNearestTask = true;
-              };
+              dankTodoman.enable = true;
               discordVoice = {
                 enable = true;
                 settings.maxBarAvatars = 10;
