@@ -72,6 +72,7 @@
             };
             workspace = "1 silent";
             center = true;
+            fullscreen = true;
           }
           {
             match = {
@@ -181,6 +182,10 @@
       };
 
       host.dms = {
+        plugins.dankTodoman = {
+          enable = true;
+          settings.showNearestTask = true;
+        };
         barConfigs = [
           {
             leftWidgets = [

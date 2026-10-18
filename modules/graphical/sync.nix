@@ -58,6 +58,7 @@
               default_list = "personal"
               default_due = 0
               humanize = True
+              startable = True
             '';
           };
           programs.khal = {

@@ -223,6 +223,50 @@ in
               iconThemeDark = osConfig.stylix.icons.dark;
 
               controlCenterShowMicPercent = false;
+
+              controlCenterWidgets = [
+                {
+                  id = "volumeSlider";
+                  enabled = true;
+                  width = 50;
+                }
+                {
+                  id = "brightnessSlider";
+                  enabled = true;
+                  width = 50;
+                }
+                {
+                  id = "wifi";
+                  enabled = true;
+                  width = 50;
+                }
+                {
+                  id = "bluetooth";
+                  enabled = true;
+                  width = 50;
+                }
+                {
+                  id = "audioOutput";
+                  enabled = true;
+                  width = 50;
+                }
+                {
+                  id = "audioInput";
+                  enabled = true;
+                  width = 50;
+                }
+                {
+                  id = "builtin_display_profiles";
+                  enabled = true;
+                  width = 50;
+                }
+                {
+                  id = "builtin_vpn";
+                  enabled = true;
+                  width = 50;
+                }
+              ];
+
               osdPowerProfileEnabled = false;
 
               fontFamily = osConfig.stylix.fonts.sansSerif.name;
