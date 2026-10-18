@@ -75,8 +75,6 @@
       proton-cachyos-v3 =
         inputs.proton-cachyos-nix.packages.${pkgs.stdenv.hostPlatform.system}.proton-cachyos-v3;
       dw-proton = inputs.dw-proton-nix.packages.${pkgs.stdenv.hostPlatform.system}.dw-proton;
-      libGL64 = config.lib.file.mkOutOfStoreSymlink "/run/opengl-driver/lib/libGL.so.1";
-      libGL32 = config.lib.file.mkOutOfStoreSymlink "/run/opengl-driver-32/lib/libGL.so.1";
       drsSettings = lib.concatStringsSep "," [
         "ngx_dlss_sr_override=on"
         "ngx_dlss_sr_override_render_preset_selection=render_preset_m"
@@ -127,24 +125,9 @@
         '';
       };
 
-      curlWithoutSteamLibs = pkgs.writeShellApplication {
-        name = "curl";
-        runtimeInputs = [ pkgs.curl ];
-        text = ''
-          clean=""
-          while IFS= read -r entry; do
-            case "$entry" in
-              *pinned_libs* | *steam-runtime*) ;;
-              *) clean="''${clean}''${clean:+:}$entry" ;;
-            esac
-          done < <(printf '%s' "''${LD_LIBRARY_PATH:-}" | tr ':' '\n')
-          LD_LIBRARY_PATH="$clean" exec curl "$@"
-        '';
-      };
     in
     {
       home.packages = [
-        curlWithoutSteamLibs
         remotePlayWrapper
       ];
 
@@ -166,17 +149,6 @@
 
       xdg.autostart = {
         entries = lib.optional (builtins.elem "steam" osConfig.host.autostart) "${osConfig.programs.steam.package}/share/applications/steam.desktop";
-      };
-
-      home.file = {
-        ".local/share/Steam/ubuntu12_64/libGL.so.1" = {
-          source = libGL64;
-          force = true;
-        };
-        ".local/share/Steam/ubuntu12_32/libGL.so.1" = {
-          source = libGL32;
-          force = true;
-        };
       };
 
       xdg.configFile."openxr/1/active_runtime.json".text = ''
