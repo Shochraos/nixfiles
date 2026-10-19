@@ -267,6 +267,9 @@ in
                 }
               ];
 
+              osdVolumeEnabled = false;
+              osdMediaVolumeEnabled = false;
+              osdAlwaysShowValue = true;
               osdPowerProfileEnabled = false;
 
               fontFamily = osConfig.stylix.fonts.sansSerif.name;
