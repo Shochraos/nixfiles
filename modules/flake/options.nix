@@ -198,6 +198,11 @@ in
                 default = [ ];
                 description = "Hyprland `bind` entries (from host + feature modules).";
               };
+              screenshotKeycode = mkOption {
+                type = types.int;
+                default = 202;
+                description = "xkb keycode of the PrintScreen key on this host. Keycodes differ per keyboard: the laptop's Print key is xkb 107 (`<PRSC>`), the desktop's reports xkb 202 (`<FK24>`).";
+              };
             };
 
             wireguard = {

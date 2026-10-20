@@ -90,6 +90,7 @@
             natural_scroll = true;
           };
         };
+        screenshotKeycode = 107;
         settings = {
           gestures = {
             workspace_swipe_invert = true;

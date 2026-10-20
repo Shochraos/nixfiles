@@ -164,13 +164,13 @@
           }
           {
             _args = [
-              "code:202"
+              "code:${toString osConfig.host.hyprland.screenshotKeycode}"
               (lua "hl.dsp.exec_cmd('dms screenshot --no-file')")
             ];
           }
           {
             _args = [
-              "SUPER + code:202"
+              "SUPER + code:${toString osConfig.host.hyprland.screenshotKeycode}"
               (lua "hl.dsp.exec_cmd('dms screenshot')")
             ];
           }
