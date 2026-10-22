@@ -27,6 +27,7 @@ in
       hsFuldaEduroamCa = ../../assets/certs/hs-fulda-eduroam-ca.pem;
       ironyModManagerIcon = ../../assets/icons/ironymodmanager.png;
       klassyRc = ../../configs/klassy/klassyrc;
+      kittyConf = ../../assets/kitty/kitty.conf;
       matugenBtopTemplate = ../../assets/matugen/btop.theme;
       matugenStarshipTemplate = ../../assets/matugen/starship.toml;
       papirusRecolorTemplate = ../../assets/papirus-matugen/recolor.sh.tpl;

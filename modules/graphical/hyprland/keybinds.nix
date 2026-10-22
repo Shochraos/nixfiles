@@ -14,6 +14,12 @@
           {
             _args = [
               "SUPER + Return"
+              (lua "hl.dsp.exec_cmd('uwsm-app -- kitty')")
+            ];
+          }
+          {
+            _args = [
+              "SUPER + SHIFT + Return"
               (lua "hl.dsp.exec_cmd('uwsm-app -- ghostty')")
             ];
           }
