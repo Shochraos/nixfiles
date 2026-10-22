@@ -176,6 +176,11 @@ in
               output_path = "~/.config/btop/themes/matugen.theme";
               post_hook = "${pkgs.procps}/bin/pkill -USR2 -u \"$USER\" -x btop || true";
             };
+
+            flyline = {
+              input_path = assets.matugenFlylineTemplate;
+              output_path = "~/.cache/flyline/matugen.sh";
+            };
           }
           // osConfig.host.matugen.templates;
         };

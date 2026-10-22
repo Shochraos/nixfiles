@@ -28,6 +28,7 @@ in
       ironyModManagerIcon = ../../assets/icons/ironymodmanager.png;
       klassyRc = ../../configs/klassy/klassyrc;
       kittyConf = ../../assets/kitty/kitty.conf;
+      matugenFlylineTemplate = ../../assets/matugen/flyline.sh;
       matugenBtopTemplate = ../../assets/matugen/btop.theme;
       matugenStarshipTemplate = ../../assets/matugen/starship.toml;
       papirusRecolorTemplate = ../../assets/papirus-matugen/recolor.sh.tpl;

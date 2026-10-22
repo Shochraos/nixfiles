@@ -67,6 +67,7 @@ in
 
             enable -f ${flyline}/lib/libflyline.so flyline
             flyline set-style inline-suggestion="dim italic"
+            [ -r ~/.cache/flyline/matugen.sh ] && source ~/.cache/flyline/matugen.sh
             flyline set-cursor --backend terminal
           '';
         };
