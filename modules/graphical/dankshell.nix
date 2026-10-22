@@ -172,7 +172,7 @@ in
               notificationHistoryMaxCount = 20;
               notificationHistoryMaxAgeDays = 1;
 
-              hyprlandLayoutRadiusOverride = 12;
+              hyprlandLayoutRadiusOverride = 14;
               hyprlandLayoutBorderSize = 1;
               hyprlandResizeOnBorder = false;
 
@@ -204,11 +204,14 @@ in
               blurBorderEnabled = false;
               blurBorderOpacity = 0;
 
-              animationSpeed = 4;
-              customAnimationDuration = 325;
-              syncComponentAnimationSpeeds = true;
+              animationSpeed = 1;
+              syncComponentAnimationSpeeds = false;
               animationVariant = 1;
-              motionEffect = 1;
+              motionEffect = 2;
+              popoutAnimationSpeed = 2;
+              modalAnimationSpeed = 2;
+              springBounce = 2;
+              notificationAnimationSpeed = 2;
 
               modalDarkenBackground = true;
 
@@ -217,7 +220,7 @@ in
               popoutElevationEnabled = false;
               barElevationEnabled = false;
 
-              cornerRadius = 16;
+              cornerRadius = 14;
               hyprlandLayoutGapsOverride = -2;
 
               iconThemeDark = osConfig.stylix.icons.dark;
@@ -274,7 +277,7 @@ in
 
               fontFamily = osConfig.stylix.fonts.sansSerif.name;
               monoFontFamily = osConfig.stylix.fonts.monospace.name;
-              fontScale = 1;
+              fontScale = 1.05;
               fontWeight = 400;
 
               powerMenuActions = [
