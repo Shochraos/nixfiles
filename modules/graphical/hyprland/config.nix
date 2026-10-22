@@ -50,6 +50,11 @@ in
         evince
       ];
 
+      programs.nautilus-open-any-terminal = {
+        enable = true;
+        terminal = "ghostty";
+      };
+
       xdg.mime = {
         enable = true;
 

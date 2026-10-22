@@ -4,16 +4,16 @@
       curve = [
         {
           _args = [
-            "curveWindow"
+            "standard"
             {
               type = "bezier";
               points = [
                 [
-                  0.61
-                  1
+                  0.2
+                  0
                 ]
                 [
-                  0.88
+                  0
                   1
                 ]
               ];
@@ -22,17 +22,17 @@
         }
         {
           _args = [
-            "curveWorkspace"
+            "emphasizedAccel"
             {
               type = "bezier";
               points = [
                 [
-                  0.25
-                  1
+                  0.3
+                  0
                 ]
                 [
-                  0.5
-                  1
+                  0.8
+                  0.15
                 ]
               ];
             }
@@ -40,17 +40,17 @@
         }
         {
           _args = [
-            "curveMenu"
+            "emphasizedDecel"
             {
               type = "bezier";
               points = [
                 [
                   0.05
-                  0.9
+                  0.7
                 ]
                 [
                   0.1
-                  1.05
+                  1
                 ]
               ];
             }
@@ -60,18 +60,47 @@
 
       animation = [
         {
-          leaf = "windows";
+          leaf = "windowsIn";
           enabled = true;
-          speed = 3.5;
-          bezier = "curveWindow";
-          style = "slide";
+          speed = 5;
+          bezier = "emphasizedDecel";
+        }
+        {
+          leaf = "windowsOut";
+          enabled = true;
+          speed = 3;
+          bezier = "emphasizedAccel";
+        }
+        {
+          leaf = "windowsMove";
+          enabled = true;
+          speed = 6;
+          bezier = "standard";
         }
         {
           leaf = "workspaces";
           enabled = true;
-          speed = 3.5;
-          bezier = "curveWorkspace";
+          speed = 4;
+          bezier = "standard";
           style = "slidevert";
+        }
+        {
+          leaf = "fadeLayers";
+          enabled = true;
+          speed = 5;
+          bezier = "standard";
+        }
+        {
+          leaf = "fade";
+          enabled = true;
+          speed = 6;
+          bezier = "standard";
+        }
+        {
+          leaf = "border";
+          enabled = true;
+          speed = 6;
+          bezier = "standard";
         }
       ];
     };

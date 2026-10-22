@@ -14,19 +14,19 @@
           {
             _args = [
               "SUPER + Return"
-              (lua "hl.dsp.exec_cmd('ghostty')")
+              (lua "hl.dsp.exec_cmd('uwsm-app -- ghostty')")
             ];
           }
           {
             _args = [
               "SUPER + F"
-              (lua "hl.dsp.exec_cmd('nautilus')")
+              (lua "hl.dsp.exec_cmd('uwsm-app -- nautilus')")
             ];
           }
           {
             _args = [
               "SUPER + T"
-              (lua "hl.dsp.exec_cmd('gnome-text-editor')")
+              (lua "hl.dsp.exec_cmd('uwsm-app -- gnome-text-editor')")
             ];
           }
           {

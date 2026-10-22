@@ -33,7 +33,7 @@ while IFS= read -r -d '' places; do
   rel="${places#"$src/"}"
   mkdir -p "$dst/$rel"
 
-  anchored="$(grep -rl "5294e2\|4877b1" "$places" | xargs -n1 basename | tr '\n' ' ')"
+  anchored="$(grep -rl "5294e2\|4877b1" "$places" | xargs -r -n1 basename | tr '\n' ' ')"
 
   for entry in "$places"/*; do
     name="$(basename "$entry")"

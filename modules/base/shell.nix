@@ -1,10 +1,13 @@
-{ inputs, ... }:
+{ inputs, config, ... }:
+let
+  inherit (config) assets;
+in
 {
   den.aspects.shell = _: {
     provides.to-users.homeManager =
       { pkgs, ... }:
       let
-        btopConfig = fromTOML (builtins.readFile ../../configs/btop/btop.conf);
+        btopConfig = fromTOML (builtins.readFile assets.btopConf);
 
         flyline = pkgs.callPackage "${inputs.flyline}/nix/package.nix" { };
       in

@@ -20,6 +20,7 @@ in
 
   config = {
     assets = {
+      btopConf = ../../configs/btop/btop.conf;
       discordTemplate = ../../assets/templates/discord.css;
       halloyTemplate = ../../assets/templates/halloy.toml;
       hermesSoul = ../../assets/harness-rules/hermes/SOUL.md;

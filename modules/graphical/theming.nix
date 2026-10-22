@@ -70,6 +70,14 @@ in
         pkgs,
         ...
       }:
+      let
+        papirusRecolorTemplate = pkgs.runCommand "papirus-recolor.sh" { } ''
+          install -m644 ${assets.papirusRecolorTemplate} $out
+          substituteInPlace $out \
+            --replace-fail '@PAPIRUS_ICONS@' '${pkgs.papirus-icon-theme}/share/icons' \
+            --replace-fail '@GTK_CACHE@' '${pkgs.gtk3}/bin/gtk-update-icon-cache'
+        '';
+      in
       {
         home.pointerCursor.enable = true;
 
@@ -158,9 +166,9 @@ in
             };
 
             papirus-folders = {
-              input_path = assets.papirusRecolorTemplate;
-              output_path = "~/.cache/papirus-matugen/recolor.sh";
-              pre_hook = "sed -i -e 's|@PAPIRUS_ICONS@|${pkgs.papirus-icon-theme}/share/icons|g' -e 's|@GTK_CACHE@|${pkgs.gtk3}/bin/gtk-update-icon-cache|g' ~/.cache/papirus-matugen/recolor.sh && chmod +x ~/.cache/papirus-matugen/recolor.sh";
+              input_path = papirusRecolorTemplate;
+              output_path = "~/.cache/papirus-matugen/recolor.sh.tmp";
+              post_hook = "mv ~/.cache/papirus-matugen/recolor.sh.tmp ~/.cache/papirus-matugen/recolor.sh";
             };
 
             btop = {
