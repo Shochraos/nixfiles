@@ -28,8 +28,10 @@
 
           "wireguard-peer.cPsDOh8aiCez/Up7DOAv0yUHDAMHlVKwbwOGMGHmIUU=" = {
             endpoint = "$WG_HOME_ENDPOINT";
-            allowed-ips = "0.0.0.0/0;::/0;";
+            allowed-ips = "0.0.0.0/0;";
           };
+
+          wireguard.mtu = 1412;
 
           ipv4 = {
             method = "manual";
@@ -39,10 +41,7 @@
           };
 
           ipv6 = {
-            method = "manual";
-            address1 = "fdb2:e9bb:28b:6078::3/128";
-            dns = "fd00:10::276:55a6:3b1c:2140;";
-            dns-search = "~;";
+            method = "disabled";
           };
         };
       };
