@@ -25,8 +25,11 @@ in
       hermesSoul = ../../assets/harness-rules/hermes/SOUL.md;
       hsFuldaEduroamCa = ../../assets/certs/hs-fulda-eduroam-ca.pem;
       ironyModManagerIcon = ../../assets/icons/ironymodmanager.png;
+      klassyRc = ../../configs/klassy/klassyrc;
+      matugenBtopTemplate = ../../assets/matugen/btop.theme;
+      matugenStarshipTemplate = ../../assets/matugen/starship.toml;
+      papirusRecolorTemplate = ../../assets/papirus-matugen/recolor.sh.tpl;
       jellyfinMpvShimConfig = ../../configs/jellyfin-mpv-shim/conf.json;
-      matugenSchemes = ../../configs/matugen;
       micMuteScript = ../../assets/scripts/mic-mute.sh;
       mp3tagIcon = ../../assets/icons/mp3tag.png;
       opencodeRules = ../../assets/harness-rules/opencode;

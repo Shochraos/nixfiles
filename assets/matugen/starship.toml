@@ -1,0 +1,101 @@
+"$schema" = 'https://starship.rs/config-schema.json'
+
+palette = "matugen"
+
+format = """
+[╭─](bold fg:tertiary)\
+[](tertiary)\
+[   ](bold bg:tertiary fg:on_tertiary)\
+[](bg:primary fg:tertiary)\
+$directory\
+[ ](fg:primary bg:secondary_container)\
+$git_branch\
+$git_status\
+[ ](fg:secondary_container bg:surface_container_high)\
+$nodejs\
+$rust\
+$golang\
+$php\
+[ ](fg:surface_container_high bg:surface_container)\
+$time\
+[ ](fg:surface_container)\
+\n[╰─](bold fg:tertiary)$character"""
+
+[character]
+format = """
+[$symbol]() """
+success_symbol = '[](fg:tertiary)'  # ➜ 
+error_symbol = '[](error)'
+
+[directory]
+style = "fg:on_primary bg:primary"
+format = "[ $path ]($style)"
+truncation_length = 3
+truncation_symbol = "…/"
+
+[directory.substitutions]
+"Documents" = "󰈙 "
+"Downloads" = " "
+"Music" = " "
+"Pictures" = " "
+
+[git_branch]
+symbol = ""
+style = "bg:secondary_container"
+format = '[[ $symbol $branch ](fg:on_secondary_container bg:secondary_container)]($style)'
+
+[git_status]
+use_git_executable=false
+style = "bg:secondary_container"
+format = '[[($conflicted$deleted$renamed$modified$typechanged$staged$untracked$ahead_behind)](fg:on_secondary_container bg:secondary_container)]($style)'
+
+[nodejs]
+symbol = ""
+style = "bg:surface_container_high"
+format = '[[ $symbol ($version) ](fg:on_surface bg:surface_container_high)]($style)'
+
+[rust]
+symbol = ""
+style = "bg:surface_container_high"
+format = '[[ $symbol ($version) ](fg:on_surface bg:surface_container_high)]($style)'
+
+[golang]
+symbol = ""
+style = "bg:surface_container_high"
+format = '[[ $symbol ($version) ](fg:on_surface bg:surface_container_high)]($style)'
+
+[php]
+symbol = ""
+style = "bg:surface_container_high"
+format = '[[ $symbol ($version) ](fg:on_surface bg:surface_container_high)]($style)'
+
+[time]
+disabled = false
+time_format = "%R" # Hour:Minute Format
+style = "bg:surface_container"
+format = '[[  $time ](fg:on_surface_variant bg:surface_container)]($style)'
+
+# Matugen fills the palette with Material colors.
+[palettes.matugen]
+primary = "{{colors.primary.default.hex}}"
+on_primary = "{{colors.on_primary.default.hex}}"
+primary_container = "{{colors.primary_container.default.hex}}"
+on_primary_container = "{{colors.on_primary_container.default.hex}}"
+primary_light = "{{colors.primary.default.hex | set_lightness: 10.0}}"
+secondary = "{{colors.secondary.default.hex}}"
+on_secondary = "{{colors.on_secondary.default.hex}}"
+secondary_container = "{{colors.secondary_container.default.hex}}"
+on_secondary_container = "{{colors.on_secondary_container.default.hex}}"
+tertiary = "{{colors.tertiary.default.hex}}"
+on_tertiary = "{{colors.on_tertiary.default.hex}}"
+tertiary_container = "{{colors.tertiary_container.default.hex}}"
+on_tertiary_container = "{{colors.on_tertiary_container.default.hex}}"
+surface_container_high = "{{colors.surface_container_high.default.hex}}"
+surface_container = "{{colors.surface_container.default.hex}}"
+on_surface = "{{colors.on_surface.default.hex}}"
+on_surface_variant = "{{colors.on_surface_variant.default.hex}}"
+outline = "{{colors.outline.default.hex}}"
+outline_variant = "{{colors.outline_variant.default.hex}}"
+background = "{{colors.background.default.hex}}"
+on_background = "{{colors.on_background.default.hex}}"
+error = "{{colors.error.default.hex}}"

@@ -1,4 +1,7 @@
-{ inputs, ... }:
+{ inputs, config, ... }:
+let
+  inherit (config) assets;
+in
 {
   den.aspects.gaming.nixos =
     { pkgs, ... }:
@@ -60,6 +63,16 @@
             ${lib.getExe' pkgs.libcap "setcap"} cap_sys_nice=p ${lib.escapeShellArg vrcompositorLauncher}
           fi
         '';
+      };
+
+      host.matugen.templates.steam = {
+        input_path = assets.steamTemplate;
+        output_path = "~/.steam/steam/millennium/themes/simply-dark/colors.css";
+      };
+
+      host.matugen.templates.steam-accents = {
+        input_path = assets.steamAccentsTemplate;
+        output_path = "~/.steam/steam/millennium/themes/simply-dark/accents.css";
       };
     };
 

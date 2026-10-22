@@ -16,6 +16,7 @@ _: {
           spotifastPkg
           pkgs.libreoffice-qt-stable
           pkgs.pdfarranger
+          pkgs.kdePackages.filelight
         ];
 
         home.file = {

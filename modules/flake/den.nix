@@ -44,6 +44,7 @@
   den.aspects.graphical.includes = with den.aspects; [
     base
     hyprland
+    theming
     terminal
     dankshell
     browser

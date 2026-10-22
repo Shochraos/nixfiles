@@ -26,7 +26,7 @@
             autoconnect = false;
           };
 
-          "wireguard-peer.cPsDOh8aiCez/Up7DOAv0yUHDAMHlVKwbwOGMGHmIUU=" = {
+          "wireguard-peer.iHYN1Gqt0q+M4A8vmo5/rU6+LOE/IKawXOgE5rBA8DA=" = {
             endpoint = "$WG_HOME_ENDPOINT";
             allowed-ips = "0.0.0.0/0;";
           };
@@ -298,7 +298,12 @@
       };
     };
 
-  den.aspects.solas.provides.to-users.homeManager = _: {
-    home.stateVersion = "25.05";
-  };
+  den.aspects.solas.provides.to-users.homeManager =
+    { pkgs, ... }:
+    {
+      home.stateVersion = "25.05";
+      home.packages = [
+        pkgs.eduvpn-client
+      ];
+    };
 }
