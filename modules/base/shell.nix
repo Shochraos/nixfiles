@@ -5,7 +5,7 @@ in
 {
   den.aspects.shell = _: {
     provides.to-users.homeManager =
-      { pkgs, ... }:
+      { config, pkgs, ... }:
       let
         btopConfig = fromTOML (builtins.readFile assets.btopConf);
 
@@ -20,8 +20,28 @@ in
 
         programs.bash = {
           enable = true;
+          enableCompletion = true;
+
+          historyFile = "${config.home.homeDirectory}/.histfile";
+          historySize = 2000;
+          historyFileSize = 3000;
+          historyControl = [
+            "ignoreboth"
+            "erasedups"
+          ];
+          shellOptions = [
+            "histappend"
+            "checkwinsize"
+            "autocd"
+            "cdspell"
+            "dirspell"
+          ];
 
           shellAliases = {
+            cp = "cp -i";
+            mv = "mv -i";
+            mkdir = "mkdir -p";
+
             ls = "eza -1 -h -l --icons --no-user --group-directories-first -F";
             la = "eza -1 -h -l --icons -a --no-user --group-directories-first -F";
             lr = "eza -1 -h -l --icons -a -R --no-user --group-directories-first -F";
@@ -35,8 +55,19 @@ in
           };
 
           initExtra = ''
+            [[ -t 0 ]] && stty -ixon
+            bind '"\e[1;5D": backward-word'
+            bind '"\e[1;5C": forward-word'
+            bind 'set bell-style visible'
+            bind 'set completion-ignore-case on'
+            bind 'set show-all-if-ambiguous on'
+            PROMPT_COMMAND+=('history -a')
+
+            command -v trash >/dev/null 2>&1 && alias rm='trash -v'
+
             enable -f ${flyline}/lib/libflyline.so flyline
             flyline set-style inline-suggestion="dim italic"
+            flyline set-cursor --backend terminal
           '';
         };
 
