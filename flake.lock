@@ -11,16 +11,15 @@
         ],
         "paper2agent": "paper2agent",
         "qt-agent-skills": "qt-agent-skills",
-        "superpowers": "superpowers",
         "vercel-skills": "vercel-skills",
         "wshobson-agents": "wshobson-agents"
       },
       "locked": {
-        "lastModified": 1791230043,
-        "narHash": "sha256-G00tawQ0f5b67Wfwf/uZMgUcua4kg2WvnNFQsc2noUQ=",
+        "lastModified": 1792781067,
+        "narHash": "sha256-AJL0XgXnQ58Fxz13sCTDoGGvmFzU5hiTHCTDUHkIKWY=",
         "owner": "Shochraos",
         "repo": "agent-skills-nix",
-        "rev": "33cb89972b9ce6cae4934f4bdeb5e29bbf3f18f8",
+        "rev": "319f14c9619219788afeb2c4c783f5d5aad39bba",
         "type": "github"
       },
       "original": {
@@ -151,11 +150,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1792684013,
-        "narHash": "sha256-JRiqnNHPyXhZiR/RuFksCrX0768S+PVsSOmux6a2lYU=",
+        "lastModified": 1792777199,
+        "narHash": "sha256-r8sZa+1xsHxV+ljHsPvK90EmjQ+axLpv3fNoJPUH3vI=",
         "owner": "AvengeMedia",
         "repo": "danksearch",
-        "rev": "646b0e046f4c806de9501892b9c38fd11612092e",
+        "rev": "235f80650ba0bfe6e10583400cefeeb42aaa73db",
         "type": "github"
       },
       "original": {
@@ -530,11 +529,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1792703141,
-        "narHash": "sha256-3X34FaSeMJXMx8CK/BN6sZ9knwNauuiJXQhLM+bQQuI=",
+        "lastModified": 1792773325,
+        "narHash": "sha256-bvba9Lts8r8d15MdIDMwJGDxLtJiTlasKtAZyhTDzXk=",
         "owner": "nix-community",
         "repo": "home-manager",
-        "rev": "6750249c69969d09d952efaf3fab88a2bdac7ec6",
+        "rev": "6d9655f76459099b0db2f57b13563729c7022aa7",
         "type": "github"
       },
       "original": {
@@ -976,22 +975,6 @@
       "original": {
         "owner": "nix-community",
         "repo": "stylix",
-        "type": "github"
-      }
-    },
-    "superpowers": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1790359587,
-        "narHash": "sha256-BWPiXoXV+jePP+wn/Z+Af4iehIL7oei00plaWaTzq8s=",
-        "owner": "obra",
-        "repo": "superpowers",
-        "rev": "8ca22dba9a94f28898bbce59f2537ff4d87c747d",
-        "type": "github"
-      },
-      "original": {
-        "owner": "obra",
-        "repo": "superpowers",
         "type": "github"
       }
     },

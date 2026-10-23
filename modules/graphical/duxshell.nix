@@ -11,7 +11,7 @@ let
       primaryOutputs = builtins.attrNames (lib.filterAttrs (_: output: output.primary) outputs);
     in
     if builtins.length primaryOutputs > 1 then
-      throw "dankshell: at most one host.outputs entry may set primary = true, got ${toString (builtins.length primaryOutputs)}"
+      throw "duxshell: at most one host.outputs entry may set primary = true, got ${toString (builtins.length primaryOutputs)}"
     else if primaryOutputs == [ ] then
       [ "all" ]
     else
@@ -24,7 +24,7 @@ let
   };
 in
 {
-  den.aspects.dankshell =
+  den.aspects.duxshell =
     { user, ... }:
     {
       nixos =
@@ -277,7 +277,7 @@ in
 
               fontFamily = osConfig.stylix.fonts.sansSerif.name;
               monoFontFamily = osConfig.stylix.fonts.monospace.name;
-              fontScale = 1.05;
+              fontScale = 1;
               fontWeight = 400;
 
               powerMenuActions = [

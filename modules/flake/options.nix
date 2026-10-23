@@ -34,7 +34,7 @@ in
                     primary = mkOption {
                       type = types.bool;
                       default = false;
-                      description = "Output is this host's primary display. At most one entry may set it. Consumed by dankshell, which pins the bar to it; with no primary the bar spans every output.";
+                      description = "Output is this host's primary display. At most one entry may set it. Consumed by duxshell, which pins the bar to it; with no primary the bar spans every output.";
                     };
                     hdr = mkOption {
                       type = types.bool;
@@ -84,7 +84,7 @@ in
                   };
                 }
               );
-              description = "Physical outputs of this host, keyed by Hyprland output name. Consumed by dankshell (which derives the DMS output settings), by the hdr aspect (which drives the single entry with `hdr = true`) and by the hyprland aspect (which pins the geometry Hyprland cannot be told through DMS, and binds each output's workspaces to it).";
+              description = "Physical outputs of this host, keyed by Hyprland output name. Consumed by duxshell (which derives the DMS output settings), by the hdr aspect (which drives the single entry with `hdr = true`) and by the hyprland aspect (which pins the geometry Hyprland cannot be told through DMS, and binds each output's workspaces to it).";
             };
 
             audio = {
@@ -230,12 +230,12 @@ in
               barConfigs = mkOption {
                 type = attrsetList;
                 default = [ ];
-                description = "DMS bar layout for this host. Each entry is merged over the shared bar defaults in dankshell.nix, so hosts usually only set the widget lists.";
+                description = "DMS bar layout for this host. Each entry is merged over the shared bar defaults in duxshell.nix, so hosts usually only set the widget lists.";
               };
               plugins = mkOption {
                 type = attrsetTable;
                 default = { };
-                description = "DMS plugins contributed by feature aspects, merged over the shared plugin set in dankshell.nix. Lets a feature enable its own plugin without depending on the dankshell aspect being present.";
+                description = "DMS plugins contributed by feature aspects, merged over the shared plugin set in duxshell.nix. Lets a feature enable its own plugin without depending on the duxshell aspect being present.";
               };
             };
 

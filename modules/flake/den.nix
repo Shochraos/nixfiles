@@ -46,7 +46,7 @@
     hyprland
     theming
     terminal
-    dankshell
+    duxshell
     browser
     editor
     apps

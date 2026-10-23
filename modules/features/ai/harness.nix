@@ -258,8 +258,6 @@ in
             "opencode/skills".source = vendored-skills;
           };
 
-          home.sessionVariables.SUPERPOWERS_DISABLE_TELEMETRY = "1";
-
           imports = [ inputs.hermes-agent.homeManagerModules.default ];
 
           programs.hermes-agent.enable = true;
