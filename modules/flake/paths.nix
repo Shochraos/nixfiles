@@ -40,6 +40,7 @@ in
       xdphScreencopyBufferReusePatch = ../../assets/patches/xdph-screencopy-buffer-reuse.patch;
       samrewrittenIcon = ../../assets/icons/samrewritten.png;
       sopsFile = ../../secrets/secrets.yaml;
+      sphinxHookScript = ../../assets/build-support/sphinx-hook.sh;
       spotifastTemplate = ../../assets/templates/spotifast.json.j2;
       steamTemplate = ../../assets/templates/steam.css;
       steamAccentsTemplate = ../../assets/templates/steam-accents.css;

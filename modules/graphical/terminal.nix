@@ -10,6 +10,11 @@ in
 
       programs.ghostty = {
         enable = true;
+        package = pkgs.ghostty.overrideAttrs (old: {
+          postFixup = (old.postFixup or "") + ''
+            rm -rf $out/share/nautilus-python
+          '';
+        });
         settings = {
           background = "000000";
           background-opacity = 0.85;

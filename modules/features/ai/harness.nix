@@ -13,6 +13,7 @@ in
     { host, ... }:
     let
       commandcodeSecret = "commandcode/api-keys/${lib.toLower host.name}";
+      exaSecret = "exa/api-key";
       honchoServerOverlay = final: _prev: {
         honchoServer = final.callPackage packageSources.honchoServer { };
       };
@@ -32,10 +33,14 @@ in
             owner = user.name;
             path = "/run/secrets/commandcode/api-key";
           };
+          sops.secrets.${exaSecret} = {
+            owner = user.name;
+          };
           sops.templates."hermes.env" = {
             owner = user.name;
             content = ''
               COMMANDCODE_API_KEY=${config.sops.placeholder.${commandcodeSecret}}
+              EXA_API_KEY=${config.sops.placeholder.${exaSecret}}
             '';
           };
 
@@ -306,6 +311,10 @@ in
               terminal.cwd = ".";
               updates.check = false;
               timezone = "Europe/Berlin";
+              web = {
+                search_backend = "exa";
+                extract_backend = "firecrawl";
+              };
               delegation = {
                 provider = "commandcode";
                 model = "deepseek/deepseek-v4.1-flash";

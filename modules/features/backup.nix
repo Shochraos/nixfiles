@@ -4,7 +4,18 @@
     {
       nixos =
         { config, pkgs, ... }:
+        let
+          borgbackupSphinxOverlay = _final: prev: {
+            borgbackup = prev.borgbackup.overrideAttrs (_old: {
+              preInstallSphinx = ''
+                rm -rf .sphinx/man/man/_static
+              '';
+            });
+          };
+        in
         {
+          nixpkgs.overlays = [ borgbackupSphinxOverlay ];
+
           sops.secrets = {
             "backup/storagebox-host".owner = user.name;
             "backup/storagebox-user".owner = user.name;

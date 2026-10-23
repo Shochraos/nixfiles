@@ -10,8 +10,18 @@
         { lib, ... }:
         let
           passKey = "calendar/nextcloud-pass/${lib.toLower host.name}";
+
+          todomanSphinxOverlay = _final: prev: {
+            todoman = prev.todoman.overrideAttrs (_old: {
+              preInstallSphinx = ''
+                rm -rf .sphinx/man/man/_static
+              '';
+            });
+          };
         in
         {
+          nixpkgs.overlays = [ todomanSphinxOverlay ];
+
           sops.secrets = {
             ${passKey}.owner = user.name;
             "calendar/nextcloud-url".owner = user.name;
