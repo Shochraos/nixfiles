@@ -187,7 +187,6 @@ in
             "hermes-baoyu-infographic"
             "hermes-claude-design"
             "hermes-design-md"
-            "hermes-humanizer"
             "hermes-manim-video"
             "hermes-p5js"
             "hermes-popular-web-designs"

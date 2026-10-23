@@ -66,7 +66,6 @@ for each of them.
 - Video or audio rendered as coloured ASCII: `ascii-video`
 - Finding a GIF: `gif-search`
 - Prose written for a human, before handing it over: `avoid-ai-writing`
-- Text that must carry a real human voice, not merely read cleanly: `humanizer`
 - Anything about Hermes itself — configuring, theming, extending, troubleshooting: `hermes-agent`
 - A coding task to hand to an external coding agent: `opencode`
 - Setting up or troubleshooting cross-session user memory: `honcho`
