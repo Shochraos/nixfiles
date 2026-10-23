@@ -319,6 +319,11 @@ in
                 provider = "commandcode";
                 model = "deepseek/deepseek-v4.1-flash";
               };
+              auxiliary.vision = {
+                provider = "commandcode";
+                model = "z-ai/glm-5.3-flash";
+                extra_body.reasoning_effort = "low";
+              };
               lsp.install_strategy = "manual";
               memory.provider = "honcho";
               curator.consolidate = true;
