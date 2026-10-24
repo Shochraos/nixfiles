@@ -138,65 +138,74 @@ in
 
         xdg.configFile."klassy/klassyrc".source = assets.klassyRc;
 
-        xdg.configFile."qtengine/config.json".text = builtins.toJSON {
-          theme = {
-            colorScheme = "${config.xdg.dataHome}/color-schemes/DankMatugen.colors";
-            iconTheme = config.stylix.icons.dark;
-            style = "klassy";
-            quickStyle = "org.kde.desktop";
-            font = {
-              family = config.stylix.fonts.sansSerif.name;
-              size = config.stylix.fonts.sizes.applications;
+        xdg.configFile."qtengine/config.json" = {
+          force = true;
+          text = builtins.toJSON {
+            theme = {
+              colorScheme = "${config.xdg.dataHome}/color-schemes/DankMatugen.colors";
+              iconTheme = config.stylix.icons.dark;
+              style = "klassy";
+              quickStyle = "org.kde.desktop";
+              font = {
+                family = config.stylix.fonts.sansSerif.name;
+                size = config.stylix.fonts.sizes.applications;
+              };
+              fontFixed = {
+                family = config.stylix.fonts.monospace.name;
+                size = config.stylix.fonts.sizes.applications;
+              };
             };
-            fontFixed = {
-              family = config.stylix.fonts.monospace.name;
-              size = config.stylix.fonts.sizes.applications;
+            misc = {
+              singleClickActivate = false;
+              menusHaveIcons = true;
+              shortcutsForContextMenus = true;
             };
-          };
-          misc = {
-            singleClickActivate = false;
-            menusHaveIcons = true;
-            shortcutsForContextMenus = true;
           };
         };
 
-        xdg.configFile."matugen/config.toml".source = (pkgs.formats.toml { }).generate "matugen-config" {
-          config = { };
-          templates = {
-            spotifast = {
-              input_path = assets.spotifastTemplate;
-              output_path = "~/.config/spotifast/themes/matugen.json";
-            };
+        xdg.configFile."matugen/config.toml".source =
+          let
+            dropUnsetHooks = pkgs.lib.filterAttrs (_: value: value != null);
+          in
+          (pkgs.formats.toml { }).generate "matugen-config" {
+            config = { };
+            templates = pkgs.lib.mapAttrs (_: dropUnsetHooks) (
+              {
+                spotifast = {
+                  input_path = assets.spotifastTemplate;
+                  output_path = "~/.config/spotifast/themes/matugen.json";
+                };
 
-            vesktop = {
-              input_path = assets.discordTemplate;
-              output_path = "~/.config/Equicord/themes/matugen.css";
-            };
+                vesktop = {
+                  input_path = assets.discordTemplate;
+                  output_path = "~/.config/Equicord/themes/matugen.css";
+                };
 
-            starship = {
-              input_path = assets.matugenStarshipTemplate;
-              output_path = "~/.config/starship.toml";
-            };
+                starship = {
+                  input_path = assets.matugenStarshipTemplate;
+                  output_path = "~/.config/starship.toml";
+                };
 
-            papirus-folders = {
-              input_path = papirusRecolorTemplate;
-              output_path = "~/.cache/papirus-matugen/recolor.sh.tmp";
-              post_hook = "mv ~/.cache/papirus-matugen/recolor.sh.tmp ~/.cache/papirus-matugen/recolor.sh";
-            };
+                papirus-folders = {
+                  input_path = papirusRecolorTemplate;
+                  output_path = "~/.cache/papirus-matugen/recolor.sh.tmp";
+                  post_hook = "mv ~/.cache/papirus-matugen/recolor.sh.tmp ~/.cache/papirus-matugen/recolor.sh";
+                };
 
-            btop = {
-              input_path = assets.matugenBtopTemplate;
-              output_path = "~/.config/btop/themes/matugen.theme";
-              post_hook = "${pkgs.procps}/bin/pkill -USR2 -u \"$USER\" -x btop || true";
-            };
+                btop = {
+                  input_path = assets.matugenBtopTemplate;
+                  output_path = "~/.config/btop/themes/matugen.theme";
+                  post_hook = "${pkgs.procps}/bin/pkill -USR2 -u \"$USER\" -x btop || true";
+                };
 
-            flyline = {
-              input_path = assets.matugenFlylineTemplate;
-              output_path = "~/.cache/flyline/matugen.sh";
-            };
-          }
-          // osConfig.host.matugen.templates;
-        };
+                flyline = {
+                  input_path = assets.matugenFlylineTemplate;
+                  output_path = "~/.cache/flyline/matugen.sh";
+                };
+              }
+              // osConfig.host.matugen.templates
+            );
+          };
 
         systemd.user.paths.papirus-matugen = {
           Unit.Description = "Run the Papirus icon recolor script whenever matugen renders it";

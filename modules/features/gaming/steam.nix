@@ -43,6 +43,36 @@ in
       vrcompositorLauncher = "${
         config.users.users.${user.name}.home
       }/.local/share/Steam/steamapps/common/SteamVR/bin/linux64/vrcompositor-launcher";
+
+      millenniumColorReseed = pkgs.writeShellApplication {
+        name = "millennium-colors-reseed";
+        runtimeInputs = [
+          pkgs.coreutils
+          pkgs.jq
+        ];
+        text = ''
+          config="''${MILLENNIUM_CONFIG:-$HOME/.config/millennium/config.json}"
+          theme="simply-dark"
+
+          if [ ! -f "$config" ]; then
+            exit 0
+          fi
+
+          if ! merged="$(jq --arg theme "$theme" 'if ((.themes.themeColors // {}) | has($theme)) then del(.themes.themeColors[$theme]) else empty end' "$config" 2>/dev/null)"; then
+            echo "millennium-colors-reseed: $config is not valid JSON, leaving it untouched" >&2
+            exit 0
+          fi
+
+          if [ -z "$merged" ]; then
+            exit 0
+          fi
+
+          scratch="$(mktemp "$config.XXXXXX")"
+          printf '%s\n' "$merged" > "$scratch"
+          chmod --reference="$config" "$scratch"
+          mv "$scratch" "$config"
+        '';
+      };
     in
     {
       security.pam.loginLimits = [
@@ -68,6 +98,7 @@ in
       host.matugen.templates.steam = {
         input_path = assets.steamTemplate;
         output_path = "~/.steam/steam/millennium/themes/simply-dark/colors.css";
+        post_hook = lib.getExe millenniumColorReseed;
       };
 
       host.matugen.templates.steam-accents = {

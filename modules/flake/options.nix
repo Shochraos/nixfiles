@@ -266,6 +266,11 @@ in
                         type = types.str;
                         description = "Shell-expanded path matugen writes the rendered template to.";
                       };
+                      post_hook = mkOption {
+                        type = types.nullOr types.str;
+                        default = null;
+                        description = "Command matugen runs after writing `output_path`; unset emits no `post_hook` key.";
+                      };
                     };
                   }
                 );
