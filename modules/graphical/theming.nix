@@ -118,6 +118,13 @@ in
           font-antialiasing = "grayscale";
         };
 
+        dconf.settings."org/gtk/Settings/FileChooser".window-size =
+          inputs.home-manager.lib.hm.gvariant.mkTuple
+            [
+              1200
+              900
+            ];
+
         xdg.configFile."gtk-3.0/gtk.css".text = ''
           @import url("dank-colors.css");
         '';
