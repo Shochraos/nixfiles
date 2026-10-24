@@ -68,6 +68,13 @@
           }
           {
             match = {
+              class = "^(steam)$";
+              title = "^$";
+            };
+            workspace = "unset";
+          }
+          {
+            match = {
               class = "^(steam_app_.*|gamescope)$";
             };
             workspace = "1 silent";
