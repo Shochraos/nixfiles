@@ -20,10 +20,8 @@ _: {
         ];
 
         home.file = {
-          ".local/share/fonts/NotoSansCJK-VF.otf.ttc".source =
-            "${pkgs.noto-fonts-cjk-sans}/share/fonts/opentype/noto-cjk/NotoSansCJK-VF.otf.ttc";
-          ".local/share/fonts/NotoSansMonoCJK-VF.otf.ttc".source =
-            "${pkgs.noto-fonts-cjk-sans}/share/fonts/opentype/noto-cjk/NotoSansMonoCJK-VF.otf.ttc";
+          ".local/share/fonts/NotoSansCJK-Regular.ttc".source =
+            "${pkgs.noto-fonts-cjk-sans}/share/fonts/opentype/noto-cjk/NotoSansCJK-Regular.ttc";
         };
 
         xdg.autostart.entries =

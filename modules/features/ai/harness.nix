@@ -16,6 +16,8 @@ in
       exaSecret = "exa/api-key";
       honchoServerOverlay = final: _prev: {
         honchoServer = final.callPackage packageSources.honchoServer { };
+        rea = final.callPackage packageSources.rea { };
+        reaPython = final.callPackage packageSources.reaPython { };
       };
     in
     {
@@ -282,6 +284,21 @@ in
             mcpServers.ScraplingServer = {
               command = "${scrapling-runtime}/bin/scrapling-mcp";
             };
+            mcpServers.rea = {
+              command = "${pkgs.rea}/bin/rea";
+              args = [ "mcp" ];
+              timeout = 1800;
+              env = {
+                GHIDRA_INSTALL_DIR = "${pkgs.ghidra}/lib/ghidra";
+                REA_BINWALK_COMMAND = "${pkgs.binwalk}/bin/binwalk";
+                REA_CAPINFOS_COMMAND = "${pkgs.tshark}/bin/capinfos";
+                REA_FIRMWARE_PRLIMIT_COMMAND = "${pkgs.util-linux}/bin/prlimit";
+                REA_GHIDRA_STARTUP_TIMEOUT_MS = "1800000";
+                REA_PWNTOOLS_PYTHON = "${pkgs.reaPython}/bin/python3";
+                REA_TSHARK_COMMAND = "${pkgs.tshark}/bin/tshark";
+                REA_TSHARK_PRLIMIT_COMMAND = "${pkgs.util-linux}/bin/prlimit";
+              };
+            };
             settings = {
               agent.coding_context = "auto";
               agent.reasoning_effort = "xhigh";
@@ -303,9 +320,14 @@ in
                 external_dirs = [
                   "${hermesSkills}"
                   "${shared-skills}"
+                  "${pkgs.rea.skills}/share/hermes/skills"
                 ];
               };
               terminal.cwd = ".";
+              timeouts = {
+                tools.sequential_call = 1900;
+                tools.concurrent_batch = 1900;
+              };
               updates.check = false;
               timezone = "Europe/Berlin";
               web = {
