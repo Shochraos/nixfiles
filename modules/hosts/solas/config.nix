@@ -199,6 +199,7 @@
 
       host.outputs."eDP-1" = {
         bitdepth = 10;
+        scale = "1.333333";
         workspaces = [
           1
           2

@@ -15,6 +15,7 @@ in
       commandcodeSecret = "commandcode/api-keys/${lib.toLower host.name}";
       exaSecret = "exa/api-key";
       honchoServerOverlay = final: _prev: {
+        honchoAi = final.callPackage packageSources.honchoAi { };
         honchoServer = final.callPackage packageSources.honchoServer { };
         rea = final.callPackage packageSources.rea { };
         reaPython = final.callPackage packageSources.reaPython { };
@@ -167,6 +168,7 @@ in
 
       provides.to-users.homeManager =
         {
+          lib,
           osConfig,
           pkgs,
           ...
@@ -179,7 +181,29 @@ in
 
           hermes = inputs.hermes-agent.packages.${pkgs.stdenv.hostPlatform.system};
 
-          hermesAutostart = lib.optional (builtins.elem "hermes" osConfig.host.autostart) "${hermes.desktop}/share/applications/hermes.desktop";
+          hermesDesktopApplications = hermes.desktop + "/share/applications";
+
+          hermesDesktopEntries = map (name: hermesDesktopApplications + ("/" + name)) (
+            builtins.attrNames (
+              lib.filterAttrs (name: _: lib.hasSuffix ".desktop" name) (
+                builtins.readDir hermesDesktopApplications
+              )
+            )
+          );
+
+          hermesAutostart = lib.optionals (builtins.elem "hermes" osConfig.host.autostart) hermesDesktopEntries;
+
+          honchoPluginSrc = pkgs.fetchFromGitHub {
+            owner = "plastic-labs";
+            repo = "honcho";
+            rev = "e2d2aba182862deeb846e5cd4a30a41bce0ed82a";
+            hash = "sha256-EZWqItroZopzw1c0nSyujPWpsN5OAUG3TpQmTdYAAsY=";
+          };
+
+          honchoPlugin = pkgs.runCommand "hermes-honcho-plugin" { } ''
+            mkdir -p $out
+            cp -r ${honchoPluginSrc}/hermes-plugin-honcho/. $out/
+          '';
 
           hermesSkills = inputs.agent-skills-nix.lib.${pkgs.stdenv.hostPlatform.system}.mkSkillset [
             "vendored-avoid-ai-writing"
@@ -268,7 +292,7 @@ in
             enable = true;
             package = hermes.minimal;
             environmentFiles = [ osConfig.sops.templates."hermes.env".path ];
-            extraDependencyGroups = [ "honcho" ];
+            extraPythonPackages = [ pkgs.honchoAi ];
             hermesHomeFiles."SOUL.md" = assets.hermesSoul;
             hermesHomeFiles."honcho.json" = (pkgs.formats.json { }).generate "honcho.json" {
               hosts.hermes = {
@@ -358,6 +382,11 @@ in
               };
             };
           };
+
+          home.activation.hermesHonchoProvider = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+            run mkdir -p "$HOME/.hermes/plugins"
+            run ln -sfn ${honchoPlugin} "$HOME/.hermes/plugins/honcho"
+          '';
         };
     };
 }

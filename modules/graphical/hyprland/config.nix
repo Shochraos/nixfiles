@@ -4,7 +4,8 @@ let
     output:
     lib.optionalAttrs (output.mode != null) { inherit (output) mode; }
     // lib.optionalAttrs (output.position != null) { inherit (output) position; }
-    // lib.optionalAttrs (output.scale != null) { inherit (output) scale; };
+    // lib.optionalAttrs (output.scale != null) { inherit (output) scale; }
+    // lib.optionalAttrs (output.bitdepth != null) { inherit (output) bitdepth; };
 
   monitorRules =
     outputs:

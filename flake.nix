@@ -90,7 +90,8 @@
 
     ### Agents ###
     hermes-agent = {
-      url = "github:NousResearch/hermes-agent/v2026.9.14";
+      url = "github:NousResearch/hermes-agent/main";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
 
     ### Gaming ###

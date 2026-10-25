@@ -50,6 +50,7 @@ in
       bscpylgtv = ../../pkgs/bscpylgtv/package.nix;
       ironyModManager = ../../pkgs/irony-mod-manager/package.nix;
       mp3tag = ../../pkgs/mp3tag/package.nix;
+      honchoAi = ../../pkgs/honcho-ai/package.nix;
       honchoServer = ../../pkgs/honcho-server/package.nix;
       rea = ../../pkgs/rea/package.nix;
       reaPython = ../../pkgs/rea/python.nix;
