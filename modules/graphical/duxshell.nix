@@ -33,7 +33,7 @@ in
           nixpkgs.overlays = [ quickshellIpcReconnectOverlay ];
 
           services.displayManager.defaultSession = "hyprland-uwsm";
-          services.displayManager.dms-greeter = {
+          services.displayManager.dux-greeter = {
             enable = true;
             configHome = config.users.users.${user.name}.home;
 
