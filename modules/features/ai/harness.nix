@@ -84,10 +84,60 @@ in
             '';
           };
 
+          services.ollama = {
+            enable = true;
+            package = pkgs.ollama-cpu;
+            loadModels = [ "bge-m3" ];
+          };
+
+          systemd.services.honcho-embedding-dims = {
+            description = "Align Honcho pgvector columns with the local embedding model";
+            after = [
+              "postgresql.service"
+              "honcho-migrate.service"
+            ];
+            requires = [ "honcho-migrate.service" ];
+            wantedBy = [ "multi-user.target" ];
+            serviceConfig = {
+              Type = "oneshot";
+              RemainAfterExit = true;
+              User = "honcho";
+            };
+            path = [ config.services.postgresql.package ];
+            script = ''
+              psql -d honcho -v ON_ERROR_STOP=1 <<'SQL'
+              DO $$
+              DECLARE current_type text;
+              BEGIN
+                SELECT format_type(atttypid, atttypmod) INTO current_type
+                  FROM pg_attribute
+                 WHERE attrelid = 'message_embeddings'::regclass AND attname = 'embedding' AND attnum > 0;
+                IF current_type IS DISTINCT FROM 'vector(1024)' THEN
+                  ALTER TABLE message_embeddings ALTER COLUMN embedding TYPE vector(1024);
+                END IF;
+
+                SELECT format_type(atttypid, atttypmod) INTO current_type
+                  FROM pg_attribute
+                 WHERE attrelid = 'documents'::regclass AND attname = 'embedding' AND attnum > 0;
+                IF current_type IS DISTINCT FROM 'vector(1024)' THEN
+                  ALTER TABLE documents ALTER COLUMN embedding TYPE vector(1024);
+                END IF;
+              END $$;
+              SQL
+            '';
+          };
+
           systemd.services.honcho-api = {
             description = "Honcho local memory server";
-            after = [ "honcho-migrate.service" ];
-            requires = [ "honcho-migrate.service" ];
+            after = [
+              "honcho-embedding-dims.service"
+              "honcho-migrate.service"
+              "ollama.service"
+            ];
+            requires = [
+              "honcho-embedding-dims.service"
+              "honcho-migrate.service"
+            ];
             wantedBy = [ "multi-user.target" ];
             serviceConfig = {
               User = "honcho";
@@ -149,8 +199,10 @@ in
               DIALECTIC_LEVELS__max__MODEL_CONFIG__OVERRIDES__BASE_URL=https://api.commandcode.ai/provider/v1
               SUMMARY_MODEL_CONFIG__TRANSPORT=openai
               SUMMARY_MODEL_CONFIG__MODEL=deepseek/deepseek-v4.1-flash
-              SUMMARY_MODEL_CONFIG__THINKING_EFFORT=high
+              SUMMARY_MODEL_CONFIG__THINKING_EFFORT=low
               SUMMARY_MODEL_CONFIG__OVERRIDES__BASE_URL=https://api.commandcode.ai/provider/v1
+              SUMMARY_MAX_TOKENS_SHORT=2000
+              SUMMARY_MAX_TOKENS_LONG=6000
               DREAM_DEDUCTION_MODEL_CONFIG__TRANSPORT=openai
               DREAM_DEDUCTION_MODEL_CONFIG__MODEL=deepseek/deepseek-v4.1-flash
               DREAM_DEDUCTION_MODEL_CONFIG__THINKING_EFFORT=high
@@ -160,8 +212,12 @@ in
               DREAM_INDUCTION_MODEL_CONFIG__THINKING_EFFORT=high
               DREAM_INDUCTION_MODEL_CONFIG__OVERRIDES__BASE_URL=https://api.commandcode.ai/provider/v1
               EMBEDDING_MODEL_CONFIG__TRANSPORT=openai
-              EMBEDDING_MODEL_CONFIG__MODEL=text-embedding-3-small
-              EMBEDDING_MODEL_CONFIG__OVERRIDES__BASE_URL=https://api.commandcode.ai/provider/v1
+              EMBEDDING_MODEL_CONFIG__MODEL=bge-m3
+              EMBEDDING_MODEL_CONFIG__DIMENSIONS_MODE=never
+              EMBEDDING_MODEL_CONFIG__ENCODING_FORMAT_MODE=float
+              EMBEDDING_MODEL_CONFIG__OVERRIDES__BASE_URL=http://127.0.0.1:11434/v1
+              EMBEDDING_MODEL_CONFIG__OVERRIDES__API_KEY=ollama
+              EMBEDDING_VECTOR_DIMENSIONS=1024
             '';
           };
         };
@@ -203,6 +259,13 @@ in
           honchoPlugin = pkgs.runCommand "hermes-honcho-plugin" { } ''
             mkdir -p $out
             cp -r ${honchoPluginSrc}/hermes-plugin-honcho/. $out/
+            ${pkgs.gnused}/bin/sed -i \
+              -e 's@^from __future__ import annotations$@&\n\nimport sys as _honcho_sys\n_honcho_sys.path.append("${pkgs.honchoAi}/lib/python3.14/site-packages")@' \
+              $out/__init__.py
+            grep -q '_honcho_sys.path.append' $out/__init__.py || {
+              echo "honcho-ai sys.path injection did not apply; __init__.py anchor changed" >&2
+              exit 1
+            }
           '';
 
           hermesSkills = inputs.agent-skills-nix.lib.${pkgs.stdenv.hostPlatform.system}.mkSkillset [
@@ -292,13 +355,13 @@ in
             enable = true;
             package = hermes.minimal;
             environmentFiles = [ osConfig.sops.templates."hermes.env".path ];
-            extraPythonPackages = [ pkgs.honchoAi ];
             hermesHomeFiles."SOUL.md" = assets.hermesSoul;
             hermesHomeFiles."honcho.json" = (pkgs.formats.json { }).generate "honcho.json" {
               hosts.hermes = {
                 enabled = true;
                 aiPeer = "hermes";
                 peerName = "shochraos";
+                pinUserPeer = true;
                 workspace = "hermes";
                 baseUrl = "http://localhost:8000";
               };
