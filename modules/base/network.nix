@@ -4,6 +4,7 @@
     {
       nixos = {
         networking.networkmanager.enable = true;
+        systemd.services.NetworkManager-wait-online.enable = false;
         networking.hostName = host.name;
         networking.firewall.enable = true;
       };

@@ -175,7 +175,8 @@ in
               LLM_OPENAI_API_KEY=${config.sops.placeholder.${commandcodeSecret}}
               DERIVER_MODEL_CONFIG__TRANSPORT=openai
               DERIVER_MODEL_CONFIG__MODEL=deepseek/deepseek-v4.1-flash
-              DERIVER_MODEL_CONFIG__THINKING_EFFORT=high
+              DERIVER_MODEL_CONFIG__THINKING_EFFORT=medium
+              DERIVER_MODEL_CONFIG__MAX_OUTPUT_TOKENS=5000
               DERIVER_MODEL_CONFIG__OVERRIDES__BASE_URL=https://api.commandcode.ai/provider/v1
               DIALECTIC_LEVELS__minimal__MODEL_CONFIG__TRANSPORT=openai
               DIALECTIC_LEVELS__minimal__MODEL_CONFIG__MODEL=deepseek/deepseek-v4.1-flash
@@ -201,8 +202,8 @@ in
               SUMMARY_MODEL_CONFIG__MODEL=deepseek/deepseek-v4.1-flash
               SUMMARY_MODEL_CONFIG__THINKING_EFFORT=low
               SUMMARY_MODEL_CONFIG__OVERRIDES__BASE_URL=https://api.commandcode.ai/provider/v1
-              SUMMARY_MAX_TOKENS_SHORT=2000
-              SUMMARY_MAX_TOKENS_LONG=6000
+              SUMMARY_MAX_TOKENS_SHORT=4000
+              SUMMARY_MAX_TOKENS_LONG=12000
               DREAM_DEDUCTION_MODEL_CONFIG__TRANSPORT=openai
               DREAM_DEDUCTION_MODEL_CONFIG__MODEL=deepseek/deepseek-v4.1-flash
               DREAM_DEDUCTION_MODEL_CONFIG__THINKING_EFFORT=high
