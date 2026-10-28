@@ -9,6 +9,7 @@
           profiles = config.host.wireguard.profiles;
           profileNames = builtins.attrNames profiles;
           secretFor = name: "wireguard/${hostname}/${name}";
+          ownsKey = name: !(profiles.${name} ? wireguard.private-key);
           envName = name: lib.toUpper (builtins.replaceStrings [ "-" ] [ "_" ] name);
           keyVar = name: "WG_${envName name}_KEY";
           pskVar = name: "WG_${envName name}_PSK";
@@ -21,7 +22,7 @@
             sops.secrets = builtins.listToAttrs (
               builtins.concatMap (
                 name:
-                [ (lib.nameValuePair (secretFor name) { }) ]
+                lib.optional (ownsKey name) (lib.nameValuePair (secretFor name) { })
                 ++ lib.optional (hasPsk name) (lib.nameValuePair "${secretFor name}-psk" { })
                 ++ map (extra: lib.nameValuePair "${secretFor name}-${extra}" { }) (extrasFor name)
               ) profileNames
@@ -30,7 +31,7 @@
             sops.templates."wireguard.env".content = lib.concatLines (
               builtins.concatMap (
                 name:
-                [ "${keyVar name}=${config.sops.placeholder.${secretFor name}}" ]
+                lib.optional (ownsKey name) "${keyVar name}=${config.sops.placeholder.${secretFor name}}"
                 ++ lib.optional (hasPsk name) "${pskVar name}=${config.sops.placeholder."${secretFor name}-psk"}"
                 ++ map (extra: "${extraVar name extra}=${config.sops.placeholder."${secretFor name}-${extra}"}") (
                   extrasFor name
@@ -50,9 +51,11 @@
                         "presharedKey"
                         "extraSecrets"
                       ])
-                      {
-                        wireguard.private-key = "$" + keyVar name;
-                      };
+                      (
+                        lib.optionalAttrs (ownsKey name) {
+                          wireguard.private-key = "$" + keyVar name;
+                        }
+                      );
                   addPsk =
                     section: value:
                     if lib.hasPrefix "wireguard-peer." section then

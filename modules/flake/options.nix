@@ -209,7 +209,7 @@ in
               profiles = mkOption {
                 type = attrsetTable;
                 default = { };
-                description = "NetworkManager WireGuard profiles for this host (keyfile sections, without key material). Each profile reads its private key from the sops secret `wireguard/<host>/<profile>`; setting `presharedKey = true` on a profile additionally injects `wireguard/<host>/<profile>-psk` into its peer sections. Suffixes listed in `extraSecrets` load `wireguard/<host>/<profile>-<suffix>` as `$WG_<PROFILE>_<SUFFIX>` for referencing in any field.";
+                description = "NetworkManager WireGuard profiles for this host (keyfile sections, without key material). Each profile reads its private key from the sops secret `wireguard/<host>/<profile>`; setting `presharedKey = true` on a profile additionally injects `wireguard/<host>/<profile>-psk` into its peer sections. Suffixes listed in `extraSecrets` load `wireguard/<host>/<profile>-<suffix>` as `$WG_<PROFILE>_<SUFFIX>` for referencing in any field. Setting `wireguard.private-key` on a profile yourself means it owns no secret of its own — point it at another profile's `$WG_<PROFILE>_KEY` and the module declares neither `wireguard/<host>/<profile>` nor its env entry.";
               };
             };
 
