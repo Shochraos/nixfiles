@@ -1,5 +1,25 @@
 {
   "nodes": {
+    "acid-boot": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1792663502,
+        "narHash": "sha256-fqwqa1FeQC9I7LtK0EUkvVq6jLfSR58xFUiz1icGbd4=",
+        "owner": "kurisu-agent",
+        "repo": "nix-acid-boot",
+        "rev": "115879c62aea2f70859f652cf46481e6bfc0642e",
+        "type": "github"
+      },
+      "original": {
+        "owner": "kurisu-agent",
+        "repo": "nix-acid-boot",
+        "type": "github"
+      }
+    },
     "agent-skills-nix": {
       "inputs": {
         "anthropics-skills": "anthropics-skills",
@@ -866,6 +886,7 @@
     },
     "root": {
       "inputs": {
+        "acid-boot": "acid-boot",
         "agent-skills-nix": "agent-skills-nix",
         "danksearch": "danksearch",
         "den": "den",

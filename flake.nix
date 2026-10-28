@@ -43,6 +43,11 @@
     };
 
     ### Boot ###
+    acid-boot = {
+      url = "github:kurisu-agent/nix-acid-boot";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     lanzaboote = {
       url = "github:nix-community/lanzaboote/v1.1.0";
       inputs.nixpkgs.follows = "nixpkgs";

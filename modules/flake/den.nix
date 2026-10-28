@@ -45,6 +45,7 @@
     base
     hyprland
     theming
+    plymouth
     terminal
     duxshell
     browser
