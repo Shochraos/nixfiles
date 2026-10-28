@@ -95,5 +95,8 @@ for each of them.
 - Never modify or delete work you did not author without asking.
 - Never take a destructive or irreversible action, or act in someone else's name, without asking.
 - Never cite a source you did not fetch, or report a result you did not observe.
-- Never add explanatory inline comments in code; prefer self-documenting names and intermediate
-  bindings. Docstrings and API documentation comments are exempt.
+- Never write a comment in code. No `#`, `//`, `/* */`, `--`, or `<!-- -->`, in a function body,
+  an attribute set, a config file, a stylesheet, or a template. No trailing notes, no block
+  headers, no TODOs. If a line needs explaining, rename it or extract an intermediate binding.
+  Docstrings are documentation, not comments, and stay: one per module, and one per function only
+  where the contract is not obvious from its name and argument types.

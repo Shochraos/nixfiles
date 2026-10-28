@@ -6,3 +6,6 @@ CLAUDE.md
 result
 result-*
 /AGENTS.md
+
+# generated diagram variants; the canonical 820 render is committed
+assets/aspect-graph-*.svg

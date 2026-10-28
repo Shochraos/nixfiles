@@ -19,6 +19,13 @@ The tree follows the **dendritic pattern**: every file under `./modules/` is a [
 
 Hosts are assembled from **den aspects** ([denful/den](https://github.com/denful/den)). Each module registers `den.aspects.<name>`, a named bundle of NixOS and home-manager config, and `modules/flake/den.nix` wires those names into `base` → `graphical` → per-host includes, plus exactly one form-factor aspect. den forwards the home-manager half itself, with `osConfig` available. Shared modules never fork per host: they read `host.*` options, declared once in `modules/flake/options.nix`, that the host's `config.nix` fills in.
 
+<details>
+<summary>Architecture graph</summary>
+
+![aspect graph: base is included by graphical, graphical by azazel and solas](assets/aspect-graph.svg)
+
+</details>
+
 > [!TIP]
 > Adding a feature is two steps: define `den.aspects.<name>` in a file under `modules/`, then add `<name>` to an includes list in `modules/flake/den.nix`. A new file is invisible to the flake until it is git-tracked, so `git add -N` it before evaluating.
 
