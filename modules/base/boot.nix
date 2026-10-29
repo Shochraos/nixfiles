@@ -35,6 +35,17 @@
 
       boot.loader.efi.canTouchEfiVariables = false;
 
+      security.protectKernelImage = true;
+
+      boot.blacklistedKernelModules = [
+        "dccp"
+        "rds"
+        "sctp"
+        "tipc"
+      ];
+
+      boot.kernel.sysctl."kernel.kptr_restrict" = 2;
+
       boot.kernelPackages = pkgs.linuxPackages_latest;
       boot.kernelParams = [ "nvme_core.default_ps_max_latency_us=0" ];
     };

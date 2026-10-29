@@ -22,6 +22,8 @@
               KbdInteractiveAuthentication = false;
               PermitRootLogin = "no";
               AllowUsers = [ user.name ];
+              MaxAuthTries = 3;
+              LoginGraceTime = 20;
             };
           };
 
