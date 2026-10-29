@@ -239,6 +239,19 @@ in
               };
             };
 
+            ssh = {
+              firewallInterfaces = mkOption {
+                type = types.listOf types.str;
+                default = [ ];
+                description = "Interface name patterns on which the SSH port is accepted. The service stays disabled until an authorized key is configured.";
+              };
+              authorizedKeys = mkOption {
+                type = types.listOf types.str;
+                default = [ ];
+                description = "Public SSH keys allowed to log in as this host's user.";
+              };
+            };
+
             autostart = mkOption {
               type = types.listOf (
                 types.enum [

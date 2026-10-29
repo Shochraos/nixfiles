@@ -11,6 +11,7 @@
       system.stateVersion = "25.05";
 
       host.flakeDir = "/home/shochraos/Repositories/nix/nixfiles";
+      host.ssh.firewallInterfaces = [ "en*" ];
 
       host.autostart = [
         "discord"

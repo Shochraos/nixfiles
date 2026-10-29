@@ -1,13 +1,37 @@
 {
   den.aspects.network =
-    { host, ... }:
+    { host, user, ... }:
     {
-      nixos = {
-        networking.networkmanager.enable = true;
-        systemd.services.NetworkManager-wait-online.enable = false;
-        networking.hostName = host.name;
-        networking.firewall.enable = true;
-      };
+      nixos =
+        { config, lib, ... }:
+        let
+          ssh = config.host.ssh;
+        in
+        {
+          networking.networkmanager.enable = true;
+          systemd.services.NetworkManager-wait-online.enable = false;
+          networking.hostName = host.name;
+          networking.firewall.enable = true;
+
+          services.openssh = {
+            enable = true;
+            openFirewall = false;
+
+            settings = {
+              PasswordAuthentication = false;
+              KbdInteractiveAuthentication = false;
+              PermitRootLogin = "no";
+              AllowUsers = [ user.name ];
+            };
+          };
+
+          users.users.${user.name}.openssh.authorizedKeys.keys = ssh.authorizedKeys;
+
+          networking.firewall.extraInputRules = lib.concatMapStringsSep "\n" (
+            pattern: ''iifname "${pattern}" tcp dport 22 accept''
+          ) ssh.firewallInterfaces;
+        };
+
       security.pki.caCertificateBlacklist = [
         "Comodo AAA Services root"
         "emSign ECC Root CA - G3"

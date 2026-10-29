@@ -15,8 +15,6 @@
               "networkmanager"
             ];
           };
-
-          users.users.root.hashedPasswordFile = config.sops.secrets."user-password-hash".path;
         };
 
     };
