@@ -1,7 +1,7 @@
+{ self, ... }:
 {
   perSystem =
     {
-      self',
       pkgs,
       lib,
       ...
@@ -43,11 +43,11 @@
             ];
           }
           ''
-            cp -r ${self'} src
+            cp -r ${self} src
             chmod -R u+w src
             cd src
             python3 assets/scripts/draw-aspects.py 820 >/dev/null
-            if ! diff -u "${self'}/assets/aspect-graph.svg" assets/aspect-graph.svg; then
+            if ! diff -u "${self}/assets/aspect-graph.svg" assets/aspect-graph.svg; then
               echo "aspect-graph: assets/aspect-graph.svg is stale — regenerate it and commit the result" >&2
               exit 1
             fi
