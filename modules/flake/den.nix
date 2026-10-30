@@ -71,7 +71,6 @@
     irc
     media
     remote-mounts
-    virtualization
     gamechat
     lgtv
     mp3tag
@@ -84,7 +83,6 @@
     laptop
     cpu-amd
     fingerprint
-    virtualization
     mic-mute
     pdfpc
     (ai {

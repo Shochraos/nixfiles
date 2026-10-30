@@ -12,6 +12,9 @@
 
       host.flakeDir = "/home/shochraos/Repositories/nix/nixfiles";
       host.ssh.firewallInterfaces = [ "en*" ];
+      host.ssh.authorizedKeys = [
+        "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIC71dT73gYzQ5zQz0hAeqC6XccOcBmBxGh9Fk2xztTb6 hermes-gateway"
+      ];
 
       host.autostart = [
         "discord"

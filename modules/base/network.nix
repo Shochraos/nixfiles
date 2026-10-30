@@ -29,9 +29,11 @@
 
           users.users.${user.name}.openssh.authorizedKeys.keys = ssh.authorizedKeys;
 
-          networking.firewall.extraInputRules = lib.concatMapStringsSep "\n" (
-            pattern: ''iifname "${pattern}" tcp dport 22 accept''
-          ) ssh.firewallInterfaces;
+          networking.firewall.interfaces =
+            lib.genAttrs (map (pattern: lib.replaceStrings [ "*" ] [ "+" ] pattern) ssh.firewallInterfaces)
+              (_: {
+                allowedTCPPorts = [ 22 ];
+              });
         };
 
       security.pki.caCertificateBlacklist = [
