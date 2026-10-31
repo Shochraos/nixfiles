@@ -23,7 +23,6 @@ in
       btopConf = ../../configs/btop/btop.conf;
       discordTemplate = ../../assets/templates/discord.css;
       halloyTemplate = ../../assets/templates/halloy.toml;
-      hermesSoul = ../../assets/harness-rules/hermes/SOUL.md;
       hsFuldaEduroamCa = ../../assets/certs/hs-fulda-eduroam-ca.pem;
       ironyModManagerIcon = ../../assets/icons/ironymodmanager.png;
       klassyRc = ../../configs/klassy/klassyrc;
@@ -35,7 +34,6 @@ in
       jellyfinMpvShimConfig = ../../configs/jellyfin-mpv-shim/conf.json;
       micMuteScript = ../../assets/scripts/mic-mute.sh;
       mp3tagIcon = ../../assets/icons/mp3tag.png;
-      opencodeRules = ../../assets/harness-rules/opencode;
       quickshellIpcReconnectPatch = ../../assets/patches/quickshell-hyprland-ipc-reconnect.patch;
       xdphScreencopyBufferReusePatch = ../../assets/patches/xdph-screencopy-buffer-reuse.patch;
       samrewrittenIcon = ../../assets/icons/samrewritten.png;
@@ -50,10 +48,7 @@ in
       bscpylgtv = ../../pkgs/bscpylgtv/package.nix;
       ironyModManager = ../../pkgs/irony-mod-manager/package.nix;
       mp3tag = ../../pkgs/mp3tag/package.nix;
-      honchoAi = ../../pkgs/honcho-ai/package.nix;
-      honchoServer = ../../pkgs/honcho-server/package.nix;
       rea = ../../pkgs/rea/package.nix;
-      reaPython = ../../pkgs/rea/python.nix;
     };
   };
 }

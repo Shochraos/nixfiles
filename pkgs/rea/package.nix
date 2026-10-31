@@ -2,6 +2,7 @@
   lib,
   buildNpmPackage,
   fetchurl,
+  ghidra,
   jdk21,
   nodejs_24,
   procps,
@@ -32,6 +33,9 @@ buildNpmPackage {
   '';
 
   makeWrapperArgs = [
+    "--set-default"
+    "GHIDRA_INSTALL_DIR"
+    "${ghidra}/lib/ghidra"
     "--prefix"
     "PATH"
     ":"
@@ -42,18 +46,6 @@ buildNpmPackage {
       jdk21
     ])
   ];
-
-  outputs = [
-    "out"
-    "skills"
-  ];
-
-  postInstall = ''
-    mkdir -p $skills/share/hermes/skills
-    cp -r skills/reverse-engineer-anything $skills/share/hermes/skills/
-    substituteInPlace $skills/share/hermes/skills/reverse-engineer-anything/SKILL.md \
-      --replace-fail 'npx -y rea-agents@${version}' "$out/bin/rea"
-  '';
 
   meta = {
     description = "Reverse engineer anything from your terminal or agent with one CLI and MCP server";

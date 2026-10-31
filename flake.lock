@@ -20,50 +20,6 @@
         "type": "github"
       }
     },
-    "agent-skills-nix": {
-      "inputs": {
-        "anthropics-skills": "anthropics-skills",
-        "dbosk-skills": "dbosk-skills",
-        "hermes-agent": "hermes-agent",
-        "nixos-skill": "nixos-skill",
-        "nixpkgs": [
-          "nixpkgs"
-        ],
-        "paper2agent": "paper2agent",
-        "qt-agent-skills": "qt-agent-skills",
-        "vercel-skills": "vercel-skills",
-        "wshobson-agents": "wshobson-agents"
-      },
-      "locked": {
-        "lastModified": 1793015385,
-        "narHash": "sha256-mCf8Z9WKDBBRDYnKB36YX8RXWo/Qp0tDwLJ7OlTTAi8=",
-        "owner": "Shochraos",
-        "repo": "agent-skills-nix",
-        "rev": "d3399ff0ab1827156a327c40d7679bd16d33e50a",
-        "type": "github"
-      },
-      "original": {
-        "owner": "Shochraos",
-        "repo": "agent-skills-nix",
-        "type": "github"
-      }
-    },
-    "anthropics-skills": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1791571549,
-        "narHash": "sha256-+UIqBnzyeIOvJSKYaDaE3GYPEpLw7qQqyUw5S971AfU=",
-        "owner": "anthropics",
-        "repo": "skills",
-        "rev": "dbd4588f9e1033efb41dad4bef2f7947c8993d44",
-        "type": "github"
-      },
-      "original": {
-        "owner": "anthropics",
-        "repo": "skills",
-        "type": "github"
-      }
-    },
     "base16": {
       "inputs": {
         "fromYaml": "fromYaml"
@@ -180,22 +136,6 @@
       "original": {
         "owner": "AvengeMedia",
         "repo": "danksearch",
-        "type": "github"
-      }
-    },
-    "dbosk-skills": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1792865839,
-        "narHash": "sha256-5DphStVxt01Ivl2LGElVyPUQdL5Z9qhOnzsqkLIvHO0=",
-        "owner": "dbosk",
-        "repo": "claude-skills",
-        "rev": "9e99f90436ed576bd196c1044964d1f17dc2219c",
-        "type": "github"
-      },
-      "original": {
-        "owner": "dbosk",
-        "repo": "claude-skills",
         "type": "github"
       }
     },
@@ -480,22 +420,6 @@
         "type": "gitlab"
       }
     },
-    "hermes-agent": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1793005886,
-        "narHash": "sha256-gZD8QVfZU4d19WbpGU1d3a1N4iJ0w1b916b/V+P0+cc=",
-        "owner": "NousResearch",
-        "repo": "hermes-agent",
-        "rev": "9b904dcc22c23fe8b82834339bbdd96495072e59",
-        "type": "github"
-      },
-      "original": {
-        "owner": "NousResearch",
-        "repo": "hermes-agent",
-        "type": "github"
-      }
-    },
     "hermes-agent_2": {
       "inputs": {
         "flake-parts": "flake-parts_2",
@@ -665,22 +589,6 @@
         "type": "github"
       }
     },
-    "nixos-skill": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1792996304,
-        "narHash": "sha256-7dpLzFlHrNKaBzT/dHus5tsnRsy1gYYgPIfgjFkOmFg=",
-        "owner": "marceloeatworld",
-        "repo": "nixos-ai-skill",
-        "rev": "2d1db6c9e41e0ba3950ceb2baa9cab9e8bca9e6a",
-        "type": "github"
-      },
-      "original": {
-        "owner": "marceloeatworld",
-        "repo": "nixos-ai-skill",
-        "type": "github"
-      }
-    },
     "nixpkgs": {
       "locked": {
         "lastModified": 1793110635,
@@ -756,22 +664,6 @@
       "original": {
         "owner": "nix-community",
         "repo": "NUR",
-        "type": "github"
-      }
-    },
-    "paper2agent": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1789664167,
-        "narHash": "sha256-/OVIznQhNicCbbIlal5F5xwtm3lv4E9t7UYCIB0vK2c=",
-        "owner": "jmiao24",
-        "repo": "Paper2Agent",
-        "rev": "8c2d059165ef8cdcb70dbea76655b9c2b55b38e6",
-        "type": "github"
-      },
-      "original": {
-        "owner": "jmiao24",
-        "repo": "Paper2Agent",
         "type": "github"
       }
     },
@@ -868,26 +760,9 @@
         "type": "github"
       }
     },
-    "qt-agent-skills": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1792492185,
-        "narHash": "sha256-AZcCqpfHRJCVHthCRlEKRoO7BG4MS9bTV85DES6U5Xc=",
-        "owner": "TheQtCompanyRnD",
-        "repo": "agent-skills",
-        "rev": "6845f02d41171a6df8b6e6fe225b7f5d1a6f4adf",
-        "type": "github"
-      },
-      "original": {
-        "owner": "TheQtCompanyRnD",
-        "repo": "agent-skills",
-        "type": "github"
-      }
-    },
     "root": {
       "inputs": {
         "acid-boot": "acid-boot",
-        "agent-skills-nix": "agent-skills-nix",
         "danksearch": "danksearch",
         "den": "den",
         "dms": "dms",
@@ -1109,38 +984,6 @@
       "original": {
         "owner": "pyproject-nix",
         "repo": "uv2nix",
-        "type": "github"
-      }
-    },
-    "vercel-skills": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1792442059,
-        "narHash": "sha256-YfWThEnWqsb1Dy3D/2m+VwLZdTjglEocyuD58WlZSrY=",
-        "owner": "vercel-labs",
-        "repo": "skills",
-        "rev": "a80e4c9d12d607631249d4d7d059f835d4b2f13a",
-        "type": "github"
-      },
-      "original": {
-        "owner": "vercel-labs",
-        "repo": "skills",
-        "type": "github"
-      }
-    },
-    "wshobson-agents": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1792273157,
-        "narHash": "sha256-v4Qt1zPrIp0rlmEWh+3qrTRbx6oVvY0ci80WbkmXzWg=",
-        "owner": "wshobson",
-        "repo": "agents",
-        "rev": "0874a27b17a22e2b7c2e2bcd725768e0803cad06",
-        "type": "github"
-      },
-      "original": {
-        "owner": "wshobson",
-        "repo": "agents",
         "type": "github"
       }
     },

@@ -87,12 +87,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    ### Agent Skills ###
-    agent-skills-nix = {
-      url = "github:Shochraos/agent-skills-nix";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
     ### Agents ###
     hermes-agent = {
       url = "github:NousResearch/hermes-agent/main";
