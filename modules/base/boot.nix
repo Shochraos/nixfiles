@@ -1,7 +1,12 @@
 { inputs, ... }:
 {
   den.aspects.boot.nixos =
-    { lib, pkgs, ... }:
+    {
+      config,
+      lib,
+      pkgs,
+      ...
+    }:
     {
       environment.systemPackages = with pkgs; [
         sbctl
@@ -47,6 +52,6 @@
       boot.kernel.sysctl."kernel.kptr_restrict" = 2;
 
       boot.kernelPackages = pkgs.linuxPackages_latest;
-      boot.kernelParams = [ "nvme_core.default_ps_max_latency_us=0" ];
+      boot.kernelParams = config.host.boot.kernelParams;
     };
 }

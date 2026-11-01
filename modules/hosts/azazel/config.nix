@@ -10,7 +10,28 @@
     {
       system.stateVersion = "25.05";
 
+      host.lact.gpus."10DE:2684-1458:40E4-0000:01:00.0" = {
+        fan_control_enabled = true;
+        fan_control_settings = {
+          mode = "curve";
+          static_speed = 0.3;
+          temperature_key = "edge";
+          interval_ms = 500;
+          spindown_delay_ms = 5000;
+          change_threshold = 5;
+          auto_threshold = 50;
+          curve = {
+            "40" = 0.3;
+            "60" = 0.35;
+            "70" = 0.4;
+            "80" = 0.6;
+            "85" = 1.0;
+          };
+        };
+      };
+
       host.flakeDir = "/home/shochraos/Repositories/nix/nixfiles";
+      host.boot.kernelParams = [ "nvme_core.default_ps_max_latency_us=0" ];
       host.ssh.firewallInterfaces = [ "en*" ];
       host.ssh.authorizedKeys = [
         "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIC71dT73gYzQ5zQz0hAeqC6XccOcBmBxGh9Fk2xztTb6 hermes-gateway"

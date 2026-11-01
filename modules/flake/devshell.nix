@@ -10,6 +10,8 @@
           pkgs.nix-init
           pkgs.nixd
           pkgs.nixfmt
+          pkgs.python3
+          pkgs.ripgrep
           pkgs.shellcheck
           pkgs.shfmt
           pkgs.sops

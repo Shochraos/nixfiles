@@ -1,12 +1,14 @@
 {
   lib,
   buildNpmPackage,
+  callPackage,
   fetchurl,
   ghidra,
   jdk21,
   nodejs_24,
   procps,
   python3,
+  pythonEnvironment ? callPackage ./python.nix { inherit python3; },
 }:
 let
   version = "6.7.0";
@@ -42,10 +44,12 @@ buildNpmPackage {
     (lib.makeBinPath [
       nodejs_24
       procps
-      python3
+      pythonEnvironment
       jdk21
     ])
   ];
+
+  passthru = { inherit pythonEnvironment; };
 
   meta = {
     description = "Reverse engineer anything from your terminal or agent with one CLI and MCP server";

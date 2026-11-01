@@ -6,15 +6,17 @@
         { config, lib, ... }:
         let
           ssh = config.host.ssh;
+          sshEnabled = ssh.authorizedKeys != [ ];
         in
         {
           networking.networkmanager.enable = true;
-          systemd.services.NetworkManager-wait-online.enable = false;
+          systemd.services.NetworkManager-wait-online.enable = config.host.network.onlinePolicy == "wait";
+
           networking.hostName = host.name;
           networking.firewall.enable = true;
 
           services.openssh = {
-            enable = true;
+            enable = sshEnabled;
             openFirewall = false;
 
             settings = {
@@ -29,18 +31,19 @@
 
           users.users.${user.name}.openssh.authorizedKeys.keys = ssh.authorizedKeys;
 
-          networking.firewall.interfaces =
-            lib.genAttrs (map (pattern: lib.replaceStrings [ "*" ] [ "+" ] pattern) ssh.firewallInterfaces)
+          networking.firewall.interfaces = lib.mkIf sshEnabled (
+            lib.genAttrs
+              (map (
+                pattern:
+                if config.networking.firewall.backend == "iptables" then
+                  lib.replaceStrings [ "*" ] [ "+" ] pattern
+                else
+                  pattern
+              ) ssh.firewallInterfaces)
               (_: {
                 allowedTCPPorts = [ 22 ];
-              });
+              })
+          );
         };
-
-      security.pki.caCertificateBlacklist = [
-        "Comodo AAA Services root"
-        "emSign ECC Root CA - G3"
-        "emSign Root CA - C1"
-        "emSign ECC Root CA - C3"
-      ];
     };
 }

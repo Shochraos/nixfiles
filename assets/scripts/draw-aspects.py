@@ -13,7 +13,6 @@ includes base. Nothing is inferred; a missing arrow is a missing edge in source.
 """
 
 import re
-import subprocess
 import sys
 from pathlib import Path
 
@@ -145,9 +144,9 @@ def nix_files():
     )
 
 
-def parse_aspects():
-    """aspect -> {includes: [(label, kind, target)], provides: {k: target}, file}"""
+def discover_sources():
     found = {}
+    definition_paths = {}
 
     def entry(name, path):
         return found.setdefault(
@@ -156,6 +155,14 @@ def parse_aspects():
 
     for path in nix_files():
         text = path.read_text()
+        relative_path = str(path.relative_to(ROOT))
+        for line in text.splitlines():
+            definition = re.search(r"den\.aspects\.([\w-]+)", line)
+            if definition:
+                name = definition.group(1)
+                files = definition_paths.setdefault(name, [])
+                if relative_path not in files:
+                    files.append(relative_path)
         for m in re.finditer(r"den\.aspects\.([\w-]+)(\.includes)?\s*=", text):
             name = m.group(1)
             ent = entry(name, path)
@@ -177,29 +184,11 @@ def parse_aspects():
             for prov in re.finditer(r"provides\.([\w-]+)\s*=\s*den\.aspects\.([\w-]+)", block):
                 if depth_at(block, prov.start()) == 1:
                     ent["provides"][prov.group(1)] = prov.group(2)
-    return found
-
-
-def definition_files():
-    """aspect -> defining file, preferring files outside flake/den.nix."""
-    out = subprocess.run(
-        ["rg", "--sort", "path", "--no-heading", "-n", r"den\.aspects\.[\w-]+", "modules", "--type", "nix"],
-        cwd=ROOT,
-        capture_output=True,
-        text=True,
-    ).stdout
-    found = {}
-    for line in out.splitlines():
-        path, _, rest = line.partition(":")
-        m = re.search(r"den\.aspects\.([\w-]+)", rest)
-        if m:
-            found.setdefault(m.group(1), [])
-            if path not in found[m.group(1)]:
-                found[m.group(1)].append(path)
-    return {
+    definitions = {
         name: next((f for f in files if not f.endswith("flake/den.nix")), files[0])
-        for name, files in found.items()
+        for name, files in definition_paths.items()
     }
+    return found, definitions
 
 
 def hosts():
@@ -380,8 +369,8 @@ def verify(path, w, h):
 
 
 def build():
-    aspects = parse_aspects()
-    defs = definition_files()
+    aspects, defs = discover_sources()
+    file_count = nix_file_count()
     host_list = hosts()
     hues = {"aspect": GREEN, "call": PURPLE, "unfree": PINK}
 
@@ -426,7 +415,7 @@ def build():
         text(
             PAD,
             72,
-            f"flake-parts + den  ·  {nix_file_count()} .nix files  ·  {len(defs)} aspect names  ·  "
+            f"flake-parts + den  ·  {file_count} .nix files  ·  {len(defs)} aspect names  ·  "
             f"{edges} includes edges  ·  {len(host_list)} hosts",
             11.5,
             DIM,
@@ -544,7 +533,7 @@ def build():
         text(
             W // 2,
             y,
-            f"{nix_file_count()} files  ·  {len(defs)} aspect names  ·  {edges} includes  ·  {len(host_list)} hosts",
+            f"{file_count} files  ·  {len(defs)} aspect names  ·  {edges} includes  ·  {len(host_list)} hosts",
             10.5,
             DIM,
             400,

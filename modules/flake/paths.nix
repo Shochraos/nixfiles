@@ -23,6 +23,8 @@ in
       btopConf = ../../configs/btop/btop.conf;
       discordTemplate = ../../assets/templates/discord.css;
       halloyTemplate = ../../assets/templates/halloy.toml;
+      hdrStateScript = ../../assets/scripts/hdr-state.py;
+      hdrRunScript = ../../assets/scripts/hdr-run.sh;
       hsFuldaEduroamCa = ../../assets/certs/hs-fulda-eduroam-ca.pem;
       ironyModManagerIcon = ../../assets/icons/ironymodmanager.png;
       klassyRc = ../../configs/klassy/klassyrc;
@@ -40,6 +42,7 @@ in
       sopsFile = ../../secrets/secrets.yaml;
       sphinxHookScript = ../../assets/build-support/sphinx-hook.sh;
       spotifastTemplate = ../../assets/templates/spotifast.json.j2;
+      steamvrCapabilitiesScript = ../../assets/scripts/steamvr-capabilities.py;
       steamTemplate = ../../assets/templates/steam.css;
       steamAccentsTemplate = ../../assets/templates/steam-accents.css;
     };

@@ -93,17 +93,20 @@ in
 
       xdg.configFile."mpv/scripts/auto-hdr.lua".text = ''
         local mp = require 'mp'
+        local utils = require 'mp.utils'
 
         local hdr_on = false
+        local hdr_pid = utils.getpid()
+        local hdr_owner = "mpv-" .. tostring(hdr_pid)
 
         local function set_hdr(state)
           if state == hdr_on then return end
-          hdr_on = state
-          mp.command_native({
+          local result = mp.command_native({
             name = "subprocess",
             playback_only = false,
-            args = { "hdr-set", state and "on" or "off" },
+            args = { "hdr-set", state and "on" or "off", hdr_owner, tostring(hdr_pid) },
           })
+          if result and result.status == 0 then hdr_on = state end
         end
 
         mp.observe_property("video-params/gamma", "string", function(_, gamma)

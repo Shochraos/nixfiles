@@ -11,7 +11,7 @@ buildSphinxPhase() {
 
   if [[ -n ${sphinxRoot:-} ]]; then
     if ! [[ -f "${sphinxRoot}/conf.py" ]]; then
-      echo 2>&1 "$sphinxRoot/conf.py: no such file"
+      echo >&2 "$sphinxRoot/conf.py: no such file"
       exit 1
     fi
     __sphinxRoot=$sphinxRoot
@@ -26,7 +26,7 @@ buildSphinxPhase() {
   fi
 
   if [[ -z ${__sphinxRoot} ]]; then
-    echo 2>&1 "Sphinx documentation not found, use 'sphinxRoot' variable"
+    echo >&2 "Sphinx documentation not found, use 'sphinxRoot' variable"
     exit 1
   fi
 

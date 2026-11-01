@@ -4,6 +4,55 @@ let
   openAttrs = types.attrsOf types.anything;
   attrsetList = types.listOf openAttrs;
   attrsetTable = types.attrsOf openAttrs;
+  positiveNumber = types.addCheck types.number (value: value > 0);
+  envName = name: lib.toUpper (lib.replaceStrings [ "-" ] [ "_" ] name);
+  profileAssertions =
+    kind: profiles:
+    let
+      names = builtins.attrNames profiles;
+      normalized = map envName names;
+      variables = lib.concatMap (
+        name:
+        let
+          profile = profiles.${name};
+          suffixes =
+            (
+              if kind == "wireguard" then
+                lib.optional (!(profile ? wireguard.private-key)) "KEY" ++ lib.optional profile.presharedKey "PSK"
+              else
+                lib.optional (!profile.open) (if profile.eap then "PASSWORD" else "PSK")
+            )
+            ++ map envName profile.extraSecrets;
+        in
+        map (suffix: "${envName name}_${suffix}") suffixes
+      ) names;
+    in
+    [
+      {
+        assertion = builtins.all (name: builtins.match "[a-zA-Z0-9_-]+" name != null) names;
+        message = "host.${kind}.profiles: profile names must be safe environment-variable components; set connection.id or wifi.ssid separately.";
+      }
+      {
+        assertion =
+          builtins.length normalized == builtins.length (lib.unique normalized)
+          && builtins.length variables == builtins.length (lib.unique variables);
+        message = "host.${kind}.profiles: profile names or extraSecrets collide after environment-variable normalization.";
+      }
+    ];
+
+  environmentComponent = types.strMatching "[a-zA-Z0-9_-]+";
+  profileType =
+    metadata:
+    types.submodule {
+      freeformType = attrsetTable;
+      options = metadata // {
+        extraSecrets = mkOption {
+          type = types.listOf environmentComponent;
+          default = [ ];
+          description = "Additional encrypted fields exposed through the profile environment.";
+        };
+      };
+    };
 in
 {
   den.default.includes = [ den.aspects.hostOptions ];
@@ -14,7 +63,37 @@ in
       nixos =
         { config, ... }:
         {
+          config.assertions =
+            let
+              outputs = builtins.attrValues config.host.outputs;
+              workspaces = lib.concatMap (output: output.workspaces) outputs;
+            in
+            [
+              {
+                assertion = builtins.length (builtins.filter (output: output.primary) outputs) <= 1;
+                message = "host.outputs: at most one output may be primary.";
+              }
+              {
+                assertion = builtins.length workspaces == builtins.length (lib.unique workspaces);
+                message = "host.outputs: workspace IDs must be unique across outputs.";
+              }
+              {
+                assertion = builtins.all (profile: !(profile.open && profile.eap)) (
+                  builtins.attrValues config.host.wifi.profiles
+                );
+                message = "host.wifi.profiles: a profile cannot be both open and EAP-authenticated.";
+              }
+            ]
+            ++ profileAssertions "wifi" config.host.wifi.profiles
+            ++ profileAssertions "wireguard" config.host.wireguard.profiles;
+
           options.host = {
+            boot.kernelParams = mkOption {
+              type = types.listOf types.str;
+              default = [ ];
+              description = "Hardware-specific kernel parameters for this host.";
+            };
+
             flakeDir = mkOption {
               type = types.str;
               description = "Absolute path to this flake's checkout on the host.";
@@ -67,12 +146,12 @@ in
                       description = "Resolution and refresh rate as Hyprland spells it, e.g. `3840x2160@143.988`. Null leaves the field to whatever DMS last wrote.";
                     };
                     position = mkOption {
-                      type = types.nullOr types.str;
+                      type = types.nullOr (types.strMatching "-?[0-9]+x-?[0-9]+");
                       default = null;
                       description = "Logical position of this output's top-left corner, e.g. `220x1798`. Null leaves the field to whatever DMS last wrote.";
                     };
                     scale = mkOption {
-                      type = types.nullOr types.str;
+                      type = types.nullOr (types.strMatching "([1-9][0-9]*(\\.[0-9]+)?|0\\.[0-9]*[1-9][0-9]*)");
                       default = null;
                       description = "Fractional scale as a string, e.g. `0.80078125`. Hyprland snaps a scale that does not divide the mode into whole logical pixels, so use the value it reports rather than the one you asked for. Null leaves the field to whatever DMS last wrote.";
                     };
@@ -85,6 +164,12 @@ in
                 }
               );
               description = "Physical outputs of this host, keyed by Hyprland output name. Consumed by duxshell (which derives the DMS output settings), by the hdr aspect (which drives the single entry with `hdr = true`) and by the hyprland aspect (which pins the geometry Hyprland cannot be told through DMS, and binds each output's workspaces to it).";
+            };
+
+            lact.gpus = mkOption {
+              type = attrsetTable;
+              default = { };
+              description = "LACT GPU settings keyed by the device ID; consumed by the gaming aspect.";
             };
 
             audio = {
@@ -128,8 +213,8 @@ in
                                         description = "Builtin biquad label for this band.";
                                       };
                                       freq = mkOption {
-                                        type = types.number;
-                                        description = "Centre or corner frequency in Hz.";
+                                        type = positiveNumber;
+                                        description = "Positive centre or corner frequency in Hz.";
                                       };
                                       gain = mkOption {
                                         type = types.number;
@@ -137,7 +222,7 @@ in
                                         description = "Band gain in dB.";
                                       };
                                       q = mkOption {
-                                        type = types.number;
+                                        type = positiveNumber;
                                         default = 0.707;
                                         description = "Band Q.";
                                       };
@@ -207,7 +292,13 @@ in
 
             wireguard = {
               profiles = mkOption {
-                type = attrsetTable;
+                type = types.attrsOf (profileType {
+                  presharedKey = mkOption {
+                    type = types.bool;
+                    default = false;
+                    description = "Inject the encrypted preshared key into this profile's peers.";
+                  };
+                });
                 default = { };
                 description = "NetworkManager WireGuard profiles for this host (keyfile sections, without key material). Each profile reads its private key from the sops secret `wireguard/<host>/<profile>`; setting `presharedKey = true` on a profile additionally injects `wireguard/<host>/<profile>-psk` into its peer sections. Suffixes listed in `extraSecrets` load `wireguard/<host>/<profile>-<suffix>` as `$WG_<PROFILE>_<SUFFIX>` for referencing in any field. Setting `wireguard.private-key` on a profile yourself means it owns no secret of its own — point it at another profile's `$WG_<PROFILE>_KEY` and the module declares neither `wireguard/<host>/<profile>` nor its env entry.";
               };
@@ -215,7 +306,18 @@ in
 
             wifi = {
               profiles = mkOption {
-                type = attrsetTable;
+                type = types.attrsOf (profileType {
+                  open = mkOption {
+                    type = types.bool;
+                    default = false;
+                    description = "This network needs no authentication secret.";
+                  };
+                  eap = mkOption {
+                    type = types.bool;
+                    default = false;
+                    description = "Use the encrypted 802.1X password instead of a PSK.";
+                  };
+                });
                 default = { };
                 description = "NetworkManager Wi-Fi profiles for this host (keyfile sections, without key material). `connection.id` and `wifi.ssid` default to the attribute name. Each profile reads its PSK from the host-independent sops secret `wifi/<profile>`; setting `eap = true` injects the secret as the `802-1x` password instead, and `open = true` skips secrets entirely. Suffixes listed in `extraSecrets` load `wifi/<profile>-<suffix>` as `$WIFI_<PROFILE>_<SUFFIX>` for referencing in any field.";
               };
@@ -239,9 +341,18 @@ in
               };
             };
 
+            network.onlinePolicy = mkOption {
+              type = types.enum [
+                "wait"
+                "skip"
+              ];
+              default = "wait";
+              description = "Whether NetworkManager must finish startup before network-online.target; only Solas opts out.";
+            };
+
             ssh = {
               firewallInterfaces = mkOption {
-                type = types.listOf types.str;
+                type = types.listOf (types.strMatching "[a-zA-Z0-9_.:-]+\\*?");
                 default = [ ];
                 description = "Interface name patterns on which the SSH port is accepted. The service stays disabled until an authorized key is configured.";
               };

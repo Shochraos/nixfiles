@@ -46,15 +46,19 @@
 
           systemd.services.borgbackup-notify = {
             description = "Notify the user when the borg backup failed";
-            serviceConfig.Type = "oneshot";
+            serviceConfig = {
+              Type = "oneshot";
+              User = user.name;
+            };
             script = ''
-              uid=$(id -u ${user.name})
-              for sock in /run/user/"$uid"/wayland-*; do
-                WAYLAND_DISPLAY=$(basename "$sock") XDG_RUNTIME_DIR=/run/user/"$uid" \
-                  ${pkgs.libnotify}/bin/notify-send -u critical "Borg backup failed" "See journalctl -u borgbackup-job-backup" \
-                  && break
-              done
               echo "borgbackup-job-backup failed" >&2
+              export XDG_RUNTIME_DIR="/run/user/$(id -u)"
+              export DBUS_SESSION_BUS_ADDRESS="unix:path=$XDG_RUNTIME_DIR/bus"
+              if [ -S "$XDG_RUNTIME_DIR/bus" ]; then
+                ${pkgs.libnotify}/bin/notify-send -u critical "Borg backup failed" "See journalctl -u borgbackup-job-backup"
+              else
+                echo "No user session bus is available; backup failure remains in the system journal" >&2
+              fi
             '';
           };
 
@@ -98,9 +102,12 @@
           cli = pkgs.writeShellApplication {
             name = "backup";
             runtimeInputs = with pkgs; [
+              borgbackup
               coreutils
               gawk
               gnugrep
+              openssh
+              util-linux
             ];
             text = ''
               verb="''${1:-}"

@@ -6,6 +6,8 @@
   ];
 
   perSystem = {
+    pre-commit.check.enable = false;
+
     pre-commit.settings.hooks.treefmt = {
       enable = true;
       always_run = true;

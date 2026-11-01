@@ -89,10 +89,25 @@ in
         wantedBy = [ "multi-user.target" ];
         serviceConfig.Type = "oneshot";
         script = ''
-          if [ -e ${lib.escapeShellArg vrcompositorLauncher} ]; then
-            ${lib.getExe' pkgs.libcap "setcap"} cap_sys_nice=p ${lib.escapeShellArg vrcompositorLauncher}
-          fi
+          ${pkgs.python3}/bin/python3 ${assets.steamvrCapabilitiesScript} \
+            --user ${lib.escapeShellArg user.name} \
+            --libcap ${lib.getLib pkgs.libcap}/lib/libcap.so.2 \
+            ${lib.escapeShellArg vrcompositorLauncher}
         '';
+      };
+      systemd.paths.steamvr-cap-sys-nice = {
+        description = "Restore SteamVR launcher capability after installation or replacement";
+        wantedBy = [ "multi-user.target" ];
+        pathConfig.PathChanged = vrcompositorLauncher;
+      };
+
+      systemd.timers.steamvr-cap-sys-nice = {
+        description = "Recheck SteamVR capability after updater churn";
+        wantedBy = [ "timers.target" ];
+        timerConfig = {
+          OnBootSec = "1min";
+          OnUnitInactiveSec = "1min";
+        };
       };
 
       host.matugen.templates.steam = {

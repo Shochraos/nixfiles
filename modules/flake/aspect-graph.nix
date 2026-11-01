@@ -10,15 +10,15 @@
       regenerate = pkgs.writeShellApplication {
         name = "aspect-graph";
         runtimeInputs = [
+          pkgs.git
           pkgs.python3
-          pkgs.ripgrep
         ];
         text = ''
           root=$(git rev-parse --show-toplevel)
           python3 "$root/assets/scripts/draw-aspects.py" 820 >/dev/null
           if ! git -C "$root" diff --quiet -- assets/aspect-graph.svg; then
-            git -C "$root" add assets/aspect-graph.svg
-            echo "aspect-graph: assets/aspect-graph.svg regenerated and staged"
+            echo "aspect-graph: assets/aspect-graph.svg changed; review and stage it explicitly" >&2
+            exit 1
           fi
         '';
       };
@@ -27,7 +27,7 @@
       pre-commit.settings.hooks.aspect-graph = {
         enable = true;
         name = "aspect graph";
-        description = "Regenerate assets/aspect-graph.svg and stage it with the current commit";
+        description = "Regenerate assets/aspect-graph.svg without changing the Git index";
         entry = lib.getExe regenerate;
         language = "system";
         files = "^(modules/.*\\.nix|assets/scripts/draw-aspects\\.py)$";
@@ -38,8 +38,8 @@
         pkgs.runCommand "aspect-graph-current"
           {
             nativeBuildInputs = [
+              pkgs.git
               pkgs.python3
-              pkgs.ripgrep
             ];
           }
           ''

@@ -1,4 +1,4 @@
-{ lib, ... }:
+{ config, lib, ... }:
 let
   hdrOutputFor =
     outputs:
@@ -22,109 +22,48 @@ in
 
       hdr-set = pkgs.writeShellApplication {
         name = "hdr-set";
-        runtimeInputs = with pkgs; [
-          coreutils
-          gnugrep
-        ];
+        runtimeInputs = [ pkgs.hyprland ];
         text = ''
-          out="$HOME/.config/hypr/dms/outputs.lua"
-          line='hl.monitor({ output = "${hdrOutput}", cm = "hdredid" })'
-
-          reload() { hyprctl reload >/dev/null 2>&1 || true; }
-
-          case "''${1:-}" in
-            on)
-              grep -qxF "$line" "$out" 2>/dev/null || printf '\n%s\n' "$line" >> "$out"
-              reload
-              ;;
-            off)
-              if [ -f "$out" ] && grep -qxF "$line" "$out"; then
-                grep -vxF "$line" "$out" > "$out.tmp" || true
-                mv "$out.tmp" "$out"
-                reload
-              fi
-              ;;
-            *)
-              echo "usage: hdr-set on|off" >&2
-              exit 1
-              ;;
-          esac
+          exec ${pkgs.python3}/bin/python3 ${config.assets.hdrStateScript} --output ${lib.escapeShellArg hdrOutput} "$@"
         '';
       };
     in
     {
+      wayland.windowManager.hyprland.extraConfig = ''
+        local hdr_state = os.getenv("XDG_RUNTIME_DIR") .. "/nixfiles-hdr/state.lua"
+        local hdr_loader = loadfile(hdr_state)
+        if hdr_loader then hdr_loader() end
+      '';
+
+      systemd.user.services.hdr-state = {
+        Unit = {
+          Description = "Reap HDR leases whose owner process has exited";
+          PartOf = [ "graphical-session.target" ];
+          After = [ "graphical-session.target" ];
+        };
+        Service = {
+          Type = "oneshot";
+          ExecStart = "${lib.getExe hdr-set} refresh";
+        };
+        Install.WantedBy = [ "graphical-session.target" ];
+      };
+      systemd.user.timers.hdr-state = {
+        Unit.PartOf = [ "graphical-session.target" ];
+        Timer.OnUnitActiveSec = "30s";
+        Install.WantedBy = [ "graphical-session.target" ];
+      };
+
       home.packages = [
         hdr-set
         (pkgs.writeShellApplication {
           name = "hdr";
-          runtimeInputs = with pkgs; [
-            coreutils
-            gnugrep
-            jq
+          runtimeInputs = [
+            pkgs.coreutils
+            pkgs.util-linux
             hdr-set
           ];
           text = ''
-            poll="''${HDR_POLL_INTERVAL:-1}"
-            grace="''${HDR_GRACE:-5}"
-            handoff="''${HDR_HANDOFF:-30}"
-
-            launch_ld="''${LD_LIBRARY_PATH-}"
-            unset LD_LIBRARY_PATH
-
-            state="$(mktemp -d)"
-            before="$state/before"
-            targets="$state/targets"
-            now="$state/now"
-            rcfile="$state/rc"
-            frozen=0
-            absent_since=""
-            empty_since=""
-
-            classes() { hyprctl clients -j 2>/dev/null | jq -r '.[].class // empty' | sort -u; }
-
-            trap 'exit 130' INT TERM
-            trap 'hdr-set off; rm -rf "$state"' EXIT
-
-            hdr-set on
-            classes > "$before"
-            : > "$targets"
-
-            ( if [ -n "$launch_ld" ]; then export LD_LIBRARY_PATH="$launch_ld"; fi
-              "$@" || rc=$?; printf '%s' "''${rc:-0}" > "$rcfile" ) &
-            child=$!
-
-            while :; do
-              classes > "$now" || true
-
-              if [ "$frozen" -eq 0 ]; then
-                comm -13 "$before" "$now" >> "$targets" 2>/dev/null || true
-                sort -u -o "$targets" "$targets"
-                if [ -s "$targets" ] && [ -f "$rcfile" ]; then
-                  frozen=1
-                fi
-              fi
-
-              if [ -s "$targets" ]; then
-                if comm -12 "$targets" "$now" 2>/dev/null | grep -q .; then
-                  absent_since=""
-                elif [ -z "$absent_since" ]; then
-                  absent_since="$SECONDS"
-                elif [ "$((SECONDS - absent_since))" -ge "$grace" ]; then
-                  break
-                fi
-              elif [ -f "$rcfile" ]; then
-                if [ -z "$empty_since" ]; then
-                  empty_since="$SECONDS"
-                elif [ "$((SECONDS - empty_since))" -ge "$handoff" ]; then
-                  break
-                fi
-              fi
-
-              sleep "$poll"
-            done
-
-            wait "$child" 2>/dev/null || true
-            exit "$(cat "$rcfile" 2>/dev/null || echo 0)"
+            exec ${pkgs.runtimeShell} ${config.assets.hdrRunScript} "$@"
           '';
         })
       ];

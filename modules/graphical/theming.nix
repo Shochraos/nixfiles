@@ -27,7 +27,30 @@ in
 
         stylix = {
           enable = true;
-          base16Scheme = "${pkgs.base16-schemes}/share/themes/chalk.yaml";
+          base16Scheme = {
+            system = "base16";
+            name = "Chalk";
+            author = "Chris Kempson (http://chriskempson.com)";
+            variant = "dark";
+            palette = {
+              base00 = "#151515";
+              base01 = "#202020";
+              base02 = "#303030";
+              base03 = "#505050";
+              base04 = "#b0b0b0";
+              base05 = "#d0d0d0";
+              base06 = "#e0e0e0";
+              base07 = "#f5f5f5";
+              base08 = "#fb9fb1";
+              base09 = "#eda987";
+              base0A = "#ddb26f";
+              base0B = "#acc267";
+              base0C = "#12cfc0";
+              base0D = "#6fc2ef";
+              base0E = "#e1a3ee";
+              base0F = "#deaf8f";
+            };
+          };
           autoEnable = false;
 
           targets = {
@@ -208,8 +231,11 @@ in
           };
 
         systemd.user.paths.papirus-matugen = {
-          Unit.Description = "Run the Papirus icon recolor script whenever matugen renders it";
-          Path.PathExists = "${config.xdg.cacheHome}/papirus-matugen/recolor.sh";
+          Unit = {
+            Description = "Run the Papirus icon recolor script whenever matugen renders it";
+            PartOf = [ "graphical-session.target" ];
+          };
+          Path.PathChanged = "${config.xdg.cacheHome}/papirus-matugen/recolor.sh";
           Install.WantedBy = [ "graphical-session.target" ];
         };
 
@@ -217,7 +243,10 @@ in
           Unit = {
             Description = "Rebuild Papirus-Matugen-Dark icons from the rendered matugen script";
             After = [ "graphical-session.target" ];
+            PartOf = [ "graphical-session.target" ];
+            ConditionPathExists = "${config.xdg.cacheHome}/papirus-matugen/recolor.sh";
           };
+          Install.WantedBy = [ "graphical-session.target" ];
           Service = {
             Type = "oneshot";
             ExecStart = "${pkgs.bash}/bin/bash ${config.xdg.cacheHome}/papirus-matugen/recolor.sh";
