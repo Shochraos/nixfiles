@@ -31,6 +31,7 @@
         entry = lib.getExe regenerate;
         language = "system";
         files = "^(modules/.*\\.nix|assets/scripts/draw-aspects\\.py)$";
+        always_run = true;
         pass_filenames = false;
       };
 

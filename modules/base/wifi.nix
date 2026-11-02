@@ -28,9 +28,22 @@ in
           var = "WIFI_${envName name}_${envName extra}";
         }) (profiles.${name}.extraSecrets or [ ]);
       secretEntries = builtins.concatMap secretsFor profileNames;
+      secrets = map (entry: entry.secret) secretEntries;
+      variables = map (entry: entry.var) secretEntries;
     in
     {
       config = lib.mkIf (profiles != { }) {
+        assertions = [
+          {
+            assertion = builtins.length secrets == builtins.length (lib.unique secrets);
+            message = "host.wifi.profiles: generated secret identifiers collide.";
+          }
+          {
+            assertion = builtins.length variables == builtins.length (lib.unique variables);
+            message = "host.wifi.profiles: profile names or extraSecrets collide after environment-variable normalization.";
+          }
+        ];
+
         environment.etc."eduroam-certs/hs-fulda-eduroam-ca.pem".source = assets.hsFuldaEduroamCa;
 
         sops.secrets = builtins.listToAttrs (map (e: lib.nameValuePair e.secret { }) secretEntries);

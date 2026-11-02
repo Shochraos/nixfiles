@@ -16,27 +16,41 @@
           hasPsk = name: profiles.${name}.presharedKey or false;
           extrasFor = name: profiles.${name}.extraSecrets or [ ];
           extraVar = name: extra: "WG_${envName name}_${envName extra}";
+          secretEntries = builtins.concatMap (
+            name:
+            lib.optional (ownsKey name) {
+              secret = secretFor name;
+              var = keyVar name;
+            }
+            ++ lib.optional (hasPsk name) {
+              secret = "${secretFor name}-psk";
+              var = pskVar name;
+            }
+            ++ map (extra: {
+              secret = "${secretFor name}-${extra}";
+              var = extraVar name extra;
+            }) (extrasFor name)
+          ) profileNames;
+          secrets = map (entry: entry.secret) secretEntries;
+          variables = map (entry: entry.var) secretEntries;
         in
         {
           config = lib.mkIf (profiles != { }) {
-            sops.secrets = builtins.listToAttrs (
-              builtins.concatMap (
-                name:
-                lib.optional (ownsKey name) (lib.nameValuePair (secretFor name) { })
-                ++ lib.optional (hasPsk name) (lib.nameValuePair "${secretFor name}-psk" { })
-                ++ map (extra: lib.nameValuePair "${secretFor name}-${extra}" { }) (extrasFor name)
-              ) profileNames
-            );
+            assertions = [
+              {
+                assertion = builtins.length secrets == builtins.length (lib.unique secrets);
+                message = "host.wireguard.profiles: generated secret identifiers collide.";
+              }
+              {
+                assertion = builtins.length variables == builtins.length (lib.unique variables);
+                message = "host.wireguard.profiles: profile names or extraSecrets collide after environment-variable normalization.";
+              }
+            ];
+
+            sops.secrets = builtins.listToAttrs (map (entry: lib.nameValuePair entry.secret { }) secretEntries);
 
             sops.templates."wireguard.env".content = lib.concatLines (
-              builtins.concatMap (
-                name:
-                lib.optional (ownsKey name) "${keyVar name}=${config.sops.placeholder.${secretFor name}}"
-                ++ lib.optional (hasPsk name) "${pskVar name}=${config.sops.placeholder."${secretFor name}-psk"}"
-                ++ map (extra: "${extraVar name extra}=${config.sops.placeholder."${secretFor name}-${extra}"}") (
-                  extrasFor name
-                )
-              ) profileNames
+              map (entry: "${entry.var}=${config.sops.placeholder.${entry.secret}}") secretEntries
             );
 
             networking.networkmanager.ensureProfiles = {

@@ -17,9 +17,9 @@ trap 'if [[ -n $child ]]; then kill -s TERM -- "-$child" 2>/dev/null || true; wa
 hdr-set on "$owner" "$$"
 
 if [[ -n $launch_ld ]]; then
-  setsid env LD_LIBRARY_PATH="$launch_ld" "$@" &
+  setsid env --default-signal=INT,QUIT LD_LIBRARY_PATH="$launch_ld" "$@" &
 else
-  setsid "$@" &
+  setsid env --default-signal=INT,QUIT "$@" &
 fi
 child=$!
 

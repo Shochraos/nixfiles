@@ -47,6 +47,7 @@ in
 
             serviceConfig = {
               Type = "oneshot";
+              User = user.name;
               EnvironmentFile = config.sops.templates."lgtv.env".path;
               ExecStart = "${lib.getExe pkgs.wakeonlan} -i \${LGTV_IP} \${LGTV_MAC}";
             };

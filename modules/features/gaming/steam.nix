@@ -5,11 +5,6 @@ in
 {
   den.aspects.gaming.nixos =
     { pkgs, ... }:
-    let
-      proton-cachyos-v3 =
-        inputs.proton-cachyos-nix.packages.${pkgs.stdenv.hostPlatform.system}.proton-cachyos-v3;
-      dw-proton = inputs.dw-proton-nix.packages.${pkgs.stdenv.hostPlatform.system}.dw-proton;
-    in
     {
       boot.kernelModules = [ "ntsync" ];
 
@@ -19,10 +14,6 @@ in
         package = pkgs.millennium-steam.override {
           steam = pkgs.steam.override { extraArgs = "-pipewire"; };
         };
-        extraCompatPackages = [
-          proton-cachyos-v3
-          dw-proton
-        ];
         remotePlay.openFirewall = true;
       };
       programs.gamescope = {

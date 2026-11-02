@@ -250,7 +250,7 @@ in
           Service = {
             Type = "oneshot";
             ExecStart = "${pkgs.bash}/bin/bash ${config.xdg.cacheHome}/papirus-matugen/recolor.sh";
-            RuntimeMaxSec = "15min";
+            TimeoutStartSec = "15min";
           };
         };
       };

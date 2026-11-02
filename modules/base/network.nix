@@ -147,10 +147,6 @@ in
             ${homeNetwork}/bin/home-network setup-static || true
           '';
 
-          networking.firewall.extraStopCommands = ''
-            ${homeNetwork}/bin/home-network detach-static || true
-          '';
-
           services.openssh = {
             enable = sshEnabled;
             openFirewall = false;

@@ -29,7 +29,9 @@
           };
 
           sops.templates."backup-storagebox-ssh" = {
-            owner = user.name;
+            owner = "root";
+            group = config.users.users.${user.name}.group;
+            mode = "0440";
             content = ''
               Host storagebox
                 HostName ${config.sops.placeholder."backup/storagebox-host"}

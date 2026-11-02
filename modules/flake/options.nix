@@ -45,21 +45,6 @@ let
     let
       names = builtins.attrNames profiles;
       normalized = map envName names;
-      variables = lib.concatMap (
-        name:
-        let
-          profile = profiles.${name};
-          suffixes =
-            (
-              if kind == "wireguard" then
-                lib.optional (!(profile ? wireguard.private-key)) "KEY" ++ lib.optional profile.presharedKey "PSK"
-              else
-                lib.optional (!profile.open) (if profile.eap then "PASSWORD" else "PSK")
-            )
-            ++ map envName profile.extraSecrets;
-        in
-        map (suffix: "${envName name}_${suffix}") suffixes
-      ) names;
     in
     [
       {
@@ -67,9 +52,7 @@ let
         message = "host.${kind}.profiles: profile names must be safe environment-variable components; set connection.id or wifi.ssid separately.";
       }
       {
-        assertion =
-          builtins.length normalized == builtins.length (lib.unique normalized)
-          && builtins.length variables == builtins.length (lib.unique variables);
+        assertion = builtins.length normalized == builtins.length (lib.unique normalized);
         message = "host.${kind}.profiles: profile names or extraSecrets collide after environment-variable normalization.";
       }
     ];
