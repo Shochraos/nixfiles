@@ -24,6 +24,11 @@
   den.aspects.kde-connect.provides.to-users.homeManager =
     { lib, pkgs, ... }:
     {
+      xdg.configFile."autostart/ca.andyholmes.Valent-autostart.desktop".text = ''
+        [Desktop Entry]
+        Hidden=true
+      '';
+
       systemd.user.services.valent = {
         Unit = {
           Description = "Valent (KDE Connect Implementation)";
