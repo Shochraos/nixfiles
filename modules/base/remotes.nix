@@ -6,6 +6,7 @@
         { config, ... }:
         let
           gitKey = "${config.host.sshKey}-git";
+          astarothHostKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMClDh2uo4ZSfbdVnvWagVd06gORzbyQrETNSNFtFmQ6";
         in
         {
           sops.secrets = {
@@ -18,6 +19,11 @@
             "git/non-github/name" = { };
             "git/non-github/email" = { };
             "git/private-git" = { };
+          };
+
+          programs.ssh.knownHosts.astaroth = {
+            hostNames = [ "astaroth" ];
+            publicKey = astarothHostKey;
           };
 
           sops.templates."ssh-secret-hosts" = {
@@ -38,6 +44,8 @@
                 HostName ${config.sops.placeholder."astaroth/ip"}
                 IdentityFile ${config.host.sshKey}
                 User root
+                HostKeyAlias astaroth
+                StrictHostKeyChecking yes
             '';
           };
 

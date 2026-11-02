@@ -22,7 +22,6 @@ in
       {
         home.packages = with pkgs; [
           samrewritten
-          faugus-launcher
           irony-mod-manager
           lsfg-vk
           lsfg-vk-ui

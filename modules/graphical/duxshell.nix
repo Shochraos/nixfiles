@@ -186,6 +186,9 @@ in
 
               launchPrefix = "uwsm-app -- ";
 
+              acLockTimeout = 600;
+              batteryLockTimeout = 300;
+              lockBeforeSuspend = true;
               loginctlLockIntegration = true;
               lockScreenPowerOffMonitorsOnLock = false;
 

@@ -101,15 +101,6 @@ in
         pathConfig.PathChanged = vrcompositorLauncher;
       };
 
-      systemd.timers.steamvr-cap-sys-nice = {
-        description = "Recheck SteamVR capability after updater churn";
-        wantedBy = [ "timers.target" ];
-        timerConfig = {
-          OnBootSec = "1min";
-          OnUnitInactiveSec = "1min";
-        };
-      };
-
       host.matugen.templates.steam = {
         input_path = assets.steamTemplate;
         output_path = "~/.steam/steam/millennium/themes/simply-dark/colors.css";

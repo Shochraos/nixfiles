@@ -5,6 +5,40 @@ let
   attrsetList = types.listOf openAttrs;
   attrsetTable = types.attrsOf openAttrs;
   positiveNumber = types.addCheck types.number (value: value > 0);
+  homeOnlyPort = types.ints.between 1 65535;
+  homeOnlyPortRange = types.submodule {
+    options = {
+      from = mkOption {
+        type = homeOnlyPort;
+        description = "First port of the inclusive range.";
+      };
+      to = mkOption {
+        type = homeOnlyPort;
+        description = "Last port of the inclusive range.";
+      };
+    };
+  };
+  homeOnlyProtocol = {
+    ports = mkOption {
+      type = types.listOf homeOnlyPort;
+      default = [ ];
+      description = "Individual ports opened between this host and recognised home-network addresses.";
+    };
+    ranges = mkOption {
+      type = types.listOf homeOnlyPortRange;
+      default = [ ];
+      apply =
+        ranges:
+        map (
+          range:
+          if range.from <= range.to then
+            range
+          else
+            throw "host.network.homeOnlyPorts: a port range must have from <= to"
+        ) ranges;
+      description = "Inclusive port ranges opened between this host and recognised home-network addresses. Each range occupies two multiport slots.";
+    };
+  };
   envName = name: lib.toUpper (lib.replaceStrings [ "-" ] [ "_" ] name);
   profileAssertions =
     kind: profiles:
@@ -341,13 +375,19 @@ in
               };
             };
 
-            network.onlinePolicy = mkOption {
-              type = types.enum [
-                "wait"
-                "skip"
-              ];
-              default = "wait";
-              description = "Whether NetworkManager must finish startup before network-online.target; only Solas opts out.";
+            network = {
+              onlinePolicy = mkOption {
+                type = types.enum [
+                  "wait"
+                  "skip"
+                ];
+                default = "wait";
+                description = "Whether NetworkManager must finish startup before network-online.target; only Solas opts out.";
+              };
+              homeOnlyPorts = {
+                tcp = homeOnlyProtocol;
+                udp = homeOnlyProtocol;
+              };
             };
 
             ssh = {

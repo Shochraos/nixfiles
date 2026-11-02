@@ -23,8 +23,9 @@ in
       btopConf = ../../configs/btop/btop.conf;
       discordTemplate = ../../assets/templates/discord.css;
       halloyTemplate = ../../assets/templates/halloy.toml;
-      hdrStateScript = ../../assets/scripts/hdr-state.py;
+      hdrStateScript = ../../assets/scripts/hdr-state.sh;
       hdrRunScript = ../../assets/scripts/hdr-run.sh;
+      homeNetworkScript = ../../assets/scripts/home-network.sh;
       hsFuldaEduroamCa = ../../assets/certs/hs-fulda-eduroam-ca.pem;
       ironyModManagerIcon = ../../assets/icons/ironymodmanager.png;
       klassyRc = ../../configs/klassy/klassyrc;

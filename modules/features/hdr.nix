@@ -22,9 +22,15 @@ in
 
       hdr-set = pkgs.writeShellApplication {
         name = "hdr-set";
-        runtimeInputs = [ pkgs.hyprland ];
+        runtimeInputs = [
+          pkgs.coreutils
+          pkgs.diffutils
+          pkgs.hyprland
+          pkgs.jq
+          pkgs.util-linux
+        ];
         text = ''
-          exec ${pkgs.python3}/bin/python3 ${config.assets.hdrStateScript} --output ${lib.escapeShellArg hdrOutput} "$@"
+          exec ${pkgs.runtimeShell} ${config.assets.hdrStateScript} --output ${lib.escapeShellArg hdrOutput} "$@"
         '';
       };
     in
