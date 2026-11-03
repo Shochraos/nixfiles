@@ -265,7 +265,7 @@ in
             Description = "Rebuild Papirus icons whenever matugen publishes a palette";
             PartOf = [ "graphical-session.target" ];
           };
-          Path.PathChanged = "${config.xdg.cacheHome}/papirus-matugen/palette.txt";
+          Path.PathExists = "${config.xdg.cacheHome}/papirus-matugen/pending";
           Install.WantedBy = [ "graphical-session.target" ];
         };
 
@@ -278,6 +278,8 @@ in
           Install.WantedBy = [ "graphical-session.target" ];
           Service = {
             Type = "oneshot";
+            Restart = "on-failure";
+            RestartSec = "30s";
             ExecStart = "${papirusRecolor}/bin/papirus-recolor";
             TimeoutStartSec = "15min";
           };
