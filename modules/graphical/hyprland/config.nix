@@ -85,6 +85,7 @@ in
       lib,
       config,
       osConfig,
+      pkgs,
       ...
     }:
     let
@@ -93,6 +94,16 @@ in
     {
       xdg.configFile."uwsm/env".source =
         "${config.home.sessionVariablesPackage}/etc/profile.d/hm-session-vars.sh";
+
+      services.udiskie = {
+        enable = true;
+        automount = true;
+        notify = true;
+        tray = "auto";
+        settings.program_options.file_manager = "${pkgs.nautilus}/bin/nautilus";
+      };
+
+      xsession.preferStatusNotifierItems = true;
 
       home.sessionVariables = {
         QT_QPA_PLATFORM = "wayland;xcb";
