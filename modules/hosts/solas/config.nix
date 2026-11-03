@@ -64,13 +64,14 @@
         };
 
         home-split = {
+          excludedSSIDs = [ "Ragnarök" ];
           extraSecrets = [ "allowed-ips" ];
 
           connection = {
             id = "Home (Split-Tunnel)";
             type = "wireguard";
             interface-name = "home-split";
-            autoconnect = false;
+            autoconnect = true;
           };
 
           "wireguard-peer.${homePeerPubkey}" = {

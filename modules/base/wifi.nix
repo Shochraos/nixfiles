@@ -14,8 +14,8 @@ in
       profileNames = builtins.attrNames profiles;
       secretFor = name: "wifi/${name}";
       envName = name: lib.toUpper (builtins.replaceStrings [ "-" ] [ "_" ] name);
-      isOpen = name: profiles.${name}.open or false;
-      isEap = name: profiles.${name}.eap or false;
+      isOpen = name: profiles.${name}.open;
+      isEap = name: profiles.${name}.eap;
       secretVar = name: "WIFI_${envName name}_${if isEap name then "PASSWORD" else "PSK"}";
       secretsFor =
         name:
@@ -26,7 +26,7 @@ in
         ++ map (extra: {
           secret = "${secretFor name}-${extra}";
           var = "WIFI_${envName name}_${envName extra}";
-        }) (profiles.${name}.extraSecrets or [ ]);
+        }) profiles.${name}.extraSecrets;
       secretEntries = builtins.concatMap secretsFor profileNames;
       secrets = map (entry: entry.secret) secretEntries;
       variables = map (entry: entry.var) secretEntries;

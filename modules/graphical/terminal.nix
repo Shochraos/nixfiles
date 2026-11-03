@@ -8,22 +8,6 @@ in
     {
       home.packages = [ pkgs.libnotify ];
 
-      programs.ghostty = {
-        enable = true;
-        package = pkgs.ghostty.overrideAttrs (old: {
-          postFixup = (old.postFixup or "") + ''
-            rm -rf $out/share/nautilus-python
-          '';
-        });
-        settings = {
-          background = "000000";
-          background-opacity = 0.85;
-          background-blur = true;
-          font-family = osConfig.stylix.fonts.monospace.name;
-          font-size = osConfig.stylix.fonts.sizes.terminal;
-        };
-      };
-
       programs.kitty = {
         enable = true;
 

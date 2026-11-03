@@ -310,6 +310,11 @@ in
             wireguard = {
               profiles = mkOption {
                 type = types.attrsOf (profileType {
+                  excludedSSIDs = mkOption {
+                    type = types.listOf types.str;
+                    default = [ ];
+                    description = "SSIDs on which this profile must stay disconnected. With autoconnect enabled, reconcile against the current physical uplink instead of NetworkManager autoconnect.";
+                  };
                   presharedKey = mkOption {
                     type = types.bool;
                     default = false;
@@ -402,7 +407,7 @@ in
                 ]
               );
               default = [ ];
-              description = "Applications that autostart at login on this host. Each name is resolved to its desktop entry by the aspect that owns the application.";
+              description = "Additional selected applications that autostart at login on this host. Each name is resolved to its desktop entry by the aspect that owns the application. Zen and Zed autostart independently when their aspects are enabled.";
             };
 
             matugen = {

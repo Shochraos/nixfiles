@@ -185,9 +185,13 @@
               db=${lib.escapeShellArg database}
               state_file="''${XDG_CACHE_HOME:-$HOME/.cache}/keepassxc/keepassxc.ini"
               if [ -f "$state_file" ] && grep -q '^ListViewState=' "$state_file"; then
-                exec keepassxc --pw-stdin "$db" < /run/secrets/keepassxc/master-password
+                exec keepassxc --pw-stdin "$db" < ${
+                  lib.escapeShellArg osConfig.sops.secrets."keepassxc/master-password".path
+                }
               fi
-              keepassxc --pw-stdin "$db" < /run/secrets/keepassxc/master-password &
+              keepassxc --pw-stdin "$db" < ${
+                lib.escapeShellArg osConfig.sops.secrets."keepassxc/master-password".path
+              } &
               app=$!
               sleep 8
               keepassxc "$db" >/dev/null 2>&1 || true

@@ -10,12 +10,7 @@ let
     let
       primaryOutputs = builtins.attrNames (lib.filterAttrs (_: output: output.primary) outputs);
     in
-    if builtins.length primaryOutputs > 1 then
-      throw "duxshell: at most one host.outputs entry may set primary = true, got ${toString (builtins.length primaryOutputs)}"
-    else if primaryOutputs == [ ] then
-      [ "all" ]
-    else
-      primaryOutputs;
+    if primaryOutputs == [ ] then [ "all" ] else primaryOutputs;
 
   quickshellIpcReconnectOverlay = _final: prev: {
     quickshell = prev.quickshell.overrideAttrs (old: {

@@ -227,7 +227,7 @@
 <circle cx="56" cy="2021" r="2.5" fill="#3dffb0"/>
 <text x="68" y="2025" font-size="10.5" fill="#93b3ab">arrows point up: the lower card includes the card above it</text>
 <circle cx="56" cy="2040" r="2.5" fill="#3dffb0"/>
-<text x="68" y="2044" font-size="10.5" fill="#93b3ab">base is included by graphical (den.nix:44); base includes graphical nowhere (den.nix:12)</text>
+<text x="68" y="2044" font-size="10.5" fill="#93b3ab">base is included by graphical in den.nix; base does not include graphical</text>
 <circle cx="56" cy="2059" r="2.5" fill="#b673ff"/>
 <text x="68" y="2063" font-size="10.5" fill="#93b3ab">call includes take arguments where they are used: (ai { local; stt; })</text>
 <circle cx="56" cy="2078" r="2.5" fill="#ff5d8a"/>

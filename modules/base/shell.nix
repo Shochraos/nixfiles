@@ -15,7 +15,6 @@ in
         home.packages = with pkgs; [
           eza
           fd
-          btop
         ];
 
         programs.bash = {

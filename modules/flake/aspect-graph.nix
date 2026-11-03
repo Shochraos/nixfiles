@@ -38,10 +38,7 @@
       checks.aspect-graph =
         pkgs.runCommand "aspect-graph-current"
           {
-            nativeBuildInputs = [
-              pkgs.git
-              pkgs.python3
-            ];
+            nativeBuildInputs = [ pkgs.python3 ];
           }
           ''
             cp -r ${self} src

@@ -12,8 +12,6 @@ in
     {
       nixpkgs.overlays = [ xdphScreencopyBufferReuseOverlay ];
 
-      programs.hyprland.portalPackage = pkgs.xdg-desktop-portal-hyprland;
-
       xdg.portal = {
         enable = true;
         extraPortals = with pkgs; [

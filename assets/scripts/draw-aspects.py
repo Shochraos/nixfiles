@@ -515,7 +515,7 @@ def build():
 
     notes = [
         (GREEN, "arrows point up: the lower card includes the card above it"),
-        (GREEN, "base is included by graphical (den.nix:44); base includes graphical nowhere (den.nix:12)"),
+        (GREEN, "base is included by graphical in den.nix; base does not include graphical"),
         (PURPLE, "call includes take arguments where they are used: (ai { local; stt; })"),
         (PINK, "unfree(...) is a den battery bundle, not an aspect file"),
         (DIM, "↑  that aspect is drawn above, in the spine"),

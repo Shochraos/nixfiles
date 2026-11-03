@@ -19,12 +19,6 @@
           }
           {
             _args = [
-              "SUPER + SHIFT + Return"
-              (lua "hl.dsp.exec_cmd('uwsm-app -- ghostty')")
-            ];
-          }
-          {
-            _args = [
               "SUPER + F"
               (lua "hl.dsp.exec_cmd('uwsm-app -- nautilus')")
             ];

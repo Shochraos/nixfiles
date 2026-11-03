@@ -11,7 +11,6 @@ in
         runtimeInputs = [
           inputs.dms.packages.${pkgs.stdenv.hostPlatform.system}.dms-shell
           pkgs.coreutils
-          pkgs.gnugrep
           pkgs.wireplumber
         ];
         text = builtins.readFile assets.micMuteScript;
