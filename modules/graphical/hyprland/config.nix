@@ -178,7 +178,7 @@ in
               shadow = {
                 enabled = true;
                 range = 30;
-                render_power = 5;
+                render_power = 4;
                 offset = "0 5";
               };
             };
