@@ -1,7 +1,9 @@
+{ inputs, ... }:
 {
   den.aspects.solas.nixos =
     {
       lib,
+      pkgs,
       ...
     }:
     let
@@ -257,6 +259,10 @@
       };
 
       host.dms = {
+        plugins.duxMirror = {
+          enable = true;
+          src = inputs.dux-mirror.packages.${pkgs.stdenv.hostPlatform.system}.default;
+        };
         powerMenuActions = [ "suspend" ];
         barConfigs = [
           {
@@ -353,6 +359,7 @@
       home.stateVersion = "25.05";
       home.packages = [
         pkgs.eduvpn-client
+        pkgs.wl-mirror
       ];
     };
 }

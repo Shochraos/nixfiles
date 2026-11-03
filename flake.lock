@@ -197,6 +197,26 @@
         "type": "github"
       }
     },
+    "dux-mirror": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1793706857,
+        "narHash": "sha256-4uPTrWGPskmw8K3sv5desHlWTNC5d9x7mn4zJ6obYCM=",
+        "owner": "Shochraos",
+        "repo": "dux-mirror",
+        "rev": "084f39264e0a32f6c7796c3b5a986fd8c0ab7634",
+        "type": "github"
+      },
+      "original": {
+        "owner": "Shochraos",
+        "repo": "dux-mirror",
+        "type": "github"
+      }
+    },
     "dw-proton-nix": {
       "inputs": {
         "nixpkgs": [
@@ -767,6 +787,7 @@
         "den": "den",
         "dms": "dms",
         "dms-plugin-registry": "dms-plugin-registry",
+        "dux-mirror": "dux-mirror",
         "dw-proton-nix": "dw-proton-nix",
         "flake-parts": "flake-parts",
         "flyline": "flyline",

@@ -262,7 +262,11 @@ in
                   width = 50;
                 }
                 {
-                  id = "builtin_display_profiles";
+                  id =
+                    if osConfig.host.dms.plugins.duxMirror.enable or false then
+                      "plugin_duxMirror"
+                    else
+                      "builtin_display_profiles";
                   enabled = true;
                   width = 50;
                 }
