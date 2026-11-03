@@ -53,7 +53,6 @@
     apps
     mail
     sync
-    kde-connect
     printing
     bluetooth
   ];
@@ -61,6 +60,7 @@
   den.aspects.azazel.includes = with den.aspects; [
     graphical
     desktop
+    kde-connect
     cpu-amd
     nvidia
     gaming

@@ -2,22 +2,9 @@
   den.aspects.kde-connect.nixos =
     { pkgs, ... }:
     {
-      environment.systemPackages = [ pkgs.valent ];
-      hardware.uinput.enable = true;
-
-      host.network.homeOnlyPorts = {
-        tcp.ranges = [
-          {
-            from = 1714;
-            to = 1764;
-          }
-        ];
-        udp.ranges = [
-          {
-            from = 1714;
-            to = 1764;
-          }
-        ];
+      programs.kdeconnect = {
+        enable = true;
+        package = pkgs.valent;
       };
     };
 

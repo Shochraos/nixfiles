@@ -26,7 +26,6 @@ in
       hermesDesktopTemplate = ../../assets/templates/hermes-desktop.js;
       hdrStateScript = ../../assets/scripts/hdr-state.sh;
       hdrRunScript = ../../assets/scripts/hdr-run.sh;
-      homeNetworkScript = ../../assets/scripts/home-network.sh;
       hsFuldaEduroamCa = ../../assets/certs/hs-fulda-eduroam-ca.pem;
       ironyModManagerIcon = ../../assets/icons/ironymodmanager.png;
       klassyRc = ../../configs/klassy/klassyrc;

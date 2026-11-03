@@ -2,6 +2,7 @@
 {
   den.aspects.solas.nixos =
     {
+      config,
       lib,
       pkgs,
       ...
@@ -15,13 +16,11 @@
 
       host.autostart = [ "hermes" ];
       host.network.onlinePolicy = "skip";
-      host.network.homeWifiProfiles = [ "ragnarok" ];
 
       host.flakeDir = "/home/shochraos/Repositories/nix/nixfiles";
       host.keepassxc.database = "/mnt/nextcloud/Security/KeePass/Vault.kdbx";
 
       host.ssh.firewallInterfaces = [
-        "home-full"
         "home-split"
       ];
 
@@ -29,40 +28,21 @@
         "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIC71dT73gYzQ5zQz0hAeqC6XccOcBmBxGh9Fk2xztTb6 hermes-gateway"
       ];
 
+      sops.secrets = lib.genAttrs [
+        "wireguard/solas/home"
+        "wireguard/solas/home-endpoint"
+        "wireguard/solas/home-address"
+        "wireguard/solas/home-dns"
+      ] (_: { });
+
+      sops.templates."wireguard.env".content = ''
+        WG_HOME_KEY=${config.sops.placeholder."wireguard/solas/home"}
+        WG_HOME_ENDPOINT=${config.sops.placeholder."wireguard/solas/home-endpoint"}
+        WG_HOME_ADDRESS=${config.sops.placeholder."wireguard/solas/home-address"}
+        WG_HOME_DNS=${config.sops.placeholder."wireguard/solas/home-dns"}
+      '';
+
       host.wireguard.profiles = {
-        home = {
-          extraSecrets = [
-            "endpoint"
-            "address"
-            "dns"
-          ];
-
-          connection = {
-            id = "Home (Full-Tunnel)";
-            type = "wireguard";
-            interface-name = "home-full";
-            autoconnect = false;
-          };
-
-          "wireguard-peer.${homePeerPubkey}" = {
-            endpoint = "$WG_HOME_ENDPOINT";
-            allowed-ips = "0.0.0.0/0;";
-          };
-
-          wireguard.mtu = 1412;
-
-          ipv4 = {
-            method = "manual";
-            address1 = "$WG_HOME_ADDRESS/32";
-            dns = "$WG_HOME_DNS;";
-            dns-search = "~;";
-          };
-
-          ipv6 = {
-            method = "disabled";
-          };
-        };
-
         home-split = {
           excludedSSIDs = [ "Ragnarök" ];
           extraSecrets = [ "allowed-ips" ];
@@ -329,10 +309,6 @@
               }
               {
                 id = "clipboard";
-                enabled = true;
-              }
-              {
-                id = "dankKDEConnect";
                 enabled = true;
               }
               {

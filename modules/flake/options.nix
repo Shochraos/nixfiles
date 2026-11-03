@@ -5,40 +5,6 @@ let
   attrsetList = types.listOf openAttrs;
   attrsetTable = types.attrsOf openAttrs;
   positiveNumber = types.addCheck types.number (value: value > 0);
-  homeOnlyPort = types.ints.between 1 65535;
-  homeOnlyPortRange = types.submodule {
-    options = {
-      from = mkOption {
-        type = homeOnlyPort;
-        description = "First port of the inclusive range.";
-      };
-      to = mkOption {
-        type = homeOnlyPort;
-        description = "Last port of the inclusive range.";
-      };
-    };
-  };
-  homeOnlyProtocol = {
-    ports = mkOption {
-      type = types.listOf homeOnlyPort;
-      default = [ ];
-      description = "Individual ports opened between this host and recognised home-network addresses.";
-    };
-    ranges = mkOption {
-      type = types.listOf homeOnlyPortRange;
-      default = [ ];
-      apply =
-        ranges:
-        map (
-          range:
-          if range.from <= range.to then
-            range
-          else
-            throw "host.network.homeOnlyPorts: a port range must have from <= to"
-        ) ranges;
-      description = "Inclusive port ranges opened between this host and recognised home-network addresses. Each range occupies two multiport slots.";
-    };
-  };
   envName = name: lib.toUpper (lib.replaceStrings [ "-" ] [ "_" ] name);
   profileAssertions =
     kind: profiles:
@@ -322,7 +288,7 @@ in
                   };
                 });
                 default = { };
-                description = "NetworkManager WireGuard profiles for this host (keyfile sections, without key material). Each profile reads its private key from the sops secret `wireguard/<host>/<profile>`; setting `presharedKey = true` on a profile additionally injects `wireguard/<host>/<profile>-psk` into its peer sections. Suffixes listed in `extraSecrets` load `wireguard/<host>/<profile>-<suffix>` as `$WG_<PROFILE>_<SUFFIX>` for referencing in any field. Setting `wireguard.private-key` on a profile yourself means it owns no secret of its own — point it at another profile's `$WG_<PROFILE>_KEY` and the module declares neither `wireguard/<host>/<profile>` nor its env entry.";
+                description = "NetworkManager WireGuard profiles for this host (keyfile sections, without key material). Each profile reads its private key from the sops secret `wireguard/<host>/<profile>`; setting `presharedKey = true` on a profile additionally injects `wireguard/<host>/<profile>-psk` into its peer sections. Suffixes listed in `extraSecrets` load `wireguard/<host>/<profile>-<suffix>` as `$WG_<PROFILE>_<SUFFIX>` for referencing in any field. Setting `wireguard.private-key` on a profile yourself means it owns no secret of its own — declare its runtime environment mapping with a native sops template and the module declares neither `wireguard/<host>/<profile>` nor its env entry.";
               };
             };
 
@@ -372,15 +338,7 @@ in
                 default = "wait";
                 description = "Whether NetworkManager must finish startup before network-online.target; only Solas opts out.";
               };
-              homeWifiProfiles = mkOption {
-                type = types.listOf (types.enum (builtins.attrNames config.host.wifi.profiles));
-                default = [ ];
-                description = "Declared Wi-Fi profile keys eligible for home trust when their active managed backing file and home prefix both match. Empty denies Wi-Fi home trust; Ethernet and VLAN prefix matching is unchanged.";
-              };
-              homeOnlyPorts = {
-                tcp = homeOnlyProtocol;
-                udp = homeOnlyProtocol;
-              };
+
             };
 
             ssh = {

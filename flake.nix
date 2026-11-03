@@ -103,6 +103,7 @@
       url = "github:Shochraos/Millennium";
       flake = false;
     };
+
     millennium = {
       url = "github:Shochraos/Millennium/?dir=packages/nix";
       inputs.nixpkgs.follows = "nixpkgs";

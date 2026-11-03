@@ -41,10 +41,6 @@
           conditionalNames = builtins.filter (
             name: profiles.${name}.excludedSSIDs != [ ] && (profiles.${name}.connection.autoconnect or true)
           ) profileNames;
-          keyReference = name: profiles.${name}.wireguard.private-key or ("$" + keyVar name);
-          sharingKey =
-            name:
-            builtins.filter (other: other != name && keyReference other == keyReference name) profileNames;
           profileFile = name: "/run/NetworkManager/system-connections/${name}.nmconnection";
           reconcile = pkgs.writeShellScript "wireguard-autoconnect" ''
             set -euo pipefail
@@ -104,24 +100,14 @@
               ;;
             esac
             reconcile_profile() {
-              local name=$1 file=$2 uuid state excluded=false blocked=false related=false allow_start=true
-              local other in_use ssid denied pending
+              local name=$1 file=$2 uuid state excluded=false allow_start=true
+              local in_use ssid denied pending
               shift 2
               local -a excluded_ssids=("$@")
               [[ ''${counts["$file"]:-0} == 1 && -n ''${uuids["$file"]:-} ]] || return 0
               uuid=''${uuids["$file"]}
               state=''${states["$file"]}
               pending=/run/wireguard-autoconnect-"$name".pending
-              for other in "''${conflicts[@]}"; do
-                if [[ ''${counts["$other"]:-0} != 1 || -z ''${uuids["$other"]:-} ]]; then
-                  blocked=true
-                  continue
-                fi
-                [[ ''${uuids["$other"]} != "''${CONNECTION_UUID:-}" ]] || related=true
-                case "''${states["$other"]}" in
-                activating | activated) blocked=true ;;
-                esac
-              done
               case "$action" in
               profiles-loaded) ;;
               up | down | dhcp4-change | dhcp6-change | reapply)
@@ -131,7 +117,7 @@
                   up) allow_start=false ;;
                   *) return 0 ;;
                   esac
-                elif ! "$physical_event" && ! "$related"; then
+                elif ! "$physical_event"; then
                   return 0
                 fi
                 ;;
@@ -143,7 +129,7 @@
                   [[ $ssid != "$denied" ]] || excluded=true
                 done
               done <<<"$wifi"
-              if "$excluded" || ! "$uplink" || "$blocked"; then
+              if "$excluded" || ! "$uplink"; then
                 rm -f -- "$pending"
                 case "$state" in
                 activating | activated) nmcli --wait 0 connection down uuid "$uuid" ;;
@@ -160,7 +146,6 @@
               fi
             }
             ${lib.concatMapStringsSep "\n" (name: ''
-              conflicts=(${lib.escapeShellArgs (map profileFile (sharingKey name))})
               reconcile_profile ${
                 lib.escapeShellArgs (
                   [
