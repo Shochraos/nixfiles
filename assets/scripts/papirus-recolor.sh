@@ -5,6 +5,7 @@ cache="$PAPIRUS_CACHE"
 out_root="$PAPIRUS_OUTPUT"
 parent=Papirus-Dark
 child=Papirus-Matugen-Dark
+renderer_format_version=1
 mkdir -p "$cache"
 if [[ ${1:-} != --publish ]]; then
   exec 9>"$cache/recolor.lock"
@@ -78,7 +79,7 @@ trap cleanup EXIT
 trap 'exit 130' INT
 trap 'exit 143' TERM
 
-printf '%s\n' "$PAPIRUS_ROOT" "$GTK_CACHE" "$(sha256sum "$0")" "$accent" "$tone" >"$work/inputs"
+printf '%s\n' "$PAPIRUS_ROOT" "$GTK_CACHE" "$renderer_format_version" "$accent" "$tone" >"$work/inputs"
 if [[ -r "$out_root/$child/index.theme" && -r "$out_root/$child/.inputs" ]] &&
   [[ $(<"$work/inputs") == $(<"$out_root/$child/.inputs") ]]; then
   rm -f -- "$cache/recolor.sh" "$cache/recolor.sh.tmp"
