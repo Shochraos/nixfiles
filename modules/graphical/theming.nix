@@ -100,12 +100,36 @@ in
         ...
       }:
       let
-        papirusRecolorTemplate = pkgs.runCommand "papirus-recolor.sh" { } ''
-          install -m644 ${assets.papirusRecolorTemplate} $out
-          substituteInPlace $out \
-            --replace-fail '@PAPIRUS_ICONS@' '${pkgs.papirus-icon-theme}/share/icons' \
-            --replace-fail '@GTK_CACHE@' '${pkgs.gtk3}/bin/gtk-update-icon-cache'
-        '';
+        hermesDesktopTemplate = pkgs.writeText "hermes-desktop.js" (
+          builtins.replaceStrings
+            [
+              "'@HERMES_FONT_SANS@'"
+              "'@HERMES_FONT_MONO@'"
+            ]
+            [
+              (builtins.toJSON "${builtins.toJSON config.stylix.fonts.sansSerif.name}, sans-serif")
+              (builtins.toJSON "${builtins.toJSON config.stylix.fonts.monospace.name}, monospace")
+            ]
+            (builtins.readFile assets.hermesDesktopTemplate)
+        );
+
+        papirusRecolor = pkgs.writeShellApplication {
+          name = "papirus-recolor";
+          runtimeInputs = with pkgs; [
+            coreutils
+            findutils
+            gnugrep
+            gnused
+            util-linux
+          ];
+          runtimeEnv = {
+            PAPIRUS_ROOT = "${pkgs.papirus-icon-theme}/share/icons";
+            GTK_CACHE = "${pkgs.gtk3}/bin/gtk-update-icon-cache";
+            PAPIRUS_CACHE = "${config.xdg.cacheHome}/papirus-matugen";
+            PAPIRUS_OUTPUT = "${config.xdg.dataHome}/icons";
+          };
+          text = builtins.readFile assets.papirusRecolorScript;
+        };
       in
       {
         home.pointerCursor.enable = true;
@@ -209,10 +233,16 @@ in
                   output_path = "~/.config/starship.toml";
                 };
 
+                hermes-desktop = {
+                  input_path = hermesDesktopTemplate;
+                  output_path = "~/.hermes/desktop-plugins/matugen/plugin.js.tmp";
+                  post_hook = "${pkgs.coreutils}/bin/mv -f -- \"$HOME/.hermes/desktop-plugins/matugen/plugin.js.tmp\" \"$HOME/.hermes/desktop-plugins/matugen/plugin.js\"";
+                };
+
                 papirus-folders = {
-                  input_path = papirusRecolorTemplate;
-                  output_path = "~/.cache/papirus-matugen/recolor.sh.tmp";
-                  post_hook = "mv ~/.cache/papirus-matugen/recolor.sh.tmp ~/.cache/papirus-matugen/recolor.sh";
+                  input_path = assets.papirusPaletteTemplate;
+                  output_path = "${config.xdg.cacheHome}/papirus-matugen/palette.txt.tmp";
+                  post_hook = "${papirusRecolor}/bin/papirus-recolor --publish";
                 };
 
                 btop = {
@@ -232,24 +262,23 @@ in
 
         systemd.user.paths.papirus-matugen = {
           Unit = {
-            Description = "Run the Papirus icon recolor script whenever matugen renders it";
+            Description = "Rebuild Papirus icons whenever matugen publishes a palette";
             PartOf = [ "graphical-session.target" ];
           };
-          Path.PathChanged = "${config.xdg.cacheHome}/papirus-matugen/recolor.sh";
+          Path.PathChanged = "${config.xdg.cacheHome}/papirus-matugen/palette.txt";
           Install.WantedBy = [ "graphical-session.target" ];
         };
 
         systemd.user.services.papirus-matugen = {
           Unit = {
-            Description = "Rebuild Papirus-Matugen-Dark icons from the rendered matugen script";
+            Description = "Reconcile Papirus-Matugen-Dark icons with the current generation";
             After = [ "graphical-session.target" ];
             PartOf = [ "graphical-session.target" ];
-            ConditionPathExists = "${config.xdg.cacheHome}/papirus-matugen/recolor.sh";
           };
           Install.WantedBy = [ "graphical-session.target" ];
           Service = {
             Type = "oneshot";
-            ExecStart = "${pkgs.bash}/bin/bash ${config.xdg.cacheHome}/papirus-matugen/recolor.sh";
+            ExecStart = "${papirusRecolor}/bin/papirus-recolor";
             TimeoutStartSec = "15min";
           };
         };

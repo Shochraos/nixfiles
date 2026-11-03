@@ -13,6 +13,7 @@
 
       host.autostart = [ "hermes" ];
       host.network.onlinePolicy = "skip";
+      host.network.homeWifiProfiles = [ "ragnarok" ];
 
       host.flakeDir = "/home/shochraos/Repositories/nix/nixfiles";
       host.keepassxc.database = "/mnt/nextcloud/Security/KeePass/Vault.kdbx";

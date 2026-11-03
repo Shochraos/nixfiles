@@ -107,6 +107,7 @@ in
         end
 
         mp.observe_property("video-params/gamma", "string", function(_, gamma)
+          if gamma == nil then return end
           set_hdr(gamma == "pq" or gamma == "hlg")
         end)
 

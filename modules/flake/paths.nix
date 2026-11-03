@@ -23,6 +23,7 @@ in
       btopConf = ../../configs/btop/btop.conf;
       discordTemplate = ../../assets/templates/discord.css;
       halloyTemplate = ../../assets/templates/halloy.toml;
+      hermesDesktopTemplate = ../../assets/templates/hermes-desktop.js;
       hdrStateScript = ../../assets/scripts/hdr-state.sh;
       hdrRunScript = ../../assets/scripts/hdr-run.sh;
       homeNetworkScript = ../../assets/scripts/home-network.sh;
@@ -33,7 +34,8 @@ in
       matugenFlylineTemplate = ../../assets/matugen/flyline.sh;
       matugenBtopTemplate = ../../assets/matugen/btop.theme;
       matugenStarshipTemplate = ../../assets/matugen/starship.toml;
-      papirusRecolorTemplate = ../../assets/papirus-matugen/recolor.sh.tpl;
+      papirusPaletteTemplate = ../../assets/papirus-matugen/palette.txt.tpl;
+      papirusRecolorScript = ../../assets/scripts/papirus-recolor.sh;
       jellyfinMpvShimConfig = ../../configs/jellyfin-mpv-shim/conf.json;
       micMuteScript = ../../assets/scripts/mic-mute.sh;
       mp3tagIcon = ../../assets/icons/mp3tag.png;

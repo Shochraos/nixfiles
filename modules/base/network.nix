@@ -55,6 +55,9 @@ in
             runtimeEnv = {
               HOME_NETWORK_TCP_PORTS = tcpPorts;
               HOME_NETWORK_UDP_PORTS = udpPorts;
+              HOME_NETWORK_WIFI_FILES = lib.concatMapStringsSep "\n" (
+                name: "/run/NetworkManager/system-connections/${name}.nmconnection"
+              ) (lib.unique config.host.network.homeWifiProfiles);
             };
             text = builtins.readFile assets.homeNetworkScript;
           };
@@ -65,6 +68,13 @@ in
             {
               assertion = config.networking.firewall.backend == "iptables";
               message = "The home-LAN service policy requires the iptables firewall backend.";
+            }
+            {
+              assertion = builtins.all (
+                name:
+                (config.networking.networkmanager.ensureProfiles.profiles.${name}.connection.type or null) == "wifi"
+              ) config.host.network.homeWifiProfiles;
+              message = "host.network.homeWifiProfiles: each selected key must generate a managed Wi-Fi profile.";
             }
             {
               assertion = multiportSlots tcp <= maxMultiportSlots;

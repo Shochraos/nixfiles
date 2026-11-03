@@ -65,6 +65,7 @@ in
           name = "hdr";
           runtimeInputs = [
             pkgs.coreutils
+            pkgs.libnotify
             pkgs.util-linux
             hdr-set
           ];

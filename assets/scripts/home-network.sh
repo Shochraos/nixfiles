@@ -191,8 +191,32 @@ address_matches() {
   return 0
 }
 
+managed_wifi_uuid() {
+  local dev=$1 active profiles uuid filename expected matches=0 approved=0
+  [[ -n ${HOME_NETWORK_WIFI_FILES:-} ]] || return 1
+  if ! active=$(LC_ALL=C nmcli -g GENERAL.CON-UUID device show "$dev" 2>/dev/null); then
+    return 1
+  fi
+  [[ $active =~ ^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$ ]] || return 1
+  if ! profiles=$(LC_ALL=C nmcli -t --escape no -f UUID,FILENAME connection show 2>/dev/null); then
+    return 1
+  fi
+  while IFS=: read -r uuid filename; do
+    [[ $uuid == "$active" ]] || continue
+    matches=$((matches + 1))
+    filename=${filename/#\/var\/run\//\/run\/}
+    while IFS= read -r expected; do
+      if [[ -n $expected && $filename == "$expected" ]]; then
+        approved=1
+      fi
+    done <<<"$HOME_NETWORK_WIFI_FILES"
+  done <<<"$profiles"
+  ((matches == 1 && approved == 1)) || return 1
+  printf '%s' "$active"
+}
+
 classify() {
-  local devices dev type state addrs records family addr trusted
+  local devices dev type state addrs records family addr trusted wifi_uuid current_uuid
   local -a addresses=()
   local -A seen=()
 
@@ -212,6 +236,10 @@ classify() {
     [[ $dev != lo ]] || continue
     if [[ ! $dev =~ ^[A-Za-z0-9_.-][A-Za-z0-9_.-]*$ ]]; then
       warn "ignoring device with unsupported name"
+      continue
+    fi
+    if [[ $type == wifi ]] && ! wifi_uuid=$(managed_wifi_uuid "$dev"); then
+      warn "skipping device $dev: managed Wi-Fi identity is unavailable or unapproved"
       continue
     fi
     if ! addrs=$(ip -j addr show dev "$dev" 2>/dev/null); then
@@ -250,6 +278,12 @@ classify() {
         break
       fi
     done
+    if ((trusted == 1)) && [[ $type == wifi ]]; then
+      if ! current_uuid=$(managed_wifi_uuid "$dev") || [[ $current_uuid != "$wifi_uuid" ]]; then
+        warn "skipping device $dev: managed Wi-Fi identity changed"
+        continue
+      fi
+    fi
     if ((trusted == 1)) && [[ -z ${seen[$dev]+x} ]]; then
       seen[$dev]=1
       trusted_ifaces+=("$dev")

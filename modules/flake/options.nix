@@ -367,6 +367,11 @@ in
                 default = "wait";
                 description = "Whether NetworkManager must finish startup before network-online.target; only Solas opts out.";
               };
+              homeWifiProfiles = mkOption {
+                type = types.listOf (types.enum (builtins.attrNames config.host.wifi.profiles));
+                default = [ ];
+                description = "Declared Wi-Fi profile keys eligible for home trust when their active managed backing file and home prefix both match. Empty denies Wi-Fi home trust; Ethernet and VLAN prefix matching is unchanged.";
+              };
               homeOnlyPorts = {
                 tcp = homeOnlyProtocol;
                 udp = homeOnlyProtocol;
