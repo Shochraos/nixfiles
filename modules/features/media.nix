@@ -1,8 +1,10 @@
-{ config, ... }:
+{ config, den, ... }:
 let
   inherit (config) assets;
 in
 {
+  den.aspects.media.includes = with den.aspects; [ hdr ];
+
   den.aspects.media.provides.to-users.homeManager =
     {
       pkgs,

@@ -1,8 +1,6 @@
 { config, ... }:
 let
-  bscpylgtvOverlay = final: _prev: {
-    bscpylgtv = final.callPackage config.packageSources.bscpylgtv { };
-  };
+  inherit (config) packageSources;
 in
 {
   den.aspects.lgtv =
@@ -20,8 +18,6 @@ in
           systemctl = lib.getExe' pkgs.systemd "systemctl";
         in
         {
-          nixpkgs.overlays = [ bscpylgtvOverlay ];
-
           sops.secrets = {
             "lgtv/mac" = { };
             "lgtv/ip" = { };
@@ -83,6 +79,9 @@ in
           pkgs,
           ...
         }:
+        let
+          bscpylgtv = pkgs.callPackage packageSources.bscpylgtv { };
+        in
         {
           systemd.user.services.sol-lgtv = {
             Unit = {
@@ -94,7 +93,7 @@ in
               EnvironmentFile = osConfig.sops.templates."lgtv.env".path;
               ExecStart = "${lib.getExe' pkgs.coreutils "true"}";
               RemainAfterExit = true;
-              ExecStop = "${lib.getExe pkgs.bscpylgtv} \${LGTV_IP} power_off";
+              ExecStop = "${lib.getExe bscpylgtv} \${LGTV_IP} power_off";
             };
             Install = {
               WantedBy = [ "graphical-session.target" ];

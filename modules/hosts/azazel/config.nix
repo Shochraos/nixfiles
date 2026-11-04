@@ -30,8 +30,7 @@
         };
       };
 
-      host.flakeDir = "/home/shochraos/Repositories/nix/nixfiles";
-      host.boot.kernelParams = [ "nvme_core.default_ps_max_latency_us=0" ];
+      boot.kernelParams = [ "nvme_core.default_ps_max_latency_us=0" ];
       host.ssh.firewallInterfaces = [ "en*" ];
       host.ssh.authorizedKeys = [
         "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIC71dT73gYzQ5zQz0hAeqC6XccOcBmBxGh9Fk2xztTb6 hermes-gateway"
@@ -339,7 +338,6 @@
         ];
       };
 
-      host.keepassxc.database = "/mnt/nextcloud/Security/KeePass/Vault.kdbx";
       host.keepassxc.settings.Security = {
         LockDatabaseIdle = false;
         LockDatabaseScreenLock = false;

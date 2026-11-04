@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="820" height="2196" viewBox="0 0 820 2196">
+<svg xmlns="http://www.w3.org/2000/svg" width="820" height="2156" viewBox="0 0 820 2156">
 <defs>
 <marker id="arw-green" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#3dffb0"/></marker>
 <marker id="arw-cyan" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#34e0ff"/></marker>
@@ -6,13 +6,13 @@
 <marker id="arw-purple" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#b673ff"/></marker>
 <pattern id="grid" width="30" height="30" patternUnits="userSpaceOnUse"><circle cx="15" cy="15" r="0.5" fill="#517269" opacity="0.18"/></pattern>
 </defs>
-<rect width="820" height="2196" rx="14" fill="#04060a"/>
-<rect width="820" height="2196" rx="14" fill="url(#grid)"/>
+<rect width="820" height="2156" rx="14" fill="#04060a"/>
+<rect width="820" height="2156" rx="14" fill="url(#grid)"/>
 <g font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">
 <text x="36" y="46" font-size="32" fill="#e6f2ec" font-weight="700">nixfiles</text>
 <rect x="680" y="24" rx="6" width="104" height="22" fill="#3dffb0" stroke="#3dffb0" stroke-width="0.5" opacity="0.12"/>
 <text x="732" y="39" font-size="10" fill="#3dffb0" font-weight="600" text-anchor="middle">DENDRITIC</text>
-<text x="36" y="72" font-size="11.5" fill="#93b3ab">flake-parts + den  ·  72 .nix files  ·  52 aspect names  ·  56 includes edges  ·  2 hosts</text>
+<text x="36" y="72" font-size="11.5" fill="#93b3ab">flake-parts + den  ·  69 .nix files  ·  49 aspect names  ·  52 includes edges  ·  2 hosts</text>
 <text x="36" y="112" font-size="10.5" fill="#93b3ab" font-weight="700" letter-spacing="2">ENTRY</text>
 <rect x="36" y="126" rx="10" width="748" height="56" fill="#151c24" stroke="#517269" stroke-width="1.5"/>
 <rect x="40" y="135" rx="3" width="4" height="38" fill="#3dffb0"/>
@@ -70,10 +70,10 @@
 <text x="766" y="695" font-size="9.5" fill="#93b3ab" text-anchor="end" opacity="0.75">modules/base/wifi.nix</text>
 <path d="M 410 743 L 410 715" stroke="#3dffb0" stroke-width="2" stroke-linecap="round" fill="none" opacity="0.85" marker-end="url(#arw-green)"/>
 <text x="422" y="735" font-size="10" fill="#3dffb0">included by graphical</text>
-<rect x="36" y="751" rx="12" width="748" height="367" fill="#151c24" stroke="#517269" stroke-width="1.5"/>
-<rect x="36" y="751" rx="2" width="4" height="367" fill="#3dffb0"/>
+<rect x="36" y="751" rx="12" width="748" height="344" fill="#151c24" stroke="#517269" stroke-width="1.5"/>
+<rect x="36" y="751" rx="2" width="4" height="344" fill="#3dffb0"/>
 <text x="54" y="775" font-size="14" fill="#e6f2ec" font-weight="700">graphical</text>
-<text x="54" y="792" font-size="10" fill="#93b3ab">den.aspects.graphical.includes · 13 entries</text>
+<text x="54" y="792" font-size="10" fill="#93b3ab">den.aspects.graphical.includes · 12 entries</text>
 <line x1="52" y1="801" x2="768" y2="801" stroke="#517269" stroke-width="1"/>
 <circle cx="60" cy="820" r="3" fill="#3dffb0"/>
 <text x="72" y="824" font-size="11.5" fill="#e6f2ec">base  ↑</text>
@@ -103,43 +103,43 @@
 <text x="72" y="1008" font-size="11.5" fill="#e6f2ec">apps  ⊃</text>
 <text x="766" y="1008" font-size="9.5" fill="#93b3ab" text-anchor="end" opacity="0.75">modules/graphical/apps.nix</text>
 <circle cx="60" cy="1027" r="3" fill="#3dffb0"/>
-<text x="72" y="1031" font-size="11.5" fill="#e6f2ec">mail</text>
-<text x="766" y="1031" font-size="9.5" fill="#93b3ab" text-anchor="end" opacity="0.75">modules/graphical/mail.nix</text>
+<text x="72" y="1031" font-size="11.5" fill="#e6f2ec">sync</text>
+<text x="766" y="1031" font-size="9.5" fill="#93b3ab" text-anchor="end" opacity="0.75">modules/graphical/sync.nix</text>
 <circle cx="60" cy="1050" r="3" fill="#3dffb0"/>
-<text x="72" y="1054" font-size="11.5" fill="#e6f2ec">sync</text>
-<text x="766" y="1054" font-size="9.5" fill="#93b3ab" text-anchor="end" opacity="0.75">modules/graphical/sync.nix</text>
+<text x="72" y="1054" font-size="11.5" fill="#e6f2ec">printing</text>
+<text x="766" y="1054" font-size="9.5" fill="#93b3ab" text-anchor="end" opacity="0.75">modules/graphical/printing.nix</text>
 <circle cx="60" cy="1073" r="3" fill="#3dffb0"/>
-<text x="72" y="1077" font-size="11.5" fill="#e6f2ec">printing</text>
-<text x="766" y="1077" font-size="9.5" fill="#93b3ab" text-anchor="end" opacity="0.75">modules/graphical/printing.nix</text>
-<circle cx="60" cy="1096" r="3" fill="#3dffb0"/>
-<text x="72" y="1100" font-size="11.5" fill="#e6f2ec">bluetooth</text>
-<text x="766" y="1100" font-size="9.5" fill="#93b3ab" text-anchor="end" opacity="0.75">modules/graphical/bluetooth.nix</text>
-<rect x="36" y="1152" rx="12" width="364" height="413" fill="#151c24" stroke="#517269" stroke-width="1.5"/>
-<rect x="36" y="1152" rx="2" width="4" height="413" fill="#ff5d8a"/>
-<text x="54" y="1176" font-size="14" fill="#e6f2ec" font-weight="700">azazel</text>
-<text x="54" y="1193" font-size="10" fill="#93b3ab">den.hosts.x86_64-linux.Azazel · 15 includes</text>
-<line x1="52" y1="1202" x2="384" y2="1202" stroke="#517269" stroke-width="1"/>
+<text x="72" y="1077" font-size="11.5" fill="#e6f2ec">bluetooth</text>
+<text x="766" y="1077" font-size="9.5" fill="#93b3ab" text-anchor="end" opacity="0.75">modules/graphical/bluetooth.nix</text>
+<rect x="36" y="1129" rx="12" width="364" height="436" fill="#151c24" stroke="#517269" stroke-width="1.5"/>
+<rect x="36" y="1129" rx="2" width="4" height="436" fill="#ff5d8a"/>
+<text x="54" y="1153" font-size="14" fill="#e6f2ec" font-weight="700">azazel</text>
+<text x="54" y="1170" font-size="10" fill="#93b3ab">den.hosts.x86_64-linux.Azazel · 16 includes</text>
+<line x1="52" y1="1179" x2="384" y2="1179" stroke="#517269" stroke-width="1"/>
+<circle cx="60" cy="1198" r="3" fill="#3dffb0"/>
+<text x="72" y="1202" font-size="11.5" fill="#e6f2ec">graphical  ↑</text>
+<text x="382" y="1202" font-size="9.5" fill="#93b3ab" text-anchor="end" opacity="0.75">modules/flake/den.nix</text>
 <circle cx="60" cy="1221" r="3" fill="#3dffb0"/>
-<text x="72" y="1225" font-size="11.5" fill="#e6f2ec">graphical  ↑</text>
-<text x="382" y="1225" font-size="9.5" fill="#93b3ab" text-anchor="end" opacity="0.75">modules/flake/den.nix</text>
+<text x="72" y="1225" font-size="11.5" fill="#e6f2ec">desktop</text>
+<text x="382" y="1225" font-size="9.5" fill="#93b3ab" text-anchor="end" opacity="0.75">modules/features/desktop.nix</text>
 <circle cx="60" cy="1244" r="3" fill="#3dffb0"/>
-<text x="72" y="1248" font-size="11.5" fill="#e6f2ec">desktop</text>
-<text x="382" y="1248" font-size="9.5" fill="#93b3ab" text-anchor="end" opacity="0.75">modules/features/desktop.nix</text>
+<text x="72" y="1248" font-size="11.5" fill="#e6f2ec">kde-connect</text>
+<text x="382" y="1248" font-size="9.5" fill="#93b3ab" text-anchor="end" opacity="0.75">modules/graphical/kde-connect.nix</text>
 <circle cx="60" cy="1267" r="3" fill="#3dffb0"/>
-<text x="72" y="1271" font-size="11.5" fill="#e6f2ec">kde-connect</text>
-<text x="382" y="1271" font-size="9.5" fill="#93b3ab" text-anchor="end" opacity="0.75">modules/graphical/kde-connect.nix</text>
+<text x="72" y="1271" font-size="11.5" fill="#e6f2ec">cpu-amd</text>
+<text x="382" y="1271" font-size="9.5" fill="#93b3ab" text-anchor="end" opacity="0.75">modules/features/cpu-amd.nix</text>
 <circle cx="60" cy="1290" r="3" fill="#3dffb0"/>
-<text x="72" y="1294" font-size="11.5" fill="#e6f2ec">cpu-amd</text>
-<text x="382" y="1294" font-size="9.5" fill="#93b3ab" text-anchor="end" opacity="0.75">modules/features/cpu-amd.nix</text>
+<text x="72" y="1294" font-size="11.5" fill="#e6f2ec">nvidia  ⊃</text>
+<text x="382" y="1294" font-size="9.5" fill="#93b3ab" text-anchor="end" opacity="0.75">modules/features/nvidia.nix</text>
 <circle cx="60" cy="1313" r="3" fill="#3dffb0"/>
-<text x="72" y="1317" font-size="11.5" fill="#e6f2ec">nvidia  ⊃</text>
-<text x="382" y="1317" font-size="9.5" fill="#93b3ab" text-anchor="end" opacity="0.75">modules/features/nvidia.nix</text>
+<text x="72" y="1317" font-size="11.5" fill="#e6f2ec">gaming  ⊃</text>
+<text x="382" y="1317" font-size="9.5" fill="#93b3ab" text-anchor="end" opacity="0.75">modules/features/gaming/lact.nix</text>
 <circle cx="60" cy="1336" r="3" fill="#3dffb0"/>
-<text x="72" y="1340" font-size="11.5" fill="#e6f2ec">gaming  ⊃</text>
-<text x="382" y="1340" font-size="9.5" fill="#93b3ab" text-anchor="end" opacity="0.75">modules/features/gaming/lact.nix</text>
-<circle cx="60" cy="1359" r="3" fill="#b673ff"/>
-<text x="72" y="1363" font-size="11.5" fill="#e6f2ec">ai {local=false; stt=true}  ⊃</text>
-<text x="382" y="1363" font-size="9.5" fill="#93b3ab" text-anchor="end" opacity="0.75">ai/default.nix</text>
+<text x="72" y="1340" font-size="11.5" fill="#e6f2ec">ai-harness</text>
+<text x="382" y="1340" font-size="9.5" fill="#93b3ab" text-anchor="end" opacity="0.75">modules/features/ai/harness.nix</text>
+<circle cx="60" cy="1359" r="3" fill="#3dffb0"/>
+<text x="72" y="1363" font-size="11.5" fill="#e6f2ec">ai-stt</text>
+<text x="382" y="1363" font-size="9.5" fill="#93b3ab" text-anchor="end" opacity="0.75">modules/features/ai/stt.nix</text>
 <circle cx="60" cy="1382" r="3" fill="#3dffb0"/>
 <text x="72" y="1386" font-size="11.5" fill="#e6f2ec">irc</text>
 <text x="382" y="1386" font-size="9.5" fill="#93b3ab" text-anchor="end" opacity="0.75">modules/features/irc.nix</text>
@@ -164,79 +164,72 @@
 <circle cx="60" cy="1543" r="3" fill="#3dffb0"/>
 <text x="72" y="1547" font-size="11.5" fill="#e6f2ec">crypto</text>
 <text x="382" y="1547" font-size="9.5" fill="#93b3ab" text-anchor="end" opacity="0.75">modules/features/crypto.nix</text>
-<rect x="420" y="1152" rx="12" width="364" height="229" fill="#151c24" stroke="#517269" stroke-width="1.5"/>
-<rect x="420" y="1152" rx="2" width="4" height="229" fill="#34e0ff"/>
-<text x="438" y="1176" font-size="14" fill="#e6f2ec" font-weight="700">solas</text>
-<text x="438" y="1193" font-size="10" fill="#93b3ab">den.hosts.x86_64-linux.Solas · 7 includes</text>
-<line x1="436" y1="1202" x2="768" y2="1202" stroke="#517269" stroke-width="1"/>
+<rect x="420" y="1129" rx="12" width="364" height="206" fill="#151c24" stroke="#517269" stroke-width="1.5"/>
+<rect x="420" y="1129" rx="2" width="4" height="206" fill="#34e0ff"/>
+<text x="438" y="1153" font-size="14" fill="#e6f2ec" font-weight="700">solas</text>
+<text x="438" y="1170" font-size="10" fill="#93b3ab">den.hosts.x86_64-linux.Solas · 6 includes</text>
+<line x1="436" y1="1179" x2="768" y2="1179" stroke="#517269" stroke-width="1"/>
+<circle cx="444" cy="1198" r="3" fill="#3dffb0"/>
+<text x="456" y="1202" font-size="11.5" fill="#e6f2ec">graphical  ↑</text>
+<text x="766" y="1202" font-size="9.5" fill="#93b3ab" text-anchor="end" opacity="0.75">modules/flake/den.nix</text>
 <circle cx="444" cy="1221" r="3" fill="#3dffb0"/>
-<text x="456" y="1225" font-size="11.5" fill="#e6f2ec">graphical  ↑</text>
-<text x="766" y="1225" font-size="9.5" fill="#93b3ab" text-anchor="end" opacity="0.75">modules/flake/den.nix</text>
+<text x="456" y="1225" font-size="11.5" fill="#e6f2ec">laptop</text>
+<text x="766" y="1225" font-size="9.5" fill="#93b3ab" text-anchor="end" opacity="0.75">modules/features/laptop.nix</text>
 <circle cx="444" cy="1244" r="3" fill="#3dffb0"/>
-<text x="456" y="1248" font-size="11.5" fill="#e6f2ec">laptop</text>
-<text x="766" y="1248" font-size="9.5" fill="#93b3ab" text-anchor="end" opacity="0.75">modules/features/laptop.nix</text>
+<text x="456" y="1248" font-size="11.5" fill="#e6f2ec">cpu-amd</text>
+<text x="766" y="1248" font-size="9.5" fill="#93b3ab" text-anchor="end" opacity="0.75">modules/features/cpu-amd.nix</text>
 <circle cx="444" cy="1267" r="3" fill="#3dffb0"/>
-<text x="456" y="1271" font-size="11.5" fill="#e6f2ec">cpu-amd</text>
-<text x="766" y="1271" font-size="9.5" fill="#93b3ab" text-anchor="end" opacity="0.75">modules/features/cpu-amd.nix</text>
+<text x="456" y="1271" font-size="11.5" fill="#e6f2ec">fingerprint</text>
+<text x="766" y="1271" font-size="9.5" fill="#93b3ab" text-anchor="end" opacity="0.75">modules/features/fingerprint.nix</text>
 <circle cx="444" cy="1290" r="3" fill="#3dffb0"/>
-<text x="456" y="1294" font-size="11.5" fill="#e6f2ec">fingerprint</text>
-<text x="766" y="1294" font-size="9.5" fill="#93b3ab" text-anchor="end" opacity="0.75">modules/features/fingerprint.nix</text>
+<text x="456" y="1294" font-size="11.5" fill="#e6f2ec">mic-mute</text>
+<text x="766" y="1294" font-size="9.5" fill="#93b3ab" text-anchor="end" opacity="0.75">modules/features/mic-mute.nix</text>
 <circle cx="444" cy="1313" r="3" fill="#3dffb0"/>
-<text x="456" y="1317" font-size="11.5" fill="#e6f2ec">mic-mute</text>
-<text x="766" y="1317" font-size="9.5" fill="#93b3ab" text-anchor="end" opacity="0.75">modules/features/mic-mute.nix</text>
-<circle cx="444" cy="1336" r="3" fill="#3dffb0"/>
-<text x="456" y="1340" font-size="11.5" fill="#e6f2ec">pdfpc</text>
-<text x="766" y="1340" font-size="9.5" fill="#93b3ab" text-anchor="end" opacity="0.75">modules/features/pdfpc.nix</text>
-<circle cx="444" cy="1359" r="3" fill="#b673ff"/>
-<text x="456" y="1363" font-size="11.5" fill="#e6f2ec">ai {local=false; stt=false}  ⊃</text>
-<text x="766" y="1363" font-size="9.5" fill="#93b3ab" text-anchor="end" opacity="0.75">ai/default.nix</text>
-<line x1="218" y1="1132" x2="602" y2="1132" stroke="#3dffb0" stroke-width="2" opacity="0.85"/>
-<path d="M 218 1154 L 218 1134" stroke="#3dffb0" stroke-width="2" stroke-linecap="round" fill="none" opacity="0.85" marker-end="url(#arw-green)"/>
-<path d="M 602 1154 L 602 1134" stroke="#3dffb0" stroke-width="2" stroke-linecap="round" fill="none" opacity="0.85" marker-end="url(#arw-green)"/>
-<path d="M 410 1132 L 410 1120" stroke="#3dffb0" stroke-width="2" stroke-linecap="round" fill="none" opacity="0.85" marker-end="url(#arw-green)"/>
-<text x="422" y="1124" font-size="10" fill="#3dffb0">included by azazel + solas</text>
+<text x="456" y="1317" font-size="11.5" fill="#e6f2ec">ai-harness</text>
+<text x="766" y="1317" font-size="9.5" fill="#93b3ab" text-anchor="end" opacity="0.75">modules/features/ai/harness.nix</text>
+<line x1="218" y1="1109" x2="602" y2="1109" stroke="#3dffb0" stroke-width="2" opacity="0.85"/>
+<path d="M 218 1131 L 218 1111" stroke="#3dffb0" stroke-width="2" stroke-linecap="round" fill="none" opacity="0.85" marker-end="url(#arw-green)"/>
+<path d="M 602 1131 L 602 1111" stroke="#3dffb0" stroke-width="2" stroke-linecap="round" fill="none" opacity="0.85" marker-end="url(#arw-green)"/>
+<path d="M 410 1109 L 410 1097" stroke="#3dffb0" stroke-width="2" stroke-linecap="round" fill="none" opacity="0.85" marker-end="url(#arw-green)"/>
+<text x="422" y="1101" font-size="10" fill="#3dffb0">included by azazel + solas</text>
 <text x="36" y="1611" font-size="10.5" fill="#93b3ab" font-weight="700" letter-spacing="2">SUB-INCLUDES</text>
 <text x="784" y="1611" font-size="10" fill="#93b3ab" text-anchor="end" opacity="0.8">the ⊃ aspects, expanded</text>
-<rect x="36" y="1627" rx="12" width="748" height="340" fill="#151c24" stroke="#517269" stroke-width="1.5"/>
-<rect x="36" y="1627" rx="2" width="4" height="340" fill="#b673ff"/>
+<rect x="36" y="1627" rx="12" width="748" height="300" fill="#151c24" stroke="#517269" stroke-width="1.5"/>
+<rect x="36" y="1627" rx="2" width="4" height="300" fill="#b673ff"/>
 <text x="54" y="1651" font-size="14" fill="#e6f2ec" font-weight="700">sub-includes</text>
-<text x="54" y="1668" font-size="10" fill="#93b3ab">7 aspects pulled in by the cards above</text>
+<text x="54" y="1668" font-size="10" fill="#93b3ab">6 composite aspects, including dormant definitions</text>
 <line x1="52" y1="1677" x2="768" y2="1677" stroke="#517269" stroke-width="1"/>
-<text x="54" y="1699" font-size="11" fill="#b673ff" font-weight="700">ai</text>
-<text x="766" y="1699" font-size="9.5" fill="#93b3ab" text-anchor="end" opacity="0.85">included by azazel, solas</text>
-<text x="70" y="1714" font-size="10.5" fill="#e6f2ec">provides tools → ai-harness · provides stt → ai-stt · provides local → ai-local</text>
-<text x="54" y="1739" font-size="11" fill="#b673ff" font-weight="700">ai-local</text>
-<text x="766" y="1739" font-size="9.5" fill="#93b3ab" text-anchor="end" opacity="0.85">included by ai, ai.provides.local</text>
-<text x="70" y="1754" font-size="10.5" fill="#e6f2ec">unfree(cuda_cccl, cuda_compat, cuda_cudart, cuda_nvcc, cuda_nvrtc, libcublas)</text>
-<text x="54" y="1779" font-size="11" fill="#b673ff" font-weight="700">apps</text>
-<text x="766" y="1779" font-size="9.5" fill="#93b3ab" text-anchor="end" opacity="0.85">included by graphical</text>
-<text x="70" y="1794" font-size="10.5" fill="#e6f2ec">unfree(discord, discord-unwrapped)</text>
-<text x="54" y="1819" font-size="11" fill="#b673ff" font-weight="700">gaming</text>
+<text x="54" y="1699" font-size="11" fill="#b673ff" font-weight="700">ai-local</text>
+<text x="70" y="1714" font-size="10.5" fill="#e6f2ec">unfree(cuda_cccl, cuda_compat, cuda_cudart, cuda_nvcc, cuda_nvrtc, libcublas)</text>
+<text x="54" y="1739" font-size="11" fill="#b673ff" font-weight="700">apps</text>
+<text x="766" y="1739" font-size="9.5" fill="#93b3ab" text-anchor="end" opacity="0.85">included by graphical</text>
+<text x="70" y="1754" font-size="10.5" fill="#e6f2ec">unfree(discord, discord-unwrapped)</text>
+<text x="54" y="1779" font-size="11" fill="#b673ff" font-weight="700">gaming</text>
+<text x="766" y="1779" font-size="9.5" fill="#93b3ab" text-anchor="end" opacity="0.85">included by azazel</text>
+<text x="70" y="1794" font-size="10.5" fill="#e6f2ec">hdr · unfree(steam, steam-unwrapped, lsfg-vk, lsfg-vk-ui)</text>
+<text x="54" y="1819" font-size="11" fill="#b673ff" font-weight="700">media</text>
 <text x="766" y="1819" font-size="9.5" fill="#93b3ab" text-anchor="end" opacity="0.85">included by azazel</text>
-<text x="70" y="1834" font-size="10.5" fill="#e6f2ec">hdr · unfree(steam, steam-unwrapped, lsfg-vk, lsfg-vk-ui)</text>
-<text x="54" y="1859" font-size="11" fill="#b673ff" font-weight="700">media</text>
+<text x="70" y="1834" font-size="10.5" fill="#e6f2ec">hdr</text>
+<text x="54" y="1859" font-size="11" fill="#b673ff" font-weight="700">mp3tag</text>
 <text x="766" y="1859" font-size="9.5" fill="#93b3ab" text-anchor="end" opacity="0.85">included by azazel</text>
-<text x="70" y="1874" font-size="10.5" fill="#e6f2ec">hdr</text>
-<text x="54" y="1899" font-size="11" fill="#b673ff" font-weight="700">mp3tag</text>
+<text x="70" y="1874" font-size="10.5" fill="#e6f2ec">unfree(mp3tag)</text>
+<text x="54" y="1899" font-size="11" fill="#b673ff" font-weight="700">nvidia</text>
 <text x="766" y="1899" font-size="9.5" fill="#93b3ab" text-anchor="end" opacity="0.85">included by azazel</text>
-<text x="70" y="1914" font-size="10.5" fill="#e6f2ec">unfree(mp3tag)</text>
-<text x="54" y="1939" font-size="11" fill="#b673ff" font-weight="700">nvidia</text>
-<text x="766" y="1939" font-size="9.5" fill="#93b3ab" text-anchor="end" opacity="0.85">included by azazel</text>
-<text x="70" y="1954" font-size="10.5" fill="#e6f2ec">unfree(nvidia-x11)</text>
-<rect x="36" y="1997" rx="10" width="748" height="153" fill="#0b141c" stroke="#517269" stroke-width="1"/>
-<circle cx="56" cy="2021" r="2.5" fill="#3dffb0"/>
-<text x="68" y="2025" font-size="10.5" fill="#93b3ab">arrows point up: the lower card includes the card above it</text>
-<circle cx="56" cy="2040" r="2.5" fill="#3dffb0"/>
-<text x="68" y="2044" font-size="10.5" fill="#93b3ab">base is included by graphical in den.nix; base does not include graphical</text>
-<circle cx="56" cy="2059" r="2.5" fill="#b673ff"/>
-<text x="68" y="2063" font-size="10.5" fill="#93b3ab">call includes take arguments where they are used: (ai { local; stt; })</text>
-<circle cx="56" cy="2078" r="2.5" fill="#ff5d8a"/>
-<text x="68" y="2082" font-size="10.5" fill="#93b3ab">unfree(...) is a den battery bundle, not an aspect file</text>
-<circle cx="56" cy="2097" r="2.5" fill="#93b3ab"/>
-<text x="68" y="2101" font-size="10.5" fill="#93b3ab">↑  that aspect is drawn above, in the spine</text>
-<circle cx="56" cy="2116" r="2.5" fill="#93b3ab"/>
-<text x="68" y="2120" font-size="10.5" fill="#93b3ab">⊃  that aspect's own includes are listed once, under SUB-INCLUDES</text>
-<circle cx="56" cy="2135" r="2.5" fill="#93b3ab"/>
-<text x="68" y="2139" font-size="10.5" fill="#93b3ab">not drawn: provides.to-users.homeManager — config forwarding, not composition</text>
-<text x="410" y="2174" font-size="10.5" fill="#93b3ab" text-anchor="middle" opacity="0.7">72 files  ·  52 aspect names  ·  56 includes  ·  2 hosts</text>
+<text x="70" y="1914" font-size="10.5" fill="#e6f2ec">unfree(nvidia-x11)</text>
+<rect x="36" y="1957" rx="10" width="748" height="153" fill="#0b141c" stroke="#517269" stroke-width="1"/>
+<circle cx="56" cy="1981" r="2.5" fill="#3dffb0"/>
+<text x="68" y="1985" font-size="10.5" fill="#93b3ab">arrows point up: the lower card includes the card above it</text>
+<circle cx="56" cy="2000" r="2.5" fill="#3dffb0"/>
+<text x="68" y="2004" font-size="10.5" fill="#93b3ab">base is included by graphical in den.nix; base does not include graphical</text>
+<circle cx="56" cy="2019" r="2.5" fill="#b673ff"/>
+<text x="68" y="2023" font-size="10.5" fill="#93b3ab">AI features use direct ai-harness and ai-stt includes</text>
+<circle cx="56" cy="2038" r="2.5" fill="#ff5d8a"/>
+<text x="68" y="2042" font-size="10.5" fill="#93b3ab">unfree(...) is a den battery bundle, not an aspect file</text>
+<circle cx="56" cy="2057" r="2.5" fill="#93b3ab"/>
+<text x="68" y="2061" font-size="10.5" fill="#93b3ab">↑  that aspect is drawn above, in the spine</text>
+<circle cx="56" cy="2076" r="2.5" fill="#93b3ab"/>
+<text x="68" y="2080" font-size="10.5" fill="#93b3ab">⊃  that aspect's own includes are listed once, under SUB-INCLUDES</text>
+<circle cx="56" cy="2095" r="2.5" fill="#93b3ab"/>
+<text x="68" y="2099" font-size="10.5" fill="#93b3ab">not drawn: provides.to-users.homeManager — config forwarding, not composition</text>
+<text x="410" y="2134" font-size="10.5" fill="#93b3ab" text-anchor="middle" opacity="0.7">69 files  ·  49 aspect names  ·  52 includes  ·  2 hosts</text>
 </g></svg>

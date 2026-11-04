@@ -17,7 +17,7 @@ A NixOS + [home-manager](https://github.com/nix-community/home-manager) configur
 
 The tree follows the **dendritic pattern**: every file under `./modules/` is a [`flake-parts`](https://flake.parts) module, auto-imported by [`import-tree`](https://github.com/vic/import-tree). There is no central import list.
 
-Hosts are assembled from **den aspects** ([denful/den](https://github.com/denful/den)). Feature modules register `den.aspects.<name>`, while `modules/flake/` also contains flake infrastructure. An aspect is a named bundle of NixOS and home-manager config, and `modules/flake/den.nix` wires those names into `base` → `graphical` → per-host includes, plus exactly one form-factor aspect. den forwards the home-manager half itself, with `osConfig` available. Shared modules never fork per host: they read `host.*` options, declared once in `modules/flake/options.nix`, that the host's `config.nix` fills in.
+Hosts are assembled from **den aspects** ([denful/den](https://github.com/denful/den)). Feature modules register `den.aspects.<name>`, while `modules/flake/` also contains flake infrastructure. An aspect is a named bundle of NixOS and home-manager config, and `modules/flake/den.nix` wires those names into `base` → `graphical` → per-host includes, plus exactly one form-factor aspect. den forwards the home-manager half itself, with `osConfig` available. Shared modules read `host.*` options, declared once in `modules/flake/options.nix`, for data shared across aspects or translated into configuration. Host-specific settings that need neither use native NixOS or home-manager options directly in the host's `config.nix`.
 
 <details>
 <summary>Architecture graph</summary>
@@ -27,16 +27,16 @@ Hosts are assembled from **den aspects** ([denful/den](https://github.com/denful
 </details>
 
 > [!TIP]
-> Adding a feature is two steps: define `den.aspects.<name>` in a file under `modules/`, then add `<name>` to an includes list in `modules/flake/den.nix`. A new file is invisible to the flake until it is git-tracked, so `git add -N` it before evaluating.
+> For substantive feature behavior, define `den.aspects.<name>` in a file under `modules/`, then add `<name>` to an includes list in `modules/flake/den.nix`. Host, base and graphical composition stays central; a feature owns its own dependency includes and scoped unfree allowances. Package-only additions belong in an existing shared or per-host `home.packages` or `environment.systemPackages` list; they do not need a dedicated aspect. A new file is invisible to the flake until it is git-tracked, so `git add -N` it before evaluating.
 
 ## Directory layout
 
 - `./flake.nix` — entry point; auto-imports `./modules/`.
 - `./modules/flake/` — assembly logic (`den.nix`, `options.nix`, `paths.nix`) plus the devshell, the treefmt gate and the aspect-graph check. Start here.
 - `./modules/base/`, `./modules/graphical/`, `./modules/features/` — the aspect layers. A file's folder names the layer that includes it.
-- `./modules/hosts/<host>/` — `config.nix` (`host.*` settings), `hardware.nix`, `filesystems.nix`.
+- `./modules/hosts/<host>/` — `config.nix` (native settings and shared `host.*` data), `hardware.nix`, `filesystems.nix`.
 - `./modules/users/` — per-user aspects, resolved by name.
-- `./pkgs/<name>/package.nix` — packages nixpkgs lacks, reached through a named overlay in the owning aspect.
+- `./pkgs/<name>/package.nix` — local package recipes, reached through `config.packageSources`. Single-consumer recipes use `pkgs.callPackage` in the consumer; overlays remain where shared package-set overrides are needed.
 - `./configs/`, `./assets/` — raw config files, templates, scripts, patches, agent rules, and the rendered aspect graph with the script that draws it.
 - `./secrets/` — [sops-nix](https://github.com/Mic92/sops-nix)-encrypted secrets.
 

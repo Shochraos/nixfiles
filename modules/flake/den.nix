@@ -23,24 +23,6 @@
     wifi
   ];
 
-  den.aspects.gaming.includes = with den.aspects; [
-    hdr
-    (den.batteries.unfree [
-      "steam"
-      "steam-unwrapped"
-      "lsfg-vk"
-      "lsfg-vk-ui"
-    ])
-  ];
-  den.aspects.media.includes = with den.aspects; [ hdr ];
-  den.aspects.apps.includes = [
-    (den.batteries.unfree [
-      "discord"
-      "discord-unwrapped"
-    ])
-  ];
-  den.aspects.nvidia.includes = [ (den.batteries.unfree [ "nvidia-x11" ]) ];
-
   den.aspects.graphical.includes = with den.aspects; [
     base
     hyprland
@@ -51,7 +33,6 @@
     browser
     editor
     apps
-    mail
     sync
     printing
     bluetooth
@@ -64,10 +45,8 @@
     cpu-amd
     nvidia
     gaming
-    (ai {
-      local = false;
-      stt = true;
-    })
+    ai-harness
+    ai-stt
     irc
     media
     remote-mounts
@@ -84,11 +63,7 @@
     cpu-amd
     fingerprint
     mic-mute
-    pdfpc
-    (ai {
-      local = false;
-      stt = false;
-    })
+    ai-harness
   ];
 
   den.hosts.x86_64-linux.Azazel = {

@@ -508,7 +508,7 @@ def build():
             (name, ", ".join(included_by.get(name, [])), " · ".join(parts) if parts else "no further includes")
         )
     elems, h = included_card(
-        PAD, y, card_w, "sub-includes", f"{len(rows)} aspects pulled in by the cards above", rows, PURPLE
+        PAD, y, card_w, "sub-includes", f"{len(rows)} composite aspects, including dormant definitions", rows, PURPLE
     )
     out += elems
     y += h + 30
@@ -516,7 +516,7 @@ def build():
     notes = [
         (GREEN, "arrows point up: the lower card includes the card above it"),
         (GREEN, "base is included by graphical in den.nix; base does not include graphical"),
-        (PURPLE, "call includes take arguments where they are used: (ai { local; stt; })"),
+        (PURPLE, "AI features use direct ai-harness and ai-stt includes"),
         (PINK, "unfree(...) is a den battery bundle, not an aspect file"),
         (DIM, "↑  that aspect is drawn above, in the spine"),
         (DIM, "⊃  that aspect's own includes are listed once, under SUB-INCLUDES"),

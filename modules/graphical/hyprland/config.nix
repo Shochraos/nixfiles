@@ -193,7 +193,7 @@ in
 
           monitor = monitorRules osConfig.host.outputs;
 
-          workspace_rule = workspaceRules osConfig.host.outputs ++ osConfig.host.hyprland.workspaceRules;
+          workspace_rule = workspaceRules osConfig.host.outputs;
           colors = {
             _var = lua "require('dms.colors')";
           };

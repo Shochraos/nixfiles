@@ -71,14 +71,9 @@ in
             ++ profileAssertions "wireguard" config.host.wireguard.profiles;
 
           options.host = {
-            boot.kernelParams = mkOption {
-              type = types.listOf types.str;
-              default = [ ];
-              description = "Hardware-specific kernel parameters for this host.";
-            };
-
             flakeDir = mkOption {
               type = types.str;
+              default = "${config.users.users.${user.name}.home}/Repositories/nix/nixfiles";
               description = "Absolute path to this flake's checkout on the host.";
             };
 
@@ -244,11 +239,6 @@ in
                 default = [ ];
                 description = "Hyprland `gesture` entries for this host.";
               };
-              workspaceRules = mkOption {
-                type = attrsetList;
-                default = [ ];
-                description = "Hyprland `workspace_rule` entries for this host.";
-              };
               windowRules = mkOption {
                 type = attrsetList;
                 default = [ ];
@@ -329,18 +319,6 @@ in
               };
             };
 
-            network = {
-              onlinePolicy = mkOption {
-                type = types.enum [
-                  "wait"
-                  "skip"
-                ];
-                default = "wait";
-                description = "Whether NetworkManager must finish startup before network-online.target; only Solas opts out.";
-              };
-
-            };
-
             ssh = {
               firewallInterfaces = mkOption {
                 type = types.listOf (types.strMatching "[a-zA-Z0-9_.:-]+\\*?");
@@ -397,7 +375,7 @@ in
             keepassxc = {
               database = mkOption {
                 type = types.nullOr types.str;
-                default = null;
+                default = "/mnt/nextcloud/Security/KeePass/Vault.kdbx";
                 description = "Absolute path of the .kdbx database unlocked automatically at login through --pw-stdin from the sops secret keepassxc/master-password; null keeps the stock autostart entry.";
               };
               settings = mkOption {

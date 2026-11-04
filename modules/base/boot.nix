@@ -2,7 +2,6 @@
 {
   den.aspects.boot.nixos =
     {
-      config,
       lib,
       pkgs,
       ...
@@ -52,6 +51,5 @@
       boot.kernel.sysctl."kernel.kptr_restrict" = 2;
 
       boot.kernelPackages = pkgs.linuxPackages_latest;
-      boot.kernelParams = config.host.boot.kernelParams;
     };
 }

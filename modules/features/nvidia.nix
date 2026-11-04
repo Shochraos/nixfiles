@@ -1,4 +1,7 @@
+{ den, ... }:
 {
+  den.aspects.nvidia.includes = [ (den.batteries.unfree [ "nvidia-x11" ]) ];
+
   den.aspects.nvidia.nixos =
     {
       config,

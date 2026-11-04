@@ -15,10 +15,7 @@
       system.stateVersion = "25.05";
 
       host.autostart = [ "hermes" ];
-      host.network.onlinePolicy = "skip";
-
-      host.flakeDir = "/home/shochraos/Repositories/nix/nixfiles";
-      host.keepassxc.database = "/mnt/nextcloud/Security/KeePass/Vault.kdbx";
+      systemd.services.NetworkManager-wait-online.enable = false;
 
       host.ssh.firewallInterfaces = [
         "home-split"
@@ -336,6 +333,7 @@
       home.stateVersion = "25.05";
       home.packages = [
         pkgs.eduvpn-client
+        pkgs.pdfpc
         pkgs.wl-mirror
       ];
     };

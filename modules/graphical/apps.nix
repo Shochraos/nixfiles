@@ -1,5 +1,13 @@
-_: {
-  den.aspects.apps = _: {
+{ den, ... }:
+{
+  den.aspects.apps = {
+    includes = [
+      (den.batteries.unfree [
+        "discord"
+        "discord-unwrapped"
+      ])
+    ];
+
     provides.to-users.homeManager =
       {
         pkgs,
@@ -17,6 +25,7 @@ _: {
           pkgs.libreoffice-qt-stable
           pkgs.pdfarranger
           pkgs.kdePackages.filelight
+          pkgs.tutanota-desktop
         ];
 
         home.file = {
