@@ -176,26 +176,11 @@
           database = osConfig.host.keepassxc.database;
           keepassxcUnlock = pkgs.writeShellApplication {
             name = "keepassxc-unlock";
-            runtimeInputs = [
-              pkgs.keepassxc
-              pkgs.coreutils
-              pkgs.gnugrep
-            ];
+            runtimeInputs = [ pkgs.keepassxc ];
             text = ''
-              db=${lib.escapeShellArg database}
-              state_file="''${XDG_CACHE_HOME:-$HOME/.cache}/keepassxc/keepassxc.ini"
-              if [ -f "$state_file" ] && grep -q '^ListViewState=' "$state_file"; then
-                exec keepassxc --pw-stdin "$db" < ${
-                  lib.escapeShellArg osConfig.sops.secrets."keepassxc/master-password".path
-                }
-              fi
-              keepassxc --pw-stdin "$db" < ${
+              exec keepassxc --pw-stdin ${lib.escapeShellArg database} < ${
                 lib.escapeShellArg osConfig.sops.secrets."keepassxc/master-password".path
-              } &
-              app=$!
-              sleep 8
-              keepassxc "$db" >/dev/null 2>&1 || true
-              wait "$app"
+              }
             '';
           };
         in
