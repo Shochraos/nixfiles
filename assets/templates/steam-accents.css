@@ -16,6 +16,17 @@
     color: var(--on-accent) !important;
 }
 
+body ._1FnJ6dPuknQFQ2RTpKTI16 > ._2AzIX5kl9k6JnxLfR5H4kX svg {
+    color: var(--on-accent) !important;
+    fill: var(--on-accent) !important;
+}
+
+body ._1FnJ6dPuknQFQ2RTpKTI16 > ._2AzIX5kl9k6JnxLfR5H4kX svg line,
+body ._1FnJ6dPuknQFQ2RTpKTI16 > ._2AzIX5kl9k6JnxLfR5H4kX svg polygon {
+    fill: var(--on-accent) !important;
+    stroke: var(--on-accent) !important;
+}
+
 .DialogButton.Primary {
     background: var(--accent) !important;
     color: var(--on-accent) !important;
