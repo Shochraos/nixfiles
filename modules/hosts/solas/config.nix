@@ -2,14 +2,13 @@
 {
   den.aspects.solas.nixos =
     {
-      config,
       lib,
       pkgs,
       ...
     }:
     let
       lua = lib.generators.mkLuaInline;
-      homePeerPubkey = "iHYN1Gqt0q+M4A8vmo5/rU6+LOE/IKawXOgE5rBA8DA=";
+      homePeerPubkey = "Mvc6EVojUxqH8v2TpFTtab4TqSWhWI4bTBM5kZQ+uUU=";
     in
     {
       system.stateVersion = "25.05";
@@ -18,46 +17,37 @@
       systemd.services.NetworkManager-wait-online.enable = false;
 
       host.ssh.firewallInterfaces = [
-        "home-split"
+        "home"
       ];
 
       host.ssh.authorizedKeys = [
         "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIC71dT73gYzQ5zQz0hAeqC6XccOcBmBxGh9Fk2xztTb6 hermes-gateway"
       ];
 
-      sops.secrets = lib.genAttrs [
-        "wireguard/solas/home"
-        "wireguard/solas/home-endpoint"
-        "wireguard/solas/home-address"
-        "wireguard/solas/home-dns"
-      ] (_: { });
-
-      sops.templates."wireguard.env".content = ''
-        WG_HOME_KEY=${config.sops.placeholder."wireguard/solas/home"}
-        WG_HOME_ENDPOINT=${config.sops.placeholder."wireguard/solas/home-endpoint"}
-        WG_HOME_ADDRESS=${config.sops.placeholder."wireguard/solas/home-address"}
-        WG_HOME_DNS=${config.sops.placeholder."wireguard/solas/home-dns"}
-      '';
-
       host.wireguard.profiles = {
-        home-split = {
+        home = {
           excludedSSIDs = [ "Ragnarök" ];
-          extraSecrets = [ "allowed-ips" ];
+          extraSecrets = [
+            "endpoint"
+            "address"
+            "address-ipv6"
+            "dns"
+            "dns-ipv6"
+          ];
 
           connection = {
-            id = "Home (Split-Tunnel)";
+            id = "Home (Full-Tunnel)";
             type = "wireguard";
-            interface-name = "home-split";
+            interface-name = "home";
             autoconnect = true;
           };
 
           "wireguard-peer.${homePeerPubkey}" = {
             endpoint = "$WG_HOME_ENDPOINT";
-            allowed-ips = "$WG_HOME_SPLIT_ALLOWED_IPS";
+            allowed-ips = "0.0.0.0/0;::/0;";
           };
 
           wireguard = {
-            private-key = "$WG_HOME_KEY";
             mtu = 1412;
           };
 
@@ -69,7 +59,10 @@
           };
 
           ipv6 = {
-            method = "disabled";
+            method = "manual";
+            address1 = "$WG_HOME_ADDRESS_IPV6/128";
+            dns = "$WG_HOME_DNS_IPV6;";
+            dns-search = "~;";
           };
         };
       };
