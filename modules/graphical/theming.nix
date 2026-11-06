@@ -233,6 +233,22 @@ in
                   output_path = "~/.config/starship.toml";
                 };
 
+                hyprtoolkit = {
+                  input_path = pkgs.writeText "hyprtoolkit.conf" ''
+                    background = 0xff{{colors.surface.default.hex_stripped}}
+                    base = 0xff{{colors.surface_container.default.hex_stripped}}
+                    text = 0xff{{colors.on_surface.default.hex_stripped}}
+                    alternate_base = 0xff{{colors.surface_container_highest.default.hex_stripped}}
+                    bright_text = 0xff{{colors.on_primary.default.hex_stripped}}
+                    link_text = 0xff{{colors.primary.default.hex_stripped}}
+                    accent = 0xff{{colors.primary.default.hex_stripped}}
+                    accent_secondary = 0xff{{colors.secondary.default.hex_stripped}}
+                    rounding_large = 14
+                    rounding_small = 7
+                  '';
+                  output_path = "~/.config/hypr/hyprtoolkit.conf";
+                };
+
                 hermes-desktop = {
                   input_path = hermesDesktopTemplate;
                   output_path = "~/.hermes/desktop-plugins/matugen/plugin.js.tmp";

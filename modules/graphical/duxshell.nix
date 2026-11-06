@@ -78,7 +78,10 @@ in
             bottomGap = 0;
             innerPadding = 5;
             spacing = 0;
+            followInterfaceStyle = false;
             transparency = 0;
+            widgetFollowInterfaceStyle = false;
+            widgetTransparency = 1;
 
             popupGapsAuto = false;
             popupGapsManual = 6;
@@ -191,7 +194,7 @@ in
               currentThemeCategory = "dynamic";
               matugenScheme = "scheme-rainbow";
               matugenSourceMode = "colorful";
-              widgetBackgroundColor = "sc";
+              widgetBackgroundColor = "s";
               widgetColorMode = "default";
 
               popupTransparency = 1;
@@ -226,6 +229,33 @@ in
               controlCenterShowMicPercent = false;
 
               controlCenterWidgets = [
+                {
+                  id = "user";
+                  enabled = true;
+                  w = 5;
+                  h = 1;
+                }
+                {
+                  id = "settings";
+                  enabled = true;
+                  w = 1;
+                  h = 1;
+                  small = true;
+                }
+                {
+                  id = "lock";
+                  enabled = true;
+                  w = 1;
+                  h = 1;
+                  small = true;
+                }
+                {
+                  id = "power";
+                  enabled = true;
+                  w = 1;
+                  h = 1;
+                  small = true;
+                }
                 {
                   id = "volumeSlider";
                   enabled = true;
