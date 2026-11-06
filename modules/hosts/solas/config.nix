@@ -18,6 +18,7 @@
 
       host.ssh.firewallInterfaces = [
         "home"
+        "home-split"
       ];
 
       host.ssh.authorizedKeys = [
@@ -26,7 +27,6 @@
 
       host.wireguard.profiles = {
         home = {
-          excludedSSIDs = [ "Ragnarök" ];
           extraSecrets = [
             "endpoint"
             "address"
@@ -39,7 +39,7 @@
             id = "Home (Full-Tunnel)";
             type = "wireguard";
             interface-name = "home";
-            autoconnect = true;
+            autoconnect = false;
           };
 
           "wireguard-peer.${homePeerPubkey}" = {
@@ -64,6 +64,37 @@
             dns = "$WG_HOME_DNS_IPV6;";
             dns-search = "~;";
           };
+        };
+
+        home-split = {
+          excludedSSIDs = [ "Ragnarök" ];
+          extraSecrets = [ "allowed-ips" ];
+
+          connection = {
+            id = "Home (Split-Tunnel)";
+            type = "wireguard";
+            interface-name = "home-split";
+            autoconnect = true;
+          };
+
+          "wireguard-peer.${homePeerPubkey}" = {
+            endpoint = "$WG_HOME_ENDPOINT";
+            allowed-ips = "$WG_HOME_SPLIT_ALLOWED_IPS";
+          };
+
+          wireguard = {
+            private-key = "$WG_HOME_KEY";
+            mtu = 1412;
+          };
+
+          ipv4 = {
+            method = "manual";
+            address1 = "$WG_HOME_ADDRESS/32";
+            dns = "$WG_HOME_DNS;";
+            dns-search = "~;";
+          };
+
+          ipv6.method = "disabled";
         };
       };
 

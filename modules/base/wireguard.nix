@@ -41,6 +41,15 @@
           conditionalNames = builtins.filter (
             name: profiles.${name}.excludedSSIDs != [ ] && (profiles.${name}.connection.autoconnect or true)
           ) profileNames;
+          keyReference = name: profiles.${name}.wireguard.private-key or ("$" + keyVar name);
+          manualProfilesFor =
+            name:
+            builtins.filter (
+              other:
+              other != name
+              && !(profiles.${other}.connection.autoconnect or true)
+              && keyReference other == keyReference name
+            ) profileNames;
           profileFile = name: "/run/NetworkManager/system-connections/${name}.nmconnection";
           reconcile = pkgs.writeShellScript "wireguard-autoconnect" ''
             set -euo pipefail
@@ -64,9 +73,11 @@
             wifi=$(nmcli --colors no --terse --escape no --fields IN-USE,SSID device wifi list --rescan no) || exit 0
             declare -A uuids states counts
             event_type=
+            event_file=
             while IFS=: read -r uuid type state active filename; do
               [[ $uuid != "''${CONNECTION_UUID:-}" ]] || event_type=$type
               filename=''${filename/#\/var\/run\//\/run\/}
+              [[ $uuid != "''${CONNECTION_UUID:-}" ]] || event_file=$filename
               [[ -n $filename ]] || continue
               counts["$filename"]=$((''${counts["$filename"]:-0} + 1))
               if [[ $type == wireguard && $uuid =~ ^[[:xdigit:]]{8}-[[:xdigit:]]{4}-[[:xdigit:]]{4}-[[:xdigit:]]{4}-[[:xdigit:]]{12}$ && ($active == yes || $active == no) ]]; then
@@ -100,14 +111,23 @@
               ;;
             esac
             reconcile_profile() {
-              local name=$1 file=$2 uuid state excluded=false allow_start=true
-              local in_use ssid denied pending
-              shift 2
+              local name=$1 file=$2 manual_count=$3 uuid state excluded=false allow_start=true
+              local in_use ssid denied pending manual_file manual_active=false manual_event=false
+              shift 3
+              local -a manual_files=("''${@:1:manual_count}")
+              shift "$manual_count"
               local -a excluded_ssids=("$@")
               [[ ''${counts["$file"]:-0} == 1 && -n ''${uuids["$file"]:-} ]] || return 0
               uuid=''${uuids["$file"]}
               state=''${states["$file"]}
               pending=/run/wireguard-autoconnect-"$name".pending
+              for manual_file in "''${manual_files[@]}"; do
+                [[ $event_file != "$manual_file" ]] || manual_event=true
+                [[ ''${counts["$manual_file"]:-0} != 0 ]] || continue
+                if [[ ''${counts["$manual_file"]} != 1 || -z ''${uuids["$manual_file"]:-} || -n ''${states["$manual_file"]:-} ]]; then
+                  manual_active=true
+                fi
+              done
               case "$action" in
               profiles-loaded) ;;
               up | down | dhcp4-change | dhcp6-change | reapply)
@@ -117,7 +137,7 @@
                   up) allow_start=false ;;
                   *) return 0 ;;
                   esac
-                elif ! "$physical_event"; then
+                elif ! "$physical_event" && ! "$manual_event"; then
                   return 0
                 fi
                 ;;
@@ -129,7 +149,7 @@
                   [[ $ssid != "$denied" ]] || excluded=true
                 done
               done <<<"$wifi"
-              if "$excluded" || ! "$uplink"; then
+              if "$manual_active" || "$excluded" || ! "$uplink"; then
                 rm -f -- "$pending"
                 case "$state" in
                 activating | activated) nmcli --wait 0 connection down uuid "$uuid" ;;
@@ -151,7 +171,9 @@
                   [
                     name
                     (profileFile name)
+                    (toString (builtins.length (manualProfilesFor name)))
                   ]
+                  ++ map profileFile (manualProfilesFor name)
                   ++ profiles.${name}.excludedSSIDs
                 )
               }
