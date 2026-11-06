@@ -179,8 +179,6 @@ in
                 apps = "list";
               };
               dankLauncherV2Size = "medium";
-              launcherLogoMode = "os";
-              launcherLogoColorOverride = "primary";
 
               launchPrefix = "uwsm-app -- ";
 

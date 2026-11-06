@@ -246,6 +246,12 @@
           {
             leftWidgets = [
               {
+                id = "launcherButton";
+                enabled = true;
+                launcherLogoMode = "os";
+                launcherLogoColorOverride = "primary";
+              }
+              {
                 id = "clock";
                 enabled = true;
               }
