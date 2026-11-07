@@ -15,7 +15,23 @@
         ...
       }:
       let
-        discordPkg = pkgs.discord.override { withEquicord = true; };
+        discordPkg = pkgs.discord.override {
+          withEquicord = true;
+          equicord = pkgs.equicord.overrideAttrs (
+            finalAttrs: previousAttrs: {
+              version = "2026-11-07";
+              src = pkgs.fetchFromGitHub {
+                owner = "Equicord";
+                repo = "Equicord";
+                tag = finalAttrs.version;
+                hash = "sha256-y48T5X5sMvGDU3Wp7+5U2kQcBacbeTQMJ4FryXJDe6w=";
+              };
+              pnpmDeps = previousAttrs.pnpmDeps.overrideAttrs {
+                outputHash = "sha256-YI+fviBbfyKPdPZtMqin3Sk2M1Rumdf+B8n68bsibnc=";
+              };
+            }
+          );
+        };
         spotifastPkg = pkgs.spotifast;
       in
       {

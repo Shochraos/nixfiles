@@ -1,4 +1,4 @@
-{ config, inputs, ... }:
+{ config, ... }:
 let
   inherit (config) assets;
 
@@ -37,49 +37,11 @@ in
         channel.enable = false;
       };
 
-      home-manager = {
-        useGlobalPkgs = true;
-        useUserPackages = true;
-      };
-
       programs.nh.clean = {
         enable = true;
         extraArgs = "--keep-since 7d --keep 10";
       };
     };
 
-    provides.to-users.nixos =
-      {
-        lib,
-        user,
-        utils,
-        ...
-      }:
-      {
-        systemd.services."home-manager-${utils.escapeSystemdPath user.name}".serviceConfig.TimeoutStartSec =
-          lib.mkForce "17min";
-      };
-
-    provides.to-users.homeManager =
-      { osConfig, ... }:
-      {
-        imports = [ inputs.nix-index-database.homeModules.default ];
-
-        systemd.user.servicesStartTimeoutMs = 16 * 60 * 1000;
-
-        programs.nix-index.enable = true;
-        programs.nix-index-database.comma.enable = true;
-
-        programs.nh = {
-          enable = true;
-          flake = osConfig.host.flakeDir;
-        };
-
-        programs.direnv = {
-          enable = true;
-          silent = true;
-          nix-direnv.enable = true;
-        };
-      };
   };
 }

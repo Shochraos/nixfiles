@@ -1,0 +1,37 @@
+{
+  den.aspects.seere.nixos = { pkgs, ... }: {
+    boot.lanzaboote.measuredBoot = {
+      enable = true;
+      pcrs = [
+        4
+        7
+      ];
+    };
+    zramSwap.enable = true;
+    systemd.sleep.settings.Sleep = {
+      AllowSuspend = false;
+      AllowHibernation = false;
+      AllowHybridSleep = false;
+      AllowSuspendThenHibernate = false;
+    };
+
+    networking.nftables.enable = true;
+
+    system.stateVersion = "26.11";
+    boot.kernelPackages = pkgs.linuxPackages;
+    sops.age.sshKeyPaths = [ "/etc/ssh/ssh_host_ed25519_key" ];
+    security.sudo.wheelNeedsPassword = false;
+    services.openssh = {
+      enable = true;
+      openFirewall = true;
+      settings.AuthenticationMethods = "publickey";
+    };
+    users.users.shochraos.openssh.authorizedKeys.keys = [
+      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIN3/LOpaM2lZXU9aJnpySqOqK1ucSCTRWgBj8BNY8qg6 moritz@alzael"
+    ];
+  };
+
+  den.aspects.seere.provides.to-users.homeManager = _: {
+    home.stateVersion = "26.11";
+  };
+}

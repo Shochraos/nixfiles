@@ -1,6 +1,6 @@
 # nixfiles
 
-A NixOS + [home-manager](https://github.com/nix-community/home-manager) configuration for a complete Wayland desktop ([Hyprland](https://hyprland.org), [DankMaterialShell](https://github.com/AvengeMedia/DankMaterialShell), [stylix](https://github.com/danth/stylix)), managed as one flake across two machines: **Azazel** (desktop / gaming) and **Solas** (laptop).
+A NixOS + [home-manager](https://github.com/nix-community/home-manager) configuration for a complete Wayland desktop ([Hyprland](https://hyprland.org), [DankMaterialShell](https://github.com/AvengeMedia/DankMaterialShell), [stylix](https://github.com/danth/stylix)), managed as one flake across **Azazel** (desktop / gaming), **Solas** (laptop), and the headless Wyse DNS appliances **Seere** and **Sitri**.
 
 > **AI disclaimer:** Parts of this configuration and this README were written with AI assistance. Review anything you adopt before adding it to your own system.
 
@@ -17,12 +17,12 @@ A NixOS + [home-manager](https://github.com/nix-community/home-manager) configur
 
 The tree follows the **dendritic pattern**: every file under `./modules/` is a [`flake-parts`](https://flake.parts) module, auto-imported by [`import-tree`](https://github.com/vic/import-tree). There is no central import list.
 
-Hosts are assembled from **den aspects** ([denful/den](https://github.com/denful/den)). Feature modules register `den.aspects.<name>`, while `modules/flake/` also contains flake infrastructure. An aspect is a named bundle of NixOS and home-manager config, and `modules/flake/den.nix` wires those names into `base` → `graphical` → per-host includes, plus exactly one form-factor aspect. den forwards the home-manager half itself, with `osConfig` available. Shared modules read `host.*` options, declared once in `modules/flake/options.nix`, for data shared across aspects or translated into configuration. Host-specific settings that need neither use native NixOS or home-manager options directly in the host's `config.nix`.
+Hosts are assembled from **den aspects** ([denful/den](https://github.com/denful/den)). Feature modules register `den.aspects.<name>`, while `modules/flake/` also contains flake infrastructure. An aspect is a named bundle of NixOS and home-manager config. `modules/flake/den.nix` shares `base` across all four hosts; `graphical` explicitly composes audio and UI capabilities for Azazel and Solas, whose host includes also select scheduling, remotes, WireGuard and Wi-Fi from `modules/features/`. Seere and Sitri keep their hardware and storage in their own host folders and explicitly select the independent `dns-server` and `reverse_proxy` aspects from the peer `server` group under `modules/server/`, with Home Manager but no graphical desktop. The server group is organizational only, not a runtime umbrella. The shared `shochraos` account uses SOPS and Home Manager on all four hosts. den forwards the home-manager configuration with `osConfig` available. Shared modules read `host.*` options, declared once in `modules/flake/options.nix`, for data shared across aspects or translated into configuration. Host-specific settings that need neither use native NixOS or home-manager options directly in the host's `config.nix`.
 
 <details>
 <summary>Architecture graph</summary>
 
-![aspect graph: base is included by graphical, graphical by azazel and solas](assets/aspect-graph.svg)
+![aspect graph: shared base, graphical workstations and headless Wyse DNS hosts](assets/aspect-graph.svg)
 
 </details>
 
@@ -33,8 +33,8 @@ Hosts are assembled from **den aspects** ([denful/den](https://github.com/denful
 
 - `./flake.nix` — entry point; auto-imports `./modules/`.
 - `./modules/flake/` — assembly logic (`den.nix`, `options.nix`, `paths.nix`) plus the devshell, the treefmt gate and the aspect-graph check. Start here.
-- `./modules/base/`, `./modules/graphical/`, `./modules/features/` — the aspect layers. A file's folder names the layer that includes it.
-- `./modules/hosts/<host>/` — `config.nix` (native settings and shared `host.*` data), `hardware.nix`, `filesystems.nix`.
+- `./modules/base/`, `./modules/graphical/`, `./modules/features/`, `./modules/server/` — organizational aspect groups. Directory membership registers definitions, not inclusion: base and graphical compose their capabilities explicitly, hosts opt into features, and each server capability is selected separately.
+- `./modules/hosts/<host>/` — `config.nix` (native settings and shared `host.*` data), `hardware.nix` and `filesystems.nix` for each host.
 - `./modules/users/` — per-user aspects, resolved by name.
 - `./pkgs/<name>/package.nix` — local package recipes, reached through `config.packageSources`. Single-consumer recipes use `pkgs.callPackage` in the consumer; overlays remain where shared package-set overrides are needed.
 - `./configs/`, `./assets/` — raw config files, templates, scripts, patches, agent rules, and the rendered aspect graph with the script that draws it.

@@ -28,6 +28,7 @@ in
       lib,
       pkgs,
       user,
+      utils,
       ...
     }:
     let
@@ -79,12 +80,15 @@ in
         description = "Give SteamVR's vrcompositor-launcher the cap_sys_nice its setup checks for";
         wantedBy = [ "multi-user.target" ];
         serviceConfig.Type = "oneshot";
-        script = ''
-          ${pkgs.python3}/bin/python3 ${assets.steamvrCapabilitiesScript} \
-            --user ${lib.escapeShellArg user.name} \
-            --libcap ${lib.getLib pkgs.libcap}/lib/libcap.so.2 \
-            ${lib.escapeShellArg vrcompositorLauncher}
-        '';
+        serviceConfig.ExecStart = utils.escapeSystemdExecArgs [
+          "${pkgs.python3}/bin/python3"
+          assets.steamvrCapabilitiesScript
+          "--user"
+          user.name
+          "--libcap"
+          "${lib.getLib pkgs.libcap}/lib/libcap.so.2"
+          vrcompositorLauncher
+        ];
       };
       systemd.paths.steamvr-cap-sys-nice = {
         description = "Restore SteamVR launcher capability after installation or replacement";
@@ -172,9 +176,9 @@ in
         remotePlayWrapper
       ];
 
-      home.activation.steamvrFacetRenderer = lib.hm.dag.entryAfter [ "writeBoundary" ] (
-        lib.getExe steamvrFacetRenderer
-      );
+      home.activation.steamvrFacetRenderer = lib.hm.dag.entryAfter [
+        "writeBoundary"
+      ] "run ${lib.getExe steamvrFacetRenderer}";
 
       home.sessionVariables = {
         PROTON_ENABLE_WAYLAND = "1";

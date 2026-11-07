@@ -199,9 +199,9 @@
               map (entry: "${entry.var}=${config.sops.placeholder.${entry.secret}}") secretEntries
             );
 
-            systemd.services.NetworkManager-ensure-profiles.postStart = lib.mkIf (conditionalNames != [ ]) ''
-              ${reconcile} "" profiles-loaded
-            '';
+            systemd.services.NetworkManager-ensure-profiles.serviceConfig.ExecStartPost = lib.mkIf (
+              conditionalNames != [ ]
+            ) ''${reconcile} "" profiles-loaded'';
 
             networking.networkmanager.dispatcherScripts = lib.optional (conditionalNames != [ ]) {
               source = reconcile;

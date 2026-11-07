@@ -42,6 +42,11 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    disko = {
+      url = "github:nix-community/disko";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     ### Boot ###
     acid-boot = {
       url = "github:kurisu-agent/nix-acid-boot";

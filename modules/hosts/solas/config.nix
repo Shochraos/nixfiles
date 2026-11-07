@@ -16,12 +16,13 @@
       host.autostart = [ "hermes" ];
       systemd.services.NetworkManager-wait-online.enable = false;
 
-      host.ssh.firewallInterfaces = [
-        "home"
-        "home-split"
-      ];
+      services.openssh.enable = true;
+      networking.firewall.interfaces = {
+        home.allowedTCPPorts = [ 22 ];
+        home-split.allowedTCPPorts = [ 22 ];
+      };
 
-      host.ssh.authorizedKeys = [
+      users.users.shochraos.openssh.authorizedKeys.keys = [
         "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIC71dT73gYzQ5zQz0hAeqC6XccOcBmBxGh9Fk2xztTb6 hermes-gateway"
       ];
 

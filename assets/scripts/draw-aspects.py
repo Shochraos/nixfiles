@@ -8,8 +8,8 @@ modules/flake/den.nix.
 
     python3 assets/scripts/draw-aspects.py [width]
 
-Edges point parent -> included, top down: a host includes graphical, graphical
-includes base. Nothing is inferred; a missing arrow is a missing edge in source.
+Base, graphical and host cards list explicit includes. The server card groups
+definitions by directory only; it creates no composition edges.
 """
 
 import re
@@ -163,10 +163,12 @@ def discover_sources():
                 files = definition_paths.setdefault(name, [])
                 if relative_path not in files:
                     files.append(relative_path)
-        for m in re.finditer(r"den\.aspects\.([\w-]+)(\.includes)?\s*=", text):
+        for m in re.finditer(r"den\.aspects\.([\w-]+)(\.includes|\.nixos)?\s*=", text):
             name = m.group(1)
             ent = entry(name, path)
-            if m.group(2):
+            if m.group(2) == ".nixos":
+                continue
+            if m.group(2) == ".includes":
                 lb = text.index("[", m.end())
                 ent["includes"] += [label_for(i) for i in split_items(text[lb + 1 : match_list(text, lb)])]
                 continue
@@ -371,16 +373,17 @@ def verify(path, w, h):
 def build():
     aspects, defs = discover_sources()
     file_count = nix_file_count()
-    host_list = hosts()
+    all_hosts = hosts()
     hues = {"aspect": GREEN, "call": PURPLE, "unfree": PINK}
 
     spine = ["base", "graphical"]
+    server = sorted(name for name, path in defs.items() if path.startswith("modules/server/"))
     composite = {
         name: ent["includes"] + [("provides " + k, "aspect", v) for k, v in ent["provides"].items()]
         for name, ent in aspects.items()
         if ent["includes"] or ent["provides"]
     }
-    host_aspects = {a for _, a in host_list}
+    host_aspects = {a for _, a in all_hosts}
     sub = sorted(n for n in composite if n not in spine and n not in host_aspects)
     edges = sum(len(v) for v in composite.values())
 
@@ -416,7 +419,7 @@ def build():
             PAD,
             72,
             f"flake-parts + den  ·  {file_count} .nix files  ·  {len(defs)} aspect names  ·  "
-            f"{edges} includes edges  ·  {len(host_list)} hosts",
+            f"{edges} includes edges  ·  {len(all_hosts)} hosts",
             11.5,
             DIM,
         ),
@@ -439,61 +442,42 @@ def build():
 
     card_w = W - 2 * PAD
 
-    out.append(text(PAD, y + 10, "INHERITANCE", 10.5, DIM, 700, spacing="2"))
-    out.append(
-        text(
-            W - PAD,
-            y + 10,
-            "read down: each card is included by the one below",
-            10,
-            DIM,
-            400,
-            "end",
-            0.8,
-        )
-    )
+    out.append(text(PAD, y + 10, "ASPECT GROUPS", 10.5, DIM, 700, spacing="2"))
+    out.append(text(W - PAD, y + 10, "membership is not inclusion", 10, DIM, 400, "end", 0.8))
     y += 28
 
-    spine_bottom = y
-    for i, name in enumerate(spine):
+    for name in spine:
         ent = aspects[name]
         rows = [(decorate(l, t), k, defs.get(t or l, "")) for l, k, t in ent["includes"]]
         elems, h = list_card(
-            PAD, y, card_w, name, f"den.aspects.{name}.includes · {len(rows)} entries", rows, GREEN, hues
+            PAD, y, card_w, name, f"den.aspects.{name}.includes · {len(rows)} explicit entries", rows, GREEN, hues
         )
         out += elems
-        y += h
-        spine_bottom = y
-        if i < len(spine) - 1:
-            child = spine[i + 1]
-            out.append(arrow(W // 2, y + 30, W // 2, y + 2, GREEN, "arw-green"))
-            out.append(text(W // 2 + 12, y + 22, f"included by {child}", 10, GREEN, 400))
-            y += 38
+        y += h + 20
 
+    rows = [(name, "aspect", defs[name]) for name in server]
+    elems, h = list_card(
+        PAD, y, card_w, "server", "modules/server/ · independent opt-in aspects · no umbrella includes", rows, CYAN, hues
+    )
+    out += elems
+    y += h + 32
+
+    out.append(text(PAD, y + 8, "HOSTS", 10.5, DIM, 700, spacing="2"))
+    out.append(text(W - PAD, y + 8, "each host's explicit includes", 10, DIM, 400, "end", 0.8))
+    y += 24
     gap = 20
     col_w = (card_w - gap) // 2
-    bus_y = y + 14
-    host_top = y + 34
-    mids, tallest = [], 0
-    for i, (host, aspect) in enumerate(host_list):
-        ent = aspects[aspect]
-        rows = [(decorate(l, t), k, defs.get(t or l, "")) for l, k, t in ent["includes"]]
-        cx = PAD + i * (col_w + gap)
-        sub_ = f"den.hosts.x86_64-linux.{host} · {len(rows)} includes"
-        elems, h = list_card(cx, host_top, col_w, aspect, sub_, rows, PINK if i == 0 else CYAN, hues)
-        out += elems
-        mids.append(cx + col_w // 2)
-        tallest = max(tallest, h)
-    out.append(
-        f'<line x1="{mids[0]}" y1="{bus_y}" x2="{mids[-1]}" y2="{bus_y}" stroke="{GREEN}" stroke-width="2" opacity="0.85"/>'
-    )
-    for mx in mids:
-        out.append(arrow(mx, host_top + 2, mx, bus_y + 2, GREEN, "arw-green"))
-    out.append(arrow(W // 2, bus_y, W // 2, spine_bottom + 2, GREEN, "arw-green"))
-    out.append(
-        text(W // 2 + 12, spine_bottom + 6, "included by " + " + ".join(a for _, a in host_list), 10, GREEN, 400)
-    )
-    y = host_top + tallest + 6
+    for start in range(0, len(all_hosts), 2):
+        tallest = 0
+        for i, (host, aspect) in enumerate(all_hosts[start : start + 2]):
+            cx = PAD + i * (col_w + gap)
+            rows = [(decorate(l, t), k, defs.get(t or l, "")) for l, k, t in aspects[aspect]["includes"]]
+            elems, h = list_card(
+                cx, y, col_w, aspect, f"den.hosts.x86_64-linux.{host} · {len(rows)} includes", rows, PINK if i == 0 else CYAN, hues
+            )
+            out += elems
+            tallest = max(tallest, h)
+        y += tallest + 20
 
     y += 32
     out.append(text(PAD, y + 8, "SUB-INCLUDES", 10.5, DIM, 700, spacing="2"))
@@ -514,11 +498,11 @@ def build():
     y += h + 30
 
     notes = [
-        (GREEN, "arrows point up: the lower card includes the card above it"),
-        (GREEN, "base is included by graphical in den.nix; base does not include graphical"),
+        (GREEN, "rows in base, graphical and host cards are explicit includes"),
+        (CYAN, "server is an organizational peer group; its aspects are selected separately"),
         (PURPLE, "AI features use direct ai-harness and ai-stt includes"),
         (PINK, "unfree(...) is a den battery bundle, not an aspect file"),
-        (DIM, "↑  that aspect is drawn above, in the spine"),
+        (DIM, "↑  that aspect is drawn above, under ASPECT GROUPS"),
         (DIM, "⊃  that aspect's own includes are listed once, under SUB-INCLUDES"),
         (DIM, "not drawn: provides.to-users.homeManager — config forwarding, not composition"),
     ]
@@ -533,7 +517,7 @@ def build():
         text(
             W // 2,
             y,
-            f"{file_count} files  ·  {len(defs)} aspect names  ·  {edges} includes  ·  {len(host_list)} hosts",
+            f"{file_count} files  ·  {len(defs)} aspect names  ·  {edges} includes  ·  {len(all_hosts)} hosts",
             10.5,
             DIM,
             400,
@@ -569,14 +553,14 @@ def build():
     target = ROOT / "assets" / f"aspect-graph{'' if W == 820 else f'-{W}'}.svg"
     target.write_text("\n".join(svg) + "\n")
 
-    print(f"aspects: {len(aspects)}  edges: {edges}  hosts: {[h for h, _ in host_list]}")
+    print(f"aspects: {len(aspects)}  edges: {edges}  hosts: {[h for h, _ in all_hosts]}")
     print(f"wrote {target.relative_to(ROOT)}  {W}x{height}  ({target.stat().st_size} bytes)")
     problems = verify(target, W, height)
     print("layout:", "ok" if not problems else f"{len(problems)} issue(s)")
     for p in problems[:12]:
         print("  !", p)
     print("edges as drawn:")
-    for name in [*(a for _, a in host_list), *spine, *sub]:
+    for name in dict.fromkeys([*(a for _, a in all_hosts), *server, *spine, *sub]):
         ent = aspects[name]
         kids = ", ".join(l for l, _, _ in ent["includes"]) or "-"
         prov = ""

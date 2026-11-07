@@ -1,13 +1,10 @@
 {
   inputs,
-  lib,
   den,
   ...
 }:
 {
   imports = [ inputs.den.flakeModule ];
-
-  den.schema.user.classes = lib.mkDefault [ "homeManager" ];
 
   den.aspects.base.includes = with den.aspects; [
     boot
@@ -15,16 +12,12 @@
     nix
     locale
     network
-    audio
-    scheduling
     shell
-    remotes
-    wireguard
-    wifi
   ];
 
   den.aspects.graphical.includes = with den.aspects; [
     base
+    audio
     hyprland
     theming
     plymouth
@@ -40,7 +33,10 @@
 
   den.aspects.azazel.includes = with den.aspects; [
     graphical
-    desktop
+    scheduling
+    remotes
+    wireguard
+    wifi
     kde-connect
     cpu-amd
     nvidia
@@ -59,6 +55,10 @@
 
   den.aspects.solas.includes = with den.aspects; [
     graphical
+    scheduling
+    remotes
+    wireguard
+    wifi
     laptop
     cpu-amd
     fingerprint
@@ -66,13 +66,34 @@
     ai-harness
   ];
 
+  den.aspects.seere.includes = with den.aspects; [
+    base
+    dns-server
+    reverse_proxy
+  ];
+  den.aspects.sitri.includes = with den.aspects; [
+    base
+    dns-server
+    reverse_proxy
+  ];
+
+  den.hosts.x86_64-linux.Seere = {
+    aspect = den.aspects.seere;
+    users.shochraos.classes = [ "homeManager" ];
+  };
+
+  den.hosts.x86_64-linux.Sitri = {
+    aspect = den.aspects.sitri;
+    users.shochraos.classes = [ "homeManager" ];
+  };
+
   den.hosts.x86_64-linux.Azazel = {
     aspect = den.aspects.azazel;
-    users.shochraos = { };
+    users.shochraos.classes = [ "homeManager" ];
   };
 
   den.hosts.x86_64-linux.Solas = {
     aspect = den.aspects.solas;
-    users.shochraos = { };
+    users.shochraos.classes = [ "homeManager" ];
   };
 }

@@ -17,6 +17,19 @@ in
           fd
         ];
 
+        programs.readline = {
+          enable = true;
+          extraConfig = ''
+            $if Bash
+            "\e[1;5D": backward-word
+            "\e[1;5C": forward-word
+            set bell-style visible
+            set completion-ignore-case on
+            set show-all-if-ambiguous on
+            $endif
+          '';
+        };
+
         programs.bash = {
           enable = true;
           enableCompletion = true;
@@ -55,11 +68,6 @@ in
 
           initExtra = ''
             [[ -t 0 ]] && stty -ixon
-            bind '"\e[1;5D": backward-word'
-            bind '"\e[1;5C": forward-word'
-            bind 'set bell-style visible'
-            bind 'set completion-ignore-case on'
-            bind 'set show-all-if-ambiguous on'
             PROMPT_COMMAND+=('history -a')
 
             command -v trash >/dev/null 2>&1 && alias rm='trash -v'

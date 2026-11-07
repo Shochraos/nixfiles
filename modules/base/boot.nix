@@ -50,6 +50,6 @@
 
       boot.kernel.sysctl."kernel.kptr_restrict" = 2;
 
-      boot.kernelPackages = pkgs.linuxPackages_latest;
+      boot.kernelPackages = lib.mkDefault pkgs.linuxPackages_latest;
     };
 }

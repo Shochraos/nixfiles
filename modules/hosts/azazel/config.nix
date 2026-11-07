@@ -10,6 +10,14 @@
     {
       system.stateVersion = "25.05";
 
+      services.scx.extraArgs = [ "--primary-domain=performance" ];
+      systemd.targets = {
+        "suspend".enable = false;
+        "hibernate".enable = false;
+        "hybrid-sleep".enable = false;
+        "suspend-then-hibernate".enable = false;
+      };
+
       host.lact.gpus."10DE:2684-1458:40E4-0000:01:00.0" = {
         fan_control_enabled = true;
         fan_control_settings = {
@@ -31,8 +39,9 @@
       };
 
       boot.kernelParams = [ "nvme_core.default_ps_max_latency_us=0" ];
-      host.ssh.firewallInterfaces = [ "en*" ];
-      host.ssh.authorizedKeys = [
+      services.openssh.enable = true;
+      networking.firewall.interfaces."en+".allowedTCPPorts = [ 22 ];
+      users.users.shochraos.openssh.authorizedKeys.keys = [
         "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIC71dT73gYzQ5zQz0hAeqC6XccOcBmBxGh9Fk2xztTb6 hermes-gateway"
       ];
 
