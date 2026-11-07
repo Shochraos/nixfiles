@@ -134,6 +134,8 @@
           };
         in
         {
+          environment.systemPackages = [ pkgs.keepassxc ];
+
           sops.secrets.${cookiesSecret} = { };
           sops.secrets."keepassxc/master-password" = {
             owner = user.name;

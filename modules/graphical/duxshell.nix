@@ -109,6 +109,11 @@ in
 
           xdg.autostart.enable = true;
 
+          programs.bash.shellAliases = {
+            copy = "dms cl copy";
+            paste = "dms cl paste";
+          };
+
           programs.dank-material-shell = {
             enable = true;
             systemd = {

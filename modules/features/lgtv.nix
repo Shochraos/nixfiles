@@ -20,14 +20,13 @@ in
         {
           sops.secrets = {
             "lgtv/mac" = { };
-            "lgtv/ip" = { };
           };
 
           sops.templates."lgtv.env" = {
             owner = user.name;
             content = ''
               LGTV_MAC=${config.sops.placeholder."lgtv/mac"}
-              LGTV_IP=${config.sops.placeholder."lgtv/ip"}
+              LGTV_IP=192.168.30.6
             '';
           };
 

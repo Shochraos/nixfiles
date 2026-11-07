@@ -13,7 +13,6 @@
             "ssh/hosts".owner = user.name;
             "ssh/private-git" = { };
             "ssh/uni-git" = { };
-            "astaroth/ip" = { };
             "git/url-rewrites".owner = user.name;
             "git/github/email" = { };
             "git/non-github/name" = { };
@@ -41,7 +40,7 @@
               Host astaroth
                 AddKeysToAgent yes
                 ForwardAgent yes
-                HostName ${config.sops.placeholder."astaroth/ip"}
+                HostName 192.168.10.2
                 IdentityFile ${config.host.sshKey}
                 User root
                 HostKeyAlias astaroth

@@ -1,21 +1,12 @@
 { inputs, ... }:
 {
   den.aspects.base = {
-    provides.to-users.nixos =
-      {
-        lib,
-        user,
-        utils,
-        ...
-      }:
-      {
-        home-manager = {
-          useGlobalPkgs = true;
-          useUserPackages = true;
-        };
-        systemd.services."home-manager-${utils.escapeSystemdPath user.name}".serviceConfig.TimeoutStartSec =
-          lib.mkForce "17min";
+    provides.to-users.nixos = _: {
+      home-manager = {
+        useGlobalPkgs = true;
+        useUserPackages = true;
       };
+    };
 
     provides.to-users.homeManager =
       { osConfig, pkgs, ... }:

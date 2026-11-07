@@ -62,32 +62,32 @@
 <text x="72" y="691" font-size="11.5" fill="#e6f2ec">base  ↑</text>
 <text x="766" y="691" font-size="9.5" fill="#93b3ab" text-anchor="end" opacity="0.75">modules/base/config.nix</text>
 <circle cx="60" cy="710" r="3" fill="#3dffb0"/>
-<text x="72" y="714" font-size="11.5" fill="#e6f2ec">audio</text>
-<text x="766" y="714" font-size="9.5" fill="#93b3ab" text-anchor="end" opacity="0.75">modules/graphical/audio.nix</text>
+<text x="72" y="714" font-size="11.5" fill="#e6f2ec">hyprland</text>
+<text x="766" y="714" font-size="9.5" fill="#93b3ab" text-anchor="end" opacity="0.75">modules/graphical/hyprland/animations.nix</text>
 <circle cx="60" cy="733" r="3" fill="#3dffb0"/>
-<text x="72" y="737" font-size="11.5" fill="#e6f2ec">hyprland</text>
-<text x="766" y="737" font-size="9.5" fill="#93b3ab" text-anchor="end" opacity="0.75">modules/graphical/hyprland/animations.nix</text>
+<text x="72" y="737" font-size="11.5" fill="#e6f2ec">apps  ⊃</text>
+<text x="766" y="737" font-size="9.5" fill="#93b3ab" text-anchor="end" opacity="0.75">modules/graphical/apps.nix</text>
 <circle cx="60" cy="756" r="3" fill="#3dffb0"/>
-<text x="72" y="760" font-size="11.5" fill="#e6f2ec">theming</text>
-<text x="766" y="760" font-size="9.5" fill="#93b3ab" text-anchor="end" opacity="0.75">modules/graphical/theming.nix</text>
+<text x="72" y="760" font-size="11.5" fill="#e6f2ec">audio</text>
+<text x="766" y="760" font-size="9.5" fill="#93b3ab" text-anchor="end" opacity="0.75">modules/graphical/audio.nix</text>
 <circle cx="60" cy="779" r="3" fill="#3dffb0"/>
-<text x="72" y="783" font-size="11.5" fill="#e6f2ec">plymouth</text>
-<text x="766" y="783" font-size="9.5" fill="#93b3ab" text-anchor="end" opacity="0.75">modules/graphical/plymouth.nix</text>
+<text x="72" y="783" font-size="11.5" fill="#e6f2ec">theming</text>
+<text x="766" y="783" font-size="9.5" fill="#93b3ab" text-anchor="end" opacity="0.75">modules/graphical/theming.nix</text>
 <circle cx="60" cy="802" r="3" fill="#3dffb0"/>
-<text x="72" y="806" font-size="11.5" fill="#e6f2ec">terminal</text>
-<text x="766" y="806" font-size="9.5" fill="#93b3ab" text-anchor="end" opacity="0.75">modules/graphical/terminal.nix</text>
+<text x="72" y="806" font-size="11.5" fill="#e6f2ec">plymouth</text>
+<text x="766" y="806" font-size="9.5" fill="#93b3ab" text-anchor="end" opacity="0.75">modules/graphical/plymouth.nix</text>
 <circle cx="60" cy="825" r="3" fill="#3dffb0"/>
-<text x="72" y="829" font-size="11.5" fill="#e6f2ec">duxshell</text>
-<text x="766" y="829" font-size="9.5" fill="#93b3ab" text-anchor="end" opacity="0.75">modules/graphical/duxshell.nix</text>
+<text x="72" y="829" font-size="11.5" fill="#e6f2ec">terminal</text>
+<text x="766" y="829" font-size="9.5" fill="#93b3ab" text-anchor="end" opacity="0.75">modules/graphical/terminal.nix</text>
 <circle cx="60" cy="848" r="3" fill="#3dffb0"/>
-<text x="72" y="852" font-size="11.5" fill="#e6f2ec">browser</text>
-<text x="766" y="852" font-size="9.5" fill="#93b3ab" text-anchor="end" opacity="0.75">modules/graphical/browser.nix</text>
+<text x="72" y="852" font-size="11.5" fill="#e6f2ec">duxshell</text>
+<text x="766" y="852" font-size="9.5" fill="#93b3ab" text-anchor="end" opacity="0.75">modules/graphical/duxshell.nix</text>
 <circle cx="60" cy="871" r="3" fill="#3dffb0"/>
-<text x="72" y="875" font-size="11.5" fill="#e6f2ec">editor</text>
-<text x="766" y="875" font-size="9.5" fill="#93b3ab" text-anchor="end" opacity="0.75">modules/graphical/editor.nix</text>
+<text x="72" y="875" font-size="11.5" fill="#e6f2ec">browser</text>
+<text x="766" y="875" font-size="9.5" fill="#93b3ab" text-anchor="end" opacity="0.75">modules/graphical/browser.nix</text>
 <circle cx="60" cy="894" r="3" fill="#3dffb0"/>
-<text x="72" y="898" font-size="11.5" fill="#e6f2ec">apps  ⊃</text>
-<text x="766" y="898" font-size="9.5" fill="#93b3ab" text-anchor="end" opacity="0.75">modules/graphical/apps.nix</text>
+<text x="72" y="898" font-size="11.5" fill="#e6f2ec">editor</text>
+<text x="766" y="898" font-size="9.5" fill="#93b3ab" text-anchor="end" opacity="0.75">modules/graphical/editor.nix</text>
 <circle cx="60" cy="917" r="3" fill="#3dffb0"/>
 <text x="72" y="921" font-size="11.5" fill="#e6f2ec">sync</text>
 <text x="766" y="921" font-size="9.5" fill="#93b3ab" text-anchor="end" opacity="0.75">modules/graphical/sync.nix</text>
@@ -160,7 +160,7 @@
 <text x="382" y="1497" font-size="9.5" fill="#93b3ab" text-anchor="end" opacity="0.75">modules/features/wifi.nix</text>
 <circle cx="60" cy="1516" r="3" fill="#3dffb0"/>
 <text x="72" y="1520" font-size="11.5" fill="#e6f2ec">kde-connect</text>
-<text x="382" y="1520" font-size="9.5" fill="#93b3ab" text-anchor="end" opacity="0.75">modules/graphical/kde-connect.nix</text>
+<text x="382" y="1520" font-size="9.5" fill="#93b3ab" text-anchor="end" opacity="0.75">modules/features/kde-connect.nix</text>
 <circle cx="60" cy="1539" r="3" fill="#3dffb0"/>
 <text x="72" y="1543" font-size="11.5" fill="#e6f2ec">cpu-amd</text>
 <text x="382" y="1543" font-size="9.5" fill="#93b3ab" text-anchor="end" opacity="0.75">modules/features/cpu-amd.nix</text>

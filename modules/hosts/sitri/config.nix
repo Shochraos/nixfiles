@@ -1,5 +1,5 @@
 {
-  den.aspects.sitri.nixos = { pkgs, ... }: {
+  den.aspects.sitri.nixos = { config, pkgs, ... }: {
     boot.lanzaboote.measuredBoot = {
       enable = true;
       pcrs = [
@@ -16,6 +16,9 @@
     };
 
     networking.nftables.enable = true;
+    services.adguardhome.settings.tls.server_name = "dns2.${
+      config.sops.placeholder."network/home-domain"
+    }";
 
     system.stateVersion = "26.11";
     boot.kernelPackages = pkgs.linuxPackages;

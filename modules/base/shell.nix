@@ -61,9 +61,6 @@ in
             nh-switch = "nh os switch --ask";
             nh-boot = "nh os boot --ask";
             nh-update = "nh os boot -u --ask";
-
-            copy = "dms cl copy";
-            paste = "dms cl paste";
           };
 
           initExtra = ''

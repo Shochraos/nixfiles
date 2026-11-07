@@ -17,15 +17,15 @@
 
   den.aspects.graphical.includes = with den.aspects; [
     base
-    audio
     hyprland
+    apps
+    audio
     theming
     plymouth
     terminal
     duxshell
     browser
     editor
-    apps
     sync
     printing
     bluetooth

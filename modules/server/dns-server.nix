@@ -8,8 +8,14 @@
         "::1"
       ];
       resolvconf.useLocalResolver = true;
-      firewall.allowedTCPPorts = [ 53 ];
-      firewall.allowedUDPPorts = [ 53 ];
+      firewall.allowedTCPPorts = [
+        53
+        853
+      ];
+      firewall.allowedUDPPorts = [
+        53
+        853
+      ];
     };
     services.resolved.enable = false;
     services.timesyncd = {
@@ -23,7 +29,9 @@
       fallbackServers = [ ];
     };
 
-    sops.secrets."dns/adguard-password-hash" = { };
+    sops.secrets = {
+      "dns/adguard-password-hash" = { };
+    };
     sops.templates."AdGuardHome.yaml" = {
       file = (pkgs.formats.yaml { }).generate "AdGuardHome.yaml" config.services.adguardhome.settings;
       mode = "0600";
@@ -55,22 +63,33 @@
           port = 53;
           serve_plain_dns = true;
           upstream_dns = [
-            "sdns://AgcAAAAAAAAABzEuMC4wLjEAEmRucy5jbG91ZGZsYXJlLmNvbQovZG5zLXF1ZXJ5"
-            "sdns://AgcAAAAAAAAAFlsyNjA2OjQ3MDA6NDcwMDo6MTExMV0AGlsyNjA2OjQ3MDA6NDcwMDo6MTExMV06NDQzCi9kbnMtcXVlcnk"
-            "sdns://AgcAAAAAAAAAFlsyNjA2OjQ3MDA6NDcwMDo6MTAwMV0AGlsyNjA2OjQ3MDA6NDcwMDo6MTAwMV06NDQzCi9kbnMtcXVlcnk"
+            "https://1.1.1.1/dns-query"
+            "https://1.0.0.1/dns-query"
           ];
-          bootstrap_dns = [ ];
+          bootstrap_dns = [
+            "1.1.1.1"
+            "1.0.0.1"
+          ];
           fallback_dns = [ ];
           upstream_mode = "load_balance";
           aaaa_disabled = false;
           allowed_clients = [
             "127.0.0.0/8"
             "::1/128"
-            "10.0.0.0/8"
-            "172.16.0.0/12"
-            "192.168.0.0/16"
-            "fc00::/7"
-            "fe80::/10"
+            "192.168.1.0/24"
+            "192.168.10.0/24"
+            "192.168.20.0/24"
+            "192.168.30.0/24"
+            "192.168.40.0/24"
+            "192.168.50.0/24"
+            "192.168.60.0/24"
+            "fd00:1::/64"
+            "fd00:10::/64"
+            "fd00:20::/64"
+            "fd00:30::/64"
+            "fd00:40::/64"
+            "fd00:50::/64"
+            "fd00:60::/64"
           ];
           ratelimit = 100;
           ratelimit_subnet_len_ipv4 = 32;
@@ -112,18 +131,26 @@
         };
         dhcp.enabled = false;
         tls = {
-          enabled = false;
+          enabled = true;
           port_https = 0;
-          port_dns_over_tls = 0;
-          port_dns_over_quic = 0;
+          port_dns_over_tls = 853;
+          port_dns_over_quic = 853;
           port_dnscrypt = 0;
+          certificate_path = "/run/credentials/adguardhome.service/acme-fullchain";
+          private_key_path = "/run/credentials/adguardhome.service/acme-key";
         };
       };
     };
     systemd.services.adguardhome = {
+      requires = [ "acme-home.service" ];
+      after = [ "acme-home.service" ];
       preStart = lib.mkForce "";
       serviceConfig = {
-        LoadCredential = [ "adguard-config:${config.sops.templates."AdGuardHome.yaml".path}" ];
+        LoadCredential = [
+          "adguard-config:${config.sops.templates."AdGuardHome.yaml".path}"
+          "acme-fullchain:${config.security.acme.certs.home.directory}/fullchain.pem"
+          "acme-key:${config.security.acme.certs.home.directory}/key.pem"
+        ];
         ExecStartPre = "${pkgs.coreutils}/bin/install -m0600 %d/adguard-config /var/lib/AdGuardHome/AdGuardHome.yaml";
       };
     };
