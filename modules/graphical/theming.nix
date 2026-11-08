@@ -100,6 +100,40 @@ in
         ...
       }:
       let
+        tutaMatugenEnabled = osConfig.networking.hostName == "Azazel";
+        tutaMatugen = pkgs.writeShellApplication {
+          name = "tutanota-matugen";
+          excludeShellChecks = [
+            "SC2089"
+            "SC2090"
+          ];
+          runtimeInputs = with pkgs; [
+            coreutils
+            diffutils
+            jq
+            procps
+            util-linux
+          ];
+          runtimeEnv = {
+            TUTA_EXECUTABLE = "${pkgs.tutanota-desktop}/bin/tutanota-desktop";
+            TUTA_THEME_KEYS = builtins.toJSON (
+              builtins.attrNames (builtins.fromJSON (builtins.readFile assets.tutanotaTemplate))
+            );
+          };
+          text = builtins.readFile assets.tutanotaMatugenScript;
+        };
+        tutaDesktop = pkgs.symlinkJoin {
+          name = "tutanota-desktop-matugen-${pkgs.tutanota-desktop.version}";
+          paths = [ pkgs.tutanota-desktop ];
+          nativeBuildInputs = [ pkgs.makeWrapper ];
+          postBuild = ''
+            rm "$out/bin/tutanota-desktop"
+            makeWrapper ${tutaMatugen}/bin/tutanota-matugen "$out/bin/tutanota-desktop" \
+              --add-flags --launch
+          '';
+          inherit (pkgs.tutanota-desktop) meta;
+        };
+
         hermesDesktopTemplate = pkgs.writeText "hermes-desktop.js" (
           builtins.replaceStrings
             [
@@ -136,12 +170,14 @@ in
 
         fonts.fontconfig.enable = true;
 
-        home.packages = with pkgs; [
-          adw-gtk3
-          qtengine
-          klassy
-          kdePackages.qqc2-desktop-style
-        ];
+        home.packages =
+          (with pkgs; [
+            adw-gtk3
+            qtengine
+            klassy
+            kdePackages.qqc2-desktop-style
+          ])
+          ++ pkgs.lib.optional tutaMatugenEnabled tutaDesktop;
 
         stylix.targets = {
           font-packages.enable = true;
@@ -270,6 +306,13 @@ in
                 flyline = {
                   input_path = assets.matugenFlylineTemplate;
                   output_path = "~/.cache/flyline/matugen.sh";
+                };
+              }
+              // pkgs.lib.optionalAttrs tutaMatugenEnabled {
+                tutanota = {
+                  input_path = assets.tutanotaTemplate;
+                  output_path = "${config.xdg.cacheHome}/tutanota-matugen/theme.json.tmp";
+                  post_hook = "${tutaMatugen}/bin/tutanota-matugen --publish";
                 };
               }
               // osConfig.host.matugen.templates

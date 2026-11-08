@@ -28,6 +28,7 @@ in
       hdrRunScript = ../../assets/scripts/hdr-run.sh;
       hsFuldaEduroamCa = ../../assets/certs/hs-fulda-eduroam-ca.pem;
       ironyModManagerIcon = ../../assets/icons/ironymodmanager.png;
+      keepassxcClassicThemePatch = ../../assets/patches/keepassxc-classic-theme.patch;
       klassyRc = ../../configs/klassy/klassyrc;
       kittyConf = ../../assets/kitty/kitty.conf;
       matugenFlylineTemplate = ../../assets/matugen/flyline.sh;
@@ -47,6 +48,8 @@ in
       steamvrCapabilitiesScript = ../../assets/scripts/steamvr-capabilities.py;
       steamTemplate = ../../assets/templates/steam.css;
       steamAccentsTemplate = ../../assets/templates/steam-accents.css;
+      tutanotaTemplate = ../../assets/templates/tutanota.json;
+      tutanotaMatugenScript = ../../assets/scripts/tutanota-matugen.sh;
     };
 
     packageSources = {

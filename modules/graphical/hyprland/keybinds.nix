@@ -219,17 +219,16 @@
               { mouse = true; }
             ];
           }
-
           {
             _args = [
               "code:199"
-              (lua "hl.dsp.exec_cmd('dms ipc call discord toggleMute')")
+              (lua "hl.dsp.global('discord:discord-toggle-mute')")
             ];
           }
           {
             _args = [
               "code:200"
-              (lua "hl.dsp.exec_cmd('dms ipc call discord toggleDeafen')")
+              (lua "hl.dsp.global('discord:discord-toggle-deafen')")
             ];
           }
           {

@@ -41,8 +41,8 @@
           pkgs.libreoffice-qt-stable
           pkgs.pdfarranger
           pkgs.kdePackages.filelight
-          pkgs.tutanota-desktop
-        ];
+        ]
+        ++ pkgs.lib.optional (osConfig.networking.hostName != "Azazel") pkgs.tutanota-desktop;
 
         home.file = {
           ".local/share/fonts/NotoSansCJK-Regular.ttc".source =

@@ -64,7 +64,6 @@ in
           config,
           lib,
           osConfig,
-          pkgs,
           ...
         }:
         let
@@ -102,11 +101,6 @@ in
             inputs.danksearch.homeModules.dsearch
           ];
 
-          home.packages = [
-            # DiscordVoice
-            pkgs.python3
-          ];
-
           xdg.autostart.enable = true;
 
           programs.bash.shellAliases = {
@@ -131,10 +125,6 @@ in
               calculator.enable = true;
               dankKDEConnect.enable = true;
               dankTodoman.enable = true;
-              discordVoice = {
-                enable = true;
-                settings.maxBarAvatars = 10;
-              };
               khalCalendar = {
                 enable = true;
                 settings = {

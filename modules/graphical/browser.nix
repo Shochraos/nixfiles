@@ -1,4 +1,11 @@
-{ inputs, ... }:
+{ config, inputs, ... }:
+let
+  keepassxcClassicThemeOverlay = _final: prev: {
+    keepassxc = prev.keepassxc.overrideAttrs (old: {
+      patches = (old.patches or [ ]) ++ [ config.assets.keepassxcClassicThemePatch ];
+    });
+  };
+in
 {
   den.aspects.browser =
     { host, user, ... }:
@@ -134,6 +141,8 @@
           };
         in
         {
+          nixpkgs.overlays = [ keepassxcClassicThemeOverlay ];
+
           environment.systemPackages = [ pkgs.keepassxc ];
 
           sops.secrets.${cookiesSecret} = { };
@@ -250,7 +259,7 @@
                 UpdateBinaryPath = false;
               };
               GUI = {
-                ApplicationTheme = "dark";
+                ApplicationTheme = "classic";
                 ShowTrayIcon = true;
                 MinimizeOnStartup = true;
                 MinimizeOnClose = true;

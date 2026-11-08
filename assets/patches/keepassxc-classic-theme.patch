@@ -1,0 +1,22 @@
+--- a/src/gui/styles/base/classicstyle.qss
++++ b/src/gui/styles/base/classicstyle.qss
+@@ -1,6 +1,6 @@
+ DatabaseOpenWidget #centralStack, DatabaseOpenWidget #publicSummaryLabel {
+     border: 2px groove palette(mid);
+-    background: palette(light);
++    background: palette(alternate-base);
+ }
+ 
+ QToolTip {
+--- a/src/gui/DatabaseOpenWidget.cpp
++++ b/src/gui/DatabaseOpenWidget.cpp
+@@ -78,7 +78,9 @@
+ 
+     auto okBtn = m_ui->buttonBox->button(QDialogButtonBox::Ok);
+     okBtn->setText(tr("Unlock"));
++    okBtn->setIcon(icons()->icon("dialog-ok", true));
+     okBtn->setDefault(true);
++    m_ui->buttonBox->button(QDialogButtonBox::Close)->setIcon(icons()->icon("dialog-close", true));
+     connect(m_ui->buttonBox, SIGNAL(accepted()), SLOT(openDatabase()));
+     connect(m_ui->buttonBox, SIGNAL(rejected()), SLOT(reject()));
+ 

@@ -272,10 +272,6 @@
                 size = 15;
               }
               {
-                id = "discordVoice";
-                enabled = true;
-              }
-              {
                 id = "gamechatMix";
                 enabled = true;
               }

@@ -69,4 +69,4 @@ Workaround removal conditions are recorded in [WORKAROUNDS.md](WORKAROUNDS.md).
 
 ## License
 
-[MIT](LICENSE) © 2026 Shochraos. The license covers the code in this repository; everything under `./secrets/` and any personal data is excluded.
+[Unlicense](UNLICENSE). The license covers the code in this repository; everything under `./secrets/` and any personal data is excluded.
