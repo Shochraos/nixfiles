@@ -106,8 +106,44 @@
           {
             enabled = true;
             id = 1;
-            name = "AdGuard DNS filter";
-            url = "https://adguardteam.github.io/AdGuardSDNSFilter/Filters/filter.txt";
+            name = "HaGeZi Multi PRO++";
+            url = "https://hagezi-mirror.dnsbunker.org/adblock/pro.plus.txt";
+          }
+          {
+            enabled = true;
+            id = 2;
+            name = "HaGeZi Threat Intelligence Feeds";
+            url = "https://hagezi-mirror.dnsbunker.org/adblock/tif.txt";
+          }
+          {
+            enabled = true;
+            id = 3;
+            name = "HaGeZi DynDNS";
+            url = "https://hagezi-mirror.dnsbunker.org/adblock/dyndns.txt";
+          }
+          {
+            enabled = true;
+            id = 4;
+            name = "HaGeZi Encrypted DNS Bypass";
+            url = "https://hagezi-mirror.dnsbunker.org/adblock/doh.txt";
+          }
+          {
+            enabled = true;
+            id = 5;
+            name = "HaGeZi Native Amazon";
+            url = "https://hagezi-mirror.dnsbunker.org/adblock/native.amazon.txt";
+          }
+          {
+            enabled = true;
+            id = 6;
+            name = "HaGeZi Native Microsoft";
+            url = "https://hagezi-mirror.dnsbunker.org/adblock/native.winoffice.txt";
+          }
+          {
+            enabled = true;
+            id = 7;
+            name = "HaGeZi Native Samsung";
+            url = "https://hagezi-mirror.dnsbunker.org/adblock/native.samsung.txt";
           }
         ];
         querylog = {
