@@ -18,16 +18,6 @@
       ];
     };
     services.resolved.enable = false;
-    services.timesyncd = {
-      enable = true;
-      servers = [
-        "162.159.200.1"
-        "162.159.200.123"
-        "2606:4700:f1::1"
-        "2606:4700:f1::123"
-      ];
-      fallbackServers = [ ];
-    };
 
     sops.secrets = {
       "dns/adguard-password-hash" = { };
