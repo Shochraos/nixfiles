@@ -30,7 +30,7 @@
     services.adguardhome = {
       enable = true;
       mutableSettings = false;
-      openFirewall = false;
+      openFirewall = true;
       allowDHCP = false;
       settings = {
         http = {
