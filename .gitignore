@@ -5,6 +5,3 @@ CLAUDE.md
 .pre-commit-config.yaml
 result
 result-*
-
-# generated diagram variants; the canonical 820 render is committed
-assets/aspect-graph-*.svg

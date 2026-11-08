@@ -5,7 +5,7 @@ This repository configures four NixOS hosts with flake-parts, import-tree, Den a
 ## Repository map
 
 - `flake.nix`: inputs and the import-tree entry point. Keep its outputs minimal.
-- `modules/flake/`: host/aspect composition in `den.nix`, shared data options in `options.nix`, repository paths in `paths.nix`, development tools, formatting and graph checks.
+- `modules/flake/`: host/aspect composition in `den.nix`, shared data options in `options.nix`, repository paths in `paths.nix`, development tools and formatting.
 - `modules/base/`: common system configuration.
 - `modules/graphical/`: desktop configuration and applications.
 - `modules/features/`: optional capabilities selected by hosts.
@@ -13,7 +13,7 @@ This repository configures four NixOS hosts with flake-parts, import-tree, Den a
 - `modules/hosts/<host>/`: each host's `config.nix`, `hardware.nix` and `filesystems.nix`.
 - `modules/users/`: user aspects, resolved by user name.
 - `pkgs/`: local package recipes, exposed through `config.packageSources`.
-- `assets/` and `configs/`: scripts, templates, patches, static configuration and the generated aspect graph.
+- `assets/` and `configs/`: scripts, templates, patches and static configuration.
 - `secrets/`: SOPS-encrypted data. `.sops.yaml` configures encryption recipients.
 
 See `README.md` for the project overview and `WORKAROUNDS.md` before changing compatibility overrides.
@@ -48,15 +48,9 @@ Use the corresponding configuration name for Solas, Seere or Sitri. Evaluate aff
 
 The full configuration gate includes formatting/linting, `nix flake check`, and Azazel/Solas builds; include affected server builds as appropriate. Builds and rebuilds require explicit permission. Report any checks not performed rather than treating no-build evaluation as a completed build.
 
-`nix fmt` runs the configured formatters and linters and can modify files. Keep formatting within the authorized scope and preserve unrelated working changes. CI runs flake checks for formatting/linting and graph freshness, not full host builds or runtime tests.
+`nix fmt` runs the configured formatters and linters and can modify files. Keep formatting within the authorized scope and preserve unrelated working changes. CI runs flake checks for formatting/linting, not full host builds or runtime tests.
 
-When changing aspect composition, regenerate `assets/aspect-graph.svg` in the development environment:
-
-```bash
-python3 assets/scripts/draw-aspects.py 820
-```
-
-Review the generated change. Local hooks check formatting and graph freshness without staging files.
+Local hooks check formatting without staging files.
 
 ## Safety and change boundaries
 

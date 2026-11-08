@@ -28,5 +28,5 @@ jobs:
           extra_nix_config: |
             experimental-features = nix-command flakes
 
-      - name: Run flake checks (formatting, linting and graph freshness)
+      - name: Run flake checks (formatting and linting)
         run: nix flake check --print-build-logs
