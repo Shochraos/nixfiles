@@ -38,11 +38,10 @@
         home.packages = [
           discordPkg
           spotifastPkg
-          pkgs.libreoffice-qt-stable
+          #pkgs.libreoffice-qt-stable
           pkgs.pdfarranger
           pkgs.kdePackages.filelight
-        ]
-        ++ pkgs.lib.optional (osConfig.networking.hostName != "Azazel") pkgs.tutanota-desktop;
+        ];
 
         home.file = {
           ".local/share/fonts/NotoSansCJK-Regular.ttc".source =
