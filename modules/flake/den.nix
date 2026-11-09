@@ -64,6 +64,7 @@
     fingerprint
     mic-mute
     ai-harness
+    unreal
   ];
 
   den.aspects.seere.includes = with den.aspects; [
