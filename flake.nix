@@ -115,13 +115,8 @@
       inputs.millennium-src.follows = "millennium-src";
     };
 
-    proton-cachyos-nix = {
-      url = "github:Shochraos/proton-cachyos-nix";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
-    dw-proton-nix = {
-      url = "github:shochraos/dw-proton-nix";
+    custom-proton-nix = {
+      url = "github:Shochraos/custom-proton-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 

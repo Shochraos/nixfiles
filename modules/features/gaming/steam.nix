@@ -118,8 +118,8 @@ in
     }:
     let
       proton-cachyos-v3 =
-        inputs.proton-cachyos-nix.packages.${pkgs.stdenv.hostPlatform.system}.proton-cachyos-v3;
-      dw-proton = inputs.dw-proton-nix.packages.${pkgs.stdenv.hostPlatform.system}.dw-proton;
+        inputs.custom-proton-nix.packages.${pkgs.stdenv.hostPlatform.system}.proton-cachyos-v3;
+      dw-proton = inputs.custom-proton-nix.packages.${pkgs.stdenv.hostPlatform.system}.dw-proton;
       drsSettings = lib.concatStringsSep "," [
         "ngx_dlss_sr_override=on"
         "ngx_dlss_sr_override_render_preset_selection=render_preset_m"
