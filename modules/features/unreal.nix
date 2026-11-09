@@ -65,7 +65,7 @@
 
       xdg.desktopEntries.unreal-engine = {
         name = "Unreal Engine";
-        exec = "unreal-engine %f";
+        exec = "${pkgs.coreutils}/bin/env SDL_VIDEODRIVER=x11 unreal-engine %f";
         terminal = false;
       };
     };
