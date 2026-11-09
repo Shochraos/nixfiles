@@ -100,7 +100,6 @@ in
         ...
       }:
       let
-        tutaMatugenEnabled = osConfig.networking.hostName == "Azazel";
         tutaMatugen = pkgs.writeShellApplication {
           name = "tutanota-matugen";
           excludeShellChecks = [
@@ -170,14 +169,13 @@ in
 
         fonts.fontconfig.enable = true;
 
-        home.packages =
-          (with pkgs; [
-            adw-gtk3
-            qtengine
-            klassy
-            kdePackages.qqc2-desktop-style
-          ])
-          ++ pkgs.lib.optional tutaMatugenEnabled tutaDesktop;
+        home.packages = with pkgs; [
+          adw-gtk3
+          qtengine
+          klassy
+          kdePackages.qqc2-desktop-style
+          tutaDesktop
+        ];
 
         stylix.targets = {
           font-packages.enable = true;
@@ -307,8 +305,7 @@ in
                   input_path = assets.matugenFlylineTemplate;
                   output_path = "~/.cache/flyline/matugen.sh";
                 };
-              }
-              // pkgs.lib.optionalAttrs tutaMatugenEnabled {
+
                 tutanota = {
                   input_path = assets.tutanotaTemplate;
                   output_path = "${config.xdg.cacheHome}/tutanota-matugen/theme.json.tmp";
