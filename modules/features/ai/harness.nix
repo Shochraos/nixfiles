@@ -9,7 +9,7 @@
     };
 
   den.aspects.ai-harness.provides.to-users.homeManager =
-    {
+    hm@{
       lib,
       osConfig,
       pkgs,
@@ -18,7 +18,30 @@
     let
       hermes = inputs.hermes-agent.packages.${pkgs.stdenv.hostPlatform.system};
 
-      hermesAutostart = lib.optional (builtins.elem "hermes" osConfig.host.autostart) "${hermes.desktop}/share/applications/com.nousresearch.hermes.desktop";
+      compatiblePatchelf =
+        dependency:
+        if (dependency.pname or "") == "patchelf" && (dependency.version or "") == "0.15.2" then
+          dependency.overrideAttrs (previous: {
+            patches = lib.filter (
+              patch:
+              !(
+                builtins.isAttrs patch && (patch.name or "") == "patchelf-fix-executable-header-load-overlap.patch"
+              )
+            ) (previous.patches or [ ]);
+          })
+        else
+          dependency;
+
+      hermesPackage = hermes.default.override (previous: {
+        pmPackages = lib.mapAttrs (
+          _: package:
+          package.overrideAttrs (old: {
+            nativeBuildInputs = map compatiblePatchelf (old.nativeBuildInputs or [ ]);
+          })
+        ) previous.pmPackages;
+      });
+
+      hermesAutostart = lib.optional (builtins.elem "hermes" osConfig.host.autostart) "${hm.config.programs.hermes-agent.desktop.package}/share/applications/com.nousresearch.hermes.desktop";
 
     in
     {
@@ -28,6 +51,7 @@
 
       imports = [ inputs.hermes-agent.homeManagerModules.default ];
 
+      services.hermes-agent.package = hermesPackage;
       programs.hermes-agent.desktop.enable = true;
 
     };
