@@ -63,9 +63,17 @@
     {
       home.packages = [ unreal-engine ];
 
+      home.file.".config/Epic/Unreal Engine/Engine/Config/UserGame.ini" = {
+        force = true;
+        text = ''
+          [StartupActions]
+          -InsertPack=(PackSource="StarterContent.upack",PackName="StarterContent")
+        '';
+      };
+
       xdg.desktopEntries.unreal-engine = {
         name = "Unreal Engine";
-        exec = "${pkgs.coreutils}/bin/env SDL_VIDEODRIVER=x11 unreal-engine %f";
+        exec = "unreal-engine %f";
         terminal = false;
       };
     };

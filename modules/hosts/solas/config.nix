@@ -156,6 +156,15 @@
         windowRules = [
           {
             match = {
+              class = "^(UnrealEditor)$";
+              title = "^$";
+            };
+            suppress_event = "activate activatefocus fullscreen maximize fullscreenoutput";
+            no_focus = true;
+            workspace = "special:unrealghost silent";
+          }
+          {
+            match = {
               class = "^(hermes)$";
             };
             workspace = "2 silent";
