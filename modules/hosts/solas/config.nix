@@ -145,7 +145,6 @@
           gestures = {
             workspace_swipe_invert = true;
           };
-          xwayland.force_zero_scaling = true;
         };
         gestures = [
           {
