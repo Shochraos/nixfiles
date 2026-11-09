@@ -10,7 +10,7 @@
     {
       system.stateVersion = "25.05";
 
-      services.scx.extraArgs = [ "--primary-domain=performance" ];
+      services.scx-loader.config.scheds.scx_bpfland.auto_mode = [ "--primary-domain=performance" ];
       systemd.targets = {
         "suspend".enable = false;
         "hibernate".enable = false;
