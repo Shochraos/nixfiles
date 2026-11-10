@@ -19,7 +19,7 @@
         programs.nix-index-database.comma.enable = true;
         programs.nh = {
           enable = true;
-          flake = osConfig.host.flakeDir;
+          flake = "github:Shochraos/nixfiles/main";
         };
         programs.direnv = {
           enable = true;

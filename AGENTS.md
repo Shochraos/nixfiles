@@ -22,7 +22,7 @@ See `README.md` for the project overview and `WORKAROUNDS.md` before changing co
 
 Enter `nix develop`, or use the existing `.envrc` with direnv. The development shell supplies Nix language tools, linters, Python and repository hooks. Keep developer tooling in `devShells.default` or the consuming program's scope; never install it globally.
 
-Use the locked inputs. Resolve input identities through `flake.lock`'s root input references, not similarly named transitive nodes. The owner uses `nh-update` for input updates; do not move the lock file unless explicitly requested. Keep both Millennium and Hermes Desktop following the root nixpkgs input.
+Use the locked inputs. Resolve input identities through `flake.lock`'s root input references, not similarly named transitive nodes. The `nh` commands use `github:Shochraos/nixfiles/main` and its published lock file. Do not move the local lock file unless explicitly requested. Keep both Millennium and Hermes Desktop following the root nixpkgs input.
 
 ## Configuration conventions
 
@@ -57,4 +57,4 @@ Local hooks check formatting without staging files.
 - Do not stage, commit or push. New source files must be included in the Git-backed flake source before normal evaluation can see them; leave index changes to the owner and report omitted files.
 - Keep root `AGENTS.md` in version control. Update it only when an approved change makes its repository guidance inaccurate; do not add task history, audit findings or code-line references.
 - Never decrypt secrets or run `sops -d`. Declare secrets and consume SOPS placeholders or runtime paths; verify structure without reading plaintext. Secret-value edits belong to the owner.
-- Ask before activation, switches, service restarts or disruptive tests. The `nh-switch`, `nh-boot` and `nh-update` helpers build and/or deploy; they are not read-only verification commands.
+- Ask before activation, switches, service restarts or disruptive tests. The `nh-switch` and `nh-boot` helpers build and/or deploy; they are not read-only verification commands.

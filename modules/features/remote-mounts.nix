@@ -56,6 +56,7 @@
                 "backups"
                 "data"
                 "misc"
+                "projects"
               ]
           );
         };
