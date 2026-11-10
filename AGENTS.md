@@ -46,7 +46,7 @@ nix eval --raw --no-write-lock-file --option allow-import-from-derivation false 
 
 Use the corresponding configuration name for Solas, Seere or Sitri. Evaluate affected hosts. For behavior-preserving changes, capture before/after toplevel derivations and relevant settings; explain any differences. Matching derivations do not establish runtime health.
 
-The full configuration gate includes formatting/linting, `nix flake check`, and Azazel/Solas builds; include affected server builds as appropriate. Builds and rebuilds require explicit permission. Report any checks not performed rather than treating no-build evaluation as a completed build.
+Do not run system builds or rebuilds (`nix build`, `nixos-rebuild` or `nh` build/deploy helpers) unless the user explicitly instructs you to do so for the current task. Implementation requests and routine verification are not build authorization. Use formatting/linting and the no-build evaluation commands above by default; never omit `--no-build` from `nix flake check` without explicit build authorization. Report checks not performed.
 
 `nix fmt` runs the configured formatters and linters and can modify files. Keep formatting within the authorized scope and preserve unrelated working changes. CI runs flake checks for formatting/linting, not full host builds or runtime tests.
 
