@@ -1,8 +1,8 @@
-# nixfiles
+# Shochraos' NixOS Configuration
 
 ## Summary
 
-Personal NixOS and Home Manager configurations for Azazel (desktop), Solas (laptop), and Seere and Sitri (headless DNS and reverse-proxy hosts). The desktop environment uses Hyprland, DankMaterialShell and Stylix.
+Personal NixOS and Home Manager configurations for Azazel (desktop), Solas (laptop), and Seere / Sitri (servers). The desktop environment uses Hyprland, DankMaterialShell and Stylix.
 
 > **AI disclaimer:** Parts of this configuration and this README were written with AI assistance. Review anything you adopt before adding it to your own system.
 
