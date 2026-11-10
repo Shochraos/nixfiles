@@ -42,13 +42,13 @@
     nvidia
     gaming
     ai-harness
-    ai-stt
+    #ai-stt
     irc
     media
     remote-mounts
     gamechat
     lgtv
-    mp3tag
+    #mp3tag
     backup
     crypto
   ];
