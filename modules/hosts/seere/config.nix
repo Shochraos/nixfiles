@@ -30,7 +30,8 @@
       settings.AuthenticationMethods = "publickey";
     };
     users.users.shochraos.openssh.authorizedKeys.keys = [
-      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIN3/LOpaM2lZXU9aJnpySqOqK1ucSCTRWgBj8BNY8qg6 moritz@alzael"
+      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIN3/LOpaM2lZXU9aJnpySqOqK1ucSCTRWgBj8BNY8qg6 shochraos@Azazel"
+      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIC71dT73gYzQ5zQz0hAeqC6XccOcBmBxGh9Fk2xztTb6 hermes-gateway"
     ];
   };
 
