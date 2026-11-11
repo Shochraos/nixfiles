@@ -3,7 +3,7 @@
   den.aspects.seere.nixos = {
     imports = [ inputs.disko.nixosModules.disko ];
 
-    disko.devices.disk.system.device = "/dev/disk/by-id/REPLACE_WITH_SEERE_WHOLE_DISK";
+    disko.devices.disk.system.device = "/dev/disk/by-id/ata-INTENSO_SSD_1782606006000284";
 
     disko.devices.disk.system = {
       type = "disk";
@@ -36,6 +36,24 @@
                 mountpoint = "/";
               };
             };
+          };
+        };
+      };
+    };
+
+    disko.devices.disk.swap = {
+      type = "disk";
+      device = "/dev/disk/by-id/mmc-DF4016_0x5795a41e";
+      content = {
+        type = "gpt";
+        partitions.swap = {
+          size = "100%";
+          type = "8200";
+          device = "/dev/disk/by-id/mmc-DF4016_0x5795a41e-part1";
+          content = {
+            type = "swap";
+            randomEncryption = true;
+            priority = 0;
           };
         };
       };
