@@ -75,18 +75,7 @@
   den.aspects.sitri.includes = with den.aspects; [
     base
     dns-server
-    reverse_proxy
   ];
-
-  den.hosts.x86_64-linux.Seere = {
-    aspect = den.aspects.seere;
-    users.shochraos.classes = [ "homeManager" ];
-  };
-
-  den.hosts.x86_64-linux.Sitri = {
-    aspect = den.aspects.sitri;
-    users.shochraos.classes = [ "homeManager" ];
-  };
 
   den.hosts.x86_64-linux.Azazel = {
     aspect = den.aspects.azazel;
@@ -95,6 +84,16 @@
 
   den.hosts.x86_64-linux.Solas = {
     aspect = den.aspects.solas;
+    users.shochraos.classes = [ "homeManager" ];
+  };
+
+  den.hosts.x86_64-linux.Seere = {
+    aspect = den.aspects.seere;
+    users.shochraos.classes = [ "homeManager" ];
+  };
+
+  den.hosts.x86_64-linux.Sitri = {
+    aspect = den.aspects.sitri;
     users.shochraos.classes = [ "homeManager" ];
   };
 }
