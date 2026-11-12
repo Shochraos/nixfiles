@@ -46,6 +46,7 @@
               connections=$(nmcli --colors no --terse --escape no --fields UUID,TYPE,STATE,ACTIVE,FILENAME connection show) || return 1
               devices=$(nmcli --colors no --terse --escape no --fields DEVICE,TYPE,STATE device status) || return 1
               while IFS=: read -r uuid type state active filename; do
+                filename=''${filename/#\/var\/run\//\/run\/}
                 [[ $type == wireguard && $state == activated && $active == yes ]] || continue
                 [[ $uuid =~ ^[[:xdigit:]]{8}-[[:xdigit:]]{4}-[[:xdigit:]]{4}-[[:xdigit:]]{4}-[[:xdigit:]]{12}$ ]] || continue
                 [[ -n $filename && -n ''${profile_interfaces["$filename"]:-} ]] || continue
@@ -152,44 +153,62 @@
             };
           };
 
-          fileSystems = builtins.listToAttrs (
+          boot.supportedFilesystems.cifs = true;
+
+          systemd.units = builtins.listToAttrs (
             map (
               share:
-              lib.nameValuePair "/mnt/astaroth/${share}" {
-                device = "//astaroth/${share}";
-                fsType = "cifs";
-                options = [
-                  "_netdev"
-                  "nodev"
-                  "nofail"
-                  "nosuid"
-                  "x-systemd.automount"
-                  "x-systemd.idle-timeout=5min"
-                  "x-systemd.mount-timeout=30s"
-                  "credentials=${config.sops.templates."astaroth-smb-credentials".path}"
-                  "uid=${user.name}"
-                  "gid=${config.users.users.${user.name}.group}"
-                  "vers=3.1.1"
-                  "seal"
-                  "cache=strict"
-                ]
-                ++ (
-                  if share == "projects" then
-                    [
-                      "posix"
-                      "exec"
-                    ]
-                  else
-                    [
-                      "noexec"
-                      "file_mode=0600"
-                      "dir_mode=0700"
-                    ]
-                )
-                ++ lib.optional needsNetworkReadiness "x-systemd.requires=astaroth-network-ready.service";
+              lib.nameValuePair "mnt-astaroth-${share}.mount" {
+                text = lib.generators.toINI { } {
+                  Unit = {
+                    Description = "Astaroth ${share} share";
+                  }
+                  // lib.optionalAttrs needsNetworkReadiness {
+                    Requires = "astaroth-network-ready.service";
+                    After = "astaroth-network-ready.service";
+                  };
+                  Mount = {
+                    Where = "/mnt/astaroth/${share}";
+                    Type = "cifs";
+                    TimeoutSec = "30s";
+                    Options = lib.concatStringsSep "," (
+                      [
+                        "_netdev"
+                        "nodev"
+                        "nofail"
+                        "nosuid"
+                        "credentials=${config.sops.templates."astaroth-smb-credentials".path}"
+                        "uid=${user.name}"
+                        "gid=${config.users.users.${user.name}.group}"
+                        "vers=3.1.1"
+                        "seal"
+                        "cache=strict"
+                      ]
+                      ++ (
+                        if share == "projects" then
+                          [
+                            "posix"
+                            "exec"
+                          ]
+                        else
+                          [
+                            "noexec"
+                            "file_mode=0600"
+                            "dir_mode=0700"
+                          ]
+                      )
+                    );
+                  };
+                };
               }
             ) shares
           );
+
+          systemd.automounts = map (share: {
+            where = "/mnt/astaroth/${share}";
+            wantedBy = [ "remote-fs.target" ];
+            automountConfig.TimeoutIdleSec = "5min";
+          }) shares;
         };
     };
 }
