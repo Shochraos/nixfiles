@@ -1,12 +1,6 @@
 {
   den.aspects.seere.nixos = { config, pkgs, ... }: {
-    boot.lanzaboote.measuredBoot = {
-      enable = true;
-      pcrs = [
-        4
-        7
-      ];
-    };
+    boot.lanzaboote.measuredBoot.enable = false;
     zramSwap.enable = true;
     systemd.sleep.settings.Sleep = {
       AllowSuspend = false;

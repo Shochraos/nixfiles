@@ -25,6 +25,22 @@
           enable = true;
           silent = true;
           nix-direnv.enable = true;
+          stdlib = ''
+            direnv_layout_dir() {
+              if [[ -n ''${direnv_layout_dir:-} ]]; then
+                printf '%s\n' "$direnv_layout_dir"
+              else
+                case "$PWD" in
+                  /mnt/astaroth/projects|/mnt/astaroth/projects/*)
+                    local project_key
+                    project_key=$(printf '%s' "$PWD" | ${pkgs.coreutils}/bin/sha256sum)
+                    printf '%s/direnv/layouts/%s\n' "''${XDG_CACHE_HOME:-$HOME/.cache}" "''${project_key%% *}"
+                    ;;
+                  *) printf '%s/.direnv\n' "$PWD" ;;
+                esac
+              fi
+            }
+          '';
         };
 
         home.packages = [

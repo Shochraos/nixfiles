@@ -7,6 +7,7 @@
 
   perSystem = {
     pre-commit.check.enable = false;
+    pre-commit.settings.install.enable = false;
 
     pre-commit.settings.hooks.treefmt = {
       enable = true;
