@@ -1,9 +1,13 @@
 { inputs, ... }:
+let
+  systemDisk = "/dev/disk/by-id/REPLACE_WITH_SITRI_WHOLE_DISK";
+  swapDisk = "/dev/disk/by-id/REPLACE_WITH_SITRI_EMMC_WHOLE_DISK";
+in
 {
   den.aspects.sitri.nixos = {
     imports = [ inputs.disko.nixosModules.disko ];
 
-    disko.devices.disk.system.device = "/dev/disk/by-id/REPLACE_WITH_SITRI_WHOLE_DISK";
+    disko.devices.disk.system.device = systemDisk;
 
     disko.devices.disk.system = {
       type = "disk";
@@ -36,6 +40,24 @@
                 mountpoint = "/";
               };
             };
+          };
+        };
+      };
+    };
+
+    disko.devices.disk.swap = {
+      type = "disk";
+      device = swapDisk;
+      content = {
+        type = "gpt";
+        partitions.swap = {
+          size = "100%";
+          type = "8200";
+          device = "${swapDisk}-part1";
+          content = {
+            type = "swap";
+            randomEncryption = true;
+            priority = 0;
           };
         };
       };

@@ -1,12 +1,6 @@
 {
-  den.aspects.sitri.nixos = { config, pkgs, ... }: {
-    boot.lanzaboote.measuredBoot = {
-      enable = true;
-      pcrs = [
-        4
-        7
-      ];
-    };
+  den.aspects.sitri.nixos = { pkgs, ... }: {
+    boot.lanzaboote.measuredBoot.enable = false;
     zramSwap.enable = true;
     systemd.sleep.settings.Sleep = {
       AllowSuspend = false;
@@ -16,9 +10,6 @@
     };
 
     networking.nftables.enable = true;
-    services.adguardhome.settings.tls.server_name = "dns2.${
-      config.sops.placeholder."network/home-domain"
-    }";
 
     system.stateVersion = "26.11";
     boot.kernelPackages = pkgs.linuxPackages;
