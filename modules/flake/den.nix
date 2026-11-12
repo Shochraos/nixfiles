@@ -65,6 +65,7 @@
     mic-mute
     ai-harness
     unreal
+    remote-mounts
   ];
 
   den.aspects.seere.includes = with den.aspects; [
