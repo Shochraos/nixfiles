@@ -1,16 +1,14 @@
 {
-  den.aspects.remotes =
+  den.aspects.git =
     { user, ... }:
     {
       nixos =
         { config, ... }:
         let
           gitKey = "${config.host.sshKey}-git";
-          astarothHostKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMClDh2uo4ZSfbdVnvWagVd06gORzbyQrETNSNFtFmQ6";
         in
         {
           sops.secrets = {
-            "ssh/hosts".owner = user.name;
             "ssh/private-git" = { };
             "ssh/uni-git" = { };
             "git/url-rewrites".owner = user.name;
@@ -18,11 +16,6 @@
             "git/non-github/name" = { };
             "git/non-github/email" = { };
             "git/private-git" = { };
-          };
-
-          programs.ssh.knownHosts.astaroth = {
-            hostNames = [ "astaroth" ];
-            publicKey = astarothHostKey;
           };
 
           sops.templates."ssh-secret-hosts" = {
@@ -36,15 +29,6 @@
                 AddKeysToAgent yes
                 IdentityFile ${gitKey}
                 Port 2222
-
-              Host astaroth
-                AddKeysToAgent yes
-                ForwardAgent yes
-                HostName 192.168.10.2
-                IdentityFile ${config.host.sshKey}
-                User root
-                HostKeyAlias astaroth
-                StrictHostKeyChecking yes
             '';
           };
 
@@ -93,10 +77,14 @@
         };
 
       provides.to-users.homeManager =
-        { config, osConfig, ... }:
+        {
+          config,
+          lib,
+          osConfig,
+          ...
+        }:
         let
-          hostKey = osConfig.host.sshKey;
-          gitKey = "${hostKey}-git";
+          gitKey = "${osConfig.host.sshKey}-git";
           githubIdentity = osConfig.sops.templates."git-github-identity".path;
         in
         {
@@ -115,14 +103,7 @@
           };
 
           programs.ssh = {
-            enable = true;
-            enableDefaultConfig = false;
-
-            includes = [
-              osConfig.sops.secrets."ssh/hosts".path
-              osConfig.sops.templates."ssh-secret-hosts".path
-            ];
-
+            includes = lib.mkAfter [ osConfig.sops.templates."ssh-secret-hosts".path ];
             settings = {
               "github.com" = {
                 AddKeysToAgent = "yes";
@@ -131,11 +112,6 @@
               "codeberg.org" = {
                 AddKeysToAgent = "yes";
                 IdentityFile = gitKey;
-              };
-
-              "*" = {
-                AddKeysToAgent = "yes";
-                IdentityFile = hostKey;
               };
             };
           };

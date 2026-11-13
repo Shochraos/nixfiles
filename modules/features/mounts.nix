@@ -1,5 +1,5 @@
 {
-  den.aspects.remote-mounts =
+  den.aspects.mounts =
     { host, user, ... }:
     {
       nixos =

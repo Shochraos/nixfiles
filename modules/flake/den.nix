@@ -12,6 +12,8 @@
     nix
     locale
     network
+    git
+    ssh
     shell
     utilities
   ];
@@ -35,7 +37,6 @@
   den.aspects.azazel.includes = with den.aspects; [
     graphical
     scheduling
-    remotes
     wireguard
     wifi
     kde-connect
@@ -46,7 +47,7 @@
     #ai-stt
     irc
     media
-    remote-mounts
+    mounts
     gamechat
     lgtv
     #mp3tag
@@ -57,7 +58,6 @@
   den.aspects.solas.includes = with den.aspects; [
     graphical
     scheduling
-    remotes
     wireguard
     wifi
     laptop
@@ -66,7 +66,7 @@
     mic-mute
     ai-harness
     unreal
-    remote-mounts
+    mounts
   ];
 
   den.aspects.seere.includes = with den.aspects; [
