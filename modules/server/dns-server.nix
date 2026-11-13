@@ -134,7 +134,16 @@
                     "usenet"
                   ];
                 };
-              /home/shochraos/Downloads/Remote-Access-Solas.conf
+                seere = {
+                  ipv4 = "192.168.10.253";
+                  ipv6 = "fdba:457d:2cbe:10:7965:bc79:23dc:5f61";
+                  aliases = [ ];
+                };
+                sitri = {
+                  ipv4 = "192.168.10.254";
+                  ipv6 = "fdba:457d:2cbe:10:da59:8116:2311:7e94";
+                  aliases = [ ];
+                };
               };
             in
             lib.concatLists (
