@@ -1,13 +1,5 @@
 { config, inputs, ... }:
 {
-  den.aspects.ai-harness.nixos.programs.ydotool.enable = true;
-
-  den.aspects.ai-harness.provides.to-users.nixos =
-    { config, user, ... }:
-    {
-      users.users.${user.name}.extraGroups = [ config.programs.ydotool.group ];
-    };
-
   den.aspects.ai-harness.provides.to-users.homeManager =
     hm@{
       lib,

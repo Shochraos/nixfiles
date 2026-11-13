@@ -105,46 +105,56 @@
           rewrites =
             let
               homeDomain = config.sops.placeholder."network/home-domain";
-              domains = [
-                homeDomain
-              ]
-              ++ map (name: "${name}.${homeDomain}") [
-                "astaroth"
-                "autobrr"
-                "cloud"
-                "convert"
-                "fritz"
-                "git"
-                "hermes"
-                "immich"
-                "jellyfin"
-                "komga"
-                "npm"
-                "ntfy"
-                "pihole"
-                "prowlarr"
-                "qui"
-                "radarr"
-                "router"
-                "server"
-                "sonarr"
-                "stash"
-                "tools"
-                "usenet"
-              ];
+              localHosts = {
+                astaroth = {
+                  ipv4 = "192.168.10.2";
+                  ipv6 = "fdba:457d:2cbe:10:12ff:e0ff:fe89:2a09";
+                  aliases = [
+                    "@"
+                    "autobrr"
+                    "cloud"
+                    "convert"
+                    "fritz"
+                    "git"
+                    "hermes"
+                    "immich"
+                    "jellyfin"
+                    "komga"
+                    "npm"
+                    "ntfy"
+                    "pihole"
+                    "prowlarr"
+                    "qui"
+                    "radarr"
+                    "router"
+                    "server"
+                    "sonarr"
+                    "stash"
+                    "tools"
+                    "usenet"
+                  ];
+                };
+              /home/shochraos/Downloads/Remote-Access-Solas.conf
+              };
             in
-            lib.concatMap (
-              domain:
-              map
-                (answer: {
-                  inherit domain answer;
-                  enabled = true;
-                })
-                [
-                  "192.168.10.2"
-                  "fdba:457d:2cbe:10:12ff:e0ff:fe89:2a09"
-                ]
-            ) domains;
+            lib.concatLists (
+              lib.mapAttrsToList (
+                name: host:
+                lib.concatMap (
+                  label:
+                  map
+                    (answer: {
+                      domain = if label == "@" then homeDomain else "${label}.${homeDomain}";
+                      inherit answer;
+                      enabled = true;
+                    })
+                    [
+                      host.ipv4
+                      host.ipv6
+                    ]
+                ) (lib.sort builtins.lessThan ([ name ] ++ host.aliases))
+              ) localHosts
+            );
         };
         user_rules = [
           "@@||*^$client=192.168.50.0/24,important"

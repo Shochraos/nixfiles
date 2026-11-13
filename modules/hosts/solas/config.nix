@@ -8,7 +8,7 @@
     }:
     let
       lua = lib.generators.mkLuaInline;
-      homePeerPubkey = "Mvc6EVojUxqH8v2TpFTtab4TqSWhWI4bTBM5kZQ+uUU=";
+      homePeerPubkey = "FrXFvqXNbU+yOyQt2qJb0iugt0YONNX2GtYX5rPGQ08=";
     in
     {
       system.stateVersion = "25.05";
@@ -49,14 +49,13 @@
           ipv4 = {
             method = "manual";
             address1 = "192.168.2.3/32";
-            dns = "192.168.10.254;";
             dns-search = "~;";
           };
 
           ipv6 = {
             method = "manual";
-            address1 = "fd00:2::3/128";
-            dns = "fd00:10::276:55a6:3b1c:2140;";
+            address1 = "fdba:457d:2cbe:2::3/128";
+            dns = "fdba:457d:2cbe:10:7965:bc79:23dc:5f61;fdba:457d:2cbe:10:da59:8116:2311:7e94;";
             dns-search = "~;";
           };
         };
@@ -73,7 +72,7 @@
 
           "wireguard-peer.${homePeerPubkey}" = {
             endpoint = "$WG_HOME_ENDPOINT";
-            allowed-ips = "192.168.1.0/24;192.168.10.0/24;192.168.20.0/24;192.168.30.0/24;192.168.40.0/24;192.168.50.0/24;192.168.60.0/24;fd00:1::/64;fd00:10::/64;fd00:20::/64;fd00:30::/64;fd00:40::/64;fd00:50::/64;fd00:60::/64;";
+            allowed-ips = "192.168.1.0/24;192.168.10.0/24;192.168.20.0/24;192.168.30.0/24;192.168.40.0/24;192.168.50.0/24;192.168.60.0/24;fdba:457d:2cbe:1::/64;fdba:457d:2cbe:10::/64;fdba:457d:2cbe:20::/64;fdba:457d:2cbe:30::/64;fdba:457d:2cbe:40::/64;fdba:457d:2cbe:50::/64;fdba:457d:2cbe:60::/64;";
           };
 
           wireguard = {
@@ -84,14 +83,13 @@
           ipv4 = {
             method = "manual";
             address1 = "192.168.2.3/32";
-            dns = "192.168.10.254;";
             dns-search = "~;";
           };
 
           ipv6 = {
             method = "manual";
-            address1 = "fd00:2::3/128";
-            dns = "fd00:10::276:55a6:3b1c:2140;";
+            address1 = "fdba:457d:2cbe:2::3/128";
+            dns = "fdba:457d:2cbe:10:7965:bc79:23dc:5f61;fdba:457d:2cbe:10:da59:8116:2311:7e94;";
             dns-search = "~;";
           };
         };
