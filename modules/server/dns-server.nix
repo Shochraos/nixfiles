@@ -21,6 +21,7 @@
 
     sops.secrets = {
       "dns/adguard-password-hash" = { };
+      "network/home-domain" = { };
     };
     sops.templates."AdGuardHome.yaml" = {
       file = (pkgs.formats.yaml { }).generate "AdGuardHome.yaml" config.services.adguardhome.settings;
@@ -100,7 +101,55 @@
           parental_enabled = false;
           safebrowsing_enabled = false;
           safe_search.enabled = false;
+          rewrites =
+            let
+              homeDomain = config.sops.placeholder."network/home-domain";
+              domains = [
+                homeDomain
+              ]
+              ++ map (name: "${name}.${homeDomain}") [
+                "astaroth"
+                "autobrr"
+                "cloud"
+                "convert"
+                "fritz"
+                "git"
+                "hermes"
+                "immich"
+                "jellyfin"
+                "komga"
+                "npm"
+                "ntfy"
+                "pihole"
+                "prowlarr"
+                "qui"
+                "radarr"
+                "router"
+                "server"
+                "sonarr"
+                "stash"
+                "tools"
+                "usenet"
+              ];
+            in
+            lib.concatMap (
+              domain:
+              map
+                (answer: {
+                  inherit domain answer;
+                })
+                [
+                  "192.168.10.2"
+                  "fdba:457d:2cbe:10:12ff:e0ff:fe89:2a09"
+                ]
+            ) domains;
         };
+        user_rules = [
+          "@@||*^$client=192.168.50.0/24,important"
+          "@@||*^$client=192.168.60.0/24,important"
+          "@@||*^$client=fdba:457d:2cbe:50::/64,important"
+          "@@||*^$client=fdba:457d:2cbe:60::/64,important"
+        ];
         filters = [
           {
             enabled = true;
