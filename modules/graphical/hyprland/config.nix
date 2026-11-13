@@ -45,6 +45,7 @@ in
       services.gvfs.enable = true;
 
       environment.systemPackages = with pkgs; [
+        dux-files
         nautilus
         gnome-text-editor
         loupe
