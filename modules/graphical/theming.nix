@@ -174,6 +174,7 @@ in
           qtengine
           klassy
           kdePackages.qqc2-desktop-style
+          kdePackages.kirigami.unwrapped
           tutaDesktop
         ];
 
