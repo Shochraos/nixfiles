@@ -13,6 +13,7 @@
     locale
     network
     shell
+    utilities
   ];
 
   den.aspects.graphical.includes = with den.aspects; [

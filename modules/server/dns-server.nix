@@ -46,10 +46,7 @@
         auth_attempts = 5;
         block_auth_min = 15;
         dns = {
-          bind_hosts = [
-            "0.0.0.0"
-            "::"
-          ];
+          bind_hosts = [ "0.0.0.0" ];
           port = 53;
           serve_plain_dns = true;
           upstream_dns = [
