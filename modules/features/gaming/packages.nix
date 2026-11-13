@@ -28,6 +28,7 @@ in
       in
       {
         home.packages = with pkgs; [
+          amethyst-mod-manager
           samrewritten
           irony-mod-manager
           lsfg-vk

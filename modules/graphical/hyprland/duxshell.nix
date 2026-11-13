@@ -50,6 +50,10 @@ in
             };
           };
 
+          programs.dux-files.enable = true;
+
+          xdg.mime.defaultApplications."inode/directory" = "dev.duxlabs.files.desktop";
+
           services.accounts-daemon.enable = true;
 
           security.pam.services.greetd.enableGnomeKeyring = true;
@@ -100,6 +104,84 @@ in
             inputs.dms-plugin-registry.homeModules.default
             inputs.danksearch.homeModules.dsearch
           ];
+
+          services.udiskie.settings.program_options.file_manager =
+            lib.getExe osConfig.programs.dux-files.package;
+
+          xdg.configFile = {
+            "hyprland-mimeapps.list".text = lib.generators.toINI { } {
+              "Default Applications"."inode/directory" = "dev.duxlabs.files.desktop;";
+            };
+
+            "dfiles/ui-settings.json" = {
+              force = true;
+              text = builtins.toJSON {
+                confirmTrash = true;
+                searchHidden = true;
+                showGamesSidebar = false;
+                showHidden = true;
+                showNetworkSidebar = false;
+                startupFolder = "home";
+              };
+            };
+
+            "dfiles/bookmarks.json" = {
+              force = true;
+              text = builtins.toJSON {
+                version = 2;
+                bookmarks = map (bookmark: bookmark // { icon = ""; }) [
+                  {
+                    path = "recent:///";
+                    label = "recent";
+                  }
+                  {
+                    path = config.home.homeDirectory;
+                    label = config.home.username;
+                  }
+                  {
+                    path = "${config.home.homeDirectory}/Desktop";
+                    label = "Desktop";
+                  }
+                  {
+                    path = "${config.home.homeDirectory}/Documents";
+                    label = "Documents";
+                  }
+                  {
+                    path = "${config.home.homeDirectory}/Downloads";
+                    label = "Downloads";
+                  }
+                  {
+                    path = "${config.home.homeDirectory}/Music";
+                    label = "Music";
+                  }
+                  {
+                    path = "${config.home.homeDirectory}/Pictures";
+                    label = "Pictures";
+                  }
+                  {
+                    path = "${config.home.homeDirectory}/Videos";
+                    label = "Videos";
+                  }
+                  {
+                    path = "/mnt/astaroth/appdata";
+                    label = "Astaroth/Appdata";
+                  }
+                  {
+                    path = "/mnt/astaroth/projects";
+                    label = "Astaroth/Projects";
+                  }
+                  {
+                    path = "/mnt/astaroth/misc";
+                    label = "Astaroth/Misc";
+                  }
+                  {
+                    path = "trash:///";
+                    label = "trash";
+                  }
+                ];
+              };
+            };
+          };
 
           xdg.autostart.enable = true;
 

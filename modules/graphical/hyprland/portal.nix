@@ -12,6 +12,8 @@ in
     {
       nixpkgs.overlays = [ xdphScreencopyBufferReuseOverlay ];
 
+      programs.dux-files.portal.enable = true;
+
       xdg.portal = {
         enable = true;
         extraPortals = with pkgs; [
@@ -24,9 +26,11 @@ in
               "hyprland"
               "gtk"
             ];
+            "org.freedesktop.impl.portal.FileChooser" = [ "dfiles" ];
           };
           common = {
             default = [ "gtk" ];
+            "org.freedesktop.impl.portal.FileChooser" = [ "dfiles" ];
           };
         };
       };

@@ -45,17 +45,10 @@ in
       services.gvfs.enable = true;
 
       environment.systemPackages = with pkgs; [
-        dux-files
-        nautilus
         gnome-text-editor
         loupe
         evince
       ];
-
-      programs.nautilus-open-any-terminal = {
-        enable = true;
-        terminal = "kitty";
-      };
 
       xdg.mime = {
         enable = true;
@@ -86,7 +79,6 @@ in
       lib,
       config,
       osConfig,
-      pkgs,
       ...
     }:
     let
@@ -101,7 +93,6 @@ in
         automount = true;
         notify = true;
         tray = "auto";
-        settings.program_options.file_manager = "${pkgs.nautilus}/bin/nautilus";
       };
 
       xsession.preferStatusNotifierItems = true;

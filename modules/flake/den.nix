@@ -22,6 +22,7 @@
     base
     hyprland
     apps
+    discord
     audio
     theming
     plymouth
@@ -76,6 +77,7 @@
   ];
   den.aspects.sitri.includes = with den.aspects; [
     base
+    dns-server
   ];
 
   den.hosts.x86_64-linux.Azazel = {

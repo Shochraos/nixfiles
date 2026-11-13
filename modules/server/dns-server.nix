@@ -1,5 +1,6 @@
-{ lib, ... }:
+{ lib, den, ... }:
 {
+  den.aspects.dns-server.includes = [ den.aspects.certificates ];
   den.aspects.dns-server.nixos = { config, pkgs, ... }: {
     networking = {
       networkmanager.dns = "none";
@@ -215,6 +216,14 @@
           private_key_path = "/run/credentials/adguardhome.service/acme-key";
         };
       };
+    };
+    security.acme.certs.home.reloadServices = [ "adguardhome.service" ];
+    systemd.services.acme-order-renew-home = {
+      wants = [ "adguardhome.service" ];
+      after = [ "adguardhome.service" ];
+      preStart = ''
+        ${pkgs.coreutils}/bin/timeout 10 ${pkgs.glibc.bin}/bin/getent ahosts acme-v02.api.letsencrypt.org >/dev/null
+      '';
     };
     systemd.services.adguardhome = {
       requires = [ "acme-home.service" ];

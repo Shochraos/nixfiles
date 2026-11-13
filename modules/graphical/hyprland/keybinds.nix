@@ -20,7 +20,7 @@
           {
             _args = [
               "SUPER + F"
-              (lua "hl.dsp.exec_cmd('uwsm-app -- nautilus')")
+              (lua "hl.dsp.exec_cmd('uwsm-app -- dfiles show')")
             ];
           }
           {
