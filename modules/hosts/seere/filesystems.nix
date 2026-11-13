@@ -1,9 +1,13 @@
 { inputs, ... }:
+let
+  systemDisk = "/dev/disk/by-id/ata-INTENSO_SSD_1782606006000284";
+  swapDisk = "/dev/disk/by-id/mmc-DF4016_0x5795a41e";
+in
 {
   den.aspects.seere.nixos = {
     imports = [ inputs.disko.nixosModules.disko ];
 
-    disko.devices.disk.system.device = "/dev/disk/by-id/ata-INTENSO_SSD_1782606006000284";
+    disko.devices.disk.system.device = systemDisk;
 
     disko.devices.disk.system = {
       type = "disk";
@@ -43,13 +47,13 @@
 
     disko.devices.disk.swap = {
       type = "disk";
-      device = "/dev/disk/by-id/mmc-DF4016_0x5795a41e";
+      device = swapDisk;
       content = {
         type = "gpt";
         partitions.swap = {
           size = "100%";
           type = "8200";
-          device = "/dev/disk/by-id/mmc-DF4016_0x5795a41e-part1";
+          device = "${swapDisk}-part1";
           content = {
             type = "swap";
             randomEncryption = true;

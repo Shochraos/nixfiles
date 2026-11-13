@@ -1,7 +1,7 @@
 { inputs, ... }:
 let
-  systemDisk = "/dev/disk/by-id/REPLACE_WITH_SITRI_WHOLE_DISK";
-  swapDisk = "/dev/disk/by-id/REPLACE_WITH_SITRI_EMMC_WHOLE_DISK";
+  systemDisk = "/dev/disk/by-id/ata-INTENSO_SSD_1782606006001300";
+  swapDisk = "/dev/disk/by-id/mmc-hA8aP__0x8edb75ec";
 in
 {
   den.aspects.sitri.nixos = {
