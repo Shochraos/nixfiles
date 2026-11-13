@@ -137,6 +137,7 @@
               map
                 (answer: {
                   inherit domain answer;
+                  enabled = true;
                 })
                 [
                   "192.168.10.2"
