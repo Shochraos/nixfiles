@@ -174,6 +174,10 @@ in
                   label = "Astaroth/Misc";
                 }
                 {
+                  path = "/mnt/nextcloud";
+                  label = "trash";
+                }
+                {
                   path = "trash:///";
                   label = "trash";
                 }
