@@ -110,7 +110,7 @@
                   ipv4 = "192.168.10.2";
                   ipv6 = "fdba:457d:2cbe:10:12ff:e0ff:fe89:2a09";
                   aliases = [
-                    "@"
+                    "attic"
                     "autobrr"
                     "cloud"
                     "convert"
@@ -142,7 +142,7 @@
                 sitri = {
                   ipv4 = "192.168.10.254";
                   ipv6 = "fdba:457d:2cbe:10:da59:8116:2311:7e94";
-                  aliases = [ ];
+                  aliases = [ "dns2" ];
                 };
               };
             in

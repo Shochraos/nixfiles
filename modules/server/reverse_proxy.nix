@@ -5,8 +5,9 @@
     { config, ... }:
     let
       sites = {
-        proxy = "127.0.0.1:3000";
-        proxy2 = "127.0.0.1:8080";
+        dns1 = "127.0.0.1:3000";
+        dns2 = "192.168.10.254:3000";
+        attic = "192.168.10.2:8085";
       };
       unrestrictedSites = [ "proxy2" ];
       allowedClientRanges = [
