@@ -110,12 +110,12 @@
 
     ### Gaming ###
     millennium-src = {
-      url = "github:Shochraos/Millennium";
+      url = "github:SteamClientHomebrew/Millennium";
       flake = false;
     };
 
     millennium = {
-      url = "github:Shochraos/Millennium/?dir=packages/nix";
+      url = "github:SteamClientHomebrew/Millennium/?dir=packages/nix";
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.millennium-src.follows = "millennium-src";
     };

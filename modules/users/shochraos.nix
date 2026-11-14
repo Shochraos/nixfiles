@@ -13,8 +13,15 @@
             hashedPasswordFile = config.sops.secrets."user-password-hash".path;
             extraGroups = [
               "wheel"
+              "networkmanager"
             ];
           };
+        };
+
+      homeManager =
+        { osConfig, ... }:
+        {
+          home.sessionVariables.SOPS_AGE_KEY_CMD = "ssh-to-age -private-key -i ${osConfig.host.sshKey}";
         };
 
     };

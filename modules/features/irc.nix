@@ -48,6 +48,7 @@ in
                 size = osConfig.stylix.fonts.sizes.applications;
               };
 
+            } // lib.optionalAttrs (config.home.username == "shochraos") {
               servers.one = {
                 nickname = secret "nickname";
                 server = secret "url";
@@ -63,8 +64,8 @@ in
             };
           };
 
-          xdg.configFile."halloy/config.toml".source = lib.mkForce (
-            config.lib.file.mkOutOfStoreSymlink osConfig.sops.templates."halloy.toml".path
+          xdg.configFile."halloy/config.toml".source = lib.mkIf (config.home.username == "shochraos") (
+            lib.mkForce (config.lib.file.mkOutOfStoreSymlink osConfig.sops.templates."halloy.toml".path)
           );
         };
     };

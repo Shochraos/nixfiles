@@ -1,6 +1,6 @@
 {
   den.aspects.printing =
-    { user, ... }:
+    { ... }:
     {
       nixos =
         { pkgs, ... }:
@@ -16,8 +16,8 @@
 
           hardware.sane.enable = true;
 
-          users.groups.lp.members = [ user.name ];
-          users.groups.scanner.members = [ user.name ];
+          users.groups.lp.members = [ "shochraos" ];
+          users.groups.scanner.members = [ "shochraos" ];
 
           environment.systemPackages = with pkgs; [
             simple-scan

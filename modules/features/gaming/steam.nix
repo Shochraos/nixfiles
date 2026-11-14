@@ -27,13 +27,13 @@ in
       config,
       lib,
       pkgs,
-      user,
+
       utils,
       ...
     }:
     let
       vrcompositorLauncher = "${
-        config.users.users.${user.name}.home
+        config.users.users.shochraos.home
       }/.local/share/Steam/steamapps/common/SteamVR/bin/linux64/vrcompositor-launcher";
 
       millenniumColorReseed = pkgs.writeShellApplication {
@@ -69,7 +69,7 @@ in
     {
       security.pam.loginLimits = [
         {
-          domain = user.name;
+          domain = "shochraos";
           item = "rtprio";
           type = "-";
           value = 95;
@@ -84,7 +84,7 @@ in
           "${pkgs.python3}/bin/python3"
           assets.steamvrCapabilitiesScript
           "--user"
-          user.name
+          "shochraos"
           "--libcap"
           "${lib.getLib pkgs.libcap}/lib/libcap.so.2"
           vrcompositorLauncher

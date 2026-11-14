@@ -74,6 +74,7 @@ in
       provides.to-users.homeManager =
         {
           lib,
+          config,
           osConfig,
           pkgs,
           ...
@@ -81,7 +82,7 @@ in
         let
           bscpylgtv = pkgs.callPackage packageSources.bscpylgtv { };
         in
-        {
+        lib.mkIf (config.home.username == "shochraos") {
           systemd.user.services.sol-lgtv = {
             Unit = {
               Description = "Shutdown-On-LAN for LGTV";

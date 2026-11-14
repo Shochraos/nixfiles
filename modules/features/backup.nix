@@ -1,6 +1,6 @@
 {
   den.aspects.backup =
-    { user, ... }:
+    { ... }:
     {
       nixos =
         { config, pkgs, ... }:
@@ -17,10 +17,10 @@
           nixpkgs.overlays = [ borgbackupSphinxOverlay ];
 
           sops.secrets = {
-            "backup/storagebox-host".owner = user.name;
-            "backup/storagebox-user".owner = user.name;
-            "backup/storagebox-ssh-key".owner = user.name;
-            "backup/storagebox-passphrase".owner = user.name;
+            "backup/storagebox-host".owner = "shochraos";
+            "backup/storagebox-user".owner = "shochraos";
+            "backup/storagebox-ssh-key".owner = "shochraos";
+            "backup/storagebox-passphrase".owner = "shochraos";
           };
 
           programs.ssh.knownHosts.storagebox = {
@@ -30,7 +30,7 @@
 
           sops.templates."backup-storagebox-ssh" = {
             owner = "root";
-            group = config.users.users.${user.name}.group;
+            group = config.users.users.shochraos.group;
             mode = "0440";
             content = ''
               Host storagebox
@@ -50,7 +50,7 @@
             description = "Notify the user when the borg backup failed";
             serviceConfig = {
               Type = "oneshot";
-              User = user.name;
+              User = "shochraos";
             };
             script = ''
               echo "borgbackup-job-backup failed" >&2
@@ -92,6 +92,7 @@
       provides.to-users.homeManager =
         {
           lib,
+          config,
           osConfig,
           pkgs,
           ...
@@ -180,7 +181,7 @@
             '';
           };
         in
-        {
+        lib.mkIf (config.home.username == "shochraos") {
           home.packages = [
             cli
           ];

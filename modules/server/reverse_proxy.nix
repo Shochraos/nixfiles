@@ -4,10 +4,10 @@
   den.aspects.reverse_proxy.nixos =
     { config, ... }:
     let
-      sites = [
-        "proxy"
-        "proxy2"
-      ];
+      sites = {
+        proxy = "127.0.0.1:8080";
+        proxy2 = "127.0.0.1:8080";
+      };
       unrestrictedSites = [ "proxy2" ];
       allowedClientRanges = [
         "192.168.2.0/24"
@@ -19,29 +19,10 @@
       ];
     in
     {
-      assertions = [
-        {
-          assertion = lib.all (site: builtins.match "[a-z][a-z0-9_]*" site != null) sites;
-          message = "Caddy site identifiers must start with a lowercase letter and contain only lowercase letters, digits, and underscores.";
-        }
-        {
-          assertion = builtins.length sites == builtins.length (lib.unique sites);
-          message = "Caddy site identifiers must be unique.";
-        }
-        {
-          assertion = lib.all (site: builtins.elem site sites) unrestrictedSites;
-          message = "Unrestricted Caddy sites must be present in the site list.";
-        }
-      ];
-      sops.secrets = lib.genAttrs (lib.concatMap (site: [
-        "caddy/${site}/domain"
-        "caddy/${site}/destination"
-      ]) sites) (_: { });
       sops.templates."caddy.env" = {
-        content = lib.concatMapStrings (site: ''
-          CADDY_${lib.toUpper site}_DOMAIN=${config.sops.placeholder."caddy/${site}/domain"}
-          CADDY_${lib.toUpper site}_DESTINATION=${config.sops.placeholder."caddy/${site}/destination"}
-        '') sites;
+        content = ''
+          CADDY_HOME_DOMAIN=${config.sops.placeholder."network/home-domain"}
+        '';
         mode = "0400";
         restartUnits = [ "caddy.service" ];
       };
@@ -52,8 +33,8 @@
         globalConfig = ''
           auto_https disable_certs
         '';
-        virtualHosts = lib.genAttrs sites (site: {
-          hostName = "https://{$CADDY_${lib.toUpper site}_DOMAIN}";
+        virtualHosts = lib.mapAttrs (site: destination: {
+          hostName = "https://${site}.{$CADDY_HOME_DOMAIN}";
           useACMEHost = "home";
           logFormat = "output discard";
           extraConfig =
@@ -62,9 +43,9 @@
               respond @denied "Forbidden" 403
             ''
             + ''
-              reverse_proxy {$CADDY_${lib.toUpper site}_DESTINATION}
+              reverse_proxy ${destination}
             '';
-        });
+        }) sites;
       };
     };
 }

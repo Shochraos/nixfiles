@@ -1,7 +1,7 @@
 {
   den.aspects.sync =
     {
-      user,
+
       host,
       ...
     }:
@@ -23,15 +23,16 @@
           nixpkgs.overlays = [ todomanSphinxOverlay ];
 
           sops.secrets = {
-            ${passKey}.owner = user.name;
-            "calendar/nextcloud-url".owner = user.name;
-            "calendar/uni-url".owner = user.name;
+            ${passKey}.owner = "shochraos";
+            "calendar/nextcloud-url".owner = "shochraos";
+            "calendar/uni-url".owner = "shochraos";
           };
         };
 
       provides.to-users.homeManager =
         {
           osConfig,
+          config,
           pkgs,
           lib,
           ...
@@ -56,7 +57,7 @@
           xdg.configFile."autostart/${desktopEntry}".source = nextcloudAutostart;
 
           programs.vdirsyncer.enable = true;
-          services.vdirsyncer.enable = true;
+          services.vdirsyncer.enable = config.home.username == "shochraos";
 
           programs.todoman = {
             enable = true;
@@ -85,7 +86,7 @@
             };
           };
 
-          accounts.calendar = {
+          accounts.calendar = lib.mkIf (config.home.username == "shochraos") {
             basePath = ".local/share/calendars";
             accounts = {
               nextcloud = {

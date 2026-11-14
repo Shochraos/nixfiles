@@ -12,14 +12,14 @@
       };
 
       provides.to-users.homeManager =
-        { osConfig, ... }:
+        { config, lib, osConfig, ... }:
         {
           programs.ssh = {
             enable = true;
             enableDefaultConfig = false;
-            includes = [ osConfig.sops.secrets."ssh/hosts".path ];
+            includes = lib.optionals (config.home.username == "shochraos") [ osConfig.sops.secrets."ssh/hosts".path ];
 
-            settings = {
+            settings = lib.mkIf (config.home.username == "shochraos") {
               astaroth = {
                 AddKeysToAgent = "yes";
                 ForwardAgent = "yes";

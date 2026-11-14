@@ -184,7 +184,7 @@ in
           ...
         }:
         let
-          database = osConfig.host.keepassxc.database;
+          database = if config.home.username == "shochraos" then osConfig.host.keepassxc.database else null;
           keepassxcUnlock = pkgs.writeShellApplication {
             name = "keepassxc-unlock";
             runtimeInputs = [ pkgs.keepassxc ];

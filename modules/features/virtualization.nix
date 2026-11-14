@@ -1,11 +1,11 @@
 {
   den.aspects.virtualization =
-    { user, ... }:
+    { ... }:
     {
       nixos = {
         programs.virt-manager.enable = true;
 
-        users.groups.libvirtd.members = [ user.name ];
+        users.groups.libvirtd.members = [ "shochraos" ];
 
         virtualisation.libvirtd.enable = true;
 

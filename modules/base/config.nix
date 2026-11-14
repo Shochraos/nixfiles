@@ -9,7 +9,7 @@
     };
 
     provides.to-users.homeManager =
-      { osConfig, pkgs, ... }:
+      { pkgs, ... }:
       {
         imports = [ inputs.nix-index-database.homeModules.default ];
 
@@ -47,7 +47,6 @@
           pkgs.sops
           pkgs.ssh-to-age
         ];
-        home.sessionVariables.SOPS_AGE_KEY_CMD = "ssh-to-age -private-key -i ${osConfig.host.sshKey}";
       };
   };
 }

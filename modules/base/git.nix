@@ -91,18 +91,17 @@
           programs.git = {
             enable = true;
             settings = {
-              user.name = "Shochraos";
               core.excludesfile = "${config.home.homeDirectory}/.gitignore";
               init.defaultBranch = "main";
-            };
-            includes = [
+            } // lib.optionalAttrs (config.home.username == "shochraos") { user.name = "Shochraos"; };
+            includes = lib.optionals (config.home.username == "shochraos") [
               { path = githubIdentity; }
               { path = osConfig.sops.secrets."git/url-rewrites".path; }
               { path = osConfig.sops.templates."git-identity-includes".path; }
             ];
           };
 
-          programs.ssh = {
+          programs.ssh = lib.mkIf (config.home.username == "shochraos") {
             includes = lib.mkAfter [ osConfig.sops.templates."ssh-secret-hosts".path ];
             settings = {
               "github.com" = {

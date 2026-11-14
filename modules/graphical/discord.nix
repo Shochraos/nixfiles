@@ -113,8 +113,8 @@
               "ignoreBots" = true;
               "ignoreSelf" = true;
               "ignoreWebhooks" = true;
-              "imageCacheDir" = "/home/shochraos/.config/Equicord/MessageLoggerData/images";
-              "logsDir" = "/home/shochraos/.config/Equicord/MessageLoggerData/logs";
+              "imageCacheDir" = "${config.home.homeDirectory}/.config/Equicord/MessageLoggerData/images";
+              "logsDir" = "${config.home.homeDirectory}/.config/Equicord/MessageLoggerData/logs";
               "messageLimit" = 0;
               "saveImages" = true;
             };

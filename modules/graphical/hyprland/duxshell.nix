@@ -20,7 +20,7 @@ let
 in
 {
   den.aspects.duxshell =
-    { user, ... }:
+    { ... }:
     {
       nixos =
         { config, ... }:
@@ -30,7 +30,7 @@ in
           services.displayManager.defaultSession = "hyprland-uwsm";
           services.displayManager.dux-greeter = {
             enable = true;
-            configHome = config.users.users.${user.name}.home;
+            configHome = config.users.users.shochraos.home;
 
             compositor = {
               name = "hyprland";
@@ -58,7 +58,7 @@ in
 
           security.pam.services.greetd.enableGnomeKeyring = true;
 
-          users.users.${user.name} = {
+          users.users.shochraos = {
             extraGroups = [ "greeter" ];
           };
         };
