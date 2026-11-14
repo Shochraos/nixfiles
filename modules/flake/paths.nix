@@ -56,8 +56,11 @@ in
     };
 
     packageSources = {
+      agentDesktopEntry = ../../pkgs/agent-desktop-entry/package.nix;
+      agentDesktopProfile = ../../pkgs/agent-desktop-profile/package.nix;
       agentDesktopRuntime = ../../pkgs/agent-desktop-runtime/package.nix;
       agentSandbox = ../../pkgs/agent-sandbox/package.nix;
+      agentUwsm = ../../pkgs/agent-uwsm/package.nix;
       bscpylgtv = ../../pkgs/bscpylgtv/package.nix;
       ironyModManager = ../../pkgs/irony-mod-manager/package.nix;
       mp3tag = ../../pkgs/mp3tag/package.nix;

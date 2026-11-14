@@ -67,6 +67,7 @@ in
         config,
         lib,
         osConfig,
+        pkgs,
         ...
       }:
       let
@@ -103,6 +104,8 @@ in
           inputs.dms-plugin-registry.homeModules.default
           inputs.danksearch.homeModules.dsearch
         ];
+
+        home.packages = [ pkgs.jq ];
 
         services.udiskie.settings.program_options.file_manager =
           lib.getExe osConfig.programs.dux-files.package;
@@ -210,21 +213,9 @@ in
             calculator.enable = true;
             dankKDEConnect.enable = true;
             dankTodoman.enable = true;
-            khalCalendar = {
+            dankCalendarAgenda = {
               enable = true;
-              settings = {
-                calendarFilter = "";
-                vdirBasePath = "${config.home.homeDirectory}/.local/share/calendars/nextcloud";
-
-                lookAheadDays = 7;
-                refreshInterval = 5;
-
-                showLocation = true;
-                showCalendarName = true;
-
-                notificationsEnabled = true;
-                notifyMinutes = 15;
-              };
+              settings.lookAheadDays = 7;
             };
           }
           // builtins.mapAttrs (

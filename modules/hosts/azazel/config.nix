@@ -259,7 +259,7 @@
                 size = 15;
               }
               {
-                id = "khalCalendar";
+                id = "dankCalendarAgenda";
                 enabled = true;
               }
               {

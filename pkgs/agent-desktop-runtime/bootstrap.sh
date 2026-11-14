@@ -47,8 +47,8 @@ exec '@coreutils@/env' -i \
   XDG_CONFIG_HOME='@out@/share/agent-desktop-runtime/manager-config' \
   XDG_RUNTIME_DIR="$XDG_RUNTIME_DIR" \
   DBUS_SESSION_BUS_ADDRESS="unix:path=$XDG_RUNTIME_DIR/bus" \
-  SYSTEMD_UNIT_PATH="$XDG_RUNTIME_DIR/systemd/transient:@out@/share/agent-desktop-runtime/units" \
-  SYSTEMD_GENERATOR_PATH='@out@/share/agent-desktop-runtime/empty' \
+  SYSTEMD_UNIT_PATH="$XDG_RUNTIME_DIR/systemd/transient:@out@/share/agent-desktop-runtime/units@profile-unit-path@" \
+  SYSTEMD_GENERATOR_PATH='@generator-path@' \
   SYSTEMD_ENVIRONMENT_GENERATOR_PATH='@out@/share/agent-desktop-runtime/empty' \
   SYSTEMD_LOG_TARGET=console \
   '@systemd@/lib/systemd/systemd' --user --log-target=console --default-standard-output=inherit --default-standard-error=inherit
