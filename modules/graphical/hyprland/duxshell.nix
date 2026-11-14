@@ -175,7 +175,7 @@ in
                 }
                 {
                   path = "/mnt/nextcloud";
-                  label = "trash";
+                  label = "Nextcloud";
                 }
                 {
                   path = "trash:///";
