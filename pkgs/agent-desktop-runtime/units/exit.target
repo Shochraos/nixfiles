@@ -1,0 +1,8 @@
+# SPDX-License-Identifier: LGPL-2.1-or-later
+[Unit]
+Description=Exit the Session
+Documentation=man:systemd.special(7)
+DefaultDependencies=no
+Requires=systemd-exit.service
+After=systemd-exit.service
+AllowIsolate=yes

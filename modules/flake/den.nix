@@ -10,6 +10,7 @@
     boot
     secrets
     nix
+    attic
     locale
     network
     git

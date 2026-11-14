@@ -1,0 +1,6 @@
+# SPDX-License-Identifier: LGPL-2.1-or-later
+[Unit]
+Description=Shutdown
+Documentation=man:systemd.special(7)
+DefaultDependencies=no
+RefuseManualStart=yes

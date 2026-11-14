@@ -203,6 +203,18 @@
  
      // ========== PID NAMESPACE ISOLATION ==========
      // IMPORTANT: These must come AFTER filesystem binds for nested bwrap to work
+@@ -3848,10 +3828,7 @@
+     // beside the helper, which makes one of its own, and not under
+     // enableWeakerNestedSandbox: bubblewrap does it by writing a sysctl, and
+     // dies on the read-only /proc/sys of an unprivileged container.
+-    if (
+-      applySeccompPrefix === undefined &&
+-      allowNestedUserNamespaces !== true
+-    ) {
++    if (applySeccompPrefix === undefined) {
+       const bwrap = enableWeakerNestedSandbox
+         ? null
+         : (bwrapPath ?? whichSync('bwrap'))
 --- a/src/sandbox/sandbox-manager.ts
 +++ b/src/sandbox/sandbox-manager.ts
 @@ -61,6 +61,7 @@

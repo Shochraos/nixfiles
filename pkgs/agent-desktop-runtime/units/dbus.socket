@@ -1,0 +1,8 @@
+[Unit]
+Description=Private D-Bus User Message Bus Socket
+DefaultDependencies=no
+
+[Socket]
+ListenStream=%t/bus
+SocketMode=0600
+RemoveOnStop=yes

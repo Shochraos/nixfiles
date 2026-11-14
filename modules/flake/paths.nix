@@ -20,6 +20,8 @@ in
 
   config = {
     assets = {
+      atticEnqueueScript = ../../assets/scripts/attic-enqueue.sh;
+      atticUploadScript = ../../assets/scripts/attic-upload.sh;
       btopConf = ../../configs/btop/btop.conf;
       discordTemplate = ../../assets/templates/discord.css;
       halloyTemplate = ../../assets/templates/halloy.toml;
@@ -53,6 +55,7 @@ in
     };
 
     packageSources = {
+      agentDesktopRuntime = ../../pkgs/agent-desktop-runtime/package.nix;
       agentSandbox = ../../pkgs/agent-sandbox/package.nix;
       bscpylgtv = ../../pkgs/bscpylgtv/package.nix;
       ironyModManager = ../../pkgs/irony-mod-manager/package.nix;

@@ -1,0 +1,13 @@
+[Unit]
+Description=Private D-Bus User Message Bus
+DefaultDependencies=no
+Requires=dbus.socket
+After=dbus.socket
+
+[Service]
+Type=notify
+NotifyAccess=main
+ExecStart=@dbus@/bin/dbus-daemon --config-file=@out@/share/agent-desktop-runtime/bus.conf --address=systemd: --nofork --nopidfile --systemd-activation --nosyslog
+StandardOutput=inherit
+StandardError=inherit
+TimeoutStartSec=8s

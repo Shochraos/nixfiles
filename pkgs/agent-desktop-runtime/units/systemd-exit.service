@@ -1,0 +1,11 @@
+# SPDX-License-Identifier: LGPL-2.1-or-later
+[Unit]
+Description=Exit the Session
+Documentation=man:systemd.special(7)
+DefaultDependencies=no
+Requires=shutdown.target
+After=shutdown.target
+SuccessAction=exit-force
+
+[Service]
+Slice=-.slice

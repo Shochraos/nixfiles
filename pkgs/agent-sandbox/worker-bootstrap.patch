@@ -1,0 +1,163 @@
+--- a/vendor/seccomp-src/apply-seccomp.c
++++ b/vendor/seccomp-src/apply-seccomp.c
+@@ -57,6 +57,11 @@
+ #include <sys/prctl.h>
+ #include <sys/wait.h>
+ #include <sys/mount.h>
++#include <sys/stat.h>
++#include <sys/statfs.h>
++#include <sys/statvfs.h>
++#include <linux/magic.h>
++#include <dirent.h>
+ #include <sys/socket.h>
+ #include <sys/un.h>
+ #include <sys/uio.h>
+@@ -617,6 +622,140 @@
+     return 0;
+ }
+ 
++static void cgroup_read(int dirfd, const char *name, char *buf, size_t size) {
++    int fd = openat(dirfd, name, O_RDONLY | O_NOFOLLOW | O_CLOEXEC);
++    if (fd < 0) die("apply-seccomp: open cgroup control file");
++    size_t used = 0;
++    for (;;) {
++        ssize_t n = read(fd, buf + used, size - 1 - used);
++        if (n < 0 && errno == EINTR) continue;
++        if (n < 0) die("apply-seccomp: read cgroup control file");
++        if (n == 0) break;
++        used += (size_t)n;
++        if (used == size - 1) {
++            errno = EOVERFLOW;
++            die("apply-seccomp: oversized cgroup control file");
++        }
++    }
++    buf[used] = '\0';
++    if (close(fd) < 0) die("apply-seccomp: close cgroup control file");
++}
++
++static void cgroup_require(int condition, const char *message) {
++    if (!condition) {
++        errno = EINVAL;
++        die(message);
++    }
++}
++
++static void cgroup_writable(int dirfd, const char *name) {
++    int fd = openat(dirfd, name, O_WRONLY | O_NOFOLLOW | O_CLOEXEC);
++    if (fd < 0) die("apply-seccomp: delegated cgroup control is not writable");
++    if (close(fd) < 0) die("apply-seccomp: close cgroup control file");
++}
++
++static void cgroup_validate(int dirfd) {
++    struct stat st;
++    struct statfs fs;
++    char buf[4096];
++    if (fstat(dirfd, &st) < 0 || fstatfs(dirfd, &fs) < 0)
++        die("apply-seccomp: stat delegated cgroup");
++    cgroup_require(S_ISDIR(st.st_mode) && fs.f_type == CGROUP2_SUPER_MAGIC,
++                   "apply-seccomp: fixed cgroup is not cgroup v2");
++    cgroup_require(st.st_uid == geteuid() && st.st_gid == getegid(),
++                   "apply-seccomp: delegated cgroup ownership does not match mapped IDs");
++    if (faccessat(dirfd, ".", W_OK | X_OK, AT_EACCESS) < 0)
++        die("apply-seccomp: delegated cgroup directory is not writable");
++    cgroup_read(dirfd, "cgroup.type", buf, sizeof(buf));
++    cgroup_require(strcmp(buf, "domain\n") == 0,
++                   "apply-seccomp: delegated cgroup is not a domain");
++    cgroup_read(dirfd, "cgroup.controllers", buf, sizeof(buf));
++    int cpu = 0, memory = 0, pids = 0;
++    char *save = NULL;
++    for (char *token = strtok_r(buf, " \t\n", &save); token;
++         token = strtok_r(NULL, " \t\n", &save)) {
++        cpu |= strcmp(token, "cpu") == 0;
++        memory |= strcmp(token, "memory") == 0;
++        pids |= strcmp(token, "pids") == 0;
++    }
++    cgroup_require(cpu && memory && pids,
++                   "apply-seccomp: cpu memory pids controllers must be available");
++    cgroup_writable(dirfd, "cgroup.procs");
++    cgroup_writable(dirfd, "cgroup.threads");
++    cgroup_writable(dirfd, "cgroup.subtree_control");
++}
++
++static void cgroup_empty_children(int dirfd) {
++    int fd = openat(dirfd, ".", O_RDONLY | O_DIRECTORY | O_CLOEXEC);
++    if (fd < 0) die("apply-seccomp: open delegated cgroup directory");
++    DIR *dir = fdopendir(fd);
++    if (!dir) die("apply-seccomp: inspect delegated cgroup directory");
++    errno = 0;
++    struct dirent *entry;
++    while ((entry = readdir(dir)) != NULL) {
++        if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0)
++            continue;
++        struct stat st;
++        if (fstatat(dirfd, entry->d_name, &st, AT_SYMLINK_NOFOLLOW) < 0)
++            die("apply-seccomp: inspect delegated cgroup entry");
++        cgroup_require(S_ISREG(st.st_mode),
++                       "apply-seccomp: delegated cgroup has unexpected children");
++        errno = 0;
++    }
++    if (errno != 0) die("apply-seccomp: read delegated cgroup directory");
++    if (closedir(dir) < 0) die("apply-seccomp: close delegated cgroup directory");
++}
++
++static void bootstrap_worker_cgroup(void) {
++    static const char root[] = "/sys/fs/cgroup";
++    char buf[4096], expected[64];
++    struct stat before, after;
++    struct statvfs flags;
++    int entry = open(root, O_RDONLY | O_DIRECTORY | O_NOFOLLOW | O_CLOEXEC);
++    if (entry < 0) die("apply-seccomp: open fixed delegated cgroup");
++    cgroup_validate(entry);
++    cgroup_empty_children(entry);
++    if (fstat(entry, &before) < 0) die("apply-seccomp: stat cgroup entry");
++    cgroup_read(entry, "cgroup.procs", buf, sizeof(buf));
++    cgroup_require(buf[0] == '\0', "apply-seccomp: delegated cgroup is not empty");
++    int procs = openat(entry, "cgroup.procs", O_WRONLY | O_NOFOLLOW | O_CLOEXEC);
++    if (procs < 0) die("apply-seccomp: open cgroup.procs for worker migration");
++    ssize_t written = write(procs, "0", 1);
++    if (written != 1) {
++        if (written >= 0) errno = EIO;
++        die("apply-seccomp: move worker to delegated cgroup");
++    }
++    if (close(procs) < 0) die("apply-seccomp: close worker cgroup.procs");
++    if (unshare(CLONE_NEWCGROUP | CLONE_NEWNS) < 0)
++        die("apply-seccomp: unshare worker cgroup and mount namespaces");
++    if (mount(NULL, "/", NULL, MS_REC | MS_PRIVATE, NULL) < 0)
++        die("apply-seccomp: make worker mounts private");
++    if (mount("tmpfs", root, "tmpfs", MS_NOSUID | MS_NODEV | MS_NOEXEC,
++              "size=64k,nr_inodes=8,mode=0700") < 0)
++        die("apply-seccomp: stage private worker cgroup mount");
++    if (mount("cgroup2", root, "cgroup2", MS_NOSUID | MS_NODEV | MS_NOEXEC, NULL) < 0)
++        die("apply-seccomp: mount fresh worker cgroup2 root");
++    int mounted = open(root, O_RDONLY | O_DIRECTORY | O_NOFOLLOW | O_CLOEXEC);
++    if (mounted < 0) die("apply-seccomp: open fresh worker cgroup2 root");
++    if (fstat(mounted, &after) < 0 || fstatvfs(mounted, &flags) < 0)
++        die("apply-seccomp: stat fresh worker cgroup2 root");
++    cgroup_require(before.st_dev == after.st_dev && before.st_ino == after.st_ino,
++                   "apply-seccomp: fresh cgroup2 root does not match entry");
++    cgroup_require((flags.f_flag & (ST_NOSUID | ST_NODEV | ST_NOEXEC | ST_RDONLY)) ==
++                   (ST_NOSUID | ST_NODEV | ST_NOEXEC),
++                   "apply-seccomp: unsafe or read-only worker cgroup2 mount");
++    cgroup_validate(mounted);
++    cgroup_read(mounted, "cgroup.procs", buf, sizeof(buf));
++    int length = snprintf(expected, sizeof(expected), "%ld\n", (long)getpid());
++    cgroup_require(length > 0 && (size_t)length < sizeof(expected) && strcmp(buf, expected) == 0,
++                   "apply-seccomp: worker is not the sole direct cgroup member");
++    cgroup_read(AT_FDCWD, "/proc/self/cgroup", buf, sizeof(buf));
++    cgroup_require(strcmp(buf, "0::/\n") == 0,
++                   "apply-seccomp: worker cgroup namespace root mismatch");
++    if (close(mounted) < 0 || close(entry) < 0)
++        die("apply-seccomp: close cgroup bootstrap descriptors");
++}
++
+ /* PID the current process forwards signals to. Used by both the outer stub
+  * (forwards to inner init) and the inner init (forwards to the worker).
+  * PID 1 ignores signals it has no handler for, so the inner init MUST install
+@@ -937,6 +1076,7 @@
+     }
+ 
+     /* ---- Worker (inner PID 2): apply seccomp and exec. ---- */
++    bootstrap_worker_cgroup();
+     unsetenv("SRT_OBSERVE_SOCK");
+     unsetenv("SRT_ENCODED_CMD");
+     unsetenv("SRT_ALLOW_NESTED_USERNS");

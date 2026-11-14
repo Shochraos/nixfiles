@@ -29,8 +29,9 @@ sandbox-runtime.overrideAttrs (old: {
   patches = (old.patches or [ ]) ++ [
     ./runtime.patch
     ./seccomp.patch
+    ./worker-bootstrap.patch
   ];
-  nativeBuildInputs = (old.nativeBuildInputs or [ ]) ++ [ libseccomp ];
+  buildInputs = (old.buildInputs or [ ]) ++ [ libseccomp ];
   postPatch = (old.postPatch or "") + ''
     file=src/sandbox/linux-sandbox-utils.ts
     test "$(grep -o '@AGENT_SANDBOX_HELPER@' "$file" | wc -l)" -eq 4
