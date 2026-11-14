@@ -110,7 +110,6 @@
                   ipv4 = "192.168.10.2";
                   ipv6 = "fdba:457d:2cbe:10:12ff:e0ff:fe89:2a09";
                   aliases = [
-                    "attic"
                     "autobrr"
                     "cloud"
                     "convert"
@@ -133,6 +132,11 @@
                     "tools"
                     "usenet"
                   ];
+                };
+                proxy = {
+                  ipv4 = "192.168.10.253";
+                  ipv6 = "fdba:457d:2cbe:10:7965:bc79:23dc:5f61";
+                  aliases = [ "attic" ];
                 };
                 seere = {
                   ipv4 = "192.168.10.253";
