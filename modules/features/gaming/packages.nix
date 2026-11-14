@@ -15,12 +15,20 @@ in
   ];
 
   den.aspects.gaming = {
-    nixos = {
-      services.udev.extraRules = ''
-        SUBSYSTEM=="input", ATTRS{idVendor}=="36b0", ATTRS{idProduct}=="3002", ENV{ID_INPUT_JOYSTICK}=="?*", ENV{ID_INPUT_JOYSTICK}=""
-        SUBSYSTEM=="input", ATTRS{idVendor}=="36b0", ATTRS{idProduct}=="3002", KERNEL=="js[0-9]*", MODE="0000", ENV{ID_INPUT_JOYSTICK}=""
-      '';
-    };
+    nixos =
+      { pkgs, ... }:
+      {
+        services.udev.extraRules = ''
+          SUBSYSTEM=="input", ATTRS{idVendor}=="36b0", ATTRS{idProduct}=="3002", ENV{ID_INPUT_JOYSTICK}=="?*", ENV{ID_INPUT_JOYSTICK}=""
+          SUBSYSTEM=="input", ATTRS{idVendor}=="36b0", ATTRS{idProduct}=="3002", KERNEL=="js[0-9]*", MODE="0000", ENV{ID_INPUT_JOYSTICK}=""
+        '';
+
+        host.matugen.templates.amethyst = {
+          input_path = assets.amethystTemplate;
+          output_path = "~/.config/AmethystModManager/themes/matugen.json.tmp";
+          post_hook = "${pkgs.coreutils}/bin/mv -f -- \"$HOME/.config/AmethystModManager/themes/matugen.json.tmp\" \"$HOME/.config/AmethystModManager/themes/matugen.json\"";
+        };
+      };
 
     provides.to-users.homeManager =
       { pkgs, ... }:

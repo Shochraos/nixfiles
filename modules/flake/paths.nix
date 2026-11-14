@@ -20,6 +20,7 @@ in
 
   config = {
     assets = {
+      amethystTemplate = ../../assets/templates/amethyst.json;
       atticEnqueueScript = ../../assets/scripts/attic-enqueue.sh;
       atticUploadScript = ../../assets/scripts/attic-upload.sh;
       btopConf = ../../configs/btop/btop.conf;

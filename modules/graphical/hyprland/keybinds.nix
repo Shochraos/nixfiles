@@ -20,7 +20,7 @@
           {
             _args = [
               "SUPER + F"
-              (lua "hl.dsp.exec_cmd('uwsm-app -- dfiles show')")
+              (lua "hl.dsp.exec_cmd('uwsm-app -- dfiles open --new-window')")
             ];
           }
           {
