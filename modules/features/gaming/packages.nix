@@ -8,6 +8,7 @@ in
     (den.batteries.unfree [
       "steam"
       "steam-unwrapped"
+      "steam-with-millennium"
       "lsfg-vk"
       "lsfg-vk-ui"
     ])

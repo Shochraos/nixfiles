@@ -8,12 +8,9 @@ in
     {
       boot.kernelModules = [ "ntsync" ];
 
-      nixpkgs.overlays = [ inputs.millennium.overlays.default ];
       programs.steam = {
         enable = true;
-        package = pkgs.millennium-steam.override {
-          steam = pkgs.steam.override { extraArgs = "-pipewire"; };
-        };
+        package = pkgs.steamWithMillennium.override { extraArgs = "-pipewire"; };
         remotePlay.openFirewall = true;
       };
       programs.gamescope = {
@@ -32,9 +29,7 @@ in
       ...
     }:
     let
-      vrcompositorLauncher = "${
-        config.users.users.shochraos.home
-      }/.local/share/Steam/steamapps/common/SteamVR/bin/linux64/vrcompositor-launcher";
+      vrcompositorLauncher = "${config.users.users.shochraos.home}/.local/share/Steam/steamapps/common/SteamVR/bin/linux64/vrcompositor-launcher";
 
       millenniumColorReseed = pkgs.writeShellApplication {
         name = "millennium-colors-reseed";

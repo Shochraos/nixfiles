@@ -86,62 +86,60 @@
             };
           };
 
-          accounts.calendar = lib.mkIf (config.home.username == "shochraos") {
-            basePath = ".local/share/calendars";
-            accounts = {
-              nextcloud = {
-                primary = false;
-                khal.enable = true;
-                khal.type = "discover";
+          accounts.calendar.basePath = ".local/share/calendars";
+          accounts.calendar.accounts = lib.mkIf (config.home.username == "shochraos") {
+            nextcloud = {
+              primary = false;
+              khal.enable = true;
+              khal.type = "discover";
 
-                vdirsyncer = {
-                  enable = true;
-                  conflictResolution = "local wins";
-                  collections = [
-                    "personal"
-                    "work"
-                    "lecturer-timetable"
-                  ];
-                  urlCommand = [
-                    "cat"
-                    osConfig.sops.secrets."calendar/nextcloud-url".path
-                  ];
-                };
-
-                remote = {
-                  type = "caldav";
-                  userName = "Shochraos";
-                  passwordCommand = [
-                    "cat"
-                    osConfig.sops.secrets.${passKey}.path
-                  ];
-                };
-
-                local = {
-                  type = "filesystem";
-                  fileExt = ".ics";
-                };
+              vdirsyncer = {
+                enable = true;
+                conflictResolution = "local wins";
+                collections = [
+                  "personal"
+                  "work"
+                  "lecturer-timetable"
+                ];
+                urlCommand = [
+                  "cat"
+                  osConfig.sops.secrets."calendar/nextcloud-url".path
+                ];
               };
 
-              uni = {
-                primary = false;
-                khal.enable = true;
-                khal.readOnly = true;
+              remote = {
+                type = "caldav";
+                userName = "Shochraos";
+                passwordCommand = [
+                  "cat"
+                  osConfig.sops.secrets.${passKey}.path
+                ];
+              };
 
-                vdirsyncer = {
-                  enable = true;
-                  urlCommand = [
-                    "cat"
-                    osConfig.sops.secrets."calendar/uni-url".path
-                  ];
-                };
+              local = {
+                type = "filesystem";
+                fileExt = ".ics";
+              };
+            };
 
-                remote.type = "http";
+            uni = {
+              primary = false;
+              khal.enable = true;
+              khal.readOnly = true;
 
-                local = {
-                  type = "filesystem";
-                  fileExt = ".ics";
-                };
+              vdirsyncer = {
+                enable = true;
+                urlCommand = [
+                  "cat"
+                  osConfig.sops.secrets."calendar/uni-url".path
+                ];
+              };
+
+              remote.type = "http";
+
+              local = {
+                type = "filesystem";
+                fileExt = ".ics";
               };
             };
           };

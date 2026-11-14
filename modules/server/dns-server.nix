@@ -137,7 +137,7 @@
                 seere = {
                   ipv4 = "192.168.10.253";
                   ipv6 = "fdba:457d:2cbe:10:7965:bc79:23dc:5f61";
-                  aliases = [ ];
+                  aliases = [ "dns1" ];
                 };
                 sitri = {
                   ipv4 = "192.168.10.254";

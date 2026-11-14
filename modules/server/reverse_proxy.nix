@@ -5,7 +5,7 @@
     { config, ... }:
     let
       sites = {
-        proxy = "127.0.0.1:8080";
+        proxy = "127.0.0.1:3000";
         proxy2 = "127.0.0.1:8080";
       };
       unrestrictedSites = [ "proxy2" ];

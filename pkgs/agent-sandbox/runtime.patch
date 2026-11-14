@@ -1,0 +1,278 @@
+--- a/src/sandbox/linux-sandbox-utils.ts
++++ b/src/sandbox/linux-sandbox-utils.ts
+@@ -32,7 +32,6 @@
+   FsReadRestrictionConfig,
+   FsWriteRestrictionConfig,
+ } from './sandbox-schemas.js'
+-import { getApplySeccompBinaryPath } from './generate-seccomp-filter.js'
+ import type { SeccompConfig } from './sandbox-config.js'
+ 
+ export interface LinuxNetworkBridgeContext {
+@@ -545,6 +544,7 @@
+   allowGitConfig = false,
+   abortSignal?: AbortSignal,
+ ): Promise<string[]> {
++  assertSafeLinuxOverrides({ ripgrepConfig })
+   const cwd = process.cwd()
+   // Use provided signal or create a fallback controller
+   const fallbackController = new AbortController()
+@@ -1271,6 +1271,23 @@
+   socatPath?: string
+ }
+ 
++export function assertSafeLinuxOverrides(
++  opts?: LinuxDependencyOptions & { ripgrepConfig?: RipgrepConfig },
++): void {
++  const { seccompConfig, bwrapPath, socatPath, ripgrepConfig } = opts ?? {}
++  if (
++    seccompConfig !== undefined ||
++    bwrapPath !== undefined ||
++    socatPath !== undefined ||
++    (ripgrepConfig !== undefined &&
++      (ripgrepConfig.command !== 'rg' ||
++        ripgrepConfig.argv0 !== undefined ||
++        (ripgrepConfig.args?.length ?? 0) !== 0))
++  ) {
++    throw new Error('Unsafe sandbox overrides are not permitted')
++  }
++}
++
+ function isExecutable(p: string): boolean {
+   try {
+     fs.accessSync(p, fs.constants.X_OK)
+@@ -1286,15 +1303,11 @@
+ export function getLinuxDependencyStatus(
+   opts?: LinuxDependencyOptions,
+ ): LinuxDependencyStatus {
+-  const { seccompConfig, bwrapPath, socatPath } = opts ?? {}
+-  // argv0 mode: apply-seccomp is compiled into the caller's binary — skip
+-  // the on-disk lookup and trust that applyPath resolves inside bwrap.
++  assertSafeLinuxOverrides(opts)
+   return {
+-    hasBwrap: bwrapPath ? isExecutable(bwrapPath) : whichSync('bwrap') !== null,
+-    hasSocat: socatPath ? isExecutable(socatPath) : whichSync('socat') !== null,
+-    hasSeccompApply: seccompConfig?.argv0
+-      ? true
+-      : getApplySeccompBinaryPath(seccompConfig?.applyPath) !== null,
++    hasBwrap: whichSync('bwrap') !== null,
++    hasSocat: whichSync('socat') !== null,
++    hasSeccompApply: isExecutable('@AGENT_SANDBOX_HELPER@'),
+   }
+ }
+ 
+@@ -1304,7 +1317,8 @@
+ export function checkLinuxDependencies(
+   opts?: LinuxDependencyOptions,
+ ): SandboxDependencyCheck {
+-  const { seccompConfig, bwrapPath, socatPath } = opts ?? {}
++  assertSafeLinuxOverrides(opts)
++  const { bwrapPath, socatPath } = opts ?? {}
+   const errors: string[] = []
+   const warnings: string[] = []
+ 
+@@ -1326,11 +1340,8 @@
+     errors.push('socat not installed')
+   }
+ 
+-  if (
+-    !seccompConfig?.argv0 &&
+-    getApplySeccompBinaryPath(seccompConfig?.applyPath) === null
+-  ) {
+-    warnings.push('seccomp not available - unix socket access not restricted')
++  if (!isExecutable('@AGENT_SANDBOX_HELPER@')) {
++    errors.push('seccomp helper not available')
+   }
+ 
+   const uid0Error = uid0SandboxError({
+@@ -1515,6 +1526,7 @@
+   socksProxyPort: number,
+   socatPath?: string,
+ ): Promise<LinuxNetworkBridgeContext> {
++  assertSafeLinuxOverrides({ socatPath })
+   const socat = socatPath ?? 'socat'
+   const socketId = randomBytes(8).toString('hex')
+   const httpSocketPath = join(tmpdir(), `claude-http-${socketId}.sock`)
+@@ -1718,31 +1730,6 @@
+ let noUsernsLimitLogged = false
+ 
+ /**
+- * Resolve how to invoke apply-seccomp: either a standalone binary path, or a
+- * multicall-binary prefix that dispatches on the ARGV0 env var.
+- *
+- * Returns a shell-ready string ending in a trailing space — callers append
+- * quote([shell, '-c', cmd]). Returns undefined when seccomp is
+- * unavailable (no argv0, no binary found).
+- *
+- * When argv0 is set, applyPath is used verbatim (no existence check); the
+- * caller is responsible for ensuring it resolves inside the bwrap namespace.
+- */
+-function resolveApplySeccompPrefix(
+-  applyPath: string | undefined,
+-  argv0: string | undefined,
+-): string | undefined {
+-  if (argv0) {
+-    if (!applyPath) {
+-      throw new Error('seccompConfig.argv0 requires seccompConfig.applyPath')
+-    }
+-    return `ARGV0=${quote([argv0])} ${quote([applyPath])} `
+-  }
+-  const binary = getApplySeccompBinaryPath(applyPath)
+-  return binary ? `${quote([binary])} ` : undefined
+-}
+-
+-/**
+  * Shell lines that return once both relays listen, given their process ids in
+  * `$_srt_http` and `$_srt_socks`. The relays are started in the background,
+  * and a command that connects at once got there first: its first connection
+@@ -3561,6 +3548,18 @@
+     observeSocketPath,
+     abortSignal,
+   } = params
++  assertSafeLinuxOverrides({ seccompConfig, bwrapPath, socatPath, ripgrepConfig })
++  if (
++    enableWeakerNestedSandbox ||
++    allowNestedUserNamespaces ||
++    allowAllUnixSockets
++  ) {
++    throw new Error('Unsafe sandbox overrides are not permitted')
++  }
++  if (!isExecutable('@AGENT_SANDBOX_HELPER@')) {
++    throw new Error('Required seccomp helper is not executable')
++  }
++
+   // bubblewrap takes no patterns, so every path here is a name. The literal
+   // lists are folded into the lists they belong to, once, so that nothing
+   // below can read a list and miss them; a pattern in `allowOnly` that is no
+@@ -3588,7 +3587,7 @@
+     !hasEnvRestrictions &&
+     !hasGitConfig
+   ) {
+-    return command
++    throw new Error('Sandbox restrictions are required')
+   }
+ 
+   // Mark this sandbox invocation as active. cleanupBwrapMountPoints() will
+@@ -3612,34 +3611,8 @@
+   let applySeccompPrefix: string | undefined
+ 
+   try {
+-    // ========== SECCOMP FILTER (Unix Socket Blocking) ==========
+-    // apply-seccomp wraps the workload and applies the baked-in BPF filter
+-    // that blocks socket(AF_UNIX, ...). Skipped when allowAllUnixSockets is true.
+-    if (!allowAllUnixSockets) {
+-      applySeccompPrefix = resolveApplySeccompPrefix(
+-        seccompConfig?.applyPath,
+-        seccompConfig?.argv0,
+-      )
+-
+-      if (!applySeccompPrefix) {
+-        logForDebugging(
+-          '[Sandbox Linux] apply-seccomp binary not available - unix socket blocking disabled. ' +
+-            'Install @anthropic-ai/sandbox-runtime globally for full protection.',
+-          { level: 'warn' },
+-        )
+-      } else {
+-        applySeccompPrefix =
+-          helperEnvironmentPrefix(allowNestedUserNamespaces === true) +
+-          applySeccompPrefix
+-        logForDebugging(
+-          '[Sandbox Linux] Applying seccomp filter for Unix socket blocking',
+-        )
+-      }
+-    } else {
+-      logForDebugging(
+-        '[Sandbox Linux] Skipping seccomp filter - allowAllUnixSockets is enabled',
+-      )
+-    }
++    applySeccompPrefix =
++      helperEnvironmentPrefix(false) + quote(['@AGENT_SANDBOX_HELPER@']) + ' '
+ 
+     // ========== VIOLATION OBSERVATION (best-effort) ==========
+     // Only meaningful when apply-seccomp will run — it is the binary that
+@@ -3799,6 +3772,13 @@
+ 
+     // Always bind /dev
+     bwrapArgs.push('--dev', '/dev')
++    const renderDevices: string[] = @AGENT_SANDBOX_RENDER_DEVICES@
++    for (const device of renderDevices) {
++      if (!fs.statSync(device).isCharacterDevice()) {
++        throw new Error(`Selected render device is not a character device: ${device}`)
++      }
++      bwrapArgs.push('--dev-bind', device, device)
++    }
+ 
+     // ========== PID NAMESPACE ISOLATION ==========
+     // IMPORTANT: These must come AFTER filesystem binds for nested bwrap to work
+--- a/src/sandbox/sandbox-manager.ts
++++ b/src/sandbox/sandbox-manager.ts
+@@ -61,6 +61,7 @@
+   initializeLinuxNetworkBridge,
+   type LinuxNetworkBridgeContext,
+   checkLinuxDependencies,
++  assertSafeLinuxOverrides,
+   type SandboxDependencyCheck,
+   cleanupBwrapMountPoints,
+   linuxGetCwdMandatoryDenyPaths,
+@@ -170,7 +171,6 @@
+ import { dirname } from 'node:path'
+ import { isDeepStrictEqual } from 'node:util'
+ import { getJavaProxyAgentJarPathAsync } from './java-proxy-agent.js'
+-import { getApplySeccompBinaryPathAsync } from './generate-seccomp-filter.js'
+ 
+ interface HostNetworkManagerContext {
+   httpProxyPort: number
+@@ -1167,12 +1167,24 @@
+   windowsMxcSdk?: MxcSdk
+ }
+ 
++function assertSafeRuntimeConfig(runtimeConfig?: SandboxRuntimeConfig): void {
++  if (getPlatform() === 'linux') {
++    assertSafeLinuxOverrides({
++      seccompConfig: runtimeConfig?.seccomp,
++      bwrapPath: runtimeConfig?.bwrapPath,
++      socatPath: runtimeConfig?.socatPath,
++      ripgrepConfig: runtimeConfig?.ripgrep,
++    })
++  }
++}
++
+ async function initialize(
+   runtimeConfig: SandboxRuntimeConfig,
+   sandboxAskCallback?: SandboxAskCallback,
+   enableLogMonitor = false,
+   options?: SandboxInitializeOptions,
+ ): Promise<void> {
++  assertSafeRuntimeConfig(runtimeConfig)
+   const args = [runtimeConfig, sandboxAskCallback, enableLogMonitor, options]
+   if (pendingInitialize) {
+     const { promise, generation, args: running } = pendingInitialize
+@@ -1900,6 +1912,8 @@
+ 
+   const platform = getPlatform()
+   if (platform === 'linux') {
++    assertSafeRuntimeConfig(config)
++    assertSafeLinuxOverrides({ ripgrepConfig })
+     // ripgrep is Linux-only: it's used by linuxGetMandatoryDenyPaths() to
+     // expand glob deny-patterns to concrete paths for bwrap. macOS seatbelt
+     // profiles take regex patterns directly, so rg is never invoked there.
+@@ -2017,12 +2031,6 @@
+ ): Promise<SandboxDependencyCheck> {
+   const mxc = mxcDependencies(options)
+   if (mxc) return mxc
+-  // Linux: resolve apply-seccomp first so its global-npm fallback
+-  // (`npm root -g`) runs off the event loop; the sync check below then
+-  // hits the shared path cache.
+-  if (getPlatform() === 'linux' && !config?.seccomp?.argv0) {
+-    await getApplySeccompBinaryPathAsync(config?.seccomp?.applyPath)
+-  }
+   const common = checkDependenciesCommon(ripgrepConfig)
+   if ('done' in common) return common.done
+   return checkWindowsDependenciesAsync(common.windows)
+@@ -3505,6 +3513,7 @@
+  * @param newConfig - The new configuration to use
+  */
+ function updateConfig(newConfig: SandboxRuntimeConfig): void {
++  assertSafeRuntimeConfig(newConfig)
+   if (
+     getPlatform() === 'windows' &&
+     config &&

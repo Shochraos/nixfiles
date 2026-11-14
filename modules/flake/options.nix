@@ -40,359 +40,355 @@ in
 {
   den.default.includes = [ den.aspects.hostOptions ];
 
-  den.aspects.hostOptions =
-    { host, user, ... }:
+  den.aspects.hostOptions.nixos =
+    { config, ... }:
     {
-      nixos =
-        { config, ... }:
-        {
-          config.assertions =
-            let
-              outputs = builtins.attrValues config.host.outputs;
-              workspaces = lib.concatMap (output: output.workspaces) outputs;
-            in
-            [
-              {
-                assertion = builtins.length (builtins.filter (output: output.primary) outputs) <= 1;
-                message = "host.outputs: at most one output may be primary.";
+      config.assertions =
+        let
+          outputs = builtins.attrValues config.host.outputs;
+          workspaces = lib.concatMap (output: output.workspaces) outputs;
+        in
+        [
+          {
+            assertion = builtins.length (builtins.filter (output: output.primary) outputs) <= 1;
+            message = "host.outputs: at most one output may be primary.";
+          }
+          {
+            assertion = builtins.length workspaces == builtins.length (lib.unique workspaces);
+            message = "host.outputs: workspace IDs must be unique across outputs.";
+          }
+          {
+            assertion = builtins.all (profile: !(profile.open && profile.eap)) (
+              builtins.attrValues config.host.wifi.profiles
+            );
+            message = "host.wifi.profiles: a profile cannot be both open and EAP-authenticated.";
+          }
+        ]
+        ++ profileAssertions "wifi" config.host.wifi.profiles
+        ++ profileAssertions "wireguard" config.host.wireguard.profiles;
+
+      options.host = {
+        flakeDir = mkOption {
+          type = types.str;
+          default = "${config.users.users.shochraos.home}/Repositories/nix/nixfiles";
+          description = "Absolute path to this flake's checkout on the host.";
+        };
+
+        sshKey = mkOption {
+          type = types.str;
+          default = "${config.users.users.shochraos.home}/.ssh/${lib.toLower config.networking.hostName}";
+          description = "Private SSH key identifying this host. Doubles as the sops age identity and as the default identity for outbound SSH.";
+        };
+
+        outputs = mkOption {
+          default = { };
+          type = types.attrsOf (
+            types.submodule {
+              options = {
+                primary = mkOption {
+                  type = types.bool;
+                  default = false;
+                  description = "Output is this host's primary display. At most one entry may set it. Consumed by duxshell, which pins the bar to it; with no primary the bar spans every output.";
+                };
+                hdr = mkOption {
+                  type = types.bool;
+                  default = false;
+                  description = "Output is HDR-capable. Advertised to DMS as `supportsHdr` and used as the target of `hdr-set`.";
+                };
+                wideColor = mkOption {
+                  type = types.bool;
+                  default = false;
+                  description = "Output covers a wide colour gamut. Advertised to DMS as `supportsWideColor`.";
+                };
+                vrrFullscreenOnly = mkOption {
+                  type = types.bool;
+                  default = false;
+                  description = "Restrict variable refresh rate to fullscreen surfaces.";
+                };
+                bitdepth = mkOption {
+                  type = types.nullOr (
+                    types.enum [
+                      8
+                      10
+                    ]
+                  );
+                  default = null;
+                  description = "Colour depth per channel. Null leaves the compositor default.";
+                };
+                mode = mkOption {
+                  type = types.nullOr types.str;
+                  default = null;
+                  description = "Resolution and refresh rate as Hyprland spells it, e.g. `3840x2160@143.988`. Null leaves the field to whatever DMS last wrote.";
+                };
+                position = mkOption {
+                  type = types.nullOr (types.strMatching "-?[0-9]+x-?[0-9]+");
+                  default = null;
+                  description = "Logical position of this output's top-left corner, e.g. `220x1798`. Null leaves the field to whatever DMS last wrote.";
+                };
+                scale = mkOption {
+                  type = types.nullOr (types.strMatching "([1-9][0-9]*(\\.[0-9]+)?|0\\.[0-9]*[1-9][0-9]*)");
+                  default = null;
+                  description = "Fractional scale as a string, e.g. `0.80078125`. Hyprland snaps a scale that does not divide the mode into whole logical pixels, so use the value it reports rather than the one you asked for. Null leaves the field to whatever DMS last wrote.";
+                };
+                workspaces = mkOption {
+                  type = types.listOf types.ints.positive;
+                  default = [ ];
+                  description = "Workspaces that live on this output. Each becomes a persistent `workspace_rule` bound to it, which is what makes the monitor-relative `m+1`/`m-1` cycle wrap within this output alone. The first entry is that output's default workspace.";
+                };
+              };
+            }
+          );
+          description = "Physical outputs of this host, keyed by Hyprland output name. Consumed by duxshell (which derives the DMS output settings), by the hdr aspect (which drives the single entry with `hdr = true`) and by the hyprland aspect (which pins the geometry Hyprland cannot be told through DMS, and binds each output's workspaces to it).";
+        };
+
+        lact.gpus = mkOption {
+          type = attrsetTable;
+          default = { };
+          description = "LACT GPU settings keyed by the device ID; consumed by the gaming aspect.";
+        };
+
+        audio = {
+          equalizers = mkOption {
+            default = { };
+            type = types.attrsOf (
+              types.submodule {
+                options = {
+                  target = mkOption {
+                    type = types.attrsOf types.str;
+                    description = "WirePlumber smart-filter match rules. Every key must equal the property of the same name on the target node, so `api.alsa.card.name` survives an ALSA profile change that would rename `node.name`.";
+                  };
+                  preamp = mkOption {
+                    type = types.number;
+                    default = 0.0;
+                    description = "Broadband gain in dB applied ahead of the bands of every preset, sized against the largest positive band gain so boosts cannot clip. Emitted as a `bq_lowshelf` above Nyquist, which the biquad collapses to a constant gain.";
+                  };
+                  default = mkOption {
+                    type = types.str;
+                    description = "Preset loaded when nothing has been selected yet, or when the recorded selection names a preset that no longer exists. Must be a key of `presets`.";
+                  };
+                  presets = mkOption {
+                    type = types.attrsOf (
+                      types.submodule {
+                        options = {
+                          bands = mkOption {
+                            type = types.listOf (
+                              types.submodule {
+                                options = {
+                                  type = mkOption {
+                                    type = types.enum [
+                                      "bq_lowshelf"
+                                      "bq_peaking"
+                                      "bq_highshelf"
+                                      "bq_lowpass"
+                                      "bq_highpass"
+                                      "bq_bandpass"
+                                      "bq_notch"
+                                      "bq_allpass"
+                                    ];
+                                    description = "Builtin biquad label for this band.";
+                                  };
+                                  freq = mkOption {
+                                    type = positiveNumber;
+                                    description = "Positive centre or corner frequency in Hz.";
+                                  };
+                                  gain = mkOption {
+                                    type = types.number;
+                                    default = 0.0;
+                                    description = "Band gain in dB.";
+                                  };
+                                  q = mkOption {
+                                    type = positiveNumber;
+                                    default = 0.707;
+                                    description = "Band Q.";
+                                  };
+                                };
+                              }
+                            );
+                            default = [ ];
+                            description = "Bands applied in series, each emitted as its own biquad node named `eq_band_<n>` so its Freq, Q and Gain stay live-settable with `pw-cli set-param <capture node> Props`.";
+                          };
+                        };
+                      }
+                    );
+                    default = { };
+                    description = "Selectable band sets, keyed by preset name. Exactly one preset is loaded at a time, as its own standalone filter-chain process, so presets may differ freely in band count and biquad type — neither is reachable on a running graph, since a band's type is its node label and only control ports appear in `Props`. `eq` switches between them; `off` is reserved and means no filter at all.";
+                  };
+                };
               }
-              {
-                assertion = builtins.length workspaces == builtins.length (lib.unique workspaces);
-                message = "host.outputs: workspace IDs must be unique across outputs.";
-              }
-              {
-                assertion = builtins.all (profile: !(profile.open && profile.eap)) (
-                  builtins.attrValues config.host.wifi.profiles
-                );
-                message = "host.wifi.profiles: a profile cannot be both open and EAP-authenticated.";
-              }
-            ]
-            ++ profileAssertions "wifi" config.host.wifi.profiles
-            ++ profileAssertions "wireguard" config.host.wireguard.profiles;
-
-          options.host = {
-            flakeDir = mkOption {
-              type = types.str;
-              default = "${config.users.users.${user.name}.home}/Repositories/nix/nixfiles";
-              description = "Absolute path to this flake's checkout on the host.";
-            };
-
-            sshKey = mkOption {
-              type = types.str;
-              default = "${config.users.users.${user.name}.home}/.ssh/${lib.toLower host.name}";
-              description = "Private SSH key identifying this host. Doubles as the sops age identity and as the default identity for outbound SSH.";
-            };
-
-            outputs = mkOption {
-              default = { };
-              type = types.attrsOf (
-                types.submodule {
-                  options = {
-                    primary = mkOption {
-                      type = types.bool;
-                      default = false;
-                      description = "Output is this host's primary display. At most one entry may set it. Consumed by duxshell, which pins the bar to it; with no primary the bar spans every output.";
-                    };
-                    hdr = mkOption {
-                      type = types.bool;
-                      default = false;
-                      description = "Output is HDR-capable. Advertised to DMS as `supportsHdr` and used as the target of `hdr-set`.";
-                    };
-                    wideColor = mkOption {
-                      type = types.bool;
-                      default = false;
-                      description = "Output covers a wide colour gamut. Advertised to DMS as `supportsWideColor`.";
-                    };
-                    vrrFullscreenOnly = mkOption {
-                      type = types.bool;
-                      default = false;
-                      description = "Restrict variable refresh rate to fullscreen surfaces.";
-                    };
-                    bitdepth = mkOption {
-                      type = types.nullOr (
-                        types.enum [
-                          8
-                          10
-                        ]
-                      );
-                      default = null;
-                      description = "Colour depth per channel. Null leaves the compositor default.";
-                    };
-                    mode = mkOption {
-                      type = types.nullOr types.str;
-                      default = null;
-                      description = "Resolution and refresh rate as Hyprland spells it, e.g. `3840x2160@143.988`. Null leaves the field to whatever DMS last wrote.";
-                    };
-                    position = mkOption {
-                      type = types.nullOr (types.strMatching "-?[0-9]+x-?[0-9]+");
-                      default = null;
-                      description = "Logical position of this output's top-left corner, e.g. `220x1798`. Null leaves the field to whatever DMS last wrote.";
-                    };
-                    scale = mkOption {
-                      type = types.nullOr (types.strMatching "([1-9][0-9]*(\\.[0-9]+)?|0\\.[0-9]*[1-9][0-9]*)");
-                      default = null;
-                      description = "Fractional scale as a string, e.g. `0.80078125`. Hyprland snaps a scale that does not divide the mode into whole logical pixels, so use the value it reports rather than the one you asked for. Null leaves the field to whatever DMS last wrote.";
-                    };
-                    workspaces = mkOption {
-                      type = types.listOf types.ints.positive;
-                      default = [ ];
-                      description = "Workspaces that live on this output. Each becomes a persistent `workspace_rule` bound to it, which is what makes the monitor-relative `m+1`/`m-1` cycle wrap within this output alone. The first entry is that output's default workspace.";
-                    };
-                  };
-                }
-              );
-              description = "Physical outputs of this host, keyed by Hyprland output name. Consumed by duxshell (which derives the DMS output settings), by the hdr aspect (which drives the single entry with `hdr = true`) and by the hyprland aspect (which pins the geometry Hyprland cannot be told through DMS, and binds each output's workspaces to it).";
-            };
-
-            lact.gpus = mkOption {
-              type = attrsetTable;
-              default = { };
-              description = "LACT GPU settings keyed by the device ID; consumed by the gaming aspect.";
-            };
-
-            audio = {
-              equalizers = mkOption {
-                default = { };
-                type = types.attrsOf (
-                  types.submodule {
-                    options = {
-                      target = mkOption {
-                        type = types.attrsOf types.str;
-                        description = "WirePlumber smart-filter match rules. Every key must equal the property of the same name on the target node, so `api.alsa.card.name` survives an ALSA profile change that would rename `node.name`.";
-                      };
-                      preamp = mkOption {
-                        type = types.number;
-                        default = 0.0;
-                        description = "Broadband gain in dB applied ahead of the bands of every preset, sized against the largest positive band gain so boosts cannot clip. Emitted as a `bq_lowshelf` above Nyquist, which the biquad collapses to a constant gain.";
-                      };
-                      default = mkOption {
-                        type = types.str;
-                        description = "Preset loaded when nothing has been selected yet, or when the recorded selection names a preset that no longer exists. Must be a key of `presets`.";
-                      };
-                      presets = mkOption {
-                        type = types.attrsOf (
-                          types.submodule {
-                            options = {
-                              bands = mkOption {
-                                type = types.listOf (
-                                  types.submodule {
-                                    options = {
-                                      type = mkOption {
-                                        type = types.enum [
-                                          "bq_lowshelf"
-                                          "bq_peaking"
-                                          "bq_highshelf"
-                                          "bq_lowpass"
-                                          "bq_highpass"
-                                          "bq_bandpass"
-                                          "bq_notch"
-                                          "bq_allpass"
-                                        ];
-                                        description = "Builtin biquad label for this band.";
-                                      };
-                                      freq = mkOption {
-                                        type = positiveNumber;
-                                        description = "Positive centre or corner frequency in Hz.";
-                                      };
-                                      gain = mkOption {
-                                        type = types.number;
-                                        default = 0.0;
-                                        description = "Band gain in dB.";
-                                      };
-                                      q = mkOption {
-                                        type = positiveNumber;
-                                        default = 0.707;
-                                        description = "Band Q.";
-                                      };
-                                    };
-                                  }
-                                );
-                                default = [ ];
-                                description = "Bands applied in series, each emitted as its own biquad node named `eq_band_<n>` so its Freq, Q and Gain stay live-settable with `pw-cli set-param <capture node> Props`.";
-                              };
-                            };
-                          }
-                        );
-                        default = { };
-                        description = "Selectable band sets, keyed by preset name. Exactly one preset is loaded at a time, as its own standalone filter-chain process, so presets may differ freely in band count and biquad type — neither is reachable on a running graph, since a band's type is its node label and only control ports appear in `Props`. `eq` switches between them; `off` is reserved and means no filter at all.";
-                      };
-                    };
-                  }
-                );
-                description = "Playback equalizers for this host, keyed by filter name. Each becomes a `pipewire-eq-<name>` user service running the selected preset as a standalone filter-chain that WirePlumber inserts in front of the matched device, so every stream reaching that device is equalised without the filter ever becoming a default sink. Node names carry the filter name and not the preset name, so a switch is invisible to anything reading the graph.";
-              };
-            };
-
-            hyprland = {
-              input = mkOption {
-                type = openAttrs;
-                default = { };
-                description = "Hyprland `input` settings merged for this host.";
-              };
-              settings = mkOption {
-                type = openAttrs;
-                default = { };
-                description = "Hyprland top-level config settings for this host.";
-              };
-              gestures = mkOption {
-                type = attrsetList;
-                default = [ ];
-                description = "Hyprland `gesture` entries for this host.";
-              };
-              windowRules = mkOption {
-                type = attrsetList;
-                default = [ ];
-                description = "Hyprland `window_rule` entries for this host.";
-              };
-              keybinds = mkOption {
-                type = types.listOf (
-                  types.submodule {
-                    options._args = mkOption {
-                      type = types.listOf types.anything;
-                      description = "Positional arguments of one `hl.bind` call: the key spec, the action, and an optional flags attrset.";
-                    };
-                  }
-                );
-                default = [ ];
-                description = "Hyprland `bind` entries (from host + feature modules).";
-              };
-              screenshotKeycode = mkOption {
-                type = types.int;
-                default = 202;
-                description = "xkb keycode of the PrintScreen key on this host. Keycodes differ per keyboard: the laptop's Print key is xkb 107 (`<PRSC>`), the desktop's reports xkb 202 (`<FK24>`).";
-              };
-            };
-
-            wireguard = {
-              profiles = mkOption {
-                type = types.attrsOf (profileType {
-                  excludedSSIDs = mkOption {
-                    type = types.listOf types.str;
-                    default = [ ];
-                    description = "SSIDs on which this profile must stay disconnected. With autoconnect enabled, reconcile against the current physical uplink instead of NetworkManager autoconnect.";
-                  };
-                  presharedKey = mkOption {
-                    type = types.bool;
-                    default = false;
-                    description = "Inject the encrypted preshared key into this profile's peers.";
-                  };
-                });
-                default = { };
-                description = "NetworkManager WireGuard profiles for this host (keyfile sections, without key material). Each profile reads its private key from the sops secret `wireguard/<host>/<profile>`; setting `presharedKey = true` on a profile additionally injects `wireguard/<host>/<profile>-psk` into its peer sections. Suffixes listed in `extraSecrets` load `wireguard/<host>/<profile>-<suffix>` as `$WG_<PROFILE>_<SUFFIX>` for referencing in any field. Setting `wireguard.private-key` on a profile yourself means it owns no secret of its own — declare its runtime environment mapping with a native sops template and the module declares neither `wireguard/<host>/<profile>` nor its env entry.";
-              };
-            };
-
-            wifi = {
-              profiles = mkOption {
-                type = types.attrsOf (profileType {
-                  open = mkOption {
-                    type = types.bool;
-                    default = false;
-                    description = "This network needs no authentication secret.";
-                  };
-                  eap = mkOption {
-                    type = types.bool;
-                    default = false;
-                    description = "Use the encrypted 802.1X password instead of a PSK.";
-                  };
-                });
-                default = { };
-                description = "NetworkManager Wi-Fi profiles for this host (keyfile sections, without key material). `connection.id` and `wifi.ssid` default to the attribute name. Each profile reads its PSK from the host-independent sops secret `wifi/<profile>`; setting `eap = true` injects the secret as the `802-1x` password instead, and `open = true` skips secrets entirely. Suffixes listed in `extraSecrets` load `wifi/<profile>-<suffix>` as `$WIFI_<PROFILE>_<SUFFIX>` for referencing in any field.";
-              };
-            };
-
-            dms = {
-              powerMenuActions = mkOption {
-                type = types.listOf types.str;
-                default = [ ];
-                description = "DMS power-menu actions for this host.";
-              };
-              barConfigs = mkOption {
-                type = attrsetList;
-                default = [ ];
-                description = "DMS bar layout for this host. Each entry is merged over the shared bar defaults in duxshell.nix, so hosts usually only set the widget lists.";
-              };
-              plugins = mkOption {
-                type = attrsetTable;
-                default = { };
-                description = "DMS plugins contributed by feature aspects, merged over the shared plugin set in duxshell.nix. Lets a feature enable its own plugin without depending on the duxshell aspect being present.";
-              };
-            };
-
-            autostart = mkOption {
-              type = types.listOf (
-                types.enum [
-                  "discord"
-                  "hermes"
-                  "jellyfin"
-                  "spotifast"
-                  "steam"
-                ]
-              );
-              default = [ ];
-              description = "Additional selected applications that autostart at login on this host. Each name is resolved to its desktop entry by the aspect that owns the application. Zen and Zed autostart independently when their aspects are enabled.";
-            };
-
-            matugen = {
-              templates = mkOption {
-                type = types.attrsOf (
-                  types.submodule {
-                    options = {
-                      input_path = mkOption {
-                        type = types.path;
-                        description = "Template source file matugen reads.";
-                      };
-                      output_path = mkOption {
-                        type = types.str;
-                        description = "Shell-expanded path matugen writes the rendered template to.";
-                      };
-                      post_hook = mkOption {
-                        type = types.nullOr types.str;
-                        default = null;
-                        description = "Command matugen runs after writing `output_path`; unset emits no `post_hook` key.";
-                      };
-                    };
-                  }
-                );
-                default = { };
-                description = "matugen templates contributed by feature aspects, merged over the shared template set in the hyprland theme aspect. Lets a feature theme itself from the live palette without depending on the hyprland aspect being present.";
-              };
-            };
-
-            keepassxc = {
-              database = mkOption {
-                type = types.nullOr types.str;
-                default = "/mnt/nextcloud/Security/KeePass/Vault.kdbx";
-                description = "Absolute path of the .kdbx database unlocked automatically at login through --pw-stdin from the sops secret keepassxc/master-password; null keeps the stock autostart entry.";
-              };
-              settings = mkOption {
-                type = attrsetTable;
-                default = { };
-                description = "keepassxc.ini settings sections for this host, deep-merged over the shared sections in the browser aspect (host keys win on conflict).";
-              };
-            };
-
-            backup = {
-              repo = mkOption {
-                type = types.str;
-                description = "Borg repository URL this host backs up to. Consumed by the backup aspect as services.borgbackup.jobs.backup.repo.";
-              };
-              paths = mkOption {
-                type = types.listOf types.str;
-                default = [ ];
-                description = "Absolute source paths included in every archive.";
-              };
-              excludes = mkOption {
-                type = types.listOf types.str;
-                default = [ ];
-                description = "Borg exclude patterns applied to every archive, in borg's default fnmatch style, where each pattern is matched against the whole archived path.";
-              };
-              sshHostKey = mkOption {
-                type = types.str;
-                description = "Public SSH host key of the backup server as a single line, e.g. from `ssh-keyscan -p 23 -t ed25519 <host>`. No default: evaluation fails until this is set, so a changed server key fails loudly instead of being auto-trusted.";
-              };
-            };
+            );
+            description = "Playback equalizers for this host, keyed by filter name. Each becomes a `pipewire-eq-<name>` user service running the selected preset as a standalone filter-chain that WirePlumber inserts in front of the matched device, so every stream reaching that device is equalised without the filter ever becoming a default sink. Node names carry the filter name and not the preset name, so a switch is invisible to anything reading the graph.";
           };
         };
+
+        hyprland = {
+          input = mkOption {
+            type = openAttrs;
+            default = { };
+            description = "Hyprland `input` settings merged for this host.";
+          };
+          settings = mkOption {
+            type = openAttrs;
+            default = { };
+            description = "Hyprland top-level config settings for this host.";
+          };
+          gestures = mkOption {
+            type = attrsetList;
+            default = [ ];
+            description = "Hyprland `gesture` entries for this host.";
+          };
+          windowRules = mkOption {
+            type = attrsetList;
+            default = [ ];
+            description = "Hyprland `window_rule` entries for this host.";
+          };
+          keybinds = mkOption {
+            type = types.listOf (
+              types.submodule {
+                options._args = mkOption {
+                  type = types.listOf types.anything;
+                  description = "Positional arguments of one `hl.bind` call: the key spec, the action, and an optional flags attrset.";
+                };
+              }
+            );
+            default = [ ];
+            description = "Hyprland `bind` entries (from host + feature modules).";
+          };
+          screenshotKeycode = mkOption {
+            type = types.int;
+            default = 202;
+            description = "xkb keycode of the PrintScreen key on this host. Keycodes differ per keyboard: the laptop's Print key is xkb 107 (`<PRSC>`), the desktop's reports xkb 202 (`<FK24>`).";
+          };
+        };
+
+        wireguard = {
+          profiles = mkOption {
+            type = types.attrsOf (profileType {
+              excludedSSIDs = mkOption {
+                type = types.listOf types.str;
+                default = [ ];
+                description = "SSIDs on which this profile must stay disconnected. With autoconnect enabled, reconcile against the current physical uplink instead of NetworkManager autoconnect.";
+              };
+              presharedKey = mkOption {
+                type = types.bool;
+                default = false;
+                description = "Inject the encrypted preshared key into this profile's peers.";
+              };
+            });
+            default = { };
+            description = "NetworkManager WireGuard profiles for this host (keyfile sections, without key material). Each profile reads its private key from the sops secret `wireguard/<host>/<profile>`; setting `presharedKey = true` on a profile additionally injects `wireguard/<host>/<profile>-psk` into its peer sections. Suffixes listed in `extraSecrets` load `wireguard/<host>/<profile>-<suffix>` as `$WG_<PROFILE>_<SUFFIX>` for referencing in any field. Setting `wireguard.private-key` on a profile yourself means it owns no secret of its own — declare its runtime environment mapping with a native sops template and the module declares neither `wireguard/<host>/<profile>` nor its env entry.";
+          };
+        };
+
+        wifi = {
+          profiles = mkOption {
+            type = types.attrsOf (profileType {
+              open = mkOption {
+                type = types.bool;
+                default = false;
+                description = "This network needs no authentication secret.";
+              };
+              eap = mkOption {
+                type = types.bool;
+                default = false;
+                description = "Use the encrypted 802.1X password instead of a PSK.";
+              };
+            });
+            default = { };
+            description = "NetworkManager Wi-Fi profiles for this host (keyfile sections, without key material). `connection.id` and `wifi.ssid` default to the attribute name. Each profile reads its PSK from the host-independent sops secret `wifi/<profile>`; setting `eap = true` injects the secret as the `802-1x` password instead, and `open = true` skips secrets entirely. Suffixes listed in `extraSecrets` load `wifi/<profile>-<suffix>` as `$WIFI_<PROFILE>_<SUFFIX>` for referencing in any field.";
+          };
+        };
+
+        dms = {
+          powerMenuActions = mkOption {
+            type = types.listOf types.str;
+            default = [ ];
+            description = "DMS power-menu actions for this host.";
+          };
+          barConfigs = mkOption {
+            type = attrsetList;
+            default = [ ];
+            description = "DMS bar layout for this host. Each entry is merged over the shared bar defaults in duxshell.nix, so hosts usually only set the widget lists.";
+          };
+          plugins = mkOption {
+            type = attrsetTable;
+            default = { };
+            description = "DMS plugins contributed by feature aspects, merged over the shared plugin set in duxshell.nix. Lets a feature enable its own plugin without depending on the duxshell aspect being present.";
+          };
+        };
+
+        autostart = mkOption {
+          type = types.listOf (
+            types.enum [
+              "discord"
+              "hermes"
+              "jellyfin"
+              "spotifast"
+              "steam"
+            ]
+          );
+          default = [ ];
+          description = "Additional selected applications that autostart at login on this host. Each name is resolved to its desktop entry by the aspect that owns the application. Zen and Zed autostart independently when their aspects are enabled.";
+        };
+
+        matugen = {
+          templates = mkOption {
+            type = types.attrsOf (
+              types.submodule {
+                options = {
+                  input_path = mkOption {
+                    type = types.path;
+                    description = "Template source file matugen reads.";
+                  };
+                  output_path = mkOption {
+                    type = types.str;
+                    description = "Shell-expanded path matugen writes the rendered template to.";
+                  };
+                  post_hook = mkOption {
+                    type = types.nullOr types.str;
+                    default = null;
+                    description = "Command matugen runs after writing `output_path`; unset emits no `post_hook` key.";
+                  };
+                };
+              }
+            );
+            default = { };
+            description = "matugen templates contributed by feature aspects, merged over the shared template set in the hyprland theme aspect. Lets a feature theme itself from the live palette without depending on the hyprland aspect being present.";
+          };
+        };
+
+        keepassxc = {
+          database = mkOption {
+            type = types.nullOr types.str;
+            default = "/mnt/nextcloud/Security/KeePass/Vault.kdbx";
+            description = "Absolute path of the .kdbx database unlocked automatically at login through --pw-stdin from the sops secret keepassxc/master-password; null keeps the stock autostart entry.";
+          };
+          settings = mkOption {
+            type = attrsetTable;
+            default = { };
+            description = "keepassxc.ini settings sections for this host, deep-merged over the shared sections in the browser aspect (host keys win on conflict).";
+          };
+        };
+
+        backup = {
+          repo = mkOption {
+            type = types.str;
+            description = "Borg repository URL this host backs up to. Consumed by the backup aspect as services.borgbackup.jobs.backup.repo.";
+          };
+          paths = mkOption {
+            type = types.listOf types.str;
+            default = [ ];
+            description = "Absolute source paths included in every archive.";
+          };
+          excludes = mkOption {
+            type = types.listOf types.str;
+            default = [ ];
+            description = "Borg exclude patterns applied to every archive, in borg's default fnmatch style, where each pattern is matched against the whole archived path.";
+          };
+          sshHostKey = mkOption {
+            type = types.str;
+            description = "Public SSH host key of the backup server as a single line, e.g. from `ssh-keyscan -p 23 -t ed25519 <host>`. No default: evaluation fails until this is set, so a changed server key fails loudly instead of being auto-trusted.";
+          };
+        };
+      };
     };
 }

@@ -22,7 +22,7 @@ See `README.md` for the project overview and `WORKAROUNDS.md` before changing co
 
 Enter `nix develop`, or use the existing `.envrc` with direnv. The development shell supplies Nix language tools, linters, Python and repository hooks. Keep developer tooling in `devShells.default` or the consuming program's scope; never install it globally.
 
-Use the locked inputs. Resolve input identities through `flake.lock`'s root input references, not similarly named transitive nodes. The `nh` commands use `github:Shochraos/nixfiles/main` and its published lock file. Do not move the local lock file unless explicitly requested. Keep both Millennium and Hermes Desktop following the root nixpkgs input.
+Use the locked inputs. Resolve input identities through `flake.lock`'s root input references, not similarly named transitive nodes. The `nh` commands use `github:Shochraos/nixfiles/main` and its published lock file. Do not move the local lock file unless explicitly requested. Use Millennium from root nixpkgs and keep Hermes Desktop following the root nixpkgs input.
 
 ## Configuration conventions
 

@@ -8,7 +8,7 @@ let
 in
 {
   den.aspects.browser =
-    { host, user, ... }:
+    { host, ... }:
     {
       nixos =
         {
@@ -147,11 +147,11 @@ in
 
           sops.secrets.${cookiesSecret} = { };
           sops.secrets."keepassxc/master-password" = {
-            owner = user.name;
+            owner = "shochraos";
           };
 
           sops.templates."zen-policies.json" = {
-            owner = user.name;
+            owner = "shochraos";
             content =
               builtins.replaceStrings
                 [ (builtins.toJSON cookiesMarker) ]

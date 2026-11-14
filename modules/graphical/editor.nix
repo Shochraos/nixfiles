@@ -7,6 +7,7 @@
       provides.to-users.homeManager =
         {
           config,
+          lib,
           osConfig,
           pkgs,
           ...
@@ -39,6 +40,8 @@
                     formatting = {
                       command = [ "nixfmt" ];
                     };
+                  }
+                  // lib.optionalAttrs (config.home.username == "shochraos") {
                     nixpkgs = {
                       expr = "import (builtins.getFlake \"${osConfig.host.flakeDir}\").inputs.nixpkgs { }";
                     };

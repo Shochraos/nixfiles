@@ -1,6 +1,6 @@
 {
   den.aspects.mounts =
-    { host, user, ... }:
+    { host, ... }:
     {
       nixos =
         {
@@ -138,7 +138,7 @@
           );
 
           systemd.tmpfiles.rules = [
-            "d /mnt/astaroth 0700 ${user.name} ${config.users.users.${user.name}.group} -"
+            "d /mnt/astaroth 0700 shochraos ${config.users.users.shochraos.group} -"
           ];
 
           systemd.services.astaroth-network-ready = lib.mkIf needsNetworkReadiness {
@@ -178,8 +178,8 @@
                         "nofail"
                         "nosuid"
                         "credentials=${config.sops.templates."astaroth-smb-credentials".path}"
-                        "uid=${user.name}"
-                        "gid=${config.users.users.${user.name}.group}"
+                        "uid=shochraos"
+                        "gid=${config.users.users.shochraos.group}"
                         "vers=3.1.1"
                         "seal"
                         "cache=strict"

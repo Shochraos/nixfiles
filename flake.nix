@@ -4,7 +4,7 @@
   inputs = {
     ### Repositories ###
     nixpkgs = {
-      url = "github:NixOS/nixpkgs/nixos-unstable";
+      url = "github:NixOS/nixpkgs/6a8b0b558e9c17857c2bd80aa3585a947d345df2";
     };
 
     ### Nix Utilities
@@ -109,17 +109,6 @@
     };
 
     ### Gaming ###
-    millennium-src = {
-      url = "github:SteamClientHomebrew/Millennium";
-      flake = false;
-    };
-
-    millennium = {
-      url = "github:SteamClientHomebrew/Millennium/?dir=packages/nix";
-      inputs.nixpkgs.follows = "nixpkgs";
-      inputs.millennium-src.follows = "millennium-src";
-    };
-
     custom-proton-nix = {
       url = "github:Shochraos/custom-proton-nix";
       inputs.nixpkgs.follows = "nixpkgs";
