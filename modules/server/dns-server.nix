@@ -241,7 +241,7 @@
       wants = [ "adguardhome.service" ];
       after = [ "adguardhome.service" ];
       preStart = ''
-        ${pkgs.coreutils}/bin/timeout 10 ${pkgs.glibc.bin}/bin/getent ahosts acme-v02.api.letsencrypt.org >/dev/null
+        ${pkgs.coreutils}/bin/timeout 10 ${lib.getExe pkgs.getent} ahosts acme-v02.api.letsencrypt.org >/dev/null
       '';
     };
     systemd.services.adguardhome = {
