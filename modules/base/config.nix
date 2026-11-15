@@ -1,6 +1,8 @@
 { inputs, ... }:
 {
   den.aspects.base = {
+    nixos.security.pam.services.su.requireWheel = true;
+
     provides.to-users.nixos = _: {
       home-manager = {
         useGlobalPkgs = true;

@@ -48,7 +48,11 @@
         "tipc"
       ];
 
-      boot.kernel.sysctl."kernel.kptr_restrict" = 2;
+      boot.kernel.sysctl = {
+        "fs.protected_fifos" = 2;
+        "fs.protected_regular" = 2;
+        "kernel.kptr_restrict" = 2;
+      };
 
       boot.kernelPackages = lib.mkDefault pkgs.linuxPackages_latest;
     };
