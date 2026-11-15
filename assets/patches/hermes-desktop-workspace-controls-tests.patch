@@ -90,16 +90,11 @@
    $currentCwd,
    $currentUsage,
    $selectedStoredSessionId,
-@@ -35,6 +37,19 @@
+@@ -35,6 +37,14 @@
  const $focusedTreePaneId = $focusedTreePaneIdMock as unknown as WritableAtom<null | string>
  
  const selectDesktopPaths = vi.hoisted(() => vi.fn<(options?: unknown) => Promise<string[]>>())
 +const workspaceOperation = vi.hoisted(() => ({ capture: vi.fn(), move: vi.fn(), assert: vi.fn() }))
-+
-+vi.mock('@/store/connections', async () => {
-+  const { atom } = await import('nanostores')
-+  return { $activeConnectionId: atom<string | null>(null) }
-+})
 +
 +vi.mock('@/lib/session-workspace-move', async importOriginal => ({
 +  ...(await importOriginal<typeof import('@/lib/session-workspace-move')>()),
@@ -110,7 +105,7 @@
  
  vi.mock('@/lib/desktop-fs', async importOriginal => ({
    ...(await importOriginal<typeof DesktopFs>()),
-@@ -216,23 +231,26 @@
+@@ -216,23 +226,26 @@
  })
  
  describe('statusbar workspace menu — change working directory', () => {
@@ -145,7 +140,7 @@
      $selectedStoredSessionId.set('primary')
      $sessions.set([{ cwd: '/opt/data', id: 'tile' }] as never)
      $sessionTiles.set([
-@@ -240,22 +258,39 @@
+@@ -240,22 +253,39 @@
      ] as never)
      focusPane('tile')
  
@@ -385,7 +380,7 @@
    resolveNewSessionCwd,
    scanAndRecordRepos,
    startWorkInRepo,
-@@ -126,6 +127,43 @@
+@@ -126,6 +127,62 @@
  })
  
  describe('projects RPC profile forwarding', () => {
@@ -426,6 +421,53 @@
 +    fresh.resolve({ active_id: null, projects: [freshNode], scoped_session_ids: [] })
 +    await waitFor(() => expect($projectTree.get()).toEqual([freshNode]))
 +  })
++
++  it('invalidates a background owner without publishing and refreshes when that owner returns', async () => {
++    $activeGatewayProfile.set('other')
++    setShowAllProfiles(false)
++    const owner = { connectionId: null, profile: 'default' }
++    const oldNode = { id: 'old', label: 'Old', repos: [] }
++    const freshNode = { id: 'fresh', label: 'Fresh', repos: [] }
++    const request = vi.fn().mockResolvedValue({ active_id: null, projects: [oldNode], scoped_session_ids: [] })
++    const gatewayRequest = vi.fn().mockResolvedValue({ active_id: null, projects: [freshNode], scoped_session_ids: [] })
++    activeGateway.mockReturnValue({ request: gatewayRequest } as never)
++    const foreground = [{ id: 'foreground', label: 'Foreground', repos: [] }] as any
++    $projectTree.set(foreground)
++    await refreshProjectTreeForOwner(owner, request)
++    expect($projectTree.get()).toBe(foreground)
++    expect(gatewayRequest).not.toHaveBeenCalled()
++    $activeGatewayProfile.set('default')
++    await waitFor(() => expect($projectTree.get()).toEqual([freshNode]))
++    expect(gatewayRequest).toHaveBeenCalledWith('projects.tree', { preview_limit: 3, profile: 'default' })
++  })
    it('distinguishes a failed drill-in from an empty project', async () => {
      const failure = new Error('gateway read failed')
      const request = vi.fn().mockRejectedValueOnce(failure).mockResolvedValueOnce({ project: null })
+--- /dev/null
++++ b/apps/desktop/src/store/projects-startup.test.ts
+@@ -0,0 +1,24 @@
++import { afterEach, describe, expect, it, vi } from 'vitest'
++
++describe('project store startup', () => {
++  afterEach(() => {
++    vi.unstubAllGlobals()
++    vi.resetModules()
++  })
++
++  it.each(['connections', 'projects'] as const)('loads the real stores starting with %s', async first => {
++    vi.stubGlobal('fetch', vi.fn(() => Promise.reject(new Error('unexpected network request'))))
++    vi.stubGlobal('WebSocket', vi.fn(() => { throw new Error('unexpected socket') }))
++    if (first === 'connections') {
++      await import('./connections')
++      await import('./projects')
++    } else {
++      await import('./projects')
++      await import('./connections')
++    }
++    const { $activeConnectionId } = await import('./connections')
++    const { $projectTree } = await import('./projects')
++    expect($activeConnectionId.get()).toBeDefined()
++    expect($projectTree.get()).toEqual([])
++  }, 60000)
++})
+\ No newline at end of file

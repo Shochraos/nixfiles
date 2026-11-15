@@ -1161,7 +1161,7 @@
  import {
    $gateway,
    activeGateway,
-@@ -465,6 +466,62 @@
+@@ -465,6 +466,69 @@
  
  let projectTreeRefreshGeneration = 0
  
@@ -1184,12 +1184,19 @@
 +  }
 +}
 +
-+$gateway.listen(projectRouteChanged)
-+$activeConnectionId.listen(projectRouteChanged)
-+$activeGatewayProfile.listen(projectRouteChanged)
-+$profileScope.listen(projectRouteChanged)
++let observingProjectRoute = false
++
++function observeProjectRoute(): void {
++  if (observingProjectRoute) return
++  observingProjectRoute = true
++  $gateway.listen(projectRouteChanged)
++  $activeConnectionId.listen(projectRouteChanged)
++  $activeGatewayProfile.listen(projectRouteChanged)
++  $profileScope.listen(projectRouteChanged)
++}
 +
 +export async function refreshProjectTreeForOwner(owner: ProjectTreeOwner, request: ProjectTreeRequest): Promise<void> {
++  observeProjectRoute()
 +  const key = projectTreeOwnerKey(owner)
 +  const entry = { owner, request }
 +  invalidProjectTrees.set(key, entry)
