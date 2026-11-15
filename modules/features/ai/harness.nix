@@ -33,6 +33,17 @@
         ) previous.pmPackages;
       });
 
+      hermesDesktop = hermesPackage.hermesDesktop.override {
+        hermesNpmLib = hermesPackage.hermesNpmLib // {
+          buildPnpmPackage =
+            arguments:
+            (hermesPackage.hermesNpmLib.buildPnpmPackage arguments).overrideAttrs (previous: {
+              patches = (previous.patches or [ ]) ++ [ config.assets.hermesDesktopWorkspaceControlsPatch ];
+              patchFlags = (previous.patchFlags or [ "-p1" ]) ++ [ "--fuzz=0" ];
+            });
+        };
+      };
+
       hermesAutostart = lib.optional (builtins.elem "hermes" osConfig.host.autostart) "${hm.config.programs.hermes-agent.desktop.package}/share/applications/com.nousresearch.hermes.desktop";
 
     in
@@ -44,7 +55,10 @@
       imports = [ inputs.hermes-agent.homeManagerModules.default ];
 
       services.hermes-agent.package = hermesPackage;
-      programs.hermes-agent.desktop.enable = true;
+      programs.hermes-agent.desktop = {
+        enable = true;
+        package = hermesDesktop;
+      };
 
     };
 }
