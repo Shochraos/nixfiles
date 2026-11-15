@@ -976,7 +976,7 @@
 +      throw new SessionWorkspaceError('unavailable')
 +    }
 +
-+    mode = connection.mode
++    mode = connection.mode ?? null
 +    connectionId ||= connection.connectionId || undefined
 +    profile = connection.profile || profile
 +  }
