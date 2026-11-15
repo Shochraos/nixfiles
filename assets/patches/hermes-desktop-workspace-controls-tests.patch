@@ -1,4 +1,83 @@
 --- /dev/null
++++ b/apps/desktop/src/api/legacy-workspace-forwarding.test.ts
+@@ -0,0 +1,76 @@
++import { afterEach, expect, test, vi } from 'vitest'
++
++import { HermesGateway } from './client'
++
++interface Frame {
++  id: number
++  method: string
++  params: Record<string, unknown>
++}
++
++class LegacySocket {
++  static OPEN = 1
++  static instances: LegacySocket[] = []
++  readyState = 0
++  frames: Frame[] = []
++  private handlers = new Map<string, (event?: { data: string }) => void>()
++
++  constructor() {
++    LegacySocket.instances.push(this)
++    setTimeout(() => {
++      this.readyState = 1
++      this.handlers.get('open')?.()
++      this.message({ jsonrpc: '2.0', method: 'event', params: { type: 'gateway.ready', payload: {} } })
++    }, 0)
++  }
++
++  addEventListener(type: string, handler: (event?: { data: string }) => void) { this.handlers.set(type, handler) }
++  removeEventListener(type: string) { this.handlers.delete(type) }
++  close() { this.readyState = 3 }
++  message(data: unknown) { this.handlers.get('message')?.({ data: JSON.stringify(data) }) }
++  send(raw: string) {
++    const frame = JSON.parse(raw) as Frame
++    this.frames.push(frame)
++    queueMicrotask(() => this.message({ jsonrpc: '2.0', id: frame.id, result: { cwd: frame.params.cwd } }))
++  }
++}
++
++afterEach(() => {
++  LegacySocket.instances = []
++  vi.unstubAllGlobals()
++})
++
++for (const [method, identity] of [
++  ['session.workspace.move', { session_key: 'stored-1' }],
++  ['session.cwd.set', { session_id: 'runtime-1' }]
++] as const) {
++  test(`legacy wire forwards ${method} to the backend that implements it`, async () => {
++    vi.stubGlobal('WebSocket', LegacySocket)
++    const gateway = new HermesGateway()
++    try {
++      await gateway.connect('ws://dashboard.test/api/ws')
++      expect(gateway.sessionWire).toBe('legacy')
++      await expect(gateway.request(method, { ...identity, cwd: '/repo', profile: 'default' })).resolves.toEqual({ cwd: '/repo' })
++      expect(LegacySocket.instances[0].frames.filter(frame => frame.method === method)).toEqual([expect.objectContaining({
++        method, params: { ...identity, cwd: '/repo', profile: 'default' }
++      })])
++    } finally {
++      gateway.close()
++    }
++  })
++}
++
++test('legacy wire still forwards unrelated methods (control)', async () => {
++  vi.stubGlobal('WebSocket', LegacySocket)
++  const gateway = new HermesGateway()
++  try {
++    await gateway.connect('ws://dashboard.test/api/ws')
++    expect(gateway.sessionWire).toBe('legacy')
++    await expect(gateway.request('projects.tree', { cwd: '/x' })).resolves.toEqual({ cwd: '/x' })
++    expect(LegacySocket.instances[0].frames.filter(frame => frame.method === 'projects.tree')).toEqual([expect.objectContaining({
++      method: 'projects.tree', params: { cwd: '/x' }
++    })])
++  } finally {
++    gateway.close()
++  }
++})
+--- /dev/null
 +++ b/apps/desktop/src/app/chat/sidebar/projects/project-folder-dialog.test.tsx
 @@ -0,0 +1,78 @@
 +import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'

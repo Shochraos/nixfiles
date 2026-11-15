@@ -1,20 +1,3 @@
---- a/apps/desktop/src/api/client.ts
-+++ b/apps/desktop/src/api/client.ts
-@@ -433,7 +433,13 @@
-       this.requireConnectionGeneration(generation)
-     }
- 
--    if (!this.canonical) { return super.request<T>(method, legacyParams(method, params), remainingRequestBudget(deadline, signal), signal) }
-+    if (!this.canonical) {
-+      if (method === 'session.workspace.move' || method === 'session.cwd.set') {
-+        throw new Error('Changing a session folder requires the canonical gateway. Update and reconnect this session’s gateway.')
-+      }
-+
-+      return super.request<T>(method, legacyParams(method, params), remainingRequestBudget(deadline, signal), signal)
-+    }
-     const redirected = this.canonicalRedirect<T>(method, params, timeoutMs, deadline, signal)
- 
-     if (redirected) { return redirected }
 --- /dev/null
 +++ b/apps/desktop/src/app/chat/sidebar/projects/project-folder-dialog.tsx
 @@ -0,0 +1,91 @@
