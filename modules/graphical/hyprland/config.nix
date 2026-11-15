@@ -70,6 +70,8 @@ in
           "video/mp4" = "mpv.desktop";
           "video/x-matroska" = "mpv.desktop";
           "text/plain" = "org.gnome.TextEditor.desktop";
+          "text/markdown" = "org.gnome.gitlab.somas.Apostrophe.desktop";
+          "text/x-markdown" = "org.gnome.gitlab.somas.Apostrophe.desktop";
         };
       };
     };
