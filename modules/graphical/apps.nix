@@ -1,4 +1,4 @@
-{ den, ... }:
+{ ... }:
 {
   den.aspects.apps = {
     provides.to-users.homeManager =
@@ -13,7 +13,7 @@
       {
         home.packages = [
           spotifastPkg
-          pkgs.libreoffice-qt-stable
+          #pkgs.libreoffice-qt-stable
           pkgs.apostrophe
           pkgs.pdfarranger
           pkgs.kdePackages.filelight
