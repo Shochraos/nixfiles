@@ -17,6 +17,9 @@
           pkgs.apostrophe
           pkgs.pdfarranger
           pkgs.kdePackages.filelight
+          pkgs.gnome-text-editor
+          pkgs.loupe
+          pkgs.evince
         ];
 
         home.file = {

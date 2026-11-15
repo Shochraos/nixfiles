@@ -32,7 +32,7 @@ let
 in
 {
   den.aspects.hyprland.nixos =
-    { pkgs, ... }:
+    { ... }:
     {
       environment.sessionVariables.NIXOS_OZONE_WL = "1";
 
@@ -43,12 +43,6 @@ in
 
       services.gnome.gnome-keyring.enable = true;
       services.gvfs.enable = true;
-
-      environment.systemPackages = with pkgs; [
-        gnome-text-editor
-        loupe
-        evince
-      ];
 
       xdg.mime = {
         enable = true;
