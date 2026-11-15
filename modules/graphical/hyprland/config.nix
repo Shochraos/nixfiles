@@ -31,44 +31,42 @@ let
     );
 in
 {
-  den.aspects.hyprland.nixos =
-    { ... }:
-    {
-      environment.sessionVariables.NIXOS_OZONE_WL = "1";
+  den.aspects.hyprland.nixos = _: {
+    environment.sessionVariables.NIXOS_OZONE_WL = "1";
 
-      programs.hyprland = {
-        enable = true;
-        withUWSM = true;
-      };
+    programs.hyprland = {
+      enable = true;
+      withUWSM = true;
+    };
 
-      services.gnome.gnome-keyring.enable = true;
-      services.gvfs.enable = true;
+    services.gnome.gnome-keyring.enable = true;
+    services.gvfs.enable = true;
 
-      xdg.mime = {
-        enable = true;
+    xdg.mime = {
+      enable = true;
 
-        defaultApplications = {
-          "text/html" = "zen-beta.desktop";
-          "x-scheme-handler/http" = "zen-beta.desktop";
-          "x-scheme-handler/https" = "zen-beta.desktop";
-          "x-scheme-handler/about" = "zen-beta.desktop";
-          "x-scheme-handler/unknown" = "zen-beta.desktop";
+      defaultApplications = {
+        "text/html" = "zen-beta.desktop";
+        "x-scheme-handler/http" = "zen-beta.desktop";
+        "x-scheme-handler/https" = "zen-beta.desktop";
+        "x-scheme-handler/about" = "zen-beta.desktop";
+        "x-scheme-handler/unknown" = "zen-beta.desktop";
 
-          "application/pdf" = [
-            "org.gnome.Evince.desktop"
-            "zen-beta.desktop"
-          ];
+        "application/pdf" = [
+          "org.gnome.Evince.desktop"
+          "zen-beta.desktop"
+        ];
 
-          "image/jpeg" = "org.gnome.Loupe.desktop";
-          "image/png" = "org.gnome.Loupe.desktop";
-          "video/mp4" = "mpv.desktop";
-          "video/x-matroska" = "mpv.desktop";
-          "text/plain" = "org.gnome.TextEditor.desktop";
-          "text/markdown" = "org.gnome.gitlab.somas.Apostrophe.desktop";
-          "text/x-markdown" = "org.gnome.gitlab.somas.Apostrophe.desktop";
-        };
+        "image/jpeg" = "org.gnome.Loupe.desktop";
+        "image/png" = "org.gnome.Loupe.desktop";
+        "video/mp4" = "mpv.desktop";
+        "video/x-matroska" = "mpv.desktop";
+        "text/plain" = "org.gnome.TextEditor.desktop";
+        "text/markdown" = "org.gnome.gitlab.somas.Apostrophe.desktop";
+        "text/x-markdown" = "org.gnome.gitlab.somas.Apostrophe.desktop";
       };
     };
+  };
 
   den.aspects.hyprland.provides.to-users.homeManager =
     {
