@@ -27,6 +27,7 @@ in
       discordTemplate = ../../assets/templates/discord.css;
       halloyTemplate = ../../assets/templates/halloy.toml;
       hermesDesktopTemplate = ../../assets/templates/hermes-desktop.js;
+      hermesDesktopWorkspaceControlsPatch = ../../assets/patches/hermes-desktop-workspace-controls.patch;
       hdrStateScript = ../../assets/scripts/hdr-state.sh;
       hdrRunScript = ../../assets/scripts/hdr-run.sh;
       hsFuldaEduroamCa = ../../assets/certs/hs-fulda-eduroam-ca.pem;
