@@ -155,6 +155,8 @@
 
           boot.supportedFilesystems.cifs = true;
 
+          systemd.services."user@".after = map (share: "mnt-astaroth-${share}.mount") shares;
+
           systemd.units = builtins.listToAttrs (
             map (
               share:
@@ -162,10 +164,13 @@
                 text = lib.generators.toINI { } {
                   Unit = {
                     Description = "Astaroth ${share} share";
+                    Before = "systemd-user-sessions.service";
+                    After = lib.concatStringsSep " " (
+                      [ "NetworkManager.service" ] ++ lib.optional needsNetworkReadiness "astaroth-network-ready.service"
+                    );
                   }
                   // lib.optionalAttrs needsNetworkReadiness {
                     Requires = "astaroth-network-ready.service";
-                    After = "astaroth-network-ready.service";
                   };
                   Mount = {
                     Where = "/mnt/astaroth/${share}";
