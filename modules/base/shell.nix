@@ -82,6 +82,10 @@ in
 
         programs.starship = {
           enable = true;
+          settings = {
+            scan_timeout = 500;
+            command_timeout = 2000;
+          };
         };
       };
   };

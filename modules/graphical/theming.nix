@@ -246,6 +246,8 @@ in
           };
         };
 
+        home.file.${config.programs.starship.configPath}.enable = false;
+
         xdg.configFile."matugen/config.toml".source =
           let
             dropUnsetHooks = pkgs.lib.filterAttrs (_: value: value != null);
@@ -265,7 +267,11 @@ in
                 };
 
                 starship = {
-                  input_path = assets.matugenStarshipTemplate;
+                  input_path = pkgs.writeText "starship-matugen.toml" ''
+                    scan_timeout = ${toString config.programs.starship.settings.scan_timeout}
+                    command_timeout = ${toString config.programs.starship.settings.command_timeout}
+                    ${builtins.readFile assets.matugenStarshipTemplate}
+                  '';
                   output_path = "~/.config/starship.toml";
                 };
 
