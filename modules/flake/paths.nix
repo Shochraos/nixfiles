@@ -31,6 +31,7 @@ in
       hdrStateScript = ../../assets/scripts/hdr-state.sh;
       hdrRunScript = ../../assets/scripts/hdr-run.sh;
       hsFuldaEduroamCa = ../../assets/certs/hs-fulda-eduroam-ca.pem;
+      hyprlandModelessMonitorPatch = ../../assets/patches/hyprland-modeless-monitor.patch;
       ironyModManagerIcon = ../../assets/icons/ironymodmanager.png;
       keepassxcClassicThemePatch = ../../assets/patches/keepassxc-classic-theme.patch;
       klassyRc = ../../configs/klassy/klassyrc;
@@ -43,11 +44,8 @@ in
       jellyfinMpvShimConfig = ../../configs/jellyfin-mpv-shim/conf.json;
       micMuteScript = ../../assets/scripts/mic-mute.sh;
       mp3tagIcon = ../../assets/icons/mp3tag.png;
-      quickshellIpcReconnectPatch = ../../assets/patches/quickshell-hyprland-ipc-reconnect.patch;
-      xdphScreencopyBufferReusePatch = ../../assets/patches/xdph-screencopy-buffer-reuse.patch;
       samrewrittenIcon = ../../assets/icons/samrewritten.png;
       sopsFile = ../../secrets/secrets.yaml;
-      sphinxHookScript = ../../assets/build-support/sphinx-hook.sh;
       spotifastTemplate = ../../assets/templates/spotifast.json.j2;
       steamvrCapabilitiesScript = ../../assets/scripts/steamvr-capabilities.py;
       steamTemplate = ../../assets/templates/steam.css;

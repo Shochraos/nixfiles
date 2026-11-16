@@ -1,30 +1,6 @@
-{ config, ... }:
-let
-  inherit (config) assets;
-
-  sphinxHookOverlay = _final: prev: {
-    python314 = prev.python314.override {
-      packageOverrides = _self: _super: {
-        sphinxHook = prev.makeSetupHook {
-          name = "sphinx-hook";
-          passthru.provides.setupHook = true;
-          propagatedBuildInputs = [
-            prev.python3Packages.sphinx
-            prev.installShellFiles
-          ];
-          substitutions = {
-            sphinxBuild = "${prev.python3Packages.sphinx}/bin/sphinx-build";
-          };
-        } assets.sphinxHookScript;
-      };
-    };
-  };
-in
 {
   den.aspects.nix = _: {
     nixos = {
-      nixpkgs.overlays = [ sphinxHookOverlay ];
-
       nix = {
         settings.experimental-features = [
           "nix-command"

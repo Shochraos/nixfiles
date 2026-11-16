@@ -107,8 +107,8 @@
               homeDomain = config.sops.placeholder."network/home-domain";
               localHosts = {
                 astaroth = {
-                  ipv4 = "192.168.10.2";
-                  ipv6 = "fdba:457d:2cbe:10:12ff:e0ff:fe89:2a09";
+                  ipv4 = [ "192.168.10.2" ];
+                  ipv6 = [ "fdba:457d:2cbe:10:12ff:e0ff:fe89:2a09" ];
                   aliases = [
                     "autobrr"
                     "cloud"
@@ -134,18 +134,18 @@
                   ];
                 };
                 proxy = {
-                  ipv4 = "192.168.10.253";
-                  ipv6 = "fdba:457d:2cbe:10:7965:bc79:23dc:5f61";
+                  ipv4 = [ "192.168.10.253" ];
+                  ipv6 = [ "fdba:457d:2cbe:10:7965:bc79:23dc:5f61" ];
                   aliases = [ "attic" ];
                 };
                 seere = {
-                  ipv4 = "192.168.10.253";
-                  ipv6 = "fdba:457d:2cbe:10:7965:bc79:23dc:5f61";
+                  ipv4 = [ "192.168.10.253" ];
+                  ipv6 = [ "fdba:457d:2cbe:10:7965:bc79:23dc:5f61" ];
                   aliases = [ "dns1" ];
                 };
                 sitri = {
-                  ipv4 = "192.168.10.254";
-                  ipv6 = "fdba:457d:2cbe:10:da59:8116:2311:7e94";
+                  ipv4 = [ "192.168.10.254" ];
+                  ipv6 = [ "fdba:457d:2cbe:10:da59:8116:2311:7e94" ];
                   aliases = [ "dns2" ];
                 };
               };
@@ -155,16 +155,11 @@
                 name: host:
                 lib.concatMap (
                   label:
-                  map
-                    (answer: {
-                      domain = if label == "@" then homeDomain else "${label}.${homeDomain}";
-                      inherit answer;
-                      enabled = true;
-                    })
-                    [
-                      host.ipv4
-                      host.ipv6
-                    ]
+                  map (answer: {
+                    domain = if label == "@" then homeDomain else "${label}.${homeDomain}";
+                    inherit answer;
+                    enabled = true;
+                  }) (host.ipv4 ++ host.ipv6)
                 ) (lib.sort builtins.lessThan ([ name ] ++ host.aliases))
               ) localHosts
             );

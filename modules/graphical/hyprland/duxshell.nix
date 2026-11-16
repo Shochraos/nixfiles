@@ -1,6 +1,5 @@
 {
   inputs,
-  config,
   lib,
   ...
 }:
@@ -11,20 +10,12 @@ let
       primaryOutputs = builtins.attrNames (lib.filterAttrs (_: output: output.primary) outputs);
     in
     if primaryOutputs == [ ] then [ "all" ] else primaryOutputs;
-
-  quickshellIpcReconnectOverlay = _final: prev: {
-    quickshell = prev.quickshell.overrideAttrs (old: {
-      patches = (old.patches or [ ]) ++ [ config.assets.quickshellIpcReconnectPatch ];
-    });
-  };
 in
 {
   den.aspects.duxshell = _: {
     nixos =
       { config, ... }:
       {
-        nixpkgs.overlays = [ quickshellIpcReconnectOverlay ];
-
         services.displayManager.defaultSession = "hyprland-uwsm";
         services.displayManager.dux-greeter = {
           enable = true;

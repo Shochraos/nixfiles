@@ -4,7 +4,11 @@
   inputs = {
     ### Repositories ###
     nixpkgs = {
+      url = "github:NixOS/nixpkgs/nixos-unstable";
+    };
+    nixpkgs-millennium = {
       url = "github:NixOS/nixpkgs/6a8b0b558e9c17857c2bd80aa3585a947d345df2";
+      flake = false;
     };
 
     ### Nix Utilities

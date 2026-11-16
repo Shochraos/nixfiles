@@ -1,4 +1,4 @@
-{ lib, ... }:
+{ config, lib, ... }:
 let
   pinnedGeometry =
     output:
@@ -32,6 +32,14 @@ let
 in
 {
   den.aspects.hyprland.nixos = _: {
+    nixpkgs.overlays = [
+      (_final: prev: {
+        hyprland = prev.hyprland.overrideAttrs (old: {
+          patches = (old.patches or [ ]) ++ [ config.assets.hyprlandModelessMonitorPatch ];
+        });
+      })
+    ];
+
     environment.sessionVariables.NIXOS_OZONE_WL = "1";
 
     programs.hyprland = {

@@ -1,6 +1,5 @@
 {
   lib,
-  buildNpmPackage,
   callPackage,
   fetchurl,
   ghidra,
@@ -8,12 +7,12 @@
   nodejs_24,
   patchelf,
   procps,
+  rea,
   python3,
   stdenv,
   pythonEnvironment ? callPackage ./python.nix { inherit python3; },
 }:
 let
-  version = "6.7.0";
   fridaVersion = "17.23.2";
   fridaPrebuild =
     {
@@ -58,41 +57,28 @@ let
     else
       null;
 in
-buildNpmPackage {
-  pname = "rea-agents";
-  inherit version;
-
-  src = fetchurl {
-    url = "https://registry.npmjs.org/rea-agents/-/rea-agents-${version}.tgz";
-    hash = "sha256-IJWKZtuhoBHlCkhr65Rjo0MSjtNoyYT5QGU2LBP1H5A=";
-  };
-
-  npmDepsHash = "sha256-HnB8R75VT1Ceq+oGqgdV7dAgIhJ1IHVeZJWlR5Fpj90=";
-
+rea.overrideAttrs (previous: {
   nodejs = nodejs_24;
 
-  dontNpmBuild = true;
-  npmFlags = [ "--ignore-scripts" ];
-  npmInstallFlags = [ "--omit=dev" ];
+  nativeBuildInputs =
+    (previous.nativeBuildInputs or [ ])
+    ++ lib.optional (fridaBinding != null && stdenv.hostPlatform.isLinux) patchelf;
 
-  nativeBuildInputs = lib.optional (fridaBinding != null && stdenv.hostPlatform.isLinux) patchelf;
+  postInstall =
+    (previous.postInstall or "")
+    + "\n"
+    + lib.optionalString (fridaBinding != null) (
+      ''
+        tar -xzf ${fridaBinding} -C "$out/lib/node_modules/rea-agents/node_modules/frida" build/frida_binding.node
+      ''
+      + lib.optionalString stdenv.hostPlatform.isLinux ''
+        patchelf --set-rpath ${
+          lib.makeLibraryPath [ stdenv.cc.libc ]
+        } "$out/lib/node_modules/rea-agents/node_modules/frida/build/frida_binding.node"
+      ''
+    );
 
-  postPatch = ''
-    cp ${./package-lock.json} package-lock.json
-  '';
-
-  postInstall = lib.optionalString (fridaBinding != null) (
-    ''
-      tar -xzf ${fridaBinding} -C "$out/lib/node_modules/rea-agents/node_modules/frida" build/frida_binding.node
-    ''
-    + lib.optionalString stdenv.hostPlatform.isLinux ''
-      patchelf --set-rpath ${
-        lib.makeLibraryPath [ stdenv.cc.libc ]
-      } "$out/lib/node_modules/rea-agents/node_modules/frida/build/frida_binding.node"
-    ''
-  );
-
-  makeWrapperArgs = [
+  makeWrapperArgs = (previous.makeWrapperArgs or [ ]) ++ [
     "--set-default"
     "GHIDRA_INSTALL_DIR"
     "${ghidra}/lib/ghidra"
@@ -107,13 +93,11 @@ buildNpmPackage {
     ])
   ];
 
-  passthru = { inherit pythonEnvironment; };
-
-  meta = {
-    description = "Reverse engineer anything from your terminal or agent with one CLI and MCP server";
-    homepage = "https://github.com/morluto/rea";
-    license = lib.licenses.mit;
-    mainProgram = "rea";
-    platforms = lib.platforms.linux ++ lib.platforms.darwin;
+  passthru = (previous.passthru or { }) // {
+    inherit pythonEnvironment;
   };
-}
+
+  meta = previous.meta // {
+    platforms = lib.intersectLists previous.meta.platforms ghidra.meta.platforms;
+  };
+})
