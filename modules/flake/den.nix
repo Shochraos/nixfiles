@@ -6,6 +6,8 @@
 {
   imports = [ inputs.den.flakeModule ];
 
+  den.schema.host.includes = [ den.batteries.user-aspects ];
+
   den.aspects.base.includes = with den.aspects; [
     boot
     secrets
