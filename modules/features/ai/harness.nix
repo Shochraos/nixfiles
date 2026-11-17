@@ -42,6 +42,7 @@
                 config.assets.hermesDesktopWorkspaceControlsPatch
                 config.assets.hermesDesktopSelectionOnlyPatch
                 config.assets.hermesDesktopRefinerTitlePatch
+                config.assets.hermesDesktopContextMeterPatch
               ];
               patchFlags = (previous.patchFlags or [ "-p1" ]) ++ [ "--fuzz=0" ];
             });

@@ -1,0 +1,28 @@
+diff --git a/apps/desktop/src/app/shell/context-usage-panel.tsx b/apps/desktop/src/app/shell/context-usage-panel.tsx
+--- a/apps/desktop/src/app/shell/context-usage-panel.tsx
++++ b/apps/desktop/src/app/shell/context-usage-panel.tsx
+@@ -141,13 +141,22 @@
+  *  came from a compression, so the two read as one idea. Zero stays out of the
+  *  meter (every fresh session would carry noise); the panel shows it. */
+ export function ContextMeterDetail({ bar, compressions }: { bar: string; compressions?: number }) {
++  const fill = /^\[(█+)/u.exec(bar)?.[1]
++  const meter = fill ? (
++    <span>
++      {'['}
++      <span data-slot="context-meter-fill">{fill}</span>
++      {bar.slice(1 + fill.length)}
++    </span>
++  ) : bar
++
+   if (!compressions) {
+-    return bar
++    return meter
+   }
+ 
+   return (
+     <span className="inline-flex items-center gap-1.5">
+-      {bar}
++      {meter}
+       <span className="inline-flex items-center gap-0.5 tabular-nums" data-testid="context-meter-compressions">
+         <Codicon aria-hidden="true" name="layers" size="0.6875rem" />
+         {compressions}

@@ -72,7 +72,7 @@ export default {
           userBubbleBorder: '#373737'
         },
         customCSS: `
-          :root[data-hermes-theme='matugen-desktop'] [data-slot='composer-surface'] button[data-slot='button'].bg-foreground {
+          :root[data-hermes-theme='matugen-desktop'] [data-slot='composer-surface'] button.bg-foreground.text-background {
             background-color: var(--dt-primary);
             color: var(--dt-primary-foreground);
 
@@ -84,6 +84,14 @@ export default {
               background-color: color-mix(in srgb, var(--dt-primary) 30%, transparent);
               color: var(--dt-foreground);
             }
+          }
+
+          :root[data-hermes-theme='matugen-desktop'] [data-slot='context-meter-fill'] {
+            color: var(--dt-primary);
+          }
+
+          :root[data-hermes-theme='matugen-desktop'] [data-slot='context-usage-panel'] {
+            --context-usage-conversation: var(--dt-primary);
           }
 
           :root[data-hermes-theme='matugen-desktop'][data-hermes-mode='dark'] {
