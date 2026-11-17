@@ -1,0 +1,12 @@
+diff --git a/apps/desktop/src/app/capabilities/plugins/plugin-packages.ts b/apps/desktop/src/app/capabilities/plugins/plugin-packages.ts
+--- a/apps/desktop/src/app/capabilities/plugins/plugin-packages.ts
++++ b/apps/desktop/src/app/capabilities/plugins/plugin-packages.ts
+@@ -72,7 +72,7 @@ export function mergePluginPackages(
+     const key = agentPackageName(row)
+     byKey.set(key, {
+       key,
+-      name: row.name,
++      name: (row.key ?? row.name) === 'prompt-refiner' ? 'Prompt Refiner (Gateway)' : row.name,
+       description: row.description,
+       kind: row.has_desktop_half ? 'both' : 'agent',
+       desktop: null,

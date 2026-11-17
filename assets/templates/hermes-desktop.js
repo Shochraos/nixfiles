@@ -72,6 +72,20 @@ export default {
           userBubbleBorder: '#373737'
         },
         customCSS: `
+          :root[data-hermes-theme='matugen-desktop'] [data-slot='composer-surface'] button[data-slot='button'].bg-foreground {
+            background-color: var(--dt-primary);
+            color: var(--dt-primary-foreground);
+
+            &:enabled:hover {
+              background-color: color-mix(in srgb, var(--dt-primary) 90%, transparent);
+            }
+
+            &:disabled {
+              background-color: color-mix(in srgb, var(--dt-primary) 30%, transparent);
+              color: var(--dt-foreground);
+            }
+          }
+
           :root[data-hermes-theme='matugen-desktop'][data-hermes-mode='dark'] {
             --theme-neutral-chrome: var(--theme-background-seed);
             --theme-neutral-card: var(--theme-card-seed);

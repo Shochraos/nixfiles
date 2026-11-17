@@ -41,6 +41,7 @@
               patches = (previous.patches or [ ]) ++ [
                 config.assets.hermesDesktopWorkspaceControlsPatch
                 config.assets.hermesDesktopSelectionOnlyPatch
+                config.assets.hermesDesktopRefinerTitlePatch
               ];
               patchFlags = (previous.patchFlags or [ "-p1" ]) ++ [ "--fuzz=0" ];
             });

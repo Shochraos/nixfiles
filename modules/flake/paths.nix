@@ -26,6 +26,7 @@ in
       btopConf = ../../configs/btop/btop.conf;
       discordTemplate = ../../assets/templates/discord.css;
       halloyTemplate = ../../assets/templates/halloy.toml;
+      hermesDesktopRefinerTitlePatch = ../../assets/patches/hermes-desktop-refiner-title.patch;
       hermesDesktopSelectionOnlyPatch = ../../assets/patches/hermes-desktop-selection-only.patch;
       hermesDesktopTemplate = ../../assets/templates/hermes-desktop.js;
       hermesDesktopWorkspaceControlsPatch = ../../assets/patches/hermes-desktop-workspace-controls.patch;
