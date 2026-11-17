@@ -489,11 +489,11 @@
     "hermes-prompt-refiner": {
       "flake": false,
       "locked": {
-        "lastModified": 1794945797,
-        "narHash": "sha256-skUnyKnwQRWaMQriqjW7MLn3ISePLe4riZMAsO3zXIs=",
+        "lastModified": 1794951578,
+        "narHash": "sha256-pdv951gLQjIu2aIUbeYBtTw/tlzIbKboa2EMub/vq7w=",
         "owner": "Shochraos",
         "repo": "hermes-prompt-refiner-plugin",
-        "rev": "927b29b23a246213d56b00bcddd25b9caf4dc840",
+        "rev": "ee2a549906ed2720e3afde192cfd1dad978230e0",
         "type": "github"
       },
       "original": {
