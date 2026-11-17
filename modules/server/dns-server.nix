@@ -138,6 +138,16 @@
                   ipv6 = [ "fdba:457d:2cbe:10:7965:bc79:23dc:5f61" ];
                   aliases = [ "attic" ];
                 };
+                azazel = {
+                  ipv4 = [ "192.168.20.2" ];
+                  ipv6 = [ "fdba:457d:2cbe:20:140f:c8c:50b:71b3" ];
+                  aliases = [];
+                };
+                solas = {
+                  ipv4 = [ "192.168.20.5" "192.168.2.3" ];
+                  ipv6 = [ "fdba:457d:2cbe:20:d570:9492:e258:2919" "fdba:457d:2cbe:2::3" ];
+                  aliases = [];
+                };
                 seere = {
                   ipv4 = [ "192.168.10.253" ];
                   ipv6 = [ "fdba:457d:2cbe:10:7965:bc79:23dc:5f61" ];
