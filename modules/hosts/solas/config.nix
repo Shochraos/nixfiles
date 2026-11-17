@@ -2,6 +2,7 @@
 {
   den.aspects.solas.nixos =
     {
+      config,
       lib,
       pkgs,
       ...
@@ -9,6 +10,24 @@
     let
       lua = lib.generators.mkLuaInline;
       homePeerPubkey = "FrXFvqXNbU+yOyQt2qJb0iugt0YONNX2GtYX5rPGQ08=";
+      homeLanIPv4 = [
+        "192.168.1.0/24"
+        "192.168.10.0/24"
+        "192.168.20.0/24"
+        "192.168.30.0/24"
+        "192.168.40.0/24"
+        "192.168.50.0/24"
+        "192.168.60.0/24"
+      ];
+      homeLanIPv6 = [
+        "fdba:457d:2cbe:1::/64"
+        "fdba:457d:2cbe:10::/64"
+        "fdba:457d:2cbe:20::/64"
+        "fdba:457d:2cbe:30::/64"
+        "fdba:457d:2cbe:40::/64"
+        "fdba:457d:2cbe:50::/64"
+        "fdba:457d:2cbe:60::/64"
+      ];
     in
     {
       system.stateVersion = "25.05";
@@ -17,9 +36,21 @@
       systemd.services.NetworkManager-wait-online.enable = false;
 
       services.openssh.enable = true;
-      networking.firewall.interfaces = {
-        home.allowedTCPPorts = [ 22 ];
-        home-split.allowedTCPPorts = [ 22 ];
+      networking.firewall = {
+        interfaces = {
+          home.allowedTCPPorts = [ 22 ];
+          home-split.allowedTCPPorts = [ 22 ];
+        };
+        extraCommands = lib.concatStringsSep "\n" (
+          map (
+            source:
+            "${config.networking.firewall.package}/bin/iptables -A nixos-fw -s ${lib.escapeShellArg source} -p tcp --dport 22 -j nixos-fw-accept"
+          ) homeLanIPv4
+          ++ map (
+            source:
+            "${config.networking.firewall.package}/bin/ip6tables -A nixos-fw -s ${lib.escapeShellArg source} -p tcp --dport 22 -j nixos-fw-accept"
+          ) homeLanIPv6
+        );
       };
 
       users.users.shochraos.openssh.authorizedKeys.keys = [

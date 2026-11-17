@@ -94,6 +94,25 @@ in
           inputs.dms.homeModules.dank-material-shell
           inputs.dms-plugin-registry.homeModules.default
           inputs.danksearch.homeModules.dsearch
+          {
+            options.programs.dank-material-shell.package = lib.mkOption {
+              apply =
+                package:
+                package.overrideAttrs (old: {
+                  preCheck = (old.preCheck or "") + ''
+                    dmsOriginalTmpdir="$TMPDIR"
+                    mkdir -p "$TMPDIR/dms-check"
+                    exec {dmsTmpdirFd}<"$TMPDIR/dms-check"
+                    export TMPDIR="/proc/$$/fd/$dmsTmpdirFd"
+                  '';
+                  postCheck = ''
+                    export TMPDIR="$dmsOriginalTmpdir"
+                    exec {dmsTmpdirFd}<&-
+                  ''
+                  + (old.postCheck or "");
+                });
+            };
+          }
         ];
 
         home.packages = [ pkgs.jq ];

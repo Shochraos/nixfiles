@@ -4,12 +4,21 @@ let
 in
 {
   den.aspects.mic-mute.provides.to-users.homeManager =
-    { lib, pkgs, ... }:
+    {
+      config,
+      lib,
+      pkgs,
+      ...
+    }:
     let
       mic-mute = pkgs.writeShellApplication {
         name = "mic-mute";
         runtimeInputs = [
-          inputs.dms.packages.${pkgs.stdenv.hostPlatform.system}.dms-shell
+          (lib.attrByPath [
+            "programs"
+            "dank-material-shell"
+            "package"
+          ] inputs.dms.packages.${pkgs.stdenv.hostPlatform.system}.dms-shell config)
           pkgs.coreutils
           pkgs.wireplumber
         ];

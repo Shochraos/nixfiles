@@ -16,6 +16,21 @@ in
           };
     in
     {
+      nixpkgs.overlays = [
+        (_: prev: {
+          steam-unwrapped = prev.steam-unwrapped.overrideAttrs (_: {
+            installTargets = [
+              "install-bin"
+              "install-docs"
+              "install-icons"
+              "install-bootstrap"
+              "install-desktop"
+              "install-appdata"
+            ];
+          });
+        })
+      ];
+
       boot.kernelModules = [ "ntsync" ];
 
       programs.steam = {

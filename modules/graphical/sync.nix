@@ -12,7 +12,17 @@
           passKey = "calendar/nextcloud-pass/${lib.toLower host.name}";
 
           todomanSphinxOverlay = _final: prev: {
-            todoman = prev.todoman.overrideAttrs (_old: {
+            todoman = prev.todoman.overrideAttrs (old: {
+              postPatch = (old.postPatch or "") + ''
+                substituteInPlace tests/test_cli.py \
+                  --replace-fail 'def test_empty_list(tmpdir: py.path.local, runner: CliRunner, create: Callable) -> None:' 'def test_empty_list(
+                    tmpdir: py.path.local,
+                    runner: CliRunner,
+                    create: Callable,
+                    default_database: Database,
+                ) -> None:
+                    default_database.close()'
+              '';
               preInstallSphinx = ''
                 rm -rf .sphinx/man/man/_static
               '';
