@@ -1,0 +1,296 @@
+diff --git a/apps/desktop/src/app/shell/model-catalog-menu.tsx b/apps/desktop/src/app/shell/model-catalog-menu.tsx
+index 61fb7c4eb66ff2fd2216c46af7ee5b908105382b..8f844406be4f6cdc4f35186afc155ebe6ba673e1 100644
+--- a/apps/desktop/src/app/shell/model-catalog-menu.tsx
++++ b/apps/desktop/src/app/shell/model-catalog-menu.tsx
+@@ -178,8 +178,11 @@ export interface ModelMenuController {
+   ) => void
+ }
+ 
++export const MODEL_CATALOG_CAPABILITIES = { selectionOnly: true } as const
++
+ interface ModelCatalogMenuProps {
+   controller: ModelMenuController
++  selectionOnly?: boolean
+   /** Rows appended under the catalog (Refresh Models, Edit Models, …). */
+   footer?: ReactNode
+   /** Rows above the search, outside the keyboard list (the local-setup offer). */
+@@ -253,6 +256,7 @@ export function ModelCatalogMenu({
+   ownerConnectionId,
+   profile = 'default',
+   request,
++  selectionOnly = false,
+   sessionId = null
+ }: ModelCatalogMenuProps): ReactElement {
+   const { t } = useI18n()
+@@ -265,7 +269,9 @@ export function ModelCatalogMenu({
+   // type. Typing a slug without this works too; the row just makes it findable.
+   const [slugEntry, setSlugEntry] = useState(false)
+   const searchRef = useRef<HTMLInputElement>(null)
+-  const collapsedProviders = useStoreCollapsed()
++  const storedCollapsedProviders = useStoreCollapsed()
++  const [localCollapsedProviders, setLocalCollapsedProviders] = useState(() => storedCollapsedProviders)
++  const collapsedProviders = selectionOnly ? localCollapsedProviders : storedCollapsedProviders
+   const defaultEffort = useDefaultEffort()
+   // Which models the user curated in Edit Models. Read HERE rather than taken
+   // as a prop: it's one global preference, so every surface that shows a
+@@ -354,7 +360,9 @@ export function ModelCatalogMenu({
+   // Resolve visibility HERE, against the catalog we actually fetched: an empty
+   // provider list would otherwise resolve to an empty key set that reads as
+   // "user hid everything" and blanks the menu on first open.
+-  useEffect(() => seedKnownModels(pickerProviders), [pickerProviders])
++  useEffect(() => {
++    if (!selectionOnly) {seedKnownModels(pickerProviders)}
++  }, [pickerProviders, selectionOnly])
+ 
+   const shownKeys = useMemo(
+     () => effectiveVisibleKeys(visibleModels, pickerProviders),
+@@ -434,7 +442,7 @@ export function ModelCatalogMenu({
+ 
+   const selectFamily = async (family: ModelFamily, provider: ModelOptionProvider): Promise<boolean> => {
+     const caps = provider.capabilities?.[family.id]
+-    const preset = controller.presetFor(provider.slug, family.id)
++    const preset = selectionOnly ? {} : controller.presetFor(provider.slug, family.id)
+ 
+     // Variant-fast models (no speed param) express "fast" as a separate `-fast`
+     // id, so honor the remembered preset by selecting that sibling. Param-fast
+@@ -446,6 +454,10 @@ export function ModelCatalogMenu({
+       return false
+     }
+ 
++    if (selectionOnly) {
++      return true
++    }
++
+     const rememberedTier = preset.serviceTier ?? (preset.fast ? 'priority' : 'normal')
+ 
+     const tier =
+@@ -481,7 +493,7 @@ export function ModelCatalogMenu({
+       return
+     }
+ 
+-    addCustomModel(provider.slug, slug, provider)
++    if (!selectionOnly) {addCustomModel(provider.slug, slug, provider)}
+     closeMenu()
+   }
+ 
+@@ -713,12 +725,13 @@ export function ModelCatalogMenu({
+           } else if (isSubmitEnter(event) && event.shiftKey) {
+             event.preventDefault()
+             event.stopPropagation()
+-            toggleKbFavorite()
++
++            if (!selectionOnly) {toggleKbFavorite()}
+           } else if (isSubmitEnter(event)) {
+             event.preventDefault()
+             event.stopPropagation()
+             commitKbRow()
+-          } else if (event.key === 'ArrowRight' && caretAtEnd(event.currentTarget)) {
++          } else if (!selectionOnly && event.key === 'ArrowRight' && caretAtEnd(event.currentTarget)) {
+             // Claimed only with the caret parked at the end of the query, where
+             // ArrowRight has nothing left to do as a text cursor.
+             if (openActiveSubmenu()) {
+@@ -788,6 +801,7 @@ export function ModelCatalogMenu({
+                     onSubOpenChange={handleSubOpenChange}
+                     provider={provider}
+                     search={search}
++                    selectionOnly={selectionOnly}
+                   />
+                 </Fragment>
+               ))}
+@@ -809,7 +823,14 @@ export function ModelCatalogMenu({
+                   )}
+                   onSelect={event => {
+                     event.preventDefault()
+-                    toggleCollapsedProvider(slug)
++
++                    if (selectionOnly) {
++                      setLocalCollapsedProviders(current =>
++                        current.includes(slug) ? current.filter(item => item !== slug) : [...current, slug]
++                      )
++                    } else {
++                      toggleCollapsedProvider(slug)
++                    }
+                   }}
+                   textValue=""
+                 >
+@@ -846,6 +867,7 @@ export function ModelCatalogMenu({
+                         onSubOpenChange={handleSubOpenChange}
+                         provider={group.provider}
+                         search={search}
++                        selectionOnly={selectionOnly}
+                       />
+                     </Fragment>
+                   ))}
+@@ -938,13 +960,15 @@ export function ModelCatalogMenu({
+         <Codicon name="add" size="0.75rem" />
+         {copyPicker.addCustomModelAction}
+       </DropdownMenuItem>
+-      <DropdownMenuItem
+-        className={cn(dropdownMenuRow, 'text-(--ui-text-tertiary)')}
+-        onSelect={() => setModelVisibilityOpen(true)}
+-      >
+-        <Codicon name="settings-gear" size="0.75rem" />
+-        {copy.editModels}
+-      </DropdownMenuItem>
++      {!selectionOnly && (
++        <DropdownMenuItem
++          className={cn(dropdownMenuRow, 'text-(--ui-text-tertiary)')}
++          onSelect={() => setModelVisibilityOpen(true)}
++        >
++          <Codicon name="settings-gear" size="0.75rem" />
++          {copy.editModels}
++        </DropdownMenuItem>
++      )}
+     </>
+   )
+ }
+@@ -1009,6 +1033,7 @@ interface ModelFamilyRowProps {
+   onSubOpenChange?: (open: boolean, key: string) => void
+   provider: ModelOptionProvider
+   search: string
++  selectionOnly: boolean
+ }
+ 
+ /** One model family row: the favorite star, the trigger that commits the
+@@ -1027,7 +1052,8 @@ function ModelFamilyRow({
+   onSelect,
+   onSubOpenChange,
+   provider,
+-  search
++  search,
++  selectionOnly
+ }: ModelFamilyRowProps): ReactElement {
+   const { t } = useI18n()
+   const copy = t.shell.modelMenu
+@@ -1116,17 +1142,19 @@ function ModelFamilyRow({
+   }
+ 
+   const favoriteLabel = favorite ? copy.removeFavorite : copy.addFavorite
++  const RowTrigger = selectionOnly ? DropdownMenuItem : DropdownMenuSubTrigger
+ 
+   return (
+     <DropdownMenuSub onOpenChange={open => onSubOpenChange?.(open, rowKey)}>
+-      <DropdownMenuSubTrigger
++      <RowTrigger
+         onClick={event => {
+           // Shift-click stars, the same gesture that pins a chat row in the
+           // sidebar. Nothing is picked and the menu stays open, so a second
+           // shift-click (on the row, now under Favorites) undoes it.
+           if (event.shiftKey) {
+             event.preventDefault()
+-            toggleFavorite()
++
++            if (!selectionOnly) {toggleFavorite()}
+ 
+             return
+           }
+@@ -1145,27 +1173,29 @@ function ModelFamilyRow({
+             outline otherwise. Its click never reaches the row, so starring
+             neither selects the model nor closes the menu. Not a tab stop —
+             the search field owns keyboard focus (Shift+Enter stars). */}
+-        <Tip label={<TipHintLabel hint={favorite ? undefined : copy.favoriteShortcut} text={favoriteLabel} />}>
+-          <button
+-            aria-label={favoriteLabel}
+-            aria-pressed={favorite}
+-            className={cn(
+-              '-mx-0.5 grid size-4 shrink-0 place-items-center rounded-sm transition-colors duration-100 hover:text-foreground hover:transition-none',
+-              favorite
+-                ? 'text-(--ui-text-secondary)'
+-                : 'text-(--ui-text-quaternary) group-hover/model:text-(--ui-text-tertiary) group-hover/model:transition-none group-data-[kb-active]/model:text-(--ui-text-tertiary)'
+-            )}
+-            onClick={event => {
+-              event.preventDefault()
+-              event.stopPropagation()
+-              toggleFavorite()
+-            }}
+-            tabIndex={-1}
+-            type="button"
+-          >
+-            <Codicon name={favorite ? 'star-full' : 'star-empty'} size="0.75rem" />
+-          </button>
+-        </Tip>
++        {!selectionOnly && (
++          <Tip label={<TipHintLabel hint={favorite ? undefined : copy.favoriteShortcut} text={favoriteLabel} />}>
++            <button
++              aria-label={favoriteLabel}
++              aria-pressed={favorite}
++              className={cn(
++                '-mx-0.5 grid size-4 shrink-0 place-items-center rounded-sm transition-colors duration-100 hover:text-foreground hover:transition-none',
++                favorite
++                  ? 'text-(--ui-text-secondary)'
++                  : 'text-(--ui-text-quaternary) group-hover/model:text-(--ui-text-tertiary) group-hover/model:transition-none group-data-[kb-active]/model:text-(--ui-text-tertiary)'
++              )}
++              onClick={event => {
++                event.preventDefault()
++                event.stopPropagation()
++                toggleFavorite()
++              }}
++              tabIndex={-1}
++              type="button"
++            >
++              <Codicon name={favorite ? 'star-full' : 'star-empty'} size="0.75rem" />
++            </button>
++          </Tip>
++        )}
+         <span className={cn('flex min-w-0 flex-1 items-center gap-1.5', limit.tone)}>
+           {decoration.icon !== undefined ? <ModelMenuRowIcon icon={decoration.icon} /> : null}
+           <span className="min-w-0 truncate">
+@@ -1198,25 +1228,27 @@ function ModelFamilyRow({
+           </ModelChip>
+         ))}
+         {isCurrent ? <Codicon className="text-foreground" name="check" size="0.75rem" /> : null}
+-      </DropdownMenuSubTrigger>
+-      <ModelEditSubmenu
+-        canDisableReasoning={caps?.can_disable_reasoning ?? undefined}
+-        daybreak={daybreak}
+-        defaultEffort={defaultEffort}
+-        effort={effEffort}
+-        effortWire={isCurrent ? current.effortWire : undefined}
+-        fastControl={fastControl}
+-        isActive={isCurrent}
+-        model={family.id}
+-        onSelectModel={nextModel => controller.select(nextModel, provider.slug)}
+-        onSetOptions={patch =>
+-          controller.setOptions(patch, { isActive: isCurrent, model: family.id, provider: provider.slug })
+-        }
+-        provider={provider.slug}
+-        reasoning={caps?.reasoning ?? true}
+-        serviceTier={effTier}
+-        ultrafastSupported={controller.allowSpeed !== false && (caps?.ultrafast ?? false)}
+-      />
++      </RowTrigger>
++      {!selectionOnly && (
++        <ModelEditSubmenu
++          canDisableReasoning={caps?.can_disable_reasoning ?? undefined}
++          daybreak={daybreak}
++          defaultEffort={defaultEffort}
++          effort={effEffort}
++          effortWire={isCurrent ? current.effortWire : undefined}
++          fastControl={fastControl}
++          isActive={isCurrent}
++          model={family.id}
++          onSelectModel={nextModel => controller.select(nextModel, provider.slug)}
++          onSetOptions={patch =>
++            controller.setOptions(patch, { isActive: isCurrent, model: family.id, provider: provider.slug })
++          }
++          provider={provider.slug}
++          reasoning={caps?.reasoning ?? true}
++          serviceTier={effTier}
++          ultrafastSupported={controller.allowSpeed !== false && (caps?.ultrafast ?? false)}
++        />
++      )}
+     </DropdownMenuSub>
+   )
+ }
+diff --git a/apps/desktop/src/sdk/index.ts b/apps/desktop/src/sdk/index.ts
+index 8c54655cf5d74c941905c3e418ab7434beda8962..6b450c65dd2edb88725a956b73e8efce8722f2f1 100644
+--- a/apps/desktop/src/sdk/index.ts
++++ b/apps/desktop/src/sdk/index.ts
+@@ -1661,6 +1661,7 @@ export { ToolsetConfigPanel } from '@/app/settings/toolset-config-panel'
+  *  (write to a session, hold a per-task override, …). Never fork it — a copy
+  *  drifts from the composer the first time either side changes. */
+ export {
++  MODEL_CATALOG_CAPABILITIES,
+   ModelCatalogMenu,
+   type ModelChoice,
+   ModelMenuCloseContext,

@@ -38,7 +38,10 @@
           buildPnpmPackage =
             arguments:
             (hermesPackage.hermesNpmLib.buildPnpmPackage arguments).overrideAttrs (previous: {
-              patches = (previous.patches or [ ]) ++ [ config.assets.hermesDesktopWorkspaceControlsPatch ];
+              patches = (previous.patches or [ ]) ++ [
+                config.assets.hermesDesktopWorkspaceControlsPatch
+                config.assets.hermesDesktopSelectionOnlyPatch
+              ];
               patchFlags = (previous.patchFlags or [ "-p1" ]) ++ [ "--fuzz=0" ];
             });
         };
