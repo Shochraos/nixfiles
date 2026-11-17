@@ -55,6 +55,7 @@ in
     };
 
     packageSources = {
+      blenderLabMcp = ../../pkgs/blender-lab-mcp/package.nix;
       bscpylgtv = ../../pkgs/bscpylgtv/package.nix;
       ironyModManager = ../../pkgs/irony-mod-manager/package.nix;
       mp3tag = ../../pkgs/mp3tag/package.nix;

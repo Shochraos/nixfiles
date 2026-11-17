@@ -44,6 +44,7 @@
     kde-connect
     cpu-amd
     nvidia
+    gamedev
     gaming
     ai-harness
     #ai-stt
@@ -67,7 +68,7 @@
     fingerprint
     mic-mute
     ai-harness
-    unreal
+    gamedev
     mounts
   ];
 
