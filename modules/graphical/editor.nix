@@ -13,6 +13,8 @@
           ...
         }:
         {
+          home.sessionVariables.ZED_FILE_WATCHER_POLL_MS = "10000";
+
           xdg.autostart = {
             entries = [
               "${config.programs.zed-editor.package}/share/applications/dev.zed.Zed.desktop"
