@@ -54,7 +54,7 @@ Local hooks check formatting without staging files.
 
 ## Safety and change boundaries
 
-- Do not stage, commit or push. New source files must be included in the Git-backed flake source before normal evaluation can see them; leave index changes to the owner and report omitted files.
+- For authorized implementation work, the coordinating agent may stage and commit completed, verified task-owned changes at logical boundaries without separate approval. Preserve unrelated changes and existing user staging; inspect the exact staged diff before committing. Do not push, merge or rewrite history unless explicitly requested. New source files must be included in the Git-backed flake source before normal evaluation can see them; report omitted files.
 - Keep root `AGENTS.md` in version control. Update it only when an approved change makes its repository guidance inaccurate; do not add task history, audit findings or code-line references.
 - Never decrypt secrets or run `sops -d`. Declare secrets and consume SOPS placeholders or runtime paths; verify structure without reading plaintext. Secret-value edits belong to the owner.
 - Ask before activation, switches, service restarts or disruptive tests. The `nh-switch` and `nh-boot` helpers build and/or deploy; they are not read-only verification commands.
