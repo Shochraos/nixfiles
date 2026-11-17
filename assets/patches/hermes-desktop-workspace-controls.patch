@@ -1,4 +1,4 @@
---- /dev/null
+w--- /dev/null
 +++ b/apps/desktop/src/app/chat/sidebar/projects/project-folder-dialog.tsx
 @@ -0,0 +1,91 @@
 +import { useEffect, useRef, useState } from 'react'
