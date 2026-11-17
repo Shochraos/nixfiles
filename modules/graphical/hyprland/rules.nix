@@ -10,6 +10,13 @@ _: {
           window_rule = [
             {
               match = {
+                initial_class = "^dev[.]duxlabs[.]files$";
+                initial_title = "negative:^Home$";
+              };
+              float = true;
+            }
+            {
+              match = {
                 class = "^(xdg-desktop-portal-gtk)$";
               };
               float = true;
