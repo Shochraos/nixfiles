@@ -50,6 +50,9 @@
     {
       home.packages = [ (pkgs.callPackage config.packageSources.rea { }) ];
 
+      home.file.".hermes/desktop-plugins/prompt-refiner/plugin.js".source =
+        inputs.hermes-prompt-refiner + "/desktop/plugin.js";
+
       xdg.autostart.entries = hermesAutostart;
 
       imports = [ inputs.hermes-agent.homeManagerModules.default ];

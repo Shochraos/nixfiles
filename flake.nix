@@ -112,6 +112,11 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    hermes-prompt-refiner = {
+      url = "github:Shochraos/hermes-prompt-refiner-plugin/main";
+      flake = false;
+    };
+
     ### Gaming ###
     custom-proton-nix = {
       url = "github:Shochraos/custom-proton-nix";

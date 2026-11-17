@@ -486,6 +486,23 @@
         "type": "github"
       }
     },
+    "hermes-prompt-refiner": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1794917268,
+        "narHash": "sha256-Wmo83RN1Wo1tkrmeTQ2N0KvNjyih5XIFuU7FyTKkyEk=",
+        "owner": "Shochraos",
+        "repo": "hermes-prompt-refiner-plugin",
+        "rev": "a825dc5ce5e8d7bee6c61306eedfc4521d1514ad",
+        "type": "github"
+      },
+      "original": {
+        "owner": "Shochraos",
+        "ref": "main",
+        "repo": "hermes-prompt-refiner-plugin",
+        "type": "github"
+      }
+    },
     "home-manager": {
       "inputs": {
         "nixpkgs": [
@@ -826,6 +843,7 @@
         "flyline": "flyline",
         "git-hooks-nix": "git-hooks-nix",
         "hermes-agent": "hermes-agent",
+        "hermes-prompt-refiner": "hermes-prompt-refiner",
         "home-manager": "home-manager_2",
         "import-tree": "import-tree",
         "lanzaboote": "lanzaboote",
