@@ -1,5 +1,4 @@
-{ ... }:
-{
+_: {
   den.aspects.apps = {
     provides.to-users.homeManager =
       {
