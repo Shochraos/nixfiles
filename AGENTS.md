@@ -31,8 +31,11 @@ Even a connection test on `azazel` or `solas` needs prior approval naming the ho
 
 ## Delivering changes
 
-1. Treat planning, explanation and review as read-only. For implementation, start a fresh branch from the intended base before editing. Continue the same task on its branch while its PR is open; after merge or closure, start a new branch. Preserve unrelated work and existing staging.
-2. The coordinating agent inspects the exact staged diff and commits only verified, task-owned changes. Workers do not commit or push. Make sure new Nix source files are tracked so the Git-backed flake can see them.
-3. An implementation request includes pushing the verified branch and opening or updating its PR against the intended base. No separate push approval is needed unless the user limits delivery. Confirm the PR head matches the local commit and report its link and any verification gaps. Merging, rewriting history and publishing beyond that PR require explicit authorization.
+Treat planning, explanation and review as read-only. For implementation, follow the user’s branch and delivery instructions. Otherwise, choose by scope:
+
+- **Small, focused changes** (for example, correcting a typo or changing one option value) can be committed and pushed directly to `main` without a separate branch or PR.
+- **Large, multi-line changes** (for example, refactoring a shared module) require a branch and PR. Start from the intended base, push the branch and open a PR against that base. Keep follow-up fixes on the same branch while its PR is open; after merge or closure, use a fresh branch for further PR work.
+
+For either route, preserve unrelated work and existing staging. The coordinating agent inspects the staged diff, commits only verified, task-owned changes and checks the outgoing commits before pushing. Workers do not commit or push. Track new Nix source files so the Git-backed flake can see them. Unless the user limits delivery, no separate push approval is needed. Confirm the remote head matches the local commit. Report any verification gaps and link the PR if there is one. Merging, rewriting history and publishing elsewhere require explicit authorization.
 
 Keep this root `AGENTS.md` in version control. Keep agent-only notes and handoffs out of commits; before writing them under `.hermes/`, verify the directory is ignored and the files are untracked.
