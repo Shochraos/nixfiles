@@ -10,6 +10,15 @@
           ...
         }:
         let
+          libgit2 = pkgs.libgit2.overrideAttrs (old: {
+            patches = (old.patches or [ ]) ++ [
+              (pkgs.fetchurl {
+                name = "libgit2-safe-directory-wildcard.patch";
+                url = "https://github.com/libgit2/libgit2/commit/c90dc5284e5f72146c85141c9e0a69e813bdfc7f.patch";
+                hash = "sha256-OjMOQSaXcPbh8izCh+wbTdrJw4x1B7CdpW6CLgBV9rU=";
+              })
+            ];
+          });
           shares = [
             "appdata"
             "backups"
@@ -97,6 +106,17 @@
           '';
         in
         {
+          nix.package =
+            let
+              series = lib.versions.majorMinor pkgs.nixVersions.stable.version;
+              components = "nixComponents_${builtins.replaceStrings [ "." ] [ "_" ] series}";
+            in
+            (pkgs.nixVersions.extend (
+              _: prev: {
+                ${components} = prev.${components}.overrideScope (_: _: { inherit libgit2; });
+              }
+            )).stable;
+
           assertions = [
             {
               assertion = !config.sops.useSystemdActivation;
@@ -185,6 +205,20 @@
             wantedBy = [ "remote-fs.target" ];
             automountConfig.TimeoutIdleSec = "5min";
           }) shares;
+        };
+      provides.to-users.homeManager =
+        {
+          config,
+          lib,
+          osConfig,
+          pkgs,
+          ...
+        }:
+        {
+          programs.direnv.nix-direnv.package = pkgs.nix-direnv.override { nix = osConfig.nix.package; };
+          programs.git.settings.safe.directory = lib.mkIf (
+            config.home.username == "shochraos"
+          ) "/mnt/astaroth/projects/*";
         };
     };
 }
