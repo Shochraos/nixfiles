@@ -49,7 +49,7 @@
         certs.home = {
           dnsProvider = "cloudflare";
           dnsResolver = "1.1.1.1:53";
-          dnsPropagationCheck = true;
+          dnsRecursivePropagationCheck = true;
           enableDebugLogs = false;
           credentialFiles = {
             CF_DNS_API_TOKEN_FILE = config.sops.secrets."dns/cloudflare-dns-api-token".path;
