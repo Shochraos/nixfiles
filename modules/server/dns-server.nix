@@ -116,7 +116,6 @@
                     "fritz"
                     "git"
                     "hermes"
-                    "immich"
                     "jellyfin"
                     "komga"
                     "npm"
@@ -136,7 +135,10 @@
                 proxy = {
                   ipv4 = [ "192.168.10.253" ];
                   ipv6 = [ "fdba:457d:2cbe:10:7965:bc79:23dc:5f61" ];
-                  aliases = [ "attic" ];
+                  aliases = [ 
+                    "attic" 
+                    "immich"
+                  ];
                 };
                 azazel = {
                   ipv4 = [ "192.168.20.2" ];
