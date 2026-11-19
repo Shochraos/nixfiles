@@ -100,38 +100,23 @@
           assertions = [
             {
               assertion = !config.sops.useSystemdActivation;
-              message = "Astaroth SMB mount drop-ins require SOPS installation during activation, before systemd loads mount units.";
+              message = "Astaroth mount drop-ins require SOPS installation during activation, before systemd loads mount units.";
             }
           ];
 
-          sops.secrets = {
-            "astaroth/smb-username" = { };
-            "astaroth/smb-password" = { };
-            "network/home-domain" = { };
-          };
+          sops.secrets."network/home-domain" = { };
 
-          sops.templates = {
-            "astaroth-smb-credentials" = {
-              owner = "root";
-              group = "root";
-              mode = "0400";
-              content = ''
-                username=${config.sops.placeholder."astaroth/smb-username"}
-                password=${config.sops.placeholder."astaroth/smb-password"}
-              '';
-            };
-          }
-          // builtins.listToAttrs (
+          sops.templates = builtins.listToAttrs (
             map (
               share:
-              lib.nameValuePair "astaroth-smb-${share}" {
+              lib.nameValuePair "astaroth-nfs-${share}" {
                 path = "/run/systemd/system/mnt-astaroth-${share}.mount.d/50-hostname.conf";
                 owner = "root";
                 group = "root";
                 mode = "0400";
                 content = ''
                   [Mount]
-                  What=//astaroth.${config.sops.placeholder."network/home-domain"}/${share}
+                  What=astaroth.${config.sops.placeholder."network/home-domain"}:/mnt/user/${share}
                 '';
               }
             ) shares
@@ -153,7 +138,7 @@
             };
           };
 
-          boot.supportedFilesystems.cifs = true;
+          boot.supportedFilesystems.nfs = true;
 
           systemd.services."user@".after = map (share: "mnt-astaroth-${share}.mount") shares;
 
@@ -174,35 +159,21 @@
                   };
                   Mount = {
                     Where = "/mnt/astaroth/${share}";
-                    Type = "cifs";
+                    Type = "nfs";
                     TimeoutSec = "30s";
-                    Options = lib.concatStringsSep "," (
-                      [
-                        "_netdev"
-                        "nodev"
-                        "nofail"
-                        "nosuid"
-                        "credentials=${config.sops.templates."astaroth-smb-credentials".path}"
-                        "uid=shochraos"
-                        "gid=${config.users.users.shochraos.group}"
-                        "vers=3.1.1"
-                        "seal"
-                        "cache=strict"
-                      ]
-                      ++ (
-                        if share == "projects" then
-                          [
-                            "posix"
-                            "exec"
-                          ]
-                        else
-                          [
-                            "noexec"
-                            "file_mode=0600"
-                            "dir_mode=0700"
-                          ]
-                      )
-                    );
+                    Options = lib.concatStringsSep "," [
+                      "_netdev"
+                      "nofail"
+                      "rw"
+                      "vers=4.2"
+                      "proto=tcp"
+                      "sec=sys"
+                      "hard"
+                      "retry=0"
+                      "nosuid"
+                      "nodev"
+                      (if share == "projects" then "exec" else "noexec")
+                    ];
                   };
                 };
               }
