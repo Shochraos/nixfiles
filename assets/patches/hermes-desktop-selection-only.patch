@@ -151,7 +151,7 @@ index 61fb7c4eb66ff2fd2216c46af7ee5b908105382b..8f844406be4f6cdc4f35186afc155ebe
 +  selectionOnly: boolean
  }
  
- /** One model family row: the favorite star, the trigger that commits the
+ function rowSpeedSetting(
 @@ -1027,7 +1052,8 @@ function ModelFamilyRow({
    onSelect,
    onSubOpenChange,
