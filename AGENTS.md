@@ -1,60 +1,41 @@
 # Working in nixfiles
 
-This repository configures four NixOS hosts with flake-parts, import-tree, Den aspects and Home Manager. Azazel and Solas use the graphical environment; Seere and Sitri are headless DNS/reverse-proxy hosts. All share the base configuration and the `shochraos` Home Manager user.
+This flake defines four NixOS systems: Azazel (desktop), Solas (laptop), Seere and Sitri (headless servers). They share the base configuration and the `shochraos` Home Manager user. See [README.md](README.md) for setup and usage. Read [WORKAROUNDS.md](WORKAROUNDS.md) before changing a compatibility override; it records when the override can be removed.
 
-## Repository map
+## Where changes belong
 
-- `flake.nix`: inputs and the import-tree entry point. Keep its outputs minimal.
-- `modules/flake/`: host/aspect composition in `den.nix`, shared data options in `options.nix`, repository paths in `paths.nix`, development tools and formatting.
-- `modules/base/`: common system configuration.
-- `modules/graphical/`: desktop configuration and applications.
-- `modules/features/`: optional capabilities selected by hosts.
-- `modules/server/`: independent server capabilities, explicitly selected per host; this directory is not an automatically enabled umbrella aspect.
-- `modules/hosts/<host>/`: each host's `config.nix`, `hardware.nix` and `filesystems.nix`.
-- `modules/users/`: user aspects, resolved by user name.
-- `pkgs/`: local package recipes, exposed through `config.packageSources`.
-- `assets/` and `configs/`: scripts, templates, patches and static configuration.
-- `secrets/`: SOPS-encrypted data. `.sops.yaml` configures encryption recipients.
+- `flake.nix` declares inputs and uses import-tree to load `modules/`. Adding a module makes its definition available; it does not select the feature for a host. Select Den aspects through includes in `modules/flake/den.nix`, not through manual import lists or parallel enable flags.
+- Extend the existing aspect in `modules/base/`, `modules/graphical/`, `modules/features/` or `modules/server/`. Keep machine-specific settings, hardware and storage under `modules/hosts/`, and user aspects under `modules/users/`. Use native NixOS and Home Manager options directly; reserve `host.*` options for data shared between aspects.
+- When an aspect needs a Den functor, keep its argument non-destructured and define the functor only once at its attribute path. Bind library helpers at file scope, not as entity arguments in a `provides` chain.
+- Register paths to `assets/`, `configs/` and local recipes in `pkgs/` through `modules/flake/paths.nix`. Consume `config.assets` or `config.packageSources` instead of duplicating relative paths. Edit a generator or its template rather than a generated config. Evaluation must not depend on files created at login or activation.
+- Keep secrets encrypted. Use SOPS declarations, placeholders and runtime paths. Never decrypt, inspect, print or commit secret values; the owner supplies them.
 
-See `README.md` for the project overview and `WORKAROUNDS.md` before changing compatibility overrides.
+## Development and verification
 
-## Development environment
+Use `nix develop` or the repository’s direnv environment. This provides the tools in `modules/flake/devshell.nix` and sets up the pre-commit runner for that checkout on that client. Keep development tools in the shell, not in a host’s system packages.
 
-Enter `nix develop`, or use the existing `.envrc` with direnv. The development shell supplies Nix language tools, linters, Python and repository hooks. Keep developer tooling in `devShells.default` or the consuming program's scope; never install it globally.
+Use the locked inputs; change `flake.lock` only when an input update is in scope. Resolve pins through the root input references rather than guessing from lock node names. Keep Millennium’s pinned recipes scoped to gaming and Hermes Desktop on the root nixpkgs input. The Hermes backend is managed outside this repository.
 
-Use the locked inputs. Resolve input identities through `flake.lock`'s root input references, not similarly named transitive nodes. The `nh` commands use `github:Shochraos/nixfiles/main` and its published lock file. Do not move the local lock file unless explicitly requested. Keep Millennium's pinned recipes scoped to gaming with dependencies from root nixpkgs, and keep Hermes Desktop following the root nixpkgs input.
+For configuration changes, check the flake and evaluate each affected host. Replace `Azazel` below with the configuration name. Inspect the changed option as well as the host derivation, especially when a shared aspect serves several hosts.
 
-## Configuration conventions
-
-- Every Nix file under `modules/` is auto-imported as a flake-parts module. Define configuration through the appropriate Den aspect; do not add manual import lists or `default.nix` aggregators.
-- Keep shared base, graphical and host composition in `modules/flake/den.nix`. A feature may own its dependency includes and scoped unfree allowances. Directory membership alone must not enable a capability.
-- Extend the existing owner before creating another aspect. Package-only additions belong in an existing shared or per-host package list. Use directory aspects for multi-file capabilities and functors only for independent variation, not mutually exclusive features.
-- Use includes for capability selection. Reserve typed `host.*` data for cross-aspect sharing or translation; do not add feature-enable booleans or aliases that merely forward native options. Put simple host-specific NixOS/Home Manager settings directly in the host configuration.
-- Keep Den functor argument lambdas non-destructured and each functor as the sole definition at its attribute path. In provides-chain aspects, bind library helpers at file scope rather than treating them as entity arguments.
-- Centralize repository-relative filesystem paths in `modules/flake/paths.nix`; consume `config.assets` and `config.packageSources` from file-level module arguments.
-- Keep evaluation independent of runtime-generated files, including Matugen outputs. Do not run plugin setup scripts; integrate dependencies and configuration declaratively.
-- Preserve native module ownership and existing behavior unless the task explicitly changes them. Keep workaround details in their existing documentation rather than adding investigation notes here.
-
-## Verification workflow
-
-For no-build evaluation, preserve the lock and disable import-from-derivation:
-
-```bash
+```sh
 nix flake check --no-build --no-write-lock-file --option allow-import-from-derivation false
 nix eval --raw --no-write-lock-file --option allow-import-from-derivation false .#nixosConfigurations.Azazel.config.system.build.toplevel.drvPath
 ```
 
-Use the corresponding configuration name for Solas, Seere or Sitri. Evaluate affected hosts. For behavior-preserving changes, capture before/after toplevel derivations and relevant settings; explain any differences. Matching derivations do not establish runtime health.
+`nix fmt` can rewrite files; restrict it to files in scope. The pre-commit hook checks formatting without staging changes. CI runs the flake’s formatting and lint checks. A no-build evaluation neither runs those checks nor proves the system builds or boots. For documentation-only changes, verify links, paths and commands against their definitions; no system build is needed.
 
-Do not run system builds or rebuilds (`nix build`, `nixos-rebuild` or `nh` build/deploy helpers) unless the user explicitly instructs you to do so for the current task. Implementation requests and routine verification are not build authorization. Use formatting/linting and the no-build evaluation commands above by default; never omit `--no-build` from `nix flake check` without explicit build authorization. Report checks not performed.
+Use `ssh nix-workspace` for authorized builds. Default to no-build checks; run a full host build or rebuild only if requested for the task. The `nh-switch` and `nh-boot` helpers use `github:Shochraos/nixfiles/main`, not the working tree. A PR does not authorize deployment, activation or a service restart.
 
-`nix fmt` runs the configured formatters and linters and can modify files. Keep formatting within the authorized scope and preserve unrelated working changes. CI runs flake checks for formatting/linting, not full host builds or runtime tests.
+Even a connection test on `azazel` or `solas` needs prior approval naming the host, purpose and scope. Agent access there is limited to approved read-only diagnostics or scoped MCP operations: never install, activate, deploy or perform destructive operations on either host.
 
-Local hooks check formatting without staging files.
+## Delivering changes
 
-## Safety and change boundaries
+Treat planning, explanation and review as read-only. For implementation, follow the user’s branch and delivery instructions. Otherwise, choose by scope:
 
-- For authorized implementation work, the coordinating agent may stage and commit completed, verified task-owned changes at logical boundaries without separate approval. Preserve unrelated changes and existing user staging; inspect the exact staged diff before committing. Do not push, merge or rewrite history unless explicitly requested. New source files must be included in the Git-backed flake source before normal evaluation can see them; report omitted files.
-- Keep root `AGENTS.md` in version control. Update it only when an approved change makes its repository guidance inaccurate; do not add task history, audit findings or code-line references.
-- Never decrypt secrets or run `sops -d`. Declare secrets and consume SOPS placeholders or runtime paths; verify structure without reading plaintext. Secret-value edits belong to the owner.
-- Ask before activation, switches, service restarts or disruptive tests. The `nh-switch` and `nh-boot` helpers build and/or deploy; they are not read-only verification commands.
+- **Small, focused changes** (for example, correcting a typo or changing one option value) can be committed and pushed directly to `main` without a separate branch or PR.
+- **Large, multi-line changes** (for example, refactoring a shared module) require a branch and PR. Start from the intended base, push the branch and open a PR against that base. Keep follow-up fixes on the same branch while its PR is open; after merge or closure, use a fresh branch for further PR work.
+
+For either route, preserve unrelated work and existing staging. The coordinating agent inspects the staged diff, commits only verified, task-owned changes and checks the outgoing commits before pushing. Workers do not commit or push. Track new Nix source files so the Git-backed flake can see them. Unless the user limits delivery, no separate push approval is needed. Confirm the remote head matches the local commit. Report any verification gaps and link the PR if there is one. Merging, rewriting history and publishing elsewhere require explicit authorization.
+
+Keep this root `AGENTS.md` in version control. Keep agent-only notes and handoffs out of commits; before writing them under `.hermes/`, verify the directory is ignored and the files are untracked.
