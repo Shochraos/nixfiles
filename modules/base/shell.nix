@@ -84,7 +84,7 @@ in
           enable = true;
           settings = {
             scan_timeout = 500;
-            command_timeout = 2000;
+            command_timeout = 10000;
           };
         };
       };
