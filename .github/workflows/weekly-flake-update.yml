@@ -52,18 +52,33 @@ jobs:
     name: Validate candidate
     needs: prepare
     if: needs.prepare.outputs.commit != ''
-    runs-on: [self-hosted, linux, x64, nix-workspace]
+    runs-on: ubuntu-latest
     env:
       CANDIDATE_COMMIT: ${{ needs.prepare.outputs.commit }}
       CANDIDATE_SHA256: ${{ needs.prepare.outputs.sha256 }}
     outputs:
       commit: ${{ steps.build.outcome == 'success' && env.CANDIDATE_COMMIT || '' }}
     steps:
+      - name: Free runner disk space
+        run: |
+          sudo rm -rf \
+            /usr/share/dotnet \
+            /usr/local/lib/android \
+            /opt/ghc \
+            /usr/local/.ghcup \
+            /opt/hostedtoolcache/CodeQL \
+            /usr/share/swift
+          df -h /
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           ref: ${{ github.sha }}
           fetch-depth: 0
           persist-credentials: false
+      - name: Install Nix with flakes enabled
+        uses: cachix/install-nix-action@3dc140bfc76c49fbd4dd958429132e3746bcb086
+        with:
+          extra_nix_config: |
+            experimental-features = nix-command flakes
       - name: Download candidate
         uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333
         with:
