@@ -22,8 +22,9 @@ _: {
         ];
 
         home.file = {
-          ".local/share/fonts/NotoSansCJK-Regular.ttc".source =
-            "${pkgs.noto-fonts-cjk-sans}/share/fonts/opentype/noto-cjk/NotoSansCJK-Regular.ttc";
+          ".local/share/fonts/NotoSansCJK-Regular.ttc".source = "${
+            pkgs.noto-fonts-cjk-sans.override { static = true; }
+          }/share/fonts/opentype/noto-cjk/NotoSansCJK-Regular.ttc";
         };
 
         xdg.autostart.entries =

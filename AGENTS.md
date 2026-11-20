@@ -14,7 +14,7 @@ This flake defines four NixOS systems: Azazel (desktop), Solas (laptop), Seere a
 
 Use `nix develop` or the repository’s direnv environment. This provides the tools in `modules/flake/devshell.nix` and sets up the pre-commit runner for that checkout on that client. Keep development tools in the shell, not in a host’s system packages.
 
-Use the locked inputs; change `flake.lock` only when an input update is in scope. Resolve pins through the root input references rather than guessing from lock node names. Keep Millennium’s pinned recipes scoped to gaming and Hermes Desktop on the root nixpkgs input. The Hermes backend is managed outside this repository.
+Use the locked inputs; change `flake.lock` only when an input update is in scope. Resolve pins through the root input references rather than guessing from lock node names. Keep Hermes Desktop on the root nixpkgs input. The Hermes backend is managed outside this repository.
 
 For configuration changes, check the flake and evaluate each affected host. Replace `Azazel` below with the configuration name. Inspect the changed option as well as the host derivation, especially when a shared aspect serves several hosts.
 
