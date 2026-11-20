@@ -1,4 +1,4 @@
-{ inputs, config, ... }:
+{ config, ... }:
 let
   inherit (config) assets;
 in
@@ -18,7 +18,7 @@ in
             "programs"
             "dank-material-shell"
             "package"
-          ] inputs.dms.packages.${pkgs.stdenv.hostPlatform.system}.dms-shell config)
+          ] pkgs.dux-shell config)
           pkgs.coreutils
           pkgs.wireplumber
         ];

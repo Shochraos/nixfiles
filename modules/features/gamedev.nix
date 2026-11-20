@@ -1,19 +1,27 @@
-{ config, den, ... }:
+{
+  config,
+  inputs,
+  lib,
+  ...
+}:
 let
   inherit (config) packageSources;
+  cudaUnfreePackages = [
+    "blender"
+    "cccl"
+    "cuda_crt"
+    "cuda_cudart"
+    "cuda_nvcc"
+    "cuda_nvrtc"
+    "libcublas"
+    "libcusolver"
+    "libcusparse"
+    "libnvjitlink"
+    "libnvvm"
+  ];
 in
 {
   den.aspects.gamedev = {
-    includes = [
-      (den.batteries.unfree [
-        "blender"
-        "cuda_cudart"
-        "cuda_nvcc"
-        "libnvvm"
-        "cuda_crt"
-        "cccl"
-      ])
-    ];
     provides.to-users.homeManager = {
       imports = [
         (
@@ -24,10 +32,21 @@ in
           }:
           let
             isNvidia = osConfig.networking.hostName == "Azazel";
-            blender = pkgs.blender.override {
-              cudaSupport = isNvidia;
-              rocmSupport = !isNvidia;
+            cudaPkgs = import inputs.nixpkgs {
+              inherit (pkgs.stdenv.hostPlatform) system;
+              config = {
+                cudaSupport = true;
+                allowUnfreePredicate = pkg: builtins.elem (lib.getName pkg) cudaUnfreePackages;
+              };
             };
+            blender =
+              if isNvidia then
+                cudaPkgs.blender
+              else
+                pkgs.blender.override {
+                  cudaSupport = false;
+                  rocmSupport = true;
+                };
             server = pkgs.callPackage packageSources.blenderLabMcp { };
             startup = pkgs.writeText "blender-mcp-startup.py" ''
               import sys

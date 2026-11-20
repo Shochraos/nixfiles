@@ -4,12 +4,14 @@
   fetchurl,
   ghidra,
   jdk21,
+  makeWrapper,
   nodejs_24,
   patchelf,
   procps,
   rea,
   python3,
   stdenv,
+  versionCheckHook,
   pythonEnvironment ? callPackage ./python.nix { inherit python3; },
 }:
 let
@@ -56,48 +58,94 @@ let
       }
     else
       null;
+  runtimePath = lib.makeBinPath [
+    nodejs_24
+    procps
+    pythonEnvironment
+    jdk21
+  ];
 in
-rea.overrideAttrs (previous: {
-  nodejs = nodejs_24;
+stdenv.mkDerivation {
+  inherit (rea) pname version;
 
-  nativeBuildInputs =
-    (previous.nativeBuildInputs or [ ])
-    ++ lib.optional (fridaBinding != null && stdenv.hostPlatform.isLinux) patchelf;
+  dontUnpack = true;
+  dontConfigure = true;
+  dontBuild = true;
 
-  postInstall =
-    (previous.postInstall or "")
-    + "\n"
-    + lib.optionalString (fridaBinding != null) (
+  nativeBuildInputs = [
+    makeWrapper
+  ]
+  ++ lib.optional (fridaBinding != null && stdenv.hostPlatform.isLinux) patchelf;
+
+  installPhase = ''
+    runHook preInstall
+
+    srcPkg="${rea}/lib/node_modules/rea-agents"
+    dstPkg="$out/lib/node_modules/rea-agents"
+    mkdir -p "$dstPkg/node_modules" "$out/bin"
+
+    shopt -s dotglob nullglob
+    for entry in "$srcPkg"/*; do
+      name="$(basename "$entry")"
+      case "$name" in
+        dist|scripts|package.json)
+          cp -r --no-preserve=mode "$entry" "$dstPkg/$name"
+          ;;
+        node_modules)
+          ;;
+        *)
+          ln -s "$entry" "$dstPkg/$name"
+          ;;
+      esac
+    done
+
+    for entry in "$srcPkg/node_modules"/*; do
+      name="$(basename "$entry")"
+      if [ "$name" = "frida" ]; then
+        cp -r --no-preserve=mode "$entry" "$dstPkg/node_modules/frida"
+      else
+        ln -s "$entry" "$dstPkg/node_modules/$name"
+      fi
+    done
+
+    chmod +x "$dstPkg/scripts/rea.mjs"
+
+    ${lib.optionalString (fridaBinding != null) (
       ''
-        tar -xzf ${fridaBinding} -C "$out/lib/node_modules/rea-agents/node_modules/frida" build/frida_binding.node
+        packagedFridaVersion="$(${lib.getExe nodejs_24} -p "JSON.parse(require('node:fs').readFileSync('$dstPkg/node_modules/frida/package.json', 'utf8')).version")"
+        if [ "$packagedFridaVersion" != "${fridaVersion}" ]; then
+          echo "rea frida version mismatch: expected ${fridaVersion}, got $packagedFridaVersion" >&2
+          exit 1
+        fi
+        tar -xzf ${fridaBinding} -C "$dstPkg/node_modules/frida" build/frida_binding.node
       ''
       + lib.optionalString stdenv.hostPlatform.isLinux ''
         patchelf --set-rpath ${
           lib.makeLibraryPath [ stdenv.cc.libc ]
-        } "$out/lib/node_modules/rea-agents/node_modules/frida/build/frida_binding.node"
+        } "$dstPkg/node_modules/frida/build/frida_binding.node"
       ''
-    );
+    )}
 
-  makeWrapperArgs = (previous.makeWrapperArgs or [ ]) ++ [
-    "--set-default"
-    "GHIDRA_INSTALL_DIR"
-    "${ghidra}/lib/ghidra"
-    "--prefix"
-    "PATH"
-    ":"
-    (lib.makeBinPath [
-      nodejs_24
-      procps
-      pythonEnvironment
-      jdk21
-    ])
-  ];
+    for binName in rea rea-agents; do
+      makeWrapper ${lib.getExe nodejs_24} "$out/bin/$binName" \
+        --add-flags "$dstPkg/scripts/rea.mjs" \
+        --set-default GHIDRA_INSTALL_DIR "${ghidra}/lib/ghidra" \
+        --prefix PATH : "${runtimePath}"
+    done
 
-  passthru = (previous.passthru or { }) // {
+    runHook postInstall
+  '';
+
+  nativeInstallCheckInputs = [ versionCheckHook ];
+  versionCheckProgram = "${placeholder "out"}/bin/rea";
+  versionCheckProgramArg = "--version";
+  doInstallCheck = true;
+
+  passthru = (rea.passthru or { }) // {
     inherit pythonEnvironment;
   };
 
-  meta = previous.meta // {
-    platforms = lib.intersectLists previous.meta.platforms ghidra.meta.platforms;
+  meta = rea.meta // {
+    platforms = lib.intersectLists rea.meta.platforms ghidra.meta.platforms;
   };
-})
+}

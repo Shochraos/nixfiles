@@ -698,23 +698,6 @@
         "url": "https://channels.nixos.org/nixpkgs-unstable/nixexprs.tar.zst"
       }
     },
-    "nixpkgs-millennium": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1794616728,
-        "narHash": "sha256-/ZszMgH8nLnUi0bqwF7XFAhOqs194owdbAdBtMb/so4=",
-        "owner": "NixOS",
-        "repo": "nixpkgs",
-        "rev": "6a8b0b558e9c17857c2bd80aa3585a947d345df2",
-        "type": "github"
-      },
-      "original": {
-        "owner": "NixOS",
-        "repo": "nixpkgs",
-        "rev": "6a8b0b558e9c17857c2bd80aa3585a947d345df2",
-        "type": "github"
-      }
-    },
     "nixpkgs-packages": {
       "locked": {
         "lastModified": 1793795574,
@@ -847,7 +830,6 @@
         "nix-index-database": "nix-index-database",
         "nixcord": "nixcord",
         "nixpkgs": "nixpkgs",
-        "nixpkgs-millennium": "nixpkgs-millennium",
         "sops-nix": "sops-nix",
         "stylix": "stylix",
         "treefmt-nix": "treefmt-nix_2",

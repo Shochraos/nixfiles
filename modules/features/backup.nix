@@ -2,48 +2,7 @@
   den.aspects.backup = _: {
     nixos =
       { config, pkgs, ... }:
-      let
-        borgbackupSphinxOverlay = _final: prev: {
-          borgbackup = prev.borgbackup.overrideAttrs (old: {
-            postPatch =
-              (old.postPatch or "")
-              + "\n"
-              + ''
-                test "$(grep -Fc '                except:' src/borg/testsuite/locking.py)" -eq 1
-                repositoryContexts=$(grep -Fc '            with self.repository:' src/borg/testsuite/repository.py)
-                substituteInPlace src/borg/testsuite/__init__.py \
-                  --replace-fail 'platform.set_flags(file.name, stat.UF_NODUMP)' \
-                    'platform.set_flags(file.name, stat.UF_NODUMP); has_lchflags = bool(platform.get_flags(file.name, os.stat(file.name)) & stat.UF_NODUMP)'
-                substituteInPlace src/borg/testsuite/locking.py \
-                  --replace-fail 'import random' $'import errno\nimport random' \
-                  --replace-fail '                except:' $'                except BaseException as error:\n                    if isinstance(error, OSError) and error.errno == errno.ESTALE:\n                        continue'
-                substituteInPlace src/borg/testsuite/repository.py \
-                  --replace-fail $'            with self.repository:\n                # the repo is only locked by a shared read lock, but to replay segments,\n                # we need an exclusive write lock - check if the lock gets upgraded.\n                self.assert_raises(LockFailed, lambda: len(self.repository))\n                upgrade.assert_called_once_with()' $'            # the repo is only locked by a shared read lock, but to replay segments,\n            # we need an exclusive write lock - check if the lock gets upgraded.\n            self.assert_raises(LockFailed, lambda: len(self.repository))\n            upgrade.assert_called_once_with()'
-                test "$((repositoryContexts - $(grep -Fc '            with self.repository:' src/borg/testsuite/repository.py)))" -eq 2
-              '';
-            preCheck =
-              (old.preCheck or "")
-              + "\n"
-              + ''
-                borgOriginalTmpDir="$TMPDIR"
-                mkdir -p "$TMPDIR/borg-check"
-                exec {borgTmpFd}<"$TMPDIR/borg-check"
-                export TMPDIR="/proc/$$/fd/$borgTmpFd"
-              '';
-            postCheck = ''
-              export TMPDIR="$borgOriginalTmpDir"
-              exec {borgTmpFd}<&-
-            ''
-            + (old.postCheck or "");
-            preInstallSphinx = ''
-              rm -rf .sphinx/man/man/_static
-            '';
-          });
-        };
-      in
       {
-        nixpkgs.overlays = [ borgbackupSphinxOverlay ];
-
         sops.secrets = {
           "backup/storagebox-host".owner = "shochraos";
           "backup/storagebox-user".owner = "shochraos";

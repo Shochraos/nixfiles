@@ -5,16 +5,6 @@ in
 {
   den.aspects.gaming.nixos =
     { pkgs, ... }:
-    let
-      millennium = pkgs.callPackage (
-        inputs.nixpkgs-millennium + /pkgs/by-name/mi/millennium/package.nix
-      ) { };
-      steamWithMillennium =
-        pkgs.callPackage (inputs.nixpkgs-millennium + /pkgs/by-name/st/steamWithMillennium/package.nix)
-          {
-            inherit millennium;
-          };
-    in
     {
       nixpkgs.overlays = [
         (_: prev: {
@@ -35,7 +25,7 @@ in
 
       programs.steam = {
         enable = true;
-        package = steamWithMillennium.override { extraArgs = "-pipewire"; };
+        package = pkgs.steamWithMillennium.override { extraArgs = "-pipewire"; };
         remotePlay.openFirewall = true;
       };
       programs.gamescope = {

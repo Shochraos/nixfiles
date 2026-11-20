@@ -1,10 +1,6 @@
 { inputs, config, ... }:
 let
   inherit (config) assets;
-
-  notoCjkStatic = _final: prev: {
-    noto-fonts-cjk-sans = prev.noto-fonts-cjk-sans.override { static = true; };
-  };
 in
 {
   den.aspects.theming = {
@@ -18,12 +14,19 @@ in
           papirus-icon-theme
         ];
 
-        nixpkgs.overlays = [ notoCjkStatic ];
-
-        fonts.packages = with pkgs; [
-          noto-fonts-cjk-sans
-          noto-fonts-cjk-serif
-        ];
+        fonts = {
+          enableDefaultPackages = false;
+          packages = with pkgs; [
+            dejavu_fonts
+            freefont_ttf
+            gyre-fonts
+            liberation_ttf
+            unifont
+            (noto-fonts-cjk-sans.override { static = true; })
+            noto-fonts-cjk-serif
+            noto-fonts-color-emoji
+          ];
+        };
 
         stylix = {
           enable = true;
