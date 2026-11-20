@@ -2,7 +2,7 @@
 
 The weekly job updates `flake.lock` once, then checks the flake and builds the NixOS toplevels for Azazel, Solas, Seere and Sitri. It does not activate them. Pull requests still use the lightweight `check` workflow on GitHub-hosted runners.
 
-The schedule is active once the workflow is merged into `main`. The automatic run starts every Monday at 05:00 UTC. No repository variable is required. To pause updates, disable **Weekly flake update** in the repository's Actions tab.
+The schedule is active once the workflow is merged into `main`. The automatic run starts every Monday at 05:00 UTC. No repository variable is required. To pause updates, disable **weekly-flake-update** in the repository's Actions tab.
 
 ## Setup before the first run
 
