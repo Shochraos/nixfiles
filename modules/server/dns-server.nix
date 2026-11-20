@@ -111,7 +111,6 @@
                   ipv6 = [ "fdba:457d:2cbe:10:12ff:e0ff:fe89:2a09" ];
                   aliases = [
                     "autobrr"
-                    "cloud"
                     "convert"
                     "fritz"
                     "git"
@@ -138,6 +137,7 @@
                   aliases = [
                     "attic"
                     "immich"
+                    "cloud"
                   ];
                 };
                 azazel = {

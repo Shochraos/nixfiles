@@ -9,6 +9,7 @@
         dns2 = "192.168.10.254:3000";
         attic = "192.168.10.2:8085";
         immich = "192.168.10.2:2283";
+        cloud = "192.168.10.2:8666";
       };
       unrestrictedSites = [ "proxy2" ];
       allowedClientRanges = [
