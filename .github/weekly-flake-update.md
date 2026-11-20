@@ -6,10 +6,10 @@ The schedule is active once the workflow is merged into `main`. The automatic ru
 
 ## Setup before the first run
 
-- Provide a Linux x86-64 Actions build runner labelled `nix-workspace` with sandboxed Nix, flakes enabled, sufficient disk space and access to the required binary caches. Use a disposable CI environment on the build infrastructure, not the development container with the writable `/projects` share. Give it no SSH agent, Docker socket, deployment credentials or access to user files. Do not let an untrusted build upload to a cache that the hosts trust. Labels select runners; they **do not** restrict which workflows can request one. Leave the runner unregistered unless jobs from untrusted workflows are excluded or fully isolated. See [GitHub's self-hosted runner security guidance](https://docs.github.com/en/actions/reference/security/secure-use#hardening-for-self-hosted-runners).
+- All workflow jobs run on GitHub-hosted `ubuntu-latest` runners; no self-hosted GitHub Actions build or notification runner is required. `Validate candidate` frees unused preinstalled SDKs before installing Nix and building the four host toplevels.
 - Allow the trusted publisher job to fast-forward `main` with its job token; do not relax branch protection for it.
 - Repair triggering runs locally on Astaroth instead of via a GitHub webhook or notification runner. No public webhook endpoint, Proton or UniFi port forward, extra Docker port, `hermes-notifier` runner, or GitHub `nix-update-notify` environment is required. Existing GitHub environment or secret settings from the retired notifier are not removed automatically; delete them manually in GitHub settings if no longer wanted.
-- Give the `nix-update-repair` Hermes profile a separate identity that cannot update or merge to upstream `main`; for example, publish its repair branch in a bot-owned fork and open a PR upstream. Keep the build runner, the local poller and the repair bot separate from the publisher's credentials.
+- Give the `nix-update-repair` Hermes profile a separate identity that cannot update or merge to upstream `main`; for example, publish its repair branch in a bot-owned fork and open a PR upstream. Keep the local poller and the repair bot separate from the publisher's credentials.
 - Optionally store a read-only fine-grained GitHub token (Actions read access on `Shochraos/nixfiles`) at `/opt/data/secrets/flake-repair-poller.token` with mode `600`. Because `Shochraos/nixfiles` is public, unauthenticated polling also works, but a shared VPN exit IP can hit GitHub's 60 requests/hour unauthenticated limit.
 - A manual `workflow_dispatch` run on `main` uses the same checks and can publish a passing lock update; it is not a dry run.
 
@@ -25,7 +25,7 @@ set -euo pipefail
 docker exec -u hermes hermes /opt/data/scripts/flake-repair-poller.sh
 ```
 
-Set the Unraid User Scripts custom cron schedule to **`0 8 * * 1`** (Monday 08:00 Europe/Berlin: 06:00 UTC in CEST and 07:00 UTC in CET). That gives the Monday 05:00 UTC workflow at least one full hour to finish without running a polling retry loop.
+Set the Unraid User Scripts custom cron schedule to **`0 9 * * 1`** (Monday 09:00 Europe/Berlin: 07:00 UTC in CEST and 08:00 UTC in CET). That gives the cold GitHub-hosted `ubuntu-latest` build two to three hours after the Monday 05:00 UTC start without running a polling retry loop.
 
 The checker queries the GitHub Actions API once, verifies the repository, workflow path, `main` branch, event, run attempt and head SHA, and triggers `hermes --profile nix-update-repair chat --oneshot --quiet --format stream-json --query-file -` only if the completed **Validate candidate** job failed at the **Check and build all hosts** step. It passes only validated run metadata and makes no model calls when no eligible failure exists.
 
