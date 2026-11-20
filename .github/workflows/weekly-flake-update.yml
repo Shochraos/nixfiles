@@ -19,9 +19,7 @@ defaults:
 jobs:
   prepare:
     name: Prepare candidate
-    if: >-
-      github.repository == 'Shochraos/nixfiles' && github.ref == 'refs/heads/main' &&
-      vars.WEEKLY_FLAKE_UPDATE_ENABLED == 'true'
+    if: github.repository == 'Shochraos/nixfiles' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     outputs:
       commit: ${{ steps.candidate.outputs.commit }}
