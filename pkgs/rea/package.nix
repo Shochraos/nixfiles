@@ -1,5 +1,6 @@
 {
   lib,
+  callPackage,
   fetchurl,
   ghidra,
   jdk21,
@@ -11,11 +12,7 @@
   python3,
   stdenv,
   versionCheckHook,
-  pythonEnvironment ? python3.withPackages (ps: [
-    ps.pwntools
-    ps.pyelftools
-    ps.unicorn
-  ]),
+  pythonEnvironment ? callPackage ./python.nix { inherit python3; },
 }:
 let
   fridaVersion = "17.23.2";
@@ -111,8 +108,15 @@ stdenv.mkDerivation {
       fi
     done
 
+    chmod +x "$dstPkg/scripts/rea.mjs"
+
     ${lib.optionalString (fridaBinding != null) (
       ''
+        packagedFridaVersion="$(${lib.getExe nodejs_24} -p "JSON.parse(require('node:fs').readFileSync('$dstPkg/node_modules/frida/package.json', 'utf8')).version")"
+        if [ "$packagedFridaVersion" != "${fridaVersion}" ]; then
+          echo "rea frida version mismatch: expected ${fridaVersion}, got $packagedFridaVersion" >&2
+          exit 1
+        fi
         tar -xzf ${fridaBinding} -C "$dstPkg/node_modules/frida" build/frida_binding.node
       ''
       + lib.optionalString stdenv.hostPlatform.isLinux ''

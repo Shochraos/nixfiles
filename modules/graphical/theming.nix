@@ -14,10 +14,19 @@ in
           papirus-icon-theme
         ];
 
-        fonts.packages = with pkgs; [
-          (noto-fonts-cjk-sans.override { static = true; })
-          noto-fonts-cjk-serif
-        ];
+        fonts = {
+          enableDefaultPackages = false;
+          packages = with pkgs; [
+            dejavu_fonts
+            freefont_ttf
+            gyre-fonts
+            liberation_ttf
+            unifont
+            (noto-fonts-cjk-sans.override { static = true; })
+            noto-fonts-cjk-serif
+            noto-fonts-color-emoji
+          ];
+        };
 
         stylix = {
           enable = true;
