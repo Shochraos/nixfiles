@@ -22,21 +22,21 @@ Schedule it as a plain cron job in **Unraid User Scripts**:
 ```bash
 #!/bin/bash
 set -euo pipefail
-docker exec hermes /opt/data/scripts/flake-repair-poller.sh
+docker exec -u hermes hermes /opt/data/scripts/flake-repair-poller.sh
 ```
 
 Set the Unraid User Scripts custom cron schedule to **`0 8 * * 1`** (Monday 08:00 Europe/Berlin: 06:00 UTC in CEST and 07:00 UTC in CET). That gives the Monday 05:00 UTC workflow at least one full hour to finish without running a polling retry loop.
 
-The checker queries the GitHub Actions API once, verifies the repository, workflow path, `main` branch, event, run attempt and head SHA, and triggers `hermes --profile nix-update-repair chat --oneshot --quiet --query-file -` only if the completed **Validate candidate** job failed at the **Check and build all hosts** step. It passes only validated run metadata and makes no model calls when no eligible failure exists.
+The checker queries the GitHub Actions API once, verifies the repository, workflow path, `main` branch, event, run attempt and head SHA, and triggers `hermes --profile nix-update-repair chat --oneshot --quiet --format stream-json --query-file -` only if the completed **Validate candidate** job failed at the **Check and build all hosts** step. It passes only validated run metadata and makes no model calls when no eligible failure exists.
 
 ### State, logs and manual runs
 
 - Attempt state and lock file live outside this repository at `/opt/data/state/flake-repair-poller/` (`poller.lock`, `attempts/<run-id>-<attempt>.json` and `logs/`).
-- Each `(run_id, run_attempt)` is launched at most once. A launch that fails before Hermes creates a session is marked `failed` and can be retried; a crash or abnormal exit after a session was accepted (or an interrupted launch) is marked `uncertain` (exit code `4`) so retries do not duplicate repairs. Check `hermes --profile nix-update-repair sessions list`, and pass `--reconcile-retry` only if you confirmed no repair session started.
+- Each `(run_id, run_attempt)` is launched at most once. A launch that fails before Hermes creates a session is marked `failed` and can be retried; a crash or abnormal exit after a session was accepted (or an interrupted launch) is marked `uncertain` (exit code `4`) so retries do not duplicate repairs. Check `docker exec -u hermes hermes hermes --profile nix-update-repair sessions list`, and pass `--reconcile-retry` only if you confirmed no repair session started.
 - To check a manual `workflow_dispatch` run on any day, or to re-check a Monday run that was still in progress (exit code `3`) or missed the 18-hour lookback window (exit code `2`):
 
 ```bash
-docker exec hermes /opt/data/scripts/flake-repair-poller.sh --run-id <RUN_ID>
+docker exec -u hermes hermes /opt/data/scripts/flake-repair-poller.sh --run-id <RUN_ID>
 ```
 
 - Pass `--dry-run` to verify a run and check deduplication state without writing state or launching Hermes, and `--attempt <N>` with `--run-id` to inspect a specific attempt.
