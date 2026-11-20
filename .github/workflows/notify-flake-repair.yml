@@ -1,0 +1,208 @@
+name: Notify flake repair
+
+on:
+  workflow_run:
+    workflows: [Weekly flake update]
+    types: [completed]
+    branches: [main]
+
+permissions: {}
+
+jobs:
+  detect:
+    name: Verify failed validation attempt
+    if: >-
+      github.repository == 'Shochraos/nixfiles' &&
+      github.workflow_ref == 'Shochraos/nixfiles/.github/workflows/notify-flake-repair.yml@refs/heads/main' &&
+      github.event.workflow_run.conclusion == 'failure'
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    permissions:
+      actions: read
+    outputs:
+      payload: ${{ steps.verify.outputs.payload }}
+    steps:
+      - name: Verify GitHub run and jobs
+        id: verify
+        shell: bash
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          node <<'NODE'
+          const { readFileSync, appendFileSync } = require('node:fs');
+          const repository = 'Shochraos/nixfiles';
+          const workflowName = 'Weekly flake update';
+          const workflowPath = '.github/workflows/weekly-flake-update.yml';
+          const isId = (value) => Number.isSafeInteger(value) && value > 0;
+          let phase = 'read the workflow_run event';
+
+          async function github(endpoint) {
+            const response = await fetch(`https://api.github.com/repos/${repository}/actions${endpoint}`, {
+              headers: {
+                Authorization: `Bearer ${process.env.GITHUB_TOKEN}`,
+                Accept: 'application/vnd.github+json',
+                'X-GitHub-Api-Version': '2022-11-28',
+              },
+              redirect: 'error',
+              signal: AbortSignal.timeout(10000),
+            });
+            if (response.status !== 200) throw new Error();
+            return response.json();
+          }
+
+          function skip(reason) {
+            console.log(`Skipping repair notification: ${reason}.`);
+          }
+
+          async function verify() {
+            const event = JSON.parse(readFileSync(process.env.GITHUB_EVENT_PATH, 'utf8'));
+            const trigger = event.workflow_run;
+            if (event.action !== 'completed' || !trigger || trigger.status !== 'completed' ||
+                trigger.conclusion !== 'failure' || trigger.name !== workflowName ||
+                event.workflow?.path !== workflowPath || trigger.head_branch !== 'main' ||
+                !['schedule', 'workflow_dispatch'].includes(trigger.event) ||
+                event.repository?.full_name !== repository || trigger.head_repository?.full_name !== repository ||
+                trigger.head_repository.id !== event.repository.id) {
+              return skip('origin is not allowlisted');
+            }
+
+            phase = 'validate triggering run identifiers';
+            if (![trigger.id, trigger.run_attempt, trigger.workflow_id, event.repository.id].every(isId) ||
+                event.workflow.id !== trigger.workflow_id || typeof trigger.head_sha !== 'string' ||
+                !/^[a-f0-9]{40}$/.test(trigger.head_sha) || !process.env.GITHUB_TOKEN) throw new Error();
+            const attempt = `/runs/${trigger.id}/attempts/${trigger.run_attempt}`;
+
+            phase = 'verify the GitHub run attempt';
+            const run = await github(attempt);
+            const sameRepo = (repo) => repo?.id === event.repository.id && repo.full_name === repository;
+            if (run.id !== trigger.id || run.run_attempt !== trigger.run_attempt ||
+                run.workflow_id !== trigger.workflow_id || run.name !== workflowName ||
+                ![workflowPath, `${workflowPath}@refs/heads/main`].includes(run.path) ||
+                run.head_branch !== 'main' || run.head_sha !== trigger.head_sha ||
+                !sameRepo(run.repository) || !sameRepo(run.head_repository) || run.event !== trigger.event ||
+                run.status !== 'completed' || run.conclusion !== 'failure') throw new Error();
+
+            phase = 'verify the GitHub attempt jobs';
+            const jobs = [];
+            let total;
+            for (let page = 1; ; page++) {
+              const batch = await github(`${attempt}/jobs?per_page=100&page=${page}`);
+              total ??= batch.total_count;
+              if (!Number.isSafeInteger(total) || total < 0 || total > 1000 || batch.total_count !== total ||
+                  !Array.isArray(batch.jobs) || batch.jobs.length !== Math.min(100, total - jobs.length) ||
+                  batch.jobs.some((job) => typeof job?.name !== 'string')) throw new Error();
+              jobs.push(...batch.jobs);
+              if (jobs.length === total) break;
+            }
+            const validation = jobs.filter((job) => job.name === 'Validate candidate' &&
+              !(isId(job.run_attempt) && job.run_attempt < run.run_attempt));
+            if (validation.length === 0) return skip('this attempt did not run candidate validation');
+            if (validation.length !== 1) throw new Error();
+            const [job] = validation;
+            if (job.run_id !== run.id || job.head_sha !== run.head_sha ||
+                (job.run_attempt !== undefined && job.run_attempt !== run.run_attempt) ||
+                job.status !== 'completed' || typeof job.conclusion !== 'string') throw new Error();
+            if (job.conclusion !== 'failure') return skip('the validation job did not fail');
+            if (!Array.isArray(job.steps) || job.steps.some((step) => typeof step?.name !== 'string')) throw new Error();
+            const checks = job.steps.filter((step) => step.name === 'Check and build all hosts');
+            if (checks.length === 0) return skip('the host check step did not run');
+            if (checks.length !== 1 || typeof checks[0].status !== 'string' ||
+                !Object.hasOwn(checks[0], 'conclusion')) throw new Error();
+            if (checks[0].status !== 'completed' || checks[0].conclusion !== 'failure') {
+              return skip('the host check step did not fail');
+            }
+
+            phase = 'write the verified notification payload';
+            const payload = JSON.stringify({
+              event_type: 'flake_update_failed', run_id: run.id, run_attempt: run.run_attempt,
+              repository, base_sha: run.head_sha,
+            });
+            appendFileSync(process.env.GITHUB_OUTPUT, `payload=${payload}\n`);
+          }
+
+          verify().catch(() => {
+            console.error(`::error::Repair notification detection failed: could not ${phase}.`);
+            process.exitCode = 1;
+          });
+          NODE
+
+  notify:
+    name: Notify Hermes of failed validation
+    needs: detect
+    if: needs.detect.result == 'success' && needs.detect.outputs.payload != ''
+    runs-on: [self-hosted, linux, hermes-notifier]
+    environment: nix-update-notify
+    timeout-minutes: 2
+    steps:
+      - name: Send signed notification
+        shell: bash
+        env:
+          PAYLOAD: ${{ needs.detect.outputs.payload }}
+          HERMES_REPAIR_WEBHOOK_URL: ${{ secrets.HERMES_REPAIR_WEBHOOK_URL }}
+          HERMES_REPAIR_WEBHOOK_SECRET: ${{ secrets.HERMES_REPAIR_WEBHOOK_SECRET }}
+          NODE_TLS_REJECT_UNAUTHORIZED: '1'
+        run: |
+          node <<'NODE'
+          const { createHmac } = require('node:crypto');
+          const isId = (value) => Number.isSafeInteger(value) && value > 0;
+          let phase = 'validate notification inputs';
+
+          async function notify() {
+            const { event_type, run_id, run_attempt, repository, base_sha } = JSON.parse(process.env.PAYLOAD);
+            if (event_type !== 'flake_update_failed' || repository !== 'Shochraos/nixfiles' ||
+                !isId(run_id) || !isId(run_attempt) || typeof base_sha !== 'string' ||
+                !/^[a-f0-9]{40}$/.test(base_sha)) throw new Error();
+            const body = JSON.stringify({ event_type, run_id, run_attempt, repository, base_sha });
+            const requestId = `flake-update-failed:${repository}:${run_id}:${run_attempt}`;
+
+            phase = 'validate webhook configuration';
+            const url = new URL(process.env.HERMES_REPAIR_WEBHOOK_URL);
+            const key = process.env.HERMES_REPAIR_WEBHOOK_SECRET;
+            if (url.protocol !== 'https:' || url.username || url.password || url.hash ||
+                !key?.trim() || key === 'INSECURE_NO_AUTH') throw new Error();
+            const timestamp = String(Math.floor(Date.now() / 1000));
+            const signature = createHmac('sha256', key).update(`${timestamp}.${body}`).digest('hex');
+
+            phase = 'send the HTTPS request';
+            const response = await fetch(url, {
+              method: 'POST',
+              redirect: 'manual',
+              signal: AbortSignal.timeout(15000),
+              headers: {
+                'Content-Type': 'application/json',
+                'X-Request-ID': requestId,
+                'X-Webhook-Timestamp': timestamp,
+                'X-Webhook-Signature-V2': signature,
+              },
+              body,
+            });
+            if (response.status !== 202 && response.status !== 200) {
+              phase = `get a successful HTTP response (HTTP ${response.status})`;
+              await response.body?.cancel();
+              throw new Error();
+            }
+
+            phase = 'validate the Hermes acknowledgement';
+            let bytes = 0;
+            const chunks = [];
+            for await (const chunk of response.body) {
+              bytes += chunk.byteLength;
+              if (bytes > 8192) throw new Error();
+              chunks.push(chunk);
+            }
+            const ack = JSON.parse(Buffer.concat(chunks).toString('utf8'));
+            if (ack?.delivery_id !== requestId) throw new Error();
+            if (response.status === 202 && ack.status === 'accepted' && ack.event === event_type) {
+              console.log('Hermes accepted the repair notification.');
+            } else if (response.status === 200 && ack.status === 'duplicate') {
+              console.log('Hermes already accepted this repair notification.');
+            } else {
+              throw new Error();
+            }
+          }
+
+          notify().catch(() => {
+            console.error(`::error::Repair notification delivery failed: could not ${phase}.`);
+            process.exitCode = 1;
+          });
+          NODE

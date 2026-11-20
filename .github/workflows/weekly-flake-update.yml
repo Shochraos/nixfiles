@@ -1,0 +1,117 @@
+name: Weekly flake update
+
+on:
+  schedule:
+    - cron: "0 5 * * 1"
+  workflow_dispatch:
+
+concurrency:
+  group: weekly-flake-update-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  prepare:
+    name: Prepare candidate
+    if: >-
+      github.repository == 'Shochraos/nixfiles' && github.ref == 'refs/heads/main' &&
+      vars.WEEKLY_FLAKE_UPDATE_ENABLED == 'true'
+    runs-on: ubuntu-latest
+    outputs:
+      commit: ${{ steps.candidate.outputs.commit }}
+      sha256: ${{ steps.candidate.outputs.sha256 }}
+      artifact: ${{ steps.upload.outputs.artifact-id }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Install Nix with flakes enabled
+        uses: cachix/install-nix-action@3dc140bfc76c49fbd4dd958429132e3746bcb086
+        with:
+          extra_nix_config: |
+            experimental-features = nix-command flakes
+      - name: Prepare lock-only commit
+        id: candidate
+        run: bash .github/scripts/weekly-flake-update.sh prepare "$RUNNER_TEMP/flake-candidate"
+      - name: Preserve candidate
+        if: steps.candidate.outputs.commit != ''
+        id: upload
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
+        with:
+          name: flake-candidate-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/flake-candidate/
+          if-no-files-found: error
+
+  validate:
+    name: Validate candidate
+    needs: prepare
+    if: needs.prepare.outputs.commit != ''
+    runs-on: [self-hosted, linux, x64, nix-workspace]
+    env:
+      CANDIDATE_COMMIT: ${{ needs.prepare.outputs.commit }}
+      CANDIDATE_SHA256: ${{ needs.prepare.outputs.sha256 }}
+    outputs:
+      commit: ${{ steps.build.outcome == 'success' && env.CANDIDATE_COMMIT || '' }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Download candidate
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333
+        with:
+          artifact-ids: ${{ needs.prepare.outputs.artifact || 'missing' }}
+          path: ${{ runner.temp }}/flake-candidate
+      - name: Recreate candidate and verify runner
+        run: |
+          bash .github/scripts/weekly-flake-update.sh restore "$RUNNER_TEMP/flake-candidate" "$CANDIDATE_COMMIT" "$CANDIDATE_SHA256"
+          git switch --detach "$CANDIDATE_COMMIT"
+          nix --extra-experimental-features 'nix-command flakes' store info
+      - name: Check and build all hosts
+        id: build
+        run: |
+          flake="git+file://$PWD?rev=$CANDIDATE_COMMIT"
+          nix_locked=(nix --extra-experimental-features 'nix-command flakes')
+          "${nix_locked[@]}" flake check --no-update-lock-file --print-build-logs "$flake"
+          targets=()
+          for host in Azazel Solas Seere Sitri; do
+            target="$flake#nixosConfigurations.$host.config.system.build.toplevel"
+            drv=$("${nix_locked[@]}" eval --no-update-lock-file --raw "$target.drvPath")
+            printf '%s: %s\n' "$host" "$drv"
+            targets+=("$target")
+          done
+          "${nix_locked[@]}" build --no-update-lock-file --no-link --keep-going --print-build-logs "${targets[@]}"
+
+  publish:
+    name: Publish candidate
+    needs: [prepare, validate]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      CANDIDATE_COMMIT: ${{ needs.prepare.outputs.commit }}
+      CANDIDATE_SHA256: ${{ needs.prepare.outputs.sha256 }}
+      TESTED_COMMIT: ${{ needs.validate.outputs.commit }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: true
+      - name: Download candidate
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333
+        with:
+          artifact-ids: ${{ needs.prepare.outputs.artifact || 'missing' }}
+          path: ${{ runner.temp }}/flake-candidate
+      - name: Publish tested commit
+        run: |
+          test "$TESTED_COMMIT" = "$CANDIDATE_COMMIT"
+          bash .github/scripts/weekly-flake-update.sh publish "$RUNNER_TEMP/flake-candidate" "$TESTED_COMMIT" "$CANDIDATE_SHA256"
