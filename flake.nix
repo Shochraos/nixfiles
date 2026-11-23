@@ -49,7 +49,7 @@
 
     ### Boot ###
     acid-boot = {
-      url = "https://github.com/Sirulex/nix-acid-boot";
+      url = "github:Sirulex/nix-acid-boot";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
