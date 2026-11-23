@@ -2,22 +2,33 @@
 
 The weekly job updates `flake.lock` once, then checks the flake and builds the NixOS toplevels for Azazel, Solas, Seere and Sitri. It does not activate them. Pull requests still use the lightweight `check` workflow on GitHub-hosted runners.
 
-The schedule is active once the workflow is merged into `main`. The automatic run starts every Monday at 05:00 UTC. No repository variable is required. To pause updates, disable **weekly-flake-update** in the repository's Actions tab.
+Astaroth triggers the workflow via `workflow_dispatch` every Monday at 05:00 Europe/Berlin instead of using GitHub Actions' `schedule` trigger, which can lag by hours or drop queued runs. No repository variable is required. To pause updates, disable **weekly-flake-update** in the repository's Actions tab; the local dispatcher checks the workflow state first and exits cleanly when it is not active.
 
 ## Setup before the first run
 
 - All workflow jobs run on GitHub-hosted `ubuntu-latest` runners; no self-hosted GitHub Actions build or notification runner is required. `Validate candidate` frees unused preinstalled SDKs before installing Nix and building the four host toplevels.
 - Allow the trusted publisher job to fast-forward `main` with its job token; do not relax branch protection for it.
-- Repair triggering runs locally on Astaroth instead of via a GitHub webhook or notification runner. No public webhook endpoint, Proton or UniFi port forward, extra Docker port, `hermes-notifier` runner, or GitHub `nix-update-notify` environment is required. Existing GitHub environment or secret settings from the retired notifier are not removed automatically; delete them manually in GitHub settings if no longer wanted.
+- Weekly dispatch and repair triggering run locally on Astaroth instead of via GitHub `schedule`, a webhook or a notification runner. No public webhook endpoint, Proton or UniFi port forward, extra Docker port, `hermes-notifier` runner, or GitHub `nix-update-notify` environment is required. Existing GitHub environment or secret settings from the retired notifier are not removed automatically; delete them manually in GitHub settings if no longer wanted.
 - Give the `nix-update-repair` Hermes profile a separate identity that cannot update or merge to upstream `main`; for example, publish its repair branch in a bot-owned fork and open a PR upstream. Keep the local poller and the repair bot separate from the publisher's credentials.
+- Store a fine-grained GitHub token scoped only to `Shochraos/nixfiles` with **Actions: Read and write** permission (no `Contents` or `Pull requests` access) at `/opt/data/secrets/flake-update-dispatch.token` with mode `600`, owned by `hermes`. Keep this dispatch token separate from both the poller and `nix-update-repair`.
 - Optionally store a read-only fine-grained GitHub token (Actions read access on `Shochraos/nixfiles`) at `/opt/data/secrets/flake-repair-poller.token` with mode `600`. Because `Shochraos/nixfiles` is public, unauthenticated polling also works, but a shared VPN exit IP can hit GitHub's 60 requests/hour unauthenticated limit.
 - A manual `workflow_dispatch` run on `main` uses the same checks and can publish a passing lock update; it is not a dry run.
 
-## Local repair checker on Astaroth
+## Local dispatch and repair checker on Astaroth
 
-The single-shot checker lives on Astaroth's persistent Hermes data mount at `/opt/data/scripts/flake-repair-poller.sh` and runs inside the `hermes` container. Because `hermes` shares `network_mode: "service:hermes-vpn"`, outbound GitHub API requests go through ProtonVPN rather than the Unraid host's default route, and Hermes is invoked locally without any inbound port.
+Both single-shot helpers live on Astaroth's persistent Hermes data mount (`/opt/data/scripts/flake-update-dispatch.sh` and `/opt/data/scripts/flake-repair-poller.sh`) and run inside the `hermes` container. Because `hermes` shares `network_mode: "service:hermes-vpn"`, outbound GitHub API requests go through ProtonVPN rather than the Unraid host's default route, and Hermes is invoked locally without any inbound port.
 
-Schedule it as a plain cron job in **Unraid User Scripts**:
+Configure two plain cron jobs in **Unraid User Scripts**:
+
+1. **Weekly flake update dispatch** with custom cron schedule `0 5 * * 1` (Monday 05:00 Europe/Berlin):
+
+```bash
+#!/bin/bash
+set -euo pipefail
+docker exec -u hermes hermes /opt/data/scripts/flake-update-dispatch.sh
+```
+
+2. **Weekly flake repair and cache-warm checker** with custom cron schedule `0 9 * * 1` (Monday 09:00 Europe/Berlin):
 
 ```bash
 #!/bin/bash
@@ -25,21 +36,24 @@ set -euo pipefail
 docker exec -u hermes hermes /opt/data/scripts/flake-repair-poller.sh
 ```
 
-Set the Unraid User Scripts custom cron schedule to **`0 9 * * 1`** (Monday 09:00 Europe/Berlin: 07:00 UTC in CEST and 08:00 UTC in CET). That gives the cold GitHub-hosted `ubuntu-latest` build two to three hours after the Monday 05:00 UTC start without running a polling retry loop.
+Running both cron entries on Astaroth's local `Europe/Berlin` clock gives the cold GitHub-hosted `ubuntu-latest` build a consistent four-hour window across CET and CEST without a polling retry loop.
 
-The checker queries the GitHub Actions API once, verifies the repository, workflow path, `main` branch, event, run attempt and head SHA, and triggers `hermes --profile nix-update-repair chat --oneshot --quiet --format stream-json --query-file -` only if the completed **Validate candidate** job failed at the **Check and build all hosts** step. It passes only validated run metadata and makes no model calls when no eligible failure exists.
+At 05:00, `flake-update-dispatch.sh` verifies that `weekly-flake-update` is `active`, skips if a non-cancelled `workflow_dispatch` or `schedule` run on `main` already started in the last 12 hours, and otherwise posts `workflow_dispatch` for `main`.
+
+At 09:00, `flake-repair-poller.sh` queries the GitHub Actions API once, finds the latest `workflow_dispatch` (or `schedule`) run on `main` in the last 18 hours, and verifies the repository, workflow path, `main` branch, event, run attempt and head SHA. On a completed `success`, it builds all four host toplevels on `nix-workspace` over SSH to warm the Attic cache. If **Validate candidate** failed at **Check and build all hosts**, it triggers `hermes --profile nix-update-repair chat --oneshot --quiet --format stream-json --continue "Bot Chat" --query-file -` with validated run metadata only. Other outcomes make no model calls.
 
 ### State, logs and manual runs
 
-- Attempt state and lock file live outside this repository at `/opt/data/state/flake-repair-poller/` (`poller.lock`, `attempts/<run-id>-<attempt>.json` and `logs/`).
-- Each `(run_id, run_attempt)` is launched at most once. A launch that fails before Hermes creates a session is marked `failed` and can be retried; a crash or abnormal exit after a session was accepted (or an interrupted launch) is marked `uncertain` (exit code `4`) so retries do not duplicate repairs. Check `docker exec -u hermes hermes hermes --profile nix-update-repair sessions list`, and pass `--reconcile-retry` only if you confirmed no repair session started.
-- To check a manual `workflow_dispatch` run on any day, or to re-check a Monday run that was still in progress (exit code `3`) or missed the 18-hour lookback window (exit code `2`):
+- Dispatcher lock and receipt live at `/opt/data/state/flake-update-dispatch/` (`dispatch.lock` and `last-dispatch.json`). Pass `--dry-run` to verify the token, workflow state and 12-hour deduplication window without dispatching, `--dedupe-hours <N>` to change that window, or `--force` to dispatch despite a recent run.
+- Poller attempt state and lock file live outside this repository at `/opt/data/state/flake-repair-poller/` (`poller.lock`, `attempts/<run-id>-<attempt>.json` and `logs/`).
+- Each `(run_id, run_attempt)` is launched at most once. A launch that fails before Hermes creates a session (or a failed SSH cache-warm build) is marked `failed` and can be retried; a crash or abnormal exit after a session was accepted (or an interrupted launch) is marked `uncertain` (exit code `4`) so retries do not duplicate work. Check `docker exec -u hermes hermes hermes --profile nix-update-repair sessions list` (or active builds on `nix-workspace` for `cache_warm`), and pass `--reconcile-retry` only after confirming nothing is running.
+- To check a specific run on any day, or to re-check a Monday run that was still in progress (exit code `3`) or fell outside the 18-hour lookback window (exit code `2`):
 
 ```bash
 docker exec -u hermes hermes /opt/data/scripts/flake-repair-poller.sh --run-id <RUN_ID>
 ```
 
-- Pass `--dry-run` to verify a run and check deduplication state without writing state or launching Hermes, and `--attempt <N>` with `--run-id` to inspect a specific attempt.
+- Pass `--dry-run` to verify a run and check deduplication state without writing state or launching work, and `--attempt <N>` with `--run-id` to inspect a specific attempt.
 
 ## Reading a run
 
