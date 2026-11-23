@@ -43,6 +43,7 @@
                 config.assets.hermesDesktopSelectionOnlyPatch
                 config.assets.hermesDesktopRefinerTitlePatch
                 config.assets.hermesDesktopContextMeterPatch
+                config.assets.hermesDesktopArchivedCheckoutsPatch
               ];
               patchFlags = (previous.patchFlags or [ "-p1" ]) ++ [ "--fuzz=0" ];
             });
