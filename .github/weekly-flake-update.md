@@ -10,25 +10,41 @@ Astaroth triggers the workflow via `workflow_dispatch` every Monday at 05:00 Eur
 - Allow the trusted publisher job to fast-forward `main` with its job token; do not relax branch protection for it.
 - Weekly dispatch and repair triggering run locally on Astaroth instead of via GitHub `schedule`, a webhook or a notification runner. No public webhook endpoint, Proton or UniFi port forward, extra Docker port, `hermes-notifier` runner, or GitHub `nix-update-notify` environment is required. Existing GitHub environment or secret settings from the retired notifier are not removed automatically; delete them manually in GitHub settings if no longer wanted.
 - Give the `nix-update-repair` Hermes profile a separate identity that cannot update or merge to upstream `main`; for example, publish its repair branch in a bot-owned fork and open a PR upstream. Keep the local poller and the repair bot separate from the publisher's credentials.
-- Store a fine-grained GitHub token scoped only to `Shochraos/nixfiles` with **Actions: Read and write** permission (no `Contents` or `Pull requests` access) at `/opt/data/secrets/flake-update-dispatch.token` with mode `600`, owned by `hermes`. Keep this dispatch token separate from both the poller and `nix-update-repair`.
+- Create a fine-grained GitHub token for `Shochraos/nixfiles` with **Actions: Read and write**. Do not grant Contents or Pull requests access. Store the token outside Hermes, as described below.
 - Optionally store a read-only fine-grained GitHub token (Actions read access on `Shochraos/nixfiles`) at `/opt/data/secrets/flake-repair-poller.token` with mode `600`. Because `Shochraos/nixfiles` is public, unauthenticated polling also works, but a shared VPN exit IP can hit GitHub's 60 requests/hour unauthenticated limit.
 - A manual `workflow_dispatch` run on `main` uses the same checks and can publish a passing lock update; it is not a dry run.
 
 ## Local dispatch and repair checker on Astaroth
 
-Both single-shot helpers live on Astaroth's persistent Hermes data mount (`/opt/data/scripts/flake-update-dispatch.sh` and `/opt/data/scripts/flake-repair-poller.sh`) and run inside the `hermes` container. Because `hermes` shares `network_mode: "service:hermes-vpn"`, outbound GitHub API requests go through ProtonVPN rather than the Unraid host's default route, and Hermes is invoked locally without any inbound port.
+The dispatcher runs in a disposable container using the local `hermes` image. It uses the running `hermes` container's network namespace without mounting its data or sharing its process namespace. The existing poller keeps running inside `hermes` without the dispatch token mounted there.
 
-Configure two plain cron jobs in **Unraid User Scripts**:
+### Set up the 05:00 dispatcher
 
-1. **Weekly flake update dispatch** with custom cron schedule `0 5 * * 1` (Monday 05:00 Europe/Berlin):
+On Astaroth, copy the reviewed [dispatcher script](scripts/flake-update-dispatch.sh) to `/mnt/user/appdata/flake-update-dispatch/dispatch.sh`. Keep that directory and its `state/` subdirectory root-owned with mode `700`. Save the token in `token` in the same directory, owned by root with mode `600`. Use a private host path outside any share or bind mount accessible to Hermes. Check mount sources with `docker inspect --format '{{range .Mounts}}{{println .Source}}{{end}}' hermes`. Do not run the host job from the shared project checkout.
+
+Add the following as **Weekly flake update dispatch** in **Unraid User Scripts**. Leave its schedule disabled while testing:
 
 ```bash
 #!/bin/bash
 set -euo pipefail
-docker exec -u hermes hermes /opt/data/scripts/flake-update-dispatch.sh
+root=/mnt/user/appdata/flake-update-dispatch
+image=$(docker inspect --type container --format '{{.Image}}' hermes)
+docker run --rm --pull never --network container:hermes --no-healthcheck \
+  --read-only --cap-drop ALL --security-opt no-new-privileges \
+  --user 0:0 --entrypoint /bin/bash \
+  --mount "type=bind,source=$root/dispatch.sh,target=/run/flake-update-dispatch/dispatch.sh,readonly" \
+  --mount "type=bind,source=$root/token,target=/run/flake-update-dispatch/token,readonly" \
+  --mount "type=bind,source=$root/state,target=/run/flake-update-dispatch/state" \
+  "$image" /run/flake-update-dispatch/dispatch.sh
 ```
 
-2. **Weekly flake repair and cache-warm checker** with custom cron schedule `0 9 * * 1` (Monday 09:00 Europe/Berlin):
+Before switching, confirm the token directory is not exposed to `hermes` and test with `--dry-run` appended to the final line. This checks the container, token authentication and workflow reads, not Actions write permission. Then run it once without `--dry-run` outside the Monday schedule window and confirm the matching run appears in GitHub Actions. That test is a live update and can publish a passing `flake.lock`.
+
+Only after the live test creates a run, merge the workflow change to remove GitHub's old schedule, then set the Astaroth User Script to `0 5 * * 1` (Monday 05:00 Europe/Berlin). Make the switch between Monday run windows. Do not enable both schedules for the same Monday: the local dispatch comes before GitHub's old 05:00 UTC slot.
+
+### Keep the 09:00 poller
+
+Keep the existing repair and cache-warm checker in **Unraid User Scripts** at `0 9 * * 1` (Monday 09:00 Europe/Berlin):
 
 ```bash
 #!/bin/bash
@@ -38,13 +54,13 @@ docker exec -u hermes hermes /opt/data/scripts/flake-repair-poller.sh
 
 Running both cron entries on Astaroth's local `Europe/Berlin` clock gives the cold GitHub-hosted `ubuntu-latest` build a consistent four-hour window across CET and CEST without a polling retry loop.
 
-At 05:00, `flake-update-dispatch.sh` verifies that `weekly-flake-update` is `active`, skips if a non-cancelled `workflow_dispatch` or `schedule` run on `main` already started in the last 12 hours, and otherwise posts `workflow_dispatch` for `main`.
+At 05:00, the dispatcher checks that `weekly-flake-update` is active. It skips if it already attempted a dispatch in the last 12 hours or GitHub shows a recent `workflow_dispatch` or `schedule` run on `main` that was not cancelled or skipped.
 
-At 09:00, `flake-repair-poller.sh` queries the GitHub Actions API once, finds the latest `workflow_dispatch` (or `schedule`) run on `main` in the last 18 hours, and verifies the repository, workflow path, `main` branch, event, run attempt and head SHA. On a completed `success`, it builds all four host toplevels on `nix-workspace` over SSH to warm the Attic cache. If **Validate candidate** failed at **Check and build all hosts**, it triggers `hermes --profile nix-update-repair chat --oneshot --quiet --format stream-json --continue "Bot Chat" --query-file -` with validated run metadata only. Other outcomes make no model calls.
+At 09:00, `flake-repair-poller.sh` finds the latest non-cancelled, non-skipped `workflow_dispatch` or `schedule` run on `main` in the last 18 hours. It verifies the repository, workflow path, branch, event, run attempt and head SHA. On success, it builds all four host toplevels on `nix-workspace` to warm the Attic cache. If **Validate candidate** failed at **Check and build all hosts**, it starts **Nix Update Repair** with verified run metadata. Other outcomes make no model calls.
 
 ### State, logs and manual runs
 
-- Dispatcher lock and receipt live at `/opt/data/state/flake-update-dispatch/` (`dispatch.lock` and `last-dispatch.json`). Pass `--dry-run` to verify the token, workflow state and 12-hour deduplication window without dispatching, `--dedupe-hours <N>` to change that window, or `--force` to dispatch despite a recent run.
+- The dispatcher writes `state/last-dispatch.json` before asking GitHub to start a run. If GitHub's response is lost, it won't retry within 12 hours. Check GitHub Actions before starting another run. `--dry-run` checks GitHub without changing or consulting the local receipt.
 - Poller attempt state and lock file live outside this repository at `/opt/data/state/flake-repair-poller/` (`poller.lock`, `attempts/<run-id>-<attempt>.json` and `logs/`).
 - Each `(run_id, run_attempt)` is launched at most once. A launch that fails before Hermes creates a session (or a failed SSH cache-warm build) is marked `failed` and can be retried; a crash or abnormal exit after a session was accepted (or an interrupted launch) is marked `uncertain` (exit code `4`) so retries do not duplicate work. Check `docker exec -u hermes hermes hermes --profile nix-update-repair sessions list` (or active builds on `nix-workspace` for `cache_warm`), and pass `--reconcile-retry` only after confirming nothing is running.
 - To check a specific run on any day, or to re-check a Monday run that was still in progress (exit code `3`) or fell outside the 18-hour lookback window (exit code `2`):
