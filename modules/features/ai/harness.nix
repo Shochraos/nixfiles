@@ -65,7 +65,13 @@
       services.hermes-agent.package = hermesPackage;
       programs.hermes-agent.desktop = {
         enable = true;
-        package = hermesDesktop;
+        package = hermesDesktop.overrideAttrs (previous: {
+          postInstall = (previous.postInstall or "") + ''
+            substituteInPlace "$out/share/applications/com.nousresearch.hermes.desktop" \
+              --replace-fail "Exec=$out/bin/hermes-desktop" \
+              "Exec=${pkgs.coreutils}/bin/env HERMES_DESKTOP_DISABLE_GPU=0 $out/bin/hermes-desktop"
+          '';
+        });
       };
 
     };
