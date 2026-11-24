@@ -67,6 +67,7 @@
 
               file_scan_exclusions = [
                 "**/.hermes"
+                "**/.superpowers"
                 "**/.direnv"
                 "..."
               ];
