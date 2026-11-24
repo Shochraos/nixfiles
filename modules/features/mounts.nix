@@ -15,6 +15,7 @@
             "backups"
             "data"
             "misc"
+            "projects"
           ];
           needsNetworkReadiness = host.name == "Solas";
           networkReady = pkgs.writeShellScript "astaroth-network-ready" ''
