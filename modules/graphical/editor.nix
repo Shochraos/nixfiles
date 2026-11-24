@@ -65,6 +65,11 @@
                 metrics = false;
               };
 
+              file_scan_exclusions = [
+                "**/.hermes"
+                "**/.direnv"
+                "..."
+              ];
               load_direnv = "direct";
               base_keymap = "VSCode";
 
