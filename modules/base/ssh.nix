@@ -12,6 +12,7 @@
     provides.to-users.homeManager =
       {
         config,
+        host,
         lib,
         osConfig,
         ...
@@ -34,6 +35,17 @@
               HostKeyAlias = "astaroth";
               StrictHostKeyChecking = "yes";
             };
+            nix-workspace =
+              lib.mkIf
+                (lib.elem host.name [
+                  "Azazel"
+                  "Solas"
+                ])
+                {
+                  HostName = "192.168.10.2";
+                  Port = 2222;
+                  User = "agent";
+                };
             "*" = {
               AddKeysToAgent = "yes";
               IdentityFile = osConfig.host.sshKey;
