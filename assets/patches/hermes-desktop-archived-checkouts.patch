@@ -1,0 +1,3263 @@
+diff --git a/apps/desktop/electron/main.ts b/apps/desktop/electron/main.ts
+index edcf51f33a687379dbe8eb9c6350a58044af65b4..2f56204730810b51b10d37a4a6a7c37ea0785ef2 100644
+--- a/apps/desktop/electron/main.ts
++++ b/apps/desktop/electron/main.ts
+@@ -488,6 +488,7 @@ import {
+   remoteProfileQueryScope,
+   settleRemoteProfileSessions,
+   shouldIncludeLocalRegistrySessionSource,
++  stripSessionListBackendIds,
+   tagPrimaryAggregateRows,
+   tagRegistrySessionResponse,
+   tagRemoteSessionRows
+@@ -14816,6 +14817,8 @@ async function fetchJsonForBackend(
+     }
+   }
+ 
++  const stripBackendIds = <T>(data: T) => stripSessionListBackendIds(path, data)
++
+   if (descriptor.authMode === 'oauth') {
+     const options = { method: opts.method, body: opts.body, timeoutMs: opts.timeoutMs, headers: descriptor.headers }
+ 
+@@ -14831,7 +14834,7 @@ async function fetchJsonForBackend(
+ 
+         return fetchJsonViaOauthSession(url, options)
+       }
+-    })
++    }).then(stripBackendIds)
+   }
+ 
+   return fetchJson(url, descriptor.token, {
+@@ -14841,7 +14844,7 @@ async function fetchJsonForBackend(
+     timeoutMs: opts.timeoutMs,
+     headers: descriptor.headers,
+     gatewayDescriptor: descriptor.gatewayEndpoint ? descriptor : undefined
+-  })
++  }).then(stripBackendIds)
+ }
+ 
+ ipcMain.handle('hermes:connection-config:probe', async (_event, rawUrl) => probeRemoteAuthMode(rawUrl, fetchPublicJson))
+@@ -15288,8 +15291,8 @@ async function interceptSessionRequestForRemote(request, registryConnectionId =
+ 
+     const [recents, cron, messaging] = await Promise.all([
+       fetchProfilesSessionSlice(recentsSp, remoteProfiles, registrySources, registryConnectionId),
+-      fetchProfilesSessionSlice(cronSp, remoteProfiles, registrySources, registryConnectionId),
+-      fetchProfilesSessionSlice(messagingSp, remoteProfiles, registrySources, registryConnectionId)
++      fetchProfilesSessionSlice(cronSp, remoteProfiles, registrySources, registryConnectionId, false),
++      fetchProfilesSessionSlice(messagingSp, remoteProfiles, registrySources, registryConnectionId, false)
+     ])
+ 
+     return assembleSidebarSessionSlices(recents, cron, messaging)
+@@ -15429,7 +15432,7 @@ async function remoteOwnerProfileForSession(sessionId: string) {
+ // returns data (never `undefined`) so a batched caller can compose slices. A
+ // specific local profile reads from the local primary; a remote-override profile
+ // reads from its remote; 'all' merges every remote into the primary aggregate.
+-async function fetchProfilesSessionSlice(searchParams, remoteProfiles, registrySources = null, pinnedConnectionId = null) {
++async function fetchProfilesSessionSlice(searchParams, remoteProfiles, registrySources = null, pinnedConnectionId = null, includeProjectFolders = true) {
+   const requested = (searchParams.get('profile') || 'all').trim() || 'all'
+ 
+   if (requested !== 'all') {
+@@ -15442,7 +15445,7 @@ async function fetchProfilesSessionSlice(searchParams, remoteProfiles, registryS
+     })
+   }
+ 
+-  return mergeRemoteProfileSessions(searchParams, remoteProfiles, registrySources, pinnedConnectionId)
++  return mergeRemoteProfileSessions(searchParams, remoteProfiles, registrySources, pinnedConnectionId, includeProjectFolders)
+ }
+ 
+ // Unified list: primary's local aggregate, with each remote profile's stale local
+@@ -15451,20 +15454,21 @@ async function fetchProfilesSessionSlice(searchParams, remoteProfiles, registryS
+ // than breaking the sidebar. Connected registry gateways' sessions are spliced
+ // in too (#88880) — the unified Sessions list shows EVERY connected gateway's
+ // chats, tagged with connection_id + profile so opens route correctly.
+-async function mergeRemoteProfileSessions(searchParams, remoteProfiles, registrySourcesOverride = null, pinned = null) {
++async function mergeRemoteProfileSessions(searchParams, remoteProfiles, registrySourcesOverride = null, pinned = null, includeProjectFolders = true) {
+   const limit = Math.max(1, Number(searchParams.get('limit')) || 20)
+   const offset = Math.max(0, Number(searchParams.get('offset')) || 0)
+   const order = searchParams.get('order') === 'created' ? 'started_at' : 'last_active'
++  const archivedOnly = searchParams.get('archived') === 'only'
++  const enrichProjectFolders = includeProjectFolders && !archivedOnly
++
++  const getRegistryJson = (descriptor, path, options?: { profileScoped: true }) =>
++    getJsonForBackend(descriptor, path, { ...options, timeoutMs: options?.profileScoped ? 2_500 : 10_000 })
+ 
+   const base = (await fetchPrimaryProfileSessions(searchParams, fetchJsonForProfile, {
+     prefixForMerge: true,
+     aggregate: globalRemoteSessions.fetchOptions()
+   })) as any
+ 
+-  if (pinned) {
+-    await tagPrimaryAggregateRows(base, globalRemoteSessions.aggregateBackend, pinned)
+-  }
+-
+   // Over-fetch each remote from offset 0 (limit+offset rows) so the merged window
+   // is correct for this page — mirrors the primary's per-profile over-fetch.
+   const remoteParams = new URLSearchParams(searchParams)
+@@ -15472,7 +15476,15 @@ async function mergeRemoteProfileSessions(searchParams, remoteProfiles, registry
+   remoteParams.set('offset', '0')
+ 
+   const remoteSet = new Set(remoteProfiles)
+-  const merged = rowsOf(base).filter(s => !remoteSet.has(s?.profile))
++  const primaryRows = rowsOf(base).filter(s => !remoteSet.has(s?.profile))
++  const merged = [...primaryRows]
++
++  const primaryConnectionId = merged.length && pinned
++    ? await tagPrimaryAggregateRows(
++        { sessions: merged }, globalRemoteSessions.aggregateBackend, pinned, enrichProjectFolders ? getRegistryJson : undefined
++      )
++    : null
++
+   const profileTotals = { ...(base.profile_totals || {}) }
+   let total = (Number(base.total) || 0) - remoteProfiles.reduce((n, p) => n + (profileTotals[p] || 0), 0)
+ 
+@@ -15505,17 +15517,23 @@ async function mergeRemoteProfileSessions(searchParams, remoteProfiles, registry
+   const registrySources = registrySourcesOverride || (await pooledRegistrySessionSources())
+ 
+   if (registrySources.length) {
+-    const getRegistryJson = (descriptor, path) => getJsonForBackend(descriptor, path, { timeoutMs: 10_000 })
+     // RT-42: count each backend (install_id) once; remote-override profiles are another backend.
+-    const identity = { primaryBackendId: await primaryBackendInstallId(), unknownPrimaryProfiles: remoteProfiles }
+-    total += await mergeRegistrySessionRows(registrySources, remoteParams, getRegistryJson, merged, profileTotals, identity)
++    const identity = {
++      primaryBackendId: await primaryBackendInstallId(),
++      primaryConnectionId,
++      unknownPrimaryProfiles: remoteProfiles,
++      verifiedPrimaryRows: new Set(primaryRows)
++    }
++
++    total += await mergeRegistrySessionRows(
++      registrySources, remoteParams, getRegistryJson, merged, profileTotals, identity,
++      enrichProjectFolders
++    )
+   }
+ 
+   const recency = s => s?.[order] ?? s?.started_at ?? 0
+   merged.sort((a, b) => recency(b) - recency(a))
+ 
+-  const archivedOnly = searchParams.get('archived') === 'only'
+-
+   return composeUnifiedSessionResponse(base, merged, offset, limit, total, profileTotals, remoteErrors, { archivedOnly })
+ }
+ 
+diff --git a/apps/desktop/electron/profile-session-routing.ts b/apps/desktop/electron/profile-session-routing.ts
+index 9479f9df3a48bf3f5b9a91b5a74480a1a218a848..6aab976a176075954315fd0e5fe5f14c6770955b 100644
+--- a/apps/desktop/electron/profile-session-routing.ts
++++ b/apps/desktop/electron/profile-session-routing.ts
+@@ -1,3 +1,5 @@
++import { PROFILE_ID_ARG_RE } from '../../shared/src/profile-id'
++
+ interface SessionListResponse {
+   sessions: unknown[]
+   total: number
+@@ -66,15 +68,45 @@ function rowsOf(data: unknown): unknown[] {
+   return Array.isArray(data.sessions) ? data.sessions : []
+ }
+ 
+-function tagRowsWithConnection(rows: unknown[], connectionId: string): void {
+-  for (const row of rows) {
+-    if (row && typeof row === 'object') {
+-      const session = row as Record<string, unknown>
+-      session.connection_id = connectionId
++function setSessionListBackendId(row: unknown, backendId?: null | string): void {
++  if (row && typeof row === 'object') {
++    const session = row as Record<string, unknown>
++    delete session.session_list_backend_id
++
++    if (backendId) {
++      session.session_list_backend_id = backendId
+     }
+   }
+ }
+ 
++function sessionResponseRows(path: string, data: unknown): unknown[] {
++  if (!data || typeof data !== 'object') {
++    return []
++  }
++
++  const pathname = path.split('?', 1)[0].replace(/\/+$/, '')
++
++  if (pathname === '/api/sessions' || pathname === '/api/profiles/sessions') {
++    return rowsOf(data)
++  }
++
++  if (pathname === '/api/profiles/sessions/sidebar') {
++    const response = data as Record<string, unknown>
++
++    return ['recents', 'cron', 'messaging'].flatMap(key => rowsOf(response[key]))
++  }
++
++  return /^\/api\/sessions\/[^/]+$/.test(pathname) ? [data] : []
++}
++
++export function stripSessionListBackendIds<T>(path: string, data: T): T {
++  for (const row of sessionResponseRows(path, data)) {
++    setSessionListBackendId(row)
++  }
++
++  return data
++}
++
+ /** Tag the primary aggregate's rows with the connection that actually served them.
+  *
+  * The primary backend's rows carry no `connection_id`, and the renderer stamps
+@@ -117,31 +149,12 @@ export function tagPrimarySessionRows(
+  * restoring that provenance, a `profile: "default"` row later resumes through
+  * the legacy local primary instead of the active registry gateway. */
+ export function tagRegistrySessionResponse(path: string, data: unknown, connectionId: string): unknown {
+-  if (!data || typeof data !== 'object') {
+-    return data
+-  }
+-
+-  const pathname = path.split('?', 1)[0].replace(/\/+$/, '')
+-
+-  if (pathname === '/api/sessions' || pathname === '/api/profiles/sessions') {
+-    tagRowsWithConnection(rowsOf(data), connectionId)
+-
+-    return data
+-  }
+-
+-  if (pathname === '/api/profiles/sessions/sidebar') {
+-    const response = data as Record<string, unknown>
+-
+-    for (const key of ['recents', 'cron', 'messaging']) {
+-      tagRowsWithConnection(rowsOf(response[key]), connectionId)
++  for (const row of sessionResponseRows(path, data)) {
++    if (row && typeof row === 'object') {
++      const session = row as Record<string, unknown>
++      session.connection_id = connectionId
++      setSessionListBackendId(session)
+     }
+-
+-    return data
+-  }
+-
+-  if (/^\/api\/sessions\/[^/]+$/.test(pathname)) {
+-    const session = data as Record<string, unknown>
+-    session.connection_id = connectionId
+   }
+ 
+   return data
+@@ -167,23 +180,32 @@ function isArchived(row: unknown): boolean {
+   return Boolean(row && typeof row === 'object' && 'archived' in row && row.archived)
+ }
+ 
+-function profileSessionId(row: unknown): string | null {
+-  const id = sessionId(row)
++function sessionConnectionId(row: unknown): string {
++  const connectionId = (row as { connection_id?: unknown } | null)?.connection_id
+ 
+-  if (!id) {
+-    return null
+-  }
++  return typeof connectionId === 'string' ? connectionId.trim() : ''
++}
+ 
+-  const profile =
+-    row && typeof row === 'object' && 'profile' in row && typeof row.profile === 'string' ? row.profile : ''
++function sessionProfile(row: unknown): string {
++  const profile = (row as { profile?: unknown } | null)?.profile
+ 
+-  return `${profile}\0${id}`
++  return typeof profile === 'string' ? profile.trim() || 'default' : 'default'
++}
++
++function isConcreteProfile(profile: unknown): profile is string {
++  return typeof profile === 'string' && PROFILE_ID_ARG_RE.test(profile) && profile !== 'all' && profile !== 'current'
++}
++
++function profileSessionId(row: unknown, owner = `connection:${sessionConnectionId(row)}`): string | null {
++  const id = sessionId(row)
++
++  return id ? `${owner}\0${sessionProfile(row)}\0${id}` : null
+ }
+ 
+ export function mergeProfileSessionWindow(rows: unknown[], offset: number, limit: number): unknown[] {
+   const window = rows.slice(offset, offset + limit)
+   const seenRows = new Set(window)
+-  const seenIds = new Set(window.map(profileSessionId).filter((id): id is string => id !== null))
++  const seenIds = new Set(window.map(row => profileSessionId(row)).filter((id): id is string => id !== null))
+ 
+   for (const row of rows.slice(offset + limit)) {
+     if (!isPinned(row)) {
+@@ -291,6 +313,7 @@ export async function fetchPrimaryProfileSessions(
+   options: { prefixForMerge?: boolean; aggregate?: ProfileSessionAggregateFetchOptions } = {}
+ ): Promise<ProfileSessionsResponse> {
+   const aggregate = options.aggregate
++
+   const fetchJson =
+     aggregate && resolveProfileSessionAggregateRoute(aggregate) === 'global-remote'
+       ? aggregate.fetchJsonForGlobalRemote
+@@ -362,8 +385,6 @@ export interface RegistrySessionSource {
+   /** SSH: named profiles served through the connection's default backend
+    *  (no pooled backend of their own), as last read from its roster. */
+   sharedProfiles?: string[]
+-  /** The connection's gateway install_id, when known. Sources sharing one are the same backend
+-   *  and count their session totals once; a source without one is never summed with another. */
+   backendId?: string
+ }
+ 
+@@ -423,7 +444,96 @@ export function shouldIncludeLocalRegistrySessionSource(
+   return Boolean(String(connectionId ?? '').trim()) || !baseCoversLocal
+ }
+ 
+-type GetJsonForDescriptor = (descriptor: unknown, path: string) => Promise<unknown>
++type GetJsonForDescriptor = (descriptor: unknown, path: string, options?: { profileScoped: true }) => Promise<unknown>
++
++interface ProjectFolderScope {
++  active: string[]
++  archived: string[]
++}
++
++async function readRegistryProjectFolders(
++  descriptor: unknown,
++  profile: string,
++  getJson: GetJsonForDescriptor
++): Promise<ProjectFolderScope | null | undefined> {
++  const params = new URLSearchParams({ profile, session_limit: '0', preview_limit: '0' })
++
++  try {
++    const payload = (await getJson(descriptor, `/api/profiles/projects/tree?${params}`, { profileScoped: true })) as {
++      projects?: unknown[]
++      projectFoldersByProfile?: Record<string, ProjectFolderScope>
++    } | null
++
++    if (!payload || typeof payload !== 'object' || errorsOf(payload)) {
++      return null
++    }
++
++    if (!Object.hasOwn(payload, 'projectFoldersByProfile')) {
++      return Array.isArray(payload.projects) ? undefined : null
++    }
++
++    const scopes = payload.projectFoldersByProfile
++
++    if (!scopes || typeof scopes !== 'object' || Array.isArray(scopes)) {
++      return null
++    }
++
++    if (!Object.hasOwn(scopes, profile)) {
++      return { active: [], archived: [] }
++    }
++
++    const scope = scopes[profile]
++
++    return scope && [scope.active, scope.archived].every(paths => Array.isArray(paths) && paths.every(path => typeof path === 'string'))
++      ? { active: scope.active, archived: scope.archived }
++      : null
++  } catch (error) {
++    return httpStatusOf(error) === 404 ? undefined : null
++  }
++}
++
++async function enrichSessionProjectFolders(
++  rows: unknown[],
++  descriptor: unknown,
++  getJson: GetJsonForDescriptor,
++  profileLabel?: string
++): Promise<void> {
++  const rowsByProfile = new Map<string, Record<string, unknown>[]>()
++  const profilesWithFolders = new Set<string>()
++
++  for (const row of rows) {
++    if (!row || typeof row !== 'object') {
++      continue
++    }
++
++    const session = row as Record<string, unknown>
++    const { cwd, git_repo_root } = session
++    const profile = profileLabel ?? session.profile
++    delete session.project_folder_scope
++
++    if (!isConcreteProfile(profile)) {
++      continue
++    }
++
++    const scopedRows = rowsByProfile.get(profile) ?? []
++    scopedRows.push(session)
++    rowsByProfile.set(profile, scopedRows)
++
++    if ((typeof cwd === 'string' && cwd.trim()) || (typeof git_repo_root === 'string' && git_repo_root.trim())) {
++      profilesWithFolders.add(profile)
++    }
++  }
++
++  await Promise.all([...profilesWithFolders].map(async profile => {
++    const scope = await readRegistryProjectFolders(descriptor, profile, getJson)
++
++    if (scope !== undefined) {
++      for (const row of rowsByProfile.get(profile) ?? []) {
++        row.project_folder_scope = scope
++      }
++    }
++  }))
++}
+ 
+ /** One registry source's rows plus its first page (which carries the totals), or null
+  *  when any page failed: a partial read must not contribute rows or a stale total. */
+@@ -551,11 +661,11 @@ export async function fetchRegistrySessionRows(
+   sources: RegistrySessionSource[],
+   searchParams: URLSearchParams,
+   getJson: GetJsonForDescriptor,
+-  reportedTotals?: Map<string, number>
++  reportedTotals?: Map<string, number>,
++  includeProjectFolders = true,
++  proof?: { rows: Map<unknown, string>; scopes: Map<string, string> }
+ ): Promise<unknown[]> {
+-  const rows: unknown[] = []
+-
+-  const recordTotals = (page: unknown, connectionId: string, profileLabel: null | string) => {
++  const recordTotals = (page: unknown, connectionId: string, profileLabel: null | string, backendId?: string) => {
+     if (!reportedTotals || !page || typeof page !== 'object') {
+       return
+     }
+@@ -571,7 +681,12 @@ export async function fetchRegistrySessionRows(
+           const count = nonNegativeNumber(value)
+ 
+           if (count !== null) {
+-            reportedTotals.set(`${connectionId}\0${profile}`, count)
++            const key = `${connectionId}\0${profile}`
++            reportedTotals.set(key, count)
++
++            if (backendId && isConcreteProfile(profile)) {
++              proof?.scopes.set(key, backendId)
++            }
+           }
+         }
+       }
+@@ -586,7 +701,15 @@ export async function fetchRegistrySessionRows(
+     }
+   }
+ 
+-  const tag = (sourceRows: unknown[], connectionId: string, profileLabel: null | string) => {
++  const tag = (
++    sourceRows: unknown[],
++    connectionId: string,
++    profileLabel: null | string,
++    retainProjectFolders: boolean,
++    backendId?: string
++  ) => {
++    const rows: unknown[] = []
++
+     for (const row of sourceRows) {
+       if (!row || typeof row !== 'object') {
+         continue
+@@ -594,6 +717,17 @@ export async function fetchRegistrySessionRows(
+ 
+       const session = row as Record<string, unknown>
+ 
++      setSessionListBackendId(session)
++
++      if (backendId && isConcreteProfile(session.profile) && (profileLabel === null || profileLabel === session.profile)) {
++        proof?.rows.set(row, backendId)
++        proof?.scopes.set(`${connectionId}\0${session.profile}`, backendId)
++      }
++
++      if (!retainProjectFolders) {
++        delete session.project_folder_scope
++      }
++
+       if (profileLabel !== null) {
+         session.profile = profileLabel
+       } else if (typeof session.profile !== 'string' || !session.profile) {
+@@ -604,31 +738,46 @@ export async function fetchRegistrySessionRows(
+       session.connection_id = connectionId
+       rows.push(session)
+     }
++
++    return rows
+   }
+ 
+   // Each backend's own list, labelled with the profile it runs as.
+-  const readEachBackend = (source: RegistrySessionSource) =>
+-    Promise.all(
++  const readEachBackend = async (source: RegistrySessionSource) => {
++    const backendId = source.kind === 'local' ? source.backendId?.trim() : undefined
++
++    const rowsByBackend = await Promise.all(
+       source.backends.map(async ({ descriptor, profileLabel }) => {
+         const params = new URLSearchParams(searchParams)
+         params.delete('profile')
+         const read = await fetchSessionRowsInPages('/api/sessions', params, path => getJson(descriptor, path))
+ 
+         if (read) {
+-          recordTotals(read.first, source.connectionId, profileLabel || 'default')
+-          tag(read.rows, source.connectionId, profileLabel || 'default')
++          const profile = profileLabel || 'default'
++          const enrich = includeProjectFolders && source.kind === 'local' && Boolean(profileLabel)
++
++          if (enrich) {
++            await enrichSessionProjectFolders(read.rows, descriptor, getJson, profile)
++          }
++
++          recordTotals(read.first, source.connectionId, profile)
++
++          return tag(read.rows, source.connectionId, profile, enrich, backendId)
+         }
++
++        return []
+       })
+     )
+ 
+-  await Promise.all(
++    return rowsByBackend.flat()
++  }
++
++  const rowsBySource = await Promise.all(
+     sources.map(async source => {
+       if (source.kind === 'local') {
+         // Forced-local backends each own a separate state.db, so read every
+         // profile backend independently.
+-        await readEachBackend(source)
+-
+-        return
++        return readEachBackend(source)
+       }
+ 
+       // SSH, remote, and cloud hosts share one HERMES_HOME across their
+@@ -637,7 +786,7 @@ export async function fetchRegistrySessionRows(
+       const shared = source.backends[0]
+ 
+       if (!shared) {
+-        return
++        return []
+       }
+ 
+       const params = new URLSearchParams(searchParams)
+@@ -646,18 +795,20 @@ export async function fetchRegistrySessionRows(
+       const aggregate = await fetchSessionRowsInPages('/api/profiles/sessions', params, getShared)
+ 
+       if (aggregate) {
+-        recordTotals(aggregate.first, source.connectionId, null)
+-        tag(aggregate.rows, source.connectionId, null)
++        const backendId = source.backendId?.trim()
++        recordTotals(aggregate.first, source.connectionId, null, backendId)
++
++        if (includeProjectFolders) {
++          await enrichSessionProjectFolders(aggregate.rows, shared.descriptor, getJson)
++        }
+ 
+-        return
++        return tag(aggregate.rows, source.connectionId, null, includeProjectFolders, backendId)
+       }
+ 
+       // Older SSH runtime without the aggregator: its named profiles run as
+       // their own pooled backends, so each one reads its own list.
+       if (source.kind === 'ssh') {
+-        await readEachBackend(source)
+-
+-        return
++        return readEachBackend(source)
+       }
+ 
+       // Older remote without the aggregator: its own default-profile list.
+@@ -667,46 +818,64 @@ export async function fetchRegistrySessionRows(
+ 
+       if (read) {
+         recordTotals(read.first, source.connectionId, 'default')
+-        tag(read.rows, source.connectionId, null)
++
++        return tag(read.rows, source.connectionId, null, false)
+       }
++
++      return []
+     })
+   )
+ 
+-  return rows
++  return rowsBySource.flat()
+ }
+ 
+-/** Splice registry-gateway rows into an already-merged unified list: dedupe by
+- *  profile + session id (a v1 remote-override splice may already carry a row), keep the
+- *  recency sort, and extend the per-profile totals so truncation flags stay
+- *  honest. Mutates and returns `merged`/`profileTotals` the way the v1 splice
+- *  does. */
+ export function spliceRegistrySessionRows(
+   merged: unknown[],
+   registryRows: unknown[],
+-  profileTotals: Record<string, number>
++  profileTotals: Record<string, number>,
++  identity: RegistryBackendIdentity = {}
+ ): { added: number } {
+-  const seen = new Set(merged.map(profileSessionId).filter((id): id is string => id !== null))
++  const unknownPrimary = new Set(identity.unknownPrimaryProfiles)
++
++  const keysOf = (row: unknown, primary: boolean): string[] => {
++    const taggedRoute = sessionConnectionId(row)
++    const profile = (row as { profile?: unknown } | null)?.profile
++
++    const isBase = primary && !unknownPrimary.has(sessionProfile(row)) &&
++      (!taggedRoute || taggedRoute === identity.primaryConnectionId)
++
++    const connection = taggedRoute || (isBase ? identity.primaryConnectionId : '') || ''
++
++    const verifiedBackend = primary
++      ? (isBase && isConcreteProfile(profile) && identity.verifiedPrimaryRows?.has(row) ? identity.primaryBackendId : null)
++      : identity.registryProof?.rows.get(row)
++
++    setSessionListBackendId(row, verifiedBackend)
++
++    const exact = profileSessionId(row, `connection:${connection}`)
++    const alias = verifiedBackend ? profileSessionId(row, `backend:${verifiedBackend}`) : null
++
++    return exact ? (alias ? [exact, alias] : [exact]) : []
++  }
++
++  const seen = new Set(merged.flatMap(row => keysOf(row, true)))
+   let added = 0
+ 
+   for (const row of registryRows) {
+-    const id = profileSessionId(row)
++    const keys = keysOf(row, false)
+ 
+-    if (id && seen.has(id)) {
++    if (keys.some(key => seen.has(key))) {
+       continue
+     }
+ 
+-    if (id) {
+-      seen.add(id)
++    for (const key of keys) {
++      seen.add(key)
+     }
+ 
+     merged.push(row)
+     added += 1
+ 
+-    const profile =
+-      row && typeof row === 'object' && 'profile' in row && typeof row.profile === 'string' && row.profile
+-        ? row.profile
+-        : 'default'
+-
++    const profile = sessionProfile(row)
+     profileTotals[profile] = (profileTotals[profile] || 0) + 1
+   }
+ 
+@@ -719,11 +888,12 @@ export function spliceRegistrySessionRows(
+ export interface RegistryBackendIdentity {
+   /** install_id of the backend the primary aggregate read; absent when unknown. */
+   primaryBackendId?: null | string
++  primaryConnectionId?: null | string
++  verifiedPrimaryRows?: ReadonlySet<unknown>
+   /** Profiles whose primary-side rows came from somewhere other than the primary backend
+    *  (per-profile remote overrides), so their backend is unknown. */
+   unknownPrimaryProfiles?: Iterable<string>
+-  /** install_id per registry connection id; a connection without one is unknown. */
+-  backendIds?: ReadonlyMap<string, string>
++  registryProof?: { rows: ReadonlyMap<unknown, string>; scopes: ReadonlyMap<string, string> }
+ }
+ 
+ /** Recompute each profile's total once a registry scan is spliced in, counting each backend once.
+@@ -748,17 +918,6 @@ export function applyRegistrySessionTotals(
+   primaryRows: unknown[] = [],
+   identity: RegistryBackendIdentity = {}
+ ): number {
+-  const connectionOf = (row: unknown) =>
+-    row && typeof row === 'object' && typeof (row as { connection_id?: unknown }).connection_id === 'string'
+-      ? (row as { connection_id: string }).connection_id
+-      : ''
+-
+-  const profileOf = (row: unknown) => {
+-    const profile = row && typeof row === 'object' ? (row as { profile?: unknown }).profile : undefined
+-
+-    return typeof profile === 'string' && profile ? profile : 'default'
+-  }
+-
+   const counts = (rows: unknown[], keyOf: (row: unknown) => string) => {
+     const tally = new Map<string, number>()
+ 
+@@ -774,10 +933,10 @@ export function applyRegistrySessionTotals(
+     return tally
+   }
+ 
+-  const scopeOf = (row: unknown) => `${connectionOf(row)}\0${profileOf(row)}`
++  const scopeOf = (row: unknown) => `${sessionConnectionId(row)}\0${sessionProfile(row)}`
+   const fetched = counts(fetchedRows, scopeOf)
+-  const addedPerProfile = counts(addedRows, profileOf)
+-  const primaryVisible = counts(primaryRows, profileOf)
++  const addedPerProfile = counts(addedRows, sessionProfile)
++  const primaryVisible = counts(primaryRows, sessionProfile)
+   // Per-profile totals as the primary/override side left them, before this scan's splice.
+   const primaryTotals: Record<string, number> = { ...profileTotals }
+ 
+@@ -788,12 +947,11 @@ export function applyRegistrySessionTotals(
+   const scopes = new Map<string, Array<{ backend: null | string; total: number }>>()
+ 
+   for (const key of new Set([...fetched.keys(), ...reportedTotals.keys()])) {
+-    const connection = key.slice(0, key.indexOf('\0'))
+     const profile = key.slice(key.indexOf('\0') + 1)
+     // An older aggregate without profile_totals: its fetched rows are all it vouches for.
+     const total = reportedTotals.get(key) ?? fetched.get(key) ?? 0
+     const list = scopes.get(profile) ?? []
+-    list.push({ backend: identity.backendIds?.get(connection) || null, total })
++    list.push({ backend: identity.registryProof?.scopes.get(key) ?? null, total })
+     scopes.set(profile, list)
+   }
+ 
+@@ -837,35 +995,24 @@ export function applyRegistrySessionTotals(
+   return contribution
+ }
+ 
+-/** Fetch and merge one registry scan, retaining its backend totals for deep pages. Each source's
+- *  `backendId` and `identity.primaryBackendId` decide which totals are the same backend. */
+ export async function mergeRegistrySessionRows(
+   sources: RegistrySessionSource[],
+   searchParams: URLSearchParams,
+   getJson: GetJsonForDescriptor,
+   merged: unknown[],
+   profileTotals: Record<string, number>,
+-  identity: Omit<RegistryBackendIdentity, 'backendIds'> = {}
++  identity: Omit<RegistryBackendIdentity, 'registryProof'> = {},
++  includeProjectFolders = true
+ ): Promise<number> {
+   const reportedTotals = new Map<string, number>()
+-  const registryRows = await fetchRegistrySessionRows(sources, searchParams, getJson, reportedTotals)
++  const proof = { rows: new Map<unknown, string>(), scopes: new Map<string, string>() }
++  const registryRows = await fetchRegistrySessionRows(sources, searchParams, getJson, reportedTotals, includeProjectFolders, proof)
+   const before = merged.length
+-  spliceRegistrySessionRows(merged, registryRows, profileTotals)
+-
+-  const backendIds = new Map<string, string>()
+ 
+-  for (const source of sources) {
+-    const id = typeof source.backendId === 'string' ? source.backendId.trim() : ''
+-
+-    if (id) {
+-      backendIds.set(source.connectionId, id)
+-    }
+-  }
++  const rowIdentity = { ...identity, registryProof: proof }
++  spliceRegistrySessionRows(merged, registryRows, profileTotals, rowIdentity)
+ 
+-  return applyRegistrySessionTotals(registryRows, merged.slice(before), reportedTotals, profileTotals, merged.slice(0, before), {
+-    ...identity,
+-    backendIds
+-  })
++  return applyRegistrySessionTotals(registryRows, merged.slice(before), reportedTotals, profileTotals, merged.slice(0, before), rowIdentity)
+ }
+ 
+ /**
+@@ -1182,7 +1329,7 @@ export function applyRemoteProfileSessionOutcomes(
+ 
+ function archivedOnlyWindow(merged: unknown[], offset: number, limit: number): unknown[] {
+   const window = mergeProfileSessionWindow(merged.filter(isArchived), offset, limit)
+-  const ids = new Set(window.map(profileSessionId).filter((id): id is string => id !== null))
++  const ids = new Set(window.map(row => profileSessionId(row)).filter((id): id is string => id !== null))
+ 
+   for (const row of merged) {
+     const id = profileSessionId(row)
+@@ -1605,6 +1752,8 @@ function mergeProjectInto(existing: any, project: any, previewLimit: number) {
+   existing.previewSessions = [...(existing.previewSessions ?? []), ...(project.previewSessions ?? [])]
+     .sort((a, b) => recencyOf(b) - recencyOf(a))
+     .slice(0, previewLimit)
++
++  existing.sessionIdsByProfile = { ...existing.sessionIdsByProfile, ...project.sessionIdsByProfile }
+ }
+ 
+ // The gateway's own cross-profile merge (`_merge_profile_tree`), keyed by the folder key each
+@@ -1613,6 +1762,7 @@ function mergeProjectInto(existing: any, project: any, previewLimit: number) {
+ function mergeProfileProjectTrees(reads: ProfileRead[], previewLimit: number) {
+   const merged = new Map<string, any>()
+   const scopedSessionIds: unknown[] = []
++  const projectFoldersByProfile = new Map<string, unknown>()
+   const errors: SessionScanError[] = []
+ 
+   for (const read of reads) {
+@@ -1623,10 +1773,17 @@ function mergeProfileProjectTrees(reads: ProfileRead[], previewLimit: number) {
+     }
+ 
+     scopedSessionIds.push(...(Array.isArray(read.data?.scoped_session_ids) ? read.data.scoped_session_ids : []))
++    const folders = read.data?.projectFoldersByProfile?.[read.profile]
++
++    if (folders) {
++      projectFoldersByProfile.set(read.profile, folders)
++    }
++
+     errors.push(...(errorsOf(read.data) ?? []))
+ 
+     for (const incoming of Array.isArray(read.data?.projects) ? read.data.projects : []) {
+-      let project = incoming
++      const ids = incoming.sessionIdsByProfile ? incoming.sessionIdsByProfile[read.profile] : incoming.sessionIds
++      let project = { ...incoming, sessionIdsByProfile: Array.isArray(ids) ? { [read.profile]: ids } : {} }
+       const key = String(project.mergeKey ?? project.path ?? project.id)
+       let existing = merged.get(key)
+ 
+@@ -1647,7 +1804,13 @@ function mergeProfileProjectTrees(reads: ProfileRead[], previewLimit: number) {
+ 
+   const projects = [...merged.values()].sort((a, b) => (b.lastActive || 0) - (a.lastActive || 0))
+ 
+-  return { projects, active_id: null, scoped_session_ids: scopedSessionIds, errors }
++  return {
++    projects,
++    active_id: null,
++    scoped_session_ids: scopedSessionIds,
++    projectFoldersByProfile: Object.fromEntries(projectFoldersByProfile),
++    errors
++  }
+ }
+ 
+ function mergeProfilePullRequests(reads: ProfileRead[]) {
+@@ -1747,33 +1910,43 @@ export async function fetchAllProfilesAggregatePerProfile(
+  *  primary with no registry id (`HERMES_DESKTOP_REMOTE_URL`) or an unreadable descriptor is
+  *  `null`: its rows stay untagged rather than being sent to a local backend that lacks them.
+  *  `resolve` must be passive, so a sidebar refresh never spawns or dials for it. */
+-export async function primaryAggregateConnectionId(resolve: () => Promise<unknown>): Promise<null | string> {
+-  try {
+-    const descriptor = (await resolve()) as { connectionId?: unknown; mode?: unknown } | null
+-    const connectionId = String(descriptor?.connectionId || '').trim()
++function primaryDescriptorOwner(value: unknown): string | null {
++  const descriptor = value as { connectionId?: unknown; mode?: unknown } | null
++  const connectionId = String(descriptor?.connectionId || '').trim()
+ 
+-    if (connectionId) {
+-      return connectionId
+-    }
++  return connectionId || (descriptor?.mode === 'local' ? 'local' : null)
++}
+ 
+-    return descriptor && String(descriptor.mode || 'local') === 'local' ? 'local' : null
++async function resolvePrimaryAggregateDescriptor(resolve: () => Promise<unknown>): Promise<unknown> {
++  try {
++    return await resolve()
+   } catch {
+     return null
+   }
+ }
+ 
+-/** Tag the primary aggregate's rows for a window pinned to another gateway, when the primary's
+- *  owner is known (see `primaryAggregateConnectionId`). */
++export async function primaryAggregateConnectionId(resolve: () => Promise<unknown>): Promise<null | string> {
++  return primaryDescriptorOwner(await resolvePrimaryAggregateDescriptor(resolve))
++}
++
+ export async function tagPrimaryAggregateRows(
+   data: unknown,
+   resolve: () => Promise<unknown>,
+-  pinnedConnectionId: string
+-): Promise<void> {
+-  const owner = await primaryAggregateConnectionId(resolve)
++  pinnedConnectionId: string,
++  getJson?: GetJsonForDescriptor
++): Promise<string | null> {
++  const descriptor = await resolvePrimaryAggregateDescriptor(resolve)
++  const owner = primaryDescriptorOwner(descriptor)
+ 
+-  if (owner) {
++  if (owner && pinnedConnectionId && owner !== pinnedConnectionId) {
+     tagPrimarySessionRows(data, owner, pinnedConnectionId)
++
++    if (getJson) {
++      await enrichSessionProjectFolders(rowsOf(data).filter(row => sessionConnectionId(row) === owner), descriptor, getJson)
++    }
+   }
++
++  return owner
+ }
+ 
+ /** A 404 raised by `fetchJson` — the shape is `404: <body>` (see fetchJson). Session lookups are a
+diff --git a/apps/desktop/src/app/chat/sidebar/index.tsx b/apps/desktop/src/app/chat/sidebar/index.tsx
+index b588ae9530a7e290b81615701c7cbe52e8d3d4ba..c88fca40158169824fb3df4b52f32b4a97a3c542 100644
+--- a/apps/desktop/src/app/chat/sidebar/index.tsx
++++ b/apps/desktop/src/app/chat/sidebar/index.tsx
+@@ -126,8 +126,7 @@ import {
+   $sessionsLoading,
+   $unreadFinishedSessionIds,
+   markAllSessionsRead,
+-  ownerLookupSessionRows,
+-  sessionPinId
++  ownerLookupSessionRows
+ } from '@/store/session'
+ import { $sessionDotStateById, sessionStatusBucket } from '@/store/session-dot-state'
+ import { $focusedSessionIsTile, $focusedStoredSessionId } from '@/store/session-focus'
+@@ -182,6 +181,7 @@ import {
+   useGatewayProjectTree,
+   useRepoWorktreeMap
+ } from './projects'
++import { isPlacedElsewhere } from './projects/workspace-groups'
+ import { WorktreeDialog } from './projects/worktree-dialog'
+ import {
+   hasSessionArea,
+@@ -191,7 +191,7 @@ import {
+   SidebarSessionSkeletons,
+   SidebarStorageCorruptNotice
+ } from './section-states'
+-import { buildSessionByAnyId, resolvePinnedSessions } from './session-index'
++import { buildSessionByAnyId, resolvePinnedSessions, usePinScope } from './session-index'
+ import { SidebarSessionsSection, VIRTUALIZE_THRESHOLD } from './sessions-section'
+ import { CONTEXT_SPLIT_KIT, SplitSubmenu } from './split-submenu'
+ import { useEnteredProjectSessions } from './use-entered-project-sessions'
+@@ -479,6 +479,7 @@ export function ChatSidebar({
+   const showAllSessions = useStore($sidebarShowAllSessions)
+   const pinnedSessionIds = useStore($pinnedSessionIds)
+   const unconfirmedPinWrites = useStore($unconfirmedPinWrites)
++  const pinScope = usePinScope()
+   const pinsOpen = useStore($sidebarPinsOpen)
+   const agentsOpen = useStore($sidebarRecentsOpen)
+   const cronOpen = useStore($sidebarCronOpen)
+@@ -680,57 +681,33 @@ export function ChatSidebar({
+     [messagingSessions, displayScope]
+   )
+ 
+-  // Index sessions by every id a pin might be stored under — recents, cron,
+-  // AND messaging, since all three can be pinned (see session-index.ts).
+   const sessionByAnyId = useMemo(
+     () => buildSessionByAnyId(visibleSessions, visibleCronSessions, visibleMessagingSessions),
+     [visibleSessions, visibleCronSessions, visibleMessagingSessions]
+   )
+ 
+-  // Local pin ids first (hand-picked order), then server-flagged pins the
+-  // local set doesn't know about — a backend `pinned=1` row must never be
+-  // invisible just because localStorage is cold or was clobbered (#85969) —
+-  // minus the rows whose flag our own in-flight pin write already contradicts.
+-  const pinnedSessions = useMemo(
++  const { isPinned: isPinnedSession, orderedPins, sessions: pinnedSessions } = useMemo(
+     () =>
+       resolvePinnedSessions(
+         pinnedSessionIds,
+-        sessionByAnyId,
+-        [...visibleSessions, ...cronSessions, ...messagingSessions],
+-        unconfirmedPinWrites
++        [...visibleSessions, ...visibleMessagingSessions, ...visibleCronSessions],
++        [...sessions, ...archivedSessions, ...cronSessions, ...messagingSessions],
++        unconfirmedPinWrites,
++        pinScope,
++        [...visibleSessions, ...cronSessions, ...messagingSessions]
+       ),
+-    [pinnedSessionIds, sessionByAnyId, visibleSessions, cronSessions, messagingSessions, unconfirmedPinWrites]
+-  )
+-
+-  // Every id a pin is reachable under: the raw stored ids, plus BOTH identities
+-  // of each session we resolved one to. A pin is stored on the durable lineage
+-  // root, but the lists that must filter it out are fed from three independent
+-  // fetches (recents, the messaging slice, the backend project tree) and each
+-  // can surface the same conversation under either its live tip or its root.
+-  // Comparing one identity against the other is how a pinned session ended up
+-  // rendered twice — once in Pinned, once in its project group.
+-  const pinnedIdentitySet = useMemo(() => {
+-    const ids = new Set(pinnedSessionIds)
+-
+-    for (const session of pinnedSessions) {
+-      ids.add(session.id)
+-
+-      if (session._lineage_root_id) {
+-        ids.add(session._lineage_root_id)
+-      }
+-    }
+-
+-    return ids
+-  }, [pinnedSessionIds, pinnedSessions])
+-
+-  // A pinned session belongs to the Pinned section and nowhere else, so every
+-  // other list filters it out. Match on either identity the row carries — a
+-  // backend snapshot can surface either side of a compression tip rotation.
+-  const isPinnedSession = useCallback(
+-    (session: SessionInfo) =>
+-      pinnedIdentitySet.has(session.id) ||
+-      (session._lineage_root_id != null && pinnedIdentitySet.has(session._lineage_root_id)),
+-    [pinnedIdentitySet]
++    [
++      pinnedSessionIds,
++      visibleSessions,
++      visibleMessagingSessions,
++      visibleCronSessions,
++      sessions,
++      archivedSessions,
++      cronSessions,
++      messagingSessions,
++      unconfirmedPinWrites,
++      pinScope
++    ]
+   )
+ 
+   // What the project tree drops: pins (they live in their own section) plus
+@@ -779,7 +756,7 @@ export function ChatSidebar({
+   // section (orderRowsWithinGroups) rather than baked into the list here, so a drag ranks a row
+   // among its own day's chats instead of flattening the whole sidebar into an undated manual mode.
+   const agentSessions = unpinnedAgentSessions
+-  const { owners, ownerKey, tree: gatewayProjectTree } = useGatewayProjectTree(projectTree, agentSessions)
++  const { owners, ownerKey, placement, tree: gatewayProjectTree } = useGatewayProjectTree(projectTree, agentSessions)
+ 
+   // Recents are local-only: messaging-platform sessions are fetched as their
+   // own slice ($messagingSessions) and rendered in self-managed per-platform
+@@ -1079,13 +1056,13 @@ export function ChatSidebar({
+     // presentation copy (Home is translated there), not the raw payload's.
+     return excludeProjectSessions(
+       { ...hydrated, label: overviewEnteredProject.label, repos: orderRepos(hydrated.repos) },
+-      isHiddenFromProjects
++      session => isHiddenFromProjects(session) || isPlacedElsewhere(placement, overviewEnteredProject.id, session)
+     )
+-  }, [overviewEnteredProject, enteredProjectTree, orderRepos, isHiddenFromProjects])
++  }, [overviewEnteredProject, enteredProjectTree, orderRepos, isHiddenFromProjects, placement])
+ 
+   const enteredProjectOverlaySessions = useMemo(
+-    () => enteredProjectLiveRows(overviewEnteredProject, agentSessions, owners),
+-    [agentSessions, overviewEnteredProject, owners]
++    () => enteredProjectLiveRows(overviewEnteredProject, agentSessions, owners, placement),
++    [agentSessions, overviewEnteredProject, owners, placement]
+   )
+ 
+   // Overlay live `$sessions` onto the entered project so a just-created session
+@@ -1098,9 +1075,9 @@ export function ChatSidebar({
+   const enteredProjectContent = useMemo(
+     () =>
+       enteredProject
+-        ? overlayLiveLanes(enteredProject, enteredProjectOverlaySessions, removedSessionIds, projectOwners, ownerKey)
++        ? overlayLiveLanes(enteredProject, enteredProjectOverlaySessions, removedSessionIds, placement, ownerKey)
+         : undefined,
+-    [enteredProject, enteredProjectOverlaySessions, removedSessionIds, projectOwners, ownerKey]
++    [enteredProject, enteredProjectOverlaySessions, removedSessionIds, placement, ownerKey]
+   )
+ 
+   const scopedRepoPaths = useMemo(
+@@ -1207,13 +1184,14 @@ export function ChatSidebar({
+         showAllSessions ? Infinity : PROJECT_PREVIEW_COUNT,
+         {
+           ownerKey,
++          placement,
+           removed: removedSessionIds,
+           // Rank before the trim, so "3 priciest in this project" isn't "3 most
+           // recent, priciest first".
+           rankIds: sortOrderIds
+         }
+       ),
+-    [projectOverview, agentSessions, projects, removedSessionIds, sortOrderIds, showAllSessions, ownerKey]
++    [projectOverview, agentSessions, projects, removedSessionIds, sortOrderIds, showAllSessions, ownerKey, placement]
+   )
+ 
+   // A row's "Show all" hydrates raw backend lanes, which — like the drill-in —
+@@ -1227,7 +1205,7 @@ export function ChatSidebar({
+     const counts: Record<string, number> = {}
+ 
+     for (const session of sessions) {
+-      const projectId = isHidden(session) ? sessionBucketId(session, projects, projectOwners) : null
++      const projectId = isHidden(session) ? sessionBucketId(session, projects, placement) : null
+ 
+       if (projectId) {
+         counts[projectId] = (counts[projectId] ?? 0) + 1
+@@ -1235,7 +1213,7 @@ export function ChatSidebar({
+     }
+ 
+     return { isHidden, counts }
+-  }, [sessions, projects, projectOwners, isHiddenFromProjects, removedSessionIds])
++  }, [sessions, projects, placement, isHiddenFromProjects, removedSessionIds])
+ 
+   const onEnterProject = useCallback(
+     (id: string) => {
+@@ -1540,16 +1518,7 @@ export function ChatSidebar({
+   // it over the default sort, so stale/new ids reconcile on the next render.
+   const reorderProjects = (ids: string[]) => setSidebarProjectOrderIds(ids)
+ 
+-  // Sortable rows carry live session ids; the pinned store is keyed by durable
+-  // (lineage-root) ids, so translate before persisting the new order.
+-  const reorderPinned = (ids: string[]) =>
+-    setPinnedSessionOrder(
+-      ids.map(id => {
+-        const session = sessionByAnyId.get(id)
+-
+-        return session ? sessionPinId(session) : id
+-      })
+-    )
++  const getPinnedOrderId = useCallback((session: SessionInfo) => orderedPins.get(session), [orderedPins])
+ 
+   return (
+     <Sidebar
+@@ -1746,6 +1715,7 @@ export function ChatSidebar({
+                 pinned={false}
+                 preserveOrder
+                 rootClassName="min-h-32 flex-1 overflow-hidden p-0"
++                sessionOwnerKey={ownerKey}
+                 sessions={searchResults}
+                 showProfileTags={showAllProfiles}
+               />
+@@ -1765,7 +1735,7 @@ export function ChatSidebar({
+                 onArchiveSession={onArchiveSession}
+                 onBranchSession={onBranchSession}
+                 onDeleteSession={onDeleteSession}
+-                onReorderSessions={reorderPinned}
++                onReorderSessions={setPinnedSessionOrder}
+                 onResumeSession={onResumeSession}
+                 onToggle={() => setSidebarPinsOpen(!pinsOpen)}
+                 onTogglePin={unpinSession}
+@@ -1773,9 +1743,11 @@ export function ChatSidebar({
+                 open={pinsOpen}
+                 pinned
+                 rootClassName="shrink-0 p-0 pb-1"
++                sessionOwnerKey={ownerKey}
+                 sessions={pinnedSessions}
++                sessionSortableId={getPinnedOrderId}
+                 showProfileTags={showAllProfiles}
+-                sortable={pinnedSessions.length > 1}
++                sortable={orderedPins.size > 1}
+               />
+             )}
+ 
+@@ -1965,6 +1937,7 @@ export function ChatSidebar({
+                 projectOverview={projectOverview}
+                 projectOverviewHidden={overviewHidden}
+                 projectOverviewPreviews={overviewPreviews}
++                projectPlacement={placement}
+                 projectRepoWorktrees={inProject ? scopedRepoWorktrees : undefined}
+                 projectsLoading={worktreeGroupingActive ? projectTreeLoading : false}
+                 removedSessionIds={inProject ? removedSessionIds : undefined}
+@@ -1972,6 +1945,7 @@ export function ChatSidebar({
+                   'min-h-32 flex-1 overflow-hidden p-0',
+                   !recentsVirtualizes && 'compact:min-h-0 compact:flex-none compact:overflow-visible'
+                 )}
++                sessionOwnerKey={ownerKey}
+                 sessions={displayAgentSessions}
+                 sortable={!showAllProfiles && agentSessions.length > 1}
+               />
+@@ -2029,6 +2003,7 @@ export function ChatSidebar({
+                     open={messagingOpenIds.includes(group.sourceId)}
+                     pinned={false}
+                     rootClassName="shrink-0 p-0"
++                    sessionOwnerKey={ownerKey}
+                     sessions={shownSessions}
+                     showProfileTags={showAllProfiles && !ownerGrouped}
+                   />
+diff --git a/apps/desktop/src/app/chat/sidebar/projects/entered-content.tsx b/apps/desktop/src/app/chat/sidebar/projects/entered-content.tsx
+index c8138285e0860a9fd19a912e3d8d7f00ab7de26b..d6ff547adb1cd2290c66e9e4b5f1eaffd50b3eac 100644
+--- a/apps/desktop/src/app/chat/sidebar/projects/entered-content.tsx
++++ b/apps/desktop/src/app/chat/sidebar/projects/entered-content.tsx
+@@ -28,6 +28,7 @@ import { SidebarWorkspaceGroup } from './workspace-group'
+ import {
+   mergeRepoWorktreeGroups,
+   overlayRepoLanes,
++  type SessionOwnerKey,
+   type SidebarProjectTree,
+   type SidebarSessionGroup,
+   type SidebarWorkspaceTree
+@@ -45,7 +46,8 @@ export function EnteredProjectContent({
+   onNewSessionSplit,
+   repoWorktrees,
+   liveSessions,
+-  removedSessionIds
++  removedSessionIds,
++  sessionOwnerKey
+ }: {
+   project: SidebarProjectTree
+   renderRows: (sessions: SessionInfo[]) => React.ReactNode
+@@ -55,6 +57,7 @@ export function EnteredProjectContent({
+   repoWorktrees?: Record<string, HermesGitWorktree[]>
+   liveSessions?: SessionInfo[]
+   removedSessionIds?: ReadonlySet<string>
++  sessionOwnerKey?: SessionOwnerKey
+ }) {
+   if (!project.repos.length) {
+     return null
+@@ -82,6 +85,7 @@ export function EnteredProjectContent({
+           removedSessionIds={removedSessionIds}
+           renderRows={renderRows}
+           repo={repo}
++          sessionOwnerKey={sessionOwnerKey}
+           showHeader={!single}
+         />
+       ))}
+@@ -119,7 +123,8 @@ function RepoFlatSection({
+   discoveredWorktrees,
+   liveSessions,
+   owner,
+-  removedSessionIds
++  removedSessionIds,
++  sessionOwnerKey
+ }: {
+   repo: SidebarWorkspaceTree
+   showHeader: boolean
+@@ -131,6 +136,7 @@ function RepoFlatSection({
+   /** Another gateway's project: its worktrees are removed and switched on that gateway. */
+   owner?: AgentProfileRoute
+   removedSessionIds?: ReadonlySet<string>
++  sessionOwnerKey?: SessionOwnerKey
+ }) {
+   const { t } = useI18n()
+   const s = t.sidebar
+@@ -151,10 +157,15 @@ function RepoFlatSection({
+       return mergedGroups
+     }
+ 
+-    const { groups } = overlayRepoLanes({ ...repo, groups: mergedGroups }, liveSessions ?? [], removedSessionIds)
++    const { groups } = overlayRepoLanes(
++      { ...repo, groups: mergedGroups },
++      liveSessions ?? [],
++      removedSessionIds,
++      sessionOwnerKey
++    )
+ 
+     return mergeRepoWorktreeGroups({ id: repo.id, path: repo.path, groups }, discoveredWorktrees)
+-  }, [repo, mergedGroups, discoveredWorktrees, liveSessions, removedSessionIds])
++  }, [repo, mergedGroups, discoveredWorktrees, liveSessions, removedSessionIds, sessionOwnerKey])
+ 
+   const discoveredWorktreePaths = useMemo(
+     () =>
+diff --git a/apps/desktop/src/app/chat/sidebar/projects/gateway-project-rows.ts b/apps/desktop/src/app/chat/sidebar/projects/gateway-project-rows.ts
+index 2ee5035f53cf4594b6bb9d6703a037b63f6edab4..ebe8c6418d4aa17eccdb6ab6e3092f9bc5bdb413 100644
+--- a/apps/desktop/src/app/chat/sidebar/projects/gateway-project-rows.ts
++++ b/apps/desktop/src/app/chat/sidebar/projects/gateway-project-rows.ts
+@@ -4,7 +4,12 @@ import type { SessionInfo } from '@/types/hermes'
+ 
+ import {
+   branchLaneId,
++  isArchivedProjectSession,
++  isPlacedElsewhere,
+   NO_PROJECT_ID,
++  type ProjectFolderScope,
++  projectOwnerBySessionId,
++  type ProjectSessionOwner,
+   reconcileEnteredProjectSessions,
+   type SessionOwnerKey,
+   sessionRecency,
+@@ -58,7 +63,9 @@ function addToNode(
+     lastActive: Math.max(node.lastActive ?? 0, ...fresh.map(sessionRecency)),
+     previewSessions: [...(node.previewSessions ?? []), ...fresh],
+     sessionCount: node.sessionCount + fresh.length,
+-    sessionIds: [...known, ...fresh.map(session => session.id)]
++    sessionIds: [...known, ...fresh.map(session => session.id)],
++    sessionIdsByProfile:
++      node.sessionIdsByProfile ?? (node.mergeKey ? {} : { [node.placementProfile ?? 'default']: known })
+   }
+ }
+ 
+@@ -103,14 +110,25 @@ export function withGatewayProjectRows(
+   tree: SidebarProjectTree[],
+   live: SessionInfo[],
+   foreignOwner: (session: SessionInfo) => null | string,
+-  gatewayLabel: (connectionId: string) => string
++  gatewayLabel: (connectionId: string) => string,
++  foldersFor?: (session: SessionInfo) => ProjectFolderScope | null | undefined,
++  ownerKey?: SessionOwnerKey
+ ): SidebarProjectTree[] {
+   const home: SessionInfo[] = []
+   const byFolder = new Map<string, { connectionId: string; path: string; rows: SessionInfo[] }>()
++  const placement = foldersFor && projectOwnerBySessionId(tree, ownerKey)
+ 
+   for (const session of live) {
+     const connectionId = foreignOwner(session)
+ 
++    const folders = foldersFor?.(session)
++
++    if ((folders === null || isArchivedProjectSession(session, folders)) && !placement?.(session)) {
++      home.push(session)
++
++      continue
++    }
++
+     if (!connectionId) {
+       continue
+     }
+@@ -227,15 +245,18 @@ export function rowsForProjectOwner(
+ export function enteredProjectLiveRows(
+   project: SidebarProjectTree | undefined,
+   live: SessionInfo[],
+-  owners: { foreignOwner: (session: SessionInfo) => null | string; ownerKey: SessionOwnerKey }
++  owners: { foreignOwner: (session: SessionInfo) => null | string; ownerKey: SessionOwnerKey },
++  placement?: ProjectSessionOwner
+ ): SessionInfo[] {
+   if (!project) {
+     return live
+   }
+ 
+-  return reconcileEnteredProjectSessions(
++  const merged = reconcileEnteredProjectSessions(
+     rowsForProjectOwner(project, live, owners.foreignOwner),
+     project.previewSessions,
+     owners.ownerKey
+   )
++
++  return placement ? merged.filter(session => !isPlacedElsewhere(placement, project.id, session)) : merged
+ }
+diff --git a/apps/desktop/src/app/chat/sidebar/projects/model.ts b/apps/desktop/src/app/chat/sidebar/projects/model.ts
+index df6d3f24671cc40cec9e6a28ac06f471fcc1e654..bb3bddbcbf260df55e5de6312110b16d94d30806 100644
+--- a/apps/desktop/src/app/chat/sidebar/projects/model.ts
++++ b/apps/desktop/src/app/chat/sidebar/projects/model.ts
+@@ -9,7 +9,12 @@ import { $sidebarWorkspaceNodeOpen, toggleWorkspaceNodeCollapsed } from '@/store
+ import { $worktreeRefreshToken } from '@/store/projects'
+ 
+ import { projectOwnerRoute } from './gateway-project-rows'
+-import { sessionRecency, type SidebarProjectTree } from './workspace-groups'
++import {
++  reconcileEnteredProjectSessions,
++  type SessionOwnerKey,
++  sessionRecency,
++  type SidebarProjectTree
++} from './workspace-groups'
+ 
+ // Page size when revealing more already-loaded rows within a workspace group.
+ export const SIDEBAR_GROUP_PAGE = 5
+@@ -69,11 +74,11 @@ export const latestProjectSessions = (project: SidebarProjectTree, limit: number
+ // Once the user asks for the rest, the project's full lanes are fetched on
+ // demand; fold them under the (live-overlaid) preview so a just-created
+ // session keeps its place and nothing renders twice.
+-export const expandedProjectSessions = (preview: SessionInfo[], hydrated: SidebarProjectTree): SessionInfo[] => {
+-  const seen = new Set(preview.map(session => session.id))
+-
+-  return [...preview, ...latestProjectSessions(hydrated, Infinity).filter(session => !seen.has(session.id))]
+-}
++export const expandedProjectSessions = (
++  preview: SessionInfo[],
++  hydrated: SidebarProjectTree,
++  ownerKey?: SessionOwnerKey
++): SessionInfo[] => reconcileEnteredProjectSessions(preview, latestProjectSessions(hydrated, Infinity), ownerKey)
+ 
+ // Home is a fixture, not a project: it always leads the overview, above the
+ // active project and outside any hand-picked order.
+diff --git a/apps/desktop/src/app/chat/sidebar/projects/overview-row.tsx b/apps/desktop/src/app/chat/sidebar/projects/overview-row.tsx
+index d33794062646e0ccbd253b24026ba031c8223e52..345bc08c9634c4bea18b36762a0431098cf6ece1 100644
+--- a/apps/desktop/src/app/chat/sidebar/projects/overview-row.tsx
++++ b/apps/desktop/src/app/chat/sidebar/projects/overview-row.tsx
+@@ -36,7 +36,13 @@ import {
+   useWorkspaceNodeOpen
+ } from './model'
+ import { ProjectContextMenu, ProjectMenu } from './project-menu'
+-import { excludeProjectSessions, type SidebarProjectTree } from './workspace-groups'
++import {
++  excludeProjectSessions,
++  isPlacedElsewhere,
++  type ProjectSessionOwner,
++  type SessionOwnerKey,
++  type SidebarProjectTree
++} from './workspace-groups'
+ import { WorkspaceAddButton, WorkspaceShowMoreRow } from './workspace-header'
+ 
+ // A bare color dot (no icon) or an icon glyph — tinted by `color` when set, else
+@@ -96,6 +102,8 @@ interface ProjectOverviewRowProps {
+    *  the same predicate `previewSessions` was built with, so a "Show all"
+    *  hydration can't resurrect them. */
+   isSessionHidden?: (session: SessionInfo) => boolean
++  projectPlacement?: ProjectSessionOwner
++  sessionOwnerKey?: SessionOwnerKey
+   /** How many of the backend's `sessionCount` that predicate hides, so
+    *  "Show all N" promises only rows the view will actually render. */
+   hiddenSessionCount?: number
+@@ -115,6 +123,8 @@ export function ProjectOverviewRow({
+   activeProjectId,
+   previewSessions,
+   isSessionHidden,
++  projectPlacement,
++  sessionOwnerKey,
+   hiddenSessionCount = 0,
+   reorderable = false,
+   dragging = false,
+@@ -137,12 +147,24 @@ export function ProjectOverviewRow({
+   const [expanded, setExpanded] = useState<SidebarProjectTree | null>(null)
+   const [expanding, setExpanding] = useState(false)
+   const limit = showAllSessions || expanded ? Infinity : PROJECT_PREVIEW_COUNT
+-  const fetched = (previewSessions ?? []).slice(0, limit)
+-  const recent = fetched.length ? fetched : latestProjectSessions(project, limit)
++
++  const isExcluded = (session: SessionInfo) =>
++    isSessionHidden?.(session) ||
++    (projectPlacement && isPlacedElsewhere(projectPlacement, project.id, session)) ||
++    false
++
++  const fetched = (previewSessions ?? []).filter(session => !isExcluded(session)).slice(0, limit)
++
++  const recent = fetched.length
++    ? fetched
++    : latestProjectSessions(project, Infinity)
++        .filter(session => !isExcluded(session))
++        .slice(0, limit)
++
+   // The hydrated lanes come straight from the backend, so — like the drill-in
+   // (index.tsx) — they haven't been through the tree's exclusion filter yet.
+-  const visible = expanded && isSessionHidden ? excludeProjectSessions(expanded, isSessionHidden) : expanded
+-  const preview = renderRows ? (visible ? expandedProjectSessions(recent, visible) : recent) : []
++  const visible = expanded && excludeProjectSessions(expanded, isExcluded)
++  const preview = renderRows ? (visible ? expandedProjectSessions(recent, visible, sessionOwnerKey) : recent) : []
+   // Once hydrated, the whole project is reachable but mounts a page at a time
+   // (a project can hold thousands of chats; the collapsed preview stays 3).
+   const page = useRevealedRows(preview, PROJECT_SESSION_PAGE)
+diff --git a/apps/desktop/src/app/chat/sidebar/projects/use-gateway-project-tree.ts b/apps/desktop/src/app/chat/sidebar/projects/use-gateway-project-tree.ts
+index cde0c6ed85d7cb7f9d4dae9fc90dba5eec1fde46..a7330d4cdee9864d32981b97f20269a1403682c9 100644
+--- a/apps/desktop/src/app/chat/sidebar/projects/use-gateway-project-tree.ts
++++ b/apps/desktop/src/app/chat/sidebar/projects/use-gateway-project-tree.ts
+@@ -1,22 +1,35 @@
+ import { useStore } from '@nanostores/react'
+-import { useEffect, useMemo } from 'react'
++import { replaceEqualDeep } from '@tanstack/react-query'
++import { useCallback, useEffect, useMemo, useRef } from 'react'
+ 
+ import { useI18n } from '@/i18n'
+ import { $connectionsRegistry } from '@/store/connection-registry-state'
+ import { $activeConnectionId } from '@/store/connections'
+ import {
++  $gatewayProjectFolders,
+   $gatewayProjectLooks,
+   folderKey,
++  gatewayProjectFoldersFor,
+   gatewayRouteKey,
+-  loadGatewayProjectLooks
++  loadGatewayProjectLooks,
++  revalidateGatewayProjectFolders
+ } from '@/store/gateway-project-looks'
+ import type { AgentProfileRoute } from '@/store/profile'
++import { $projectArchiveFolders } from '@/store/projects'
+ import type { SessionInfo } from '@/types/hermes'
+ 
+ import { gatewayLabel } from '../gateway-group-model'
+ 
+-import { projectOwnerRoute, withGatewayProjectRows } from './gateway-project-rows'
+-import type { SessionOwnerKey, SidebarProjectTree } from './workspace-groups'
++import { projectOwnerRoute, sessionIdentityKey, withGatewayProjectRows } from './gateway-project-rows'
++import {
++  isArchivedProjectSession,
++  NO_PROJECT_ID,
++  type ProjectFolderScope,
++  projectOwnerBySessionId,
++  type ProjectSessionOwner,
++  type SessionOwnerKey,
++  type SidebarProjectTree
++} from './workspace-groups'
+ 
+ export interface SessionOwners {
+   /** The gateway owning a row when it is not the window's (whose tree files its own rows). */
+@@ -25,7 +38,7 @@ export interface SessionOwners {
+   ownerKey: SessionOwnerKey
+ }
+ 
+-const profileOf = (session: SessionInfo): string => (session.profile || '').trim() || 'default'
++const profileOf = (session: Pick<SessionInfo, 'profile'>): string => (session.profile || '').trim() || 'default'
+ 
+ /** Who owns each sidebar row, resolved the way session routing resolves it. */
+ export function useSessionOwners(): SessionOwners {
+@@ -53,39 +66,95 @@ export function useSessionOwners(): SessionOwners {
+ export function useGatewayProjectTree(
+   tree: SidebarProjectTree[],
+   live: SessionInfo[]
+-): { owners: SessionOwners; ownerKey: SessionOwnerKey; tree: SidebarProjectTree[] } {
++): { owners: SessionOwners; ownerKey: SessionOwnerKey; placement: ProjectSessionOwner; tree: SidebarProjectTree[] } {
+   const { t } = useI18n()
+   const registry = useStore($connectionsRegistry)
+   const owners = useSessionOwners()
+   const localLabel = t.settings.gateway.webappHostTitle
+ 
+   const looks = useStore($gatewayProjectLooks)
++  const foreignFolders = useStore($gatewayProjectFolders)
++  const windowFolders = useStore($projectArchiveFolders)
++  const previousHttpScopes = useRef(new Map<string, SessionInfo['project_folder_scope']>())
++
++  // eslint-disable-next-line no-restricted-syntax -- compare against the previous committed list, not the current atom
++  useEffect(() => {
++    const previous = previousHttpScopes.current
++    const next = new Map<string, SessionInfo['project_folder_scope']>()
++    const changed = new Map<string, { route: AgentProfileRoute; scope: ProjectFolderScope }>()
++
++    for (const row of live) {
++      const connectionId = owners.foreignOwner(row)
++
++      if (!connectionId) {
++        continue
++      }
++
++      const rowKey = sessionIdentityKey(connectionId, row)
++      const scope = row.project_folder_scope
++      const before = previous.get(rowKey)
++      next.set(rowKey, scope)
+ 
+-  const merged = useMemo(() => {
+-    if (!registry) {
+-      return tree
++      if (scope && previous.has(rowKey) && replaceEqualDeep(before, scope) !== before) {
++        const route = { connectionId, profile: profileOf(row) }
++        changed.set(gatewayRouteKey(route), { route, scope })
++      }
+     }
+ 
+-    return withGatewayProjectRows(tree, live, owners.foreignOwner, connectionId =>
+-      gatewayLabel(connectionId, registry, localLabel)
+-    )
+-  }, [tree, live, registry, owners, localLabel])
++    previousHttpScopes.current = next
++
++    for (const { route, scope } of changed.values()) {
++      revalidateGatewayProjectFolders(route, scope)
++    }
++  }, [live, owners])
++
++  const foldersFor = useCallback(
++    (session: SessionInfo) => {
++      const profile = profileOf(session)
++      const connectionId = owners.foreignOwner(session)
++
++      if (connectionId) {
++        return gatewayProjectFoldersFor({ connectionId, profile }, foreignFolders) ?? session.project_folder_scope
++      }
++
++      return windowFolders &&
++        owners.ownerKey({ connection_id: windowFolders.connectionId ?? undefined, profile }) ===
++          owners.ownerKey(session)
++        ? windowFolders.profiles[profile]
++        : undefined
++    },
++    [owners, foreignFolders, windowFolders]
++  )
++
++  const merged = useMemo(
++    () =>
++      withGatewayProjectRows(
++        tree,
++        live,
++        owners.foreignOwner,
++        connectionId => (registry ? gatewayLabel(connectionId, registry, localLabel) : connectionId),
++        foldersFor,
++        owners.ownerKey
++      ),
++    [tree, live, registry, owners, localLabel, foldersFor]
++  )
+ 
+   // Each owner's project looks, read once per (gateway, profile) its projects here come from, and
+   // only over a socket already open to it: a render that finds none retries on the next render.
+   const ownerRoutes = useMemo(() => {
+     const routes = new Map<string, AgentProfileRoute>()
+ 
+-    for (const node of merged) {
+-      const route = projectOwnerRoute(node)
++    for (const session of live) {
++      const connectionId = owners.foreignOwner(session)
+ 
+-      if (route) {
++      if (connectionId) {
++        const route = { connectionId, profile: profileOf(session) }
+         routes.set(gatewayRouteKey(route), route)
+       }
+     }
+ 
+     return [...routes.values()]
+-  }, [merged])
++  }, [live, owners])
+ 
+   useEffect(() => loadGatewayProjectLooks(ownerRoutes))
+ 
+@@ -100,5 +169,15 @@ export function useGatewayProjectTree(
+     [merged, looks]
+   )
+ 
+-  return { owners, ownerKey: owners.ownerKey, tree: themed }
++  const placement = useMemo(() => {
++    const confirmed = projectOwnerBySessionId(merged, owners.ownerKey)
++
++    return (session: SessionInfo) => {
++      const folders = foldersFor(session)
++
++      return confirmed(session) ?? (folders === null || isArchivedProjectSession(session, folders) ? NO_PROJECT_ID : undefined)
++    }
++  }, [merged, owners, foldersFor])
++
++  return { owners, ownerKey: owners.ownerKey, placement, tree: themed }
+ }
+diff --git a/apps/desktop/src/app/chat/sidebar/projects/workspace-groups.ts b/apps/desktop/src/app/chat/sidebar/projects/workspace-groups.ts
+index 2718249ced68f07a71123773d1308e2bb617fd27..6dc055c2239a05a7c06a0458f8d1a2077bb0b09e 100644
+--- a/apps/desktop/src/app/chat/sidebar/projects/workspace-groups.ts
++++ b/apps/desktop/src/app/chat/sidebar/projects/workspace-groups.ts
+@@ -82,6 +82,10 @@ export interface SidebarProjectTree {
+   // Every session id the backend assigned to this project — the authoritative
+   // owner set the live overlay keys on (complete, unlike `previewSessions`).
+   sessionIds?: string[]
++  sessionIdsByProfile?: Record<string, string[]>
++  placementConnectionId?: string
++  placementProfile?: string
++  mergeKey?: string
+ }
+ 
+ /** Path split into segments, ignoring trailing slashes and mixed separators. */
+@@ -401,7 +405,9 @@ export function mergeRepoWorktreeGroups(
+ // needs the backend common-root probe, so those rows are left for the next
+ // tree refresh; the common case (a new main-checkout session) overlays here.
+ 
+-const NO_OWNERS: ReadonlyMap<string, string> = new Map()
++export type ProjectSessionOwner = (session: SessionInfo) => string | undefined
++
++const NO_OWNERS: ProjectSessionOwner = () => undefined
+ 
+ /** True when `target` equals `folder` or is nested under it (segment-wise). */
+ function isPathUnder(folder: string, target: string): boolean {
+@@ -415,6 +421,33 @@ function isPathUnder(folder: string, target: string): boolean {
+   return f.every((seg, i) => seg === t[i])
+ }
+ 
++export interface ProjectFolderScope {
++  active: string[]
++  archived: string[]
++}
++
++export function projectFolderScope(projects: ProjectInfo[]): ProjectFolderScope {
++  const scope: ProjectFolderScope = { active: [], archived: [] }
++
++  for (const project of projects) {
++    scope[project.archived ? 'archived' : 'active'].push(...(project.folders ?? []).map(folder => folder.path))
++  }
++
++  return scope
++}
++
++export function isArchivedProjectSession(session: SessionInfo, scope: ProjectFolderScope | undefined): boolean {
++  if (!scope?.archived.length) {
++    return false
++  }
++
++  const cwd = (session.cwd || '').trim()
++  const root = (session.git_repo_root || '').trim()
++  const matches = (folder: string) => isPathUnder(folder, cwd) || isPathUnder(folder, root)
++
++  return scope.archived.some(matches) && !scope.active.some(matches)
++}
++
+ /**
+  * The project a live session belongs to (overview membership) — explicit project
+  * by longest-prefix folder, else the repo root (the auto-project id). An IN-TREE
+@@ -436,12 +469,12 @@ function isPathUnder(folder: string, target: string): boolean {
+ export function liveSessionProjectId(
+   session: SessionInfo,
+   explicitProjects: ProjectInfo[],
+-  owners: ReadonlyMap<string, string> = NO_OWNERS
++  owners: ProjectSessionOwner = NO_OWNERS
+ ): null | string {
+-  const owner = owners.get(session.id)
++  const owner = owners(session)
+ 
+-  if (owner && owner !== NO_PROJECT_ID) {
+-    return owner
++  if (owner) {
++    return owner === NO_PROJECT_ID ? null : owner
+   }
+ 
+   const cwd = (session.cwd || '').trim()
+@@ -496,13 +529,15 @@ export function liveSessionProjectId(
+ export function sessionBucketId(
+   session: SessionInfo,
+   explicitProjects: ProjectInfo[],
+-  owners: ReadonlyMap<string, string> = NO_OWNERS
++  owners: ProjectSessionOwner = NO_OWNERS
+ ): null | string {
+-  if (ownerOf(owners, session) === NO_PROJECT_ID) {
+-    return NO_PROJECT_ID
++  const owner = owners(session)
++
++  if (owner) {
++    return owner
+   }
+ 
+-  return liveSessionProjectId(session, explicitProjects, owners) ?? (isDetachedSession(session) ? NO_PROJECT_ID : null)
++  return liveSessionProjectId(session, explicitProjects) ?? (isDetachedSession(session) ? NO_PROJECT_ID : null)
+ }
+ 
+ /**
+@@ -515,7 +550,7 @@ export function sessionMatchesProjectFilter(
+   session: SessionInfo,
+   filter: readonly string[],
+   explicitProjects: ProjectInfo[],
+-  owners: ReadonlyMap<string, string> = NO_OWNERS
++  owners: ProjectSessionOwner = NO_OWNERS
+ ): boolean {
+   if (!filter.length) {
+     return true
+@@ -539,7 +574,7 @@ export function sessionMatchesProjectFilter(
+ export function sessionProjectColor(
+   session: SessionInfo,
+   projects: ProjectInfo[],
+-  owners: ReadonlyMap<string, string> = NO_OWNERS
++  owners: ProjectSessionOwner = NO_OWNERS
+ ): null | string {
+   const projectId = liveSessionProjectId(session, projects, owners)
+ 
+@@ -557,23 +592,46 @@ export function sessionProjectColor(
+  * live cache refreshes the same row instead of re-inferring ownership from its
+  * cwd (which can make an umbrella project claim it as well).
+  */
+-export function projectOwnerBySessionId(projects: SidebarProjectTree[]): ReadonlyMap<string, string> {
++export function projectOwnerBySessionId(
++  projects: SidebarProjectTree[],
++  ownerKey: SessionOwnerKey = session =>
++    JSON.stringify([session.connection_id?.trim() || '', session.profile || 'default'])
++): ProjectSessionOwner {
+   const owners = new Map<string, string>()
++  const rowOwners = new Map<string, string>()
+ 
+   for (const project of projects) {
+-    const ids = [
+-      ...(project.sessionIds ?? []),
+-      // Older backends only carry the rows themselves.
+-      ...(project.previewSessions ?? []).map(session => session.id),
+-      ...project.repos.flatMap(repo => repo.groups.flatMap(group => group.sessions.map(session => session.id)))
++    const placements =
++      project.sessionIdsByProfile ??
++      (project.placementProfile || (!project.mergeKey && !project.connectionId)
++        ? { [project.placementProfile ?? 'default']: project.sessionIds ?? [] }
++        : {})
++
++    for (const [profile, ids] of Object.entries(placements)) {
++      const owner = ownerKey({ connection_id: project.placementConnectionId ?? project.connectionId, profile })
++
++      for (const id of ids) {
++        owners.set(`${owner}\0${id}`, project.id)
++      }
++    }
++
++    const rows = [
++      ...(project.previewSessions ?? []),
++      ...project.repos.flatMap(repo => repo.groups.flatMap(group => group.sessions))
+     ]
+ 
+-    for (const id of ids) {
+-      owners.set(id, project.id)
++    for (const row of rows) {
++      for (const id of conversationIds(row, ownerKey)) {
++        rowOwners.set(id, project.id)
++      }
+     }
+   }
+ 
+-  return owners
++  return session => {
++    const ids = conversationIds(session, ownerKey)
++
++    return ids.map(id => owners.get(id)).find(Boolean) ?? ids.map(id => rowOwners.get(id)).find(Boolean)
++  }
+ }
+ 
+ /**
+@@ -586,7 +644,7 @@ export function projectOwnerBySessionId(projects: SidebarProjectTree[]): Readonl
+  * so rows of two owners are never the same conversation, even under one durable id. The default
+  * treats every row as one owner (a single gateway's tree).
+  */
+-export type SessionOwnerKey = (session: SessionInfo) => string
++export type SessionOwnerKey = (session: Pick<SessionInfo, 'connection_id' | 'profile'>) => string
+ 
+ const ONE_OWNER: SessionOwnerKey = () => ''
+ 
+@@ -609,17 +667,10 @@ function sameConversationAs(session: SessionInfo, ownerKey?: SessionOwnerKey): (
+   return row => conversationIds(row, ownerKey).some(id => ids.has(id))
+ }
+ 
+-/** The snapshot's owner for a live row, found by any id its conversation has had. */
+-function ownerOf(owners: ReadonlyMap<string, string>, session: SessionInfo): string | undefined {
+-  for (const id of lineageIds(session)) {
+-    const owner = owners.get(id)
+-
+-    if (owner) {
+-      return owner
+-    }
+-  }
++export function isPlacedElsewhere(placement: ProjectSessionOwner, projectId: string, session: SessionInfo): boolean {
++  const owner = placement(session)
+ 
+-  return undefined
++  return owner !== undefined && owner !== projectId
+ }
+ 
+ /** Rows minus any that repeat an earlier row's conversation (first wins). */
+@@ -700,7 +751,8 @@ const NO_REMOVED: ReadonlySet<string> = new Set()
+ export function overlayRepoLanes(
+   repo: SidebarWorkspaceTree,
+   live: SessionInfo[],
+-  removed: ReadonlySet<string> = NO_REMOVED
++  removed: ReadonlySet<string> = NO_REMOVED,
++  ownerKey?: SessionOwnerKey
+ ): SidebarWorkspaceTree {
+   const repoRootKey = pathKey(repo.path)
+   let changed = false
+@@ -795,7 +847,7 @@ export function overlayRepoLanes(
+     // new worktree — the overlay places it into the worktree lane, but without
+     // this eviction the stale main-lane entry persists and the session appears
+     // under both groups until the next backend tree refresh).
+-    const isSame = sameConversationAs(session)
++    const isSame = sameConversationAs(session, ownerKey)
+ 
+     for (const g of lanes) {
+       if (g !== lane) {
+@@ -808,7 +860,7 @@ export function overlayRepoLanes(
+       }
+     }
+ 
+-    lane.sessions = upsertSession(lane.sessions, session)
++    lane.sessions = upsertSession(lane.sessions, session, ownerKey)
+     changed = true
+   }
+ 
+@@ -836,20 +888,14 @@ function overlayHomeLane(
+   project: SidebarProjectTree,
+   live: SessionInfo[],
+   removed: ReadonlySet<string>,
+-  owners: ReadonlyMap<string, string>,
++  owners: ProjectSessionOwner,
+   ownerKey?: SessionOwnerKey
+ ): SidebarProjectTree {
+-  const ownedElsewhere = (session: SessionInfo): boolean => {
+-    const owner = ownerOf(owners, session)
+-
+-    return Boolean(owner) && owner !== NO_PROJECT_ID
+-  }
++  const belongs = (session: SessionInfo): boolean =>
++    !removed.has(session.id) && !isPlacedElsewhere(owners, NO_PROJECT_ID, session)
+ 
+-  const belongs = (session: SessionInfo): boolean => !removed.has(session.id) && !ownedElsewhere(session)
+   const lane = project.repos[0]?.groups[0]
+-
+-  const homed = (session: SessionInfo): boolean =>
+-    isDetachedSession(session) || ownerOf(owners, session) === NO_PROJECT_ID
++  const homed = (session: SessionInfo): boolean => isDetachedSession(session) || owners(session) === NO_PROJECT_ID
+ 
+   const arrivals = live.filter(session => homed(session) && belongs(session))
+   const kept = (lane?.sessions ?? []).filter(belongs)
+@@ -932,7 +978,7 @@ export function overlayLiveLanes(
+   project: SidebarProjectTree,
+   live: SessionInfo[],
+   removed: ReadonlySet<string> = NO_REMOVED,
+-  authoritativeOwners: ReadonlyMap<string, string> = NO_OWNERS,
++  authoritativeOwners: ProjectSessionOwner = NO_OWNERS,
+   ownerKey?: SessionOwnerKey
+ ): SidebarProjectTree {
+   if (project.isNoProject) {
+@@ -941,14 +987,10 @@ export function overlayLiveLanes(
+ 
+   let changed = false
+ 
+-  const projectLive = live.filter(session => {
+-    const owner = ownerOf(authoritativeOwners, session)
+-
+-    return !owner || owner === project.id
+-  })
++  const projectLive = live.filter(session => !isPlacedElsewhere(authoritativeOwners, project.id, session))
+ 
+   const repos = project.repos.map(repo => {
+-    const next = overlayRepoLanes(repo, projectLive, removed)
++    const next = overlayRepoLanes(repo, projectLive, removed, ownerKey)
+ 
+     changed ||= next !== repo
+ 
+@@ -988,6 +1030,7 @@ export function reconcileEnteredProjectSessions(
+ 
+ interface PreviewOverlayOptions {
+   ownerKey?: SessionOwnerKey
++  placement?: ProjectSessionOwner
+   removed?: ReadonlySet<string>
+   /** The active sort key as an id order; recency when empty. */
+   rankIds?: string[]
+@@ -999,17 +1042,21 @@ export function overlayLivePreviews(
+   live: SessionInfo[],
+   explicitProjects: ProjectInfo[],
+   limit: number,
+-  { ownerKey, removed = NO_REMOVED, rankIds }: PreviewOverlayOptions = {}
++  {
++    ownerKey,
++    placement = projectOwnerBySessionId(projects, ownerKey),
++    removed = NO_REMOVED,
++    rankIds
++  }: PreviewOverlayOptions = {}
+ ): Record<string, SessionInfo[]> {
+   const byProject = new Map<string, SessionInfo[]>()
+-  const authoritativeOwners = projectOwnerBySessionId(projects)
+ 
+   for (const session of live) {
+     if (removed.has(session.id)) {
+       continue
+     }
+ 
+-    const projectId = ownerOf(authoritativeOwners, session) ?? sessionBucketId(session, explicitProjects)
++    const projectId = placement(session) ?? sessionBucketId(session, explicitProjects)
+ 
+     if (!projectId) {
+       continue
+@@ -1024,7 +1071,10 @@ export function overlayLivePreviews(
+ 
+   for (const node of projects) {
+     const liveRows = byProject.get(node.id) ?? []
+-    const base = (node.previewSessions ?? []).filter(session => !removed.has(session.id))
++
++    const base = (node.previewSessions ?? []).filter(
++      session => !removed.has(session.id) && !isPlacedElsewhere(placement, node.id, session)
++    )
+ 
+     if (!liveRows.length && !base.length) {
+       continue
+diff --git a/apps/desktop/src/app/chat/sidebar/session-index.ts b/apps/desktop/src/app/chat/sidebar/session-index.ts
+index be881ef95036219b942070a763d8ae1c9429ae5f..bbba86d69ccd73974413731a45a854d1f5a8949c 100644
+--- a/apps/desktop/src/app/chat/sidebar/session-index.ts
++++ b/apps/desktop/src/app/chat/sidebar/session-index.ts
+@@ -1,19 +1,16 @@
++import { LOCAL_CONNECTION_ID } from '@hermes/shared'
++import { useStore } from '@nanostores/react'
++import { useMemo } from 'react'
++
++import { $apiRequestScope } from '@/api/client'
++import { activeConnectionScopeSuffix } from '@/lib/connection-scoped'
++import { $connectionsRegistry } from '@/store/connection-registry-state'
++import { $connection } from '@/store/session'
+ import type { SessionInfo } from '@/types/hermes'
+ 
+-/**
+- * Index sessions by every id a pin might be stored under.
+- *
+- * The sidebar fetches three independent slices — recents, cron, and messaging
+- * — and renders the latter two in self-managed sections. Any of them can be
+- * pinned, so all three must be indexed here or the Pinned section can't
+- * resolve the pin to a row. A pinned session is also filtered out of its own
+- * section, so failing to index it doesn't merely misplace the row: it removes
+- * the session from the sidebar entirely.
+- *
+- * Each session is keyed under both its live id and its lineage root, so a pin
+- * stored before an auto-compression still resolves to the live continuation
+- * tip. Recents are indexed last and win a direct id collision.
+- */
++import { useSessionOwners } from './projects/use-gateway-project-tree'
++import type { SessionOwnerKey } from './projects/workspace-groups'
++
+ export function buildSessionByAnyId(
+   visibleSessions: SessionInfo[],
+   cronSessions: SessionInfo[],
+@@ -32,66 +29,103 @@ export function buildSessionByAnyId(
+   return map
+ }
+ 
+-/**
+- * Resolve the Pinned section's rows: the locally stored pin ids first (in the
+- * user's hand-picked order), then any row the SERVER flags `pinned` that the
+- * local set doesn't know about yet.
+- *
+- * The local set (`$pinnedSessionIds` in localStorage) is a UI-ordering hint,
+- * not the source of truth — `sessions.pinned` in the backend's state.db is.
+- * When the two disagree (cold localStorage after a reload, a pin made from
+- * another client, a persist that never landed), every other sidebar list
+- * filters the session out as "pinned" while the Pinned section — resolving
+- * only local ids — renders empty, so the conversation vanishes from the
+- * sidebar entirely (#85969). Falling back to the row flag keeps the invariant:
+- * a session the backend says is pinned is always reachable from the Pinned
+- * section, whatever the local cache holds. For a row the pin set's own gateway
+- * owns, session-pin-sync then adopts the pin into the local set on its next
+- * reconcile, restoring ordering control; another gateway's row (kept or still
+- * painted after a pick) is never adopted and stays a server-only pin.
+- *
+- * `unconfirmedPinWrites` is that same module's fence, and the fallback has to
+- * respect it. Unpinning drops the id from the local set immediately, but the
+- * loaded row keeps saying `pinned: true` until a page issued after the PATCH
+- * lands — so an unfenced fallback reads the user's own unpin as a foreign pin
+- * and parks the session at the bottom of Pinned for a refresh cycle before it
+- * finally moves to Sessions.
+- */
++interface PinScope {
++  ownerKey: SessionOwnerKey
++  connectionId: string | null | undefined
++}
++
++export function usePinScope(): PinScope {
++  const { ownerKey } = useSessionOwners()
++  const registry = useStore($connectionsRegistry)
++  const connection = useStore($connection)
++  const { connectionId: requestConnectionId } = useStore($apiRequestScope)
++  const taggedConnection = connection?.connectionId?.trim() || requestConnectionId?.trim()
++  const hasRemoteScope = connection?.mode === 'remote' || Boolean(activeConnectionScopeSuffix())
++  const connectionId = taggedConnection || (registry ? (hasRemoteScope ? null : LOCAL_CONNECTION_ID) : undefined)
++
++  return useMemo(() => ({ ownerKey, connectionId }), [ownerKey, connectionId])
++}
++
++const pinIds = (session: SessionInfo): string[] =>
++  session._lineage_root_id && session._lineage_root_id !== session.id
++    ? [session.id, session._lineage_root_id]
++    : [session.id]
++
+ export function resolvePinnedSessions(
+   pinnedSessionIds: readonly string[],
+-  sessionByAnyId: Map<string, SessionInfo>,
++  visibleSessions: readonly SessionInfo[],
+   allSessions: readonly SessionInfo[],
+-  unconfirmedPinWrites: ReadonlySet<string>
+-): SessionInfo[] {
++  unconfirmedPinWrites: ReadonlySet<string>,
++  { connectionId, ownerKey }: PinScope,
++  serverRows = visibleSessions
++) {
++  const pinConnection = ownerKey({ connection_id: connectionId ?? undefined })
++
++  const hasLegacyPinScope = (session: SessionInfo) =>
++    connectionId !== null && ownerKey({ connection_id: session.connection_id }) === pinConnection
++
++  const uniqueOwnerById = new Map<string, string | null>()
++
++  if (pinnedSessionIds.length || unconfirmedPinWrites.size) {
++    for (const session of allSessions) {
++      if (!hasLegacyPinScope(session)) {
++        continue
++      }
++
++      const owner = ownerKey(session)
++
++      for (const id of pinIds(session)) {
++        const previousOwner = uniqueOwnerById.get(id)
++        uniqueOwnerById.set(id, previousOwner === undefined || previousOwner === owner ? owner : null)
++      }
++    }
++  }
++
++  const keyFor = (session: SessionInfo, id = session.id) => JSON.stringify([ownerKey(session), id])
++  const isLegacyPinFor = (id: string, session: SessionInfo) => uniqueOwnerById.get(id) === ownerKey(session)
+   const seen = new Set<string>()
+-  const out: SessionInfo[] = []
++  const pinnedIdentities = new Set<string>()
++  const sessions: SessionInfo[] = []
++  const orderedPins = new Map<SessionInfo, string>()
+ 
+-  for (const pinId of pinnedSessionIds) {
+-    const session = sessionByAnyId.get(pinId)
++  const addPin = (session: SessionInfo) => {
++    seen.add(keyFor(session))
+ 
+-    if (session && !seen.has(session.id)) {
+-      seen.add(session.id)
+-      out.push(session)
++    for (const id of pinIds(session)) {
++      pinnedIdentities.add(keyFor(session, id))
+     }
++
++    sessions.push(session)
+   }
+ 
+-  for (const session of allSessions) {
+-    if (session.pinned !== true || seen.has(session.id)) {
++  if (pinnedSessionIds.length) {
++    const localByAnyId = buildSessionByAnyId(visibleSessions.filter(hasLegacyPinScope).reverse(), [], [])
++
++    for (const pinId of pinnedSessionIds) {
++      const session = localByAnyId.get(pinId)
++
++      if (session && isLegacyPinFor(pinId, session) && !seen.has(keyFor(session))) {
++        addPin(session)
++        orderedPins.set(session, pinId)
++      }
++    }
++  }
++
++  for (const session of serverRows) {
++    if (session.pinned !== true || seen.has(keyFor(session))) {
+       continue
+     }
+ 
+-    // A pin write of ours the row predates — under either identity, since the
+-    // fence is keyed on the durable id and the row may surface as its tip.
+-    if (
+-      unconfirmedPinWrites.has(session.id) ||
+-      (session._lineage_root_id != null && unconfirmedPinWrites.has(session._lineage_root_id))
+-    ) {
++    if (pinIds(session).some(id => unconfirmedPinWrites.has(id) && isLegacyPinFor(id, session))) {
+       continue
+     }
+ 
+-    seen.add(session.id)
+-    out.push(session)
++    addPin(session)
+   }
+ 
+-  return out
++  return {
++    isPinned: (session: SessionInfo) => pinIds(session).some(id => pinnedIdentities.has(keyFor(session, id))),
++    orderedPins,
++    sessions
++  }
+ }
+diff --git a/apps/desktop/src/app/chat/sidebar/sessions-section.tsx b/apps/desktop/src/app/chat/sidebar/sessions-section.tsx
+index 97d0056beed7f5cad91b4d9a9919310b2990cff6..dacdc326f62494f666cc7afad9cbc34817b4069d 100644
+--- a/apps/desktop/src/app/chat/sidebar/sessions-section.tsx
++++ b/apps/desktop/src/app/chat/sidebar/sessions-section.tsx
+@@ -10,7 +10,7 @@ import { SidebarGroup, SidebarGroupContent } from '@/components/ui/sidebar'
+ import type { HermesGitWorktree } from '@/global'
+ import type { SessionInfo } from '@/hermes'
+ import { useI18n } from '@/i18n'
+-import { flattenSessionsWithBranches } from '@/lib/session-branch-tree'
++import { flattenSessionsWithBranches, sidebarSessionRowKey } from '@/lib/session-branch-tree'
+ import {
+   groupEntriesByRecency,
+   groupEntriesByStatus,
+@@ -42,6 +42,7 @@ import {
+   SidebarWorkspaceGroup,
+   type SidebarWorkspaceTree
+ } from './projects'
++import type { ProjectSessionOwner, SessionOwnerKey } from './projects/workspace-groups'
+ import { WorkspaceAddButton } from './projects/workspace-header'
+ import { ReorderableList, useSortableBindings } from './reorderable-list'
+ import { SidebarSessionSkeletons } from './section-states'
+@@ -147,6 +148,9 @@ interface SidebarSessionsSectionProps {
+   // ids) plus how many of each project's `sessionCount` it hides — applied
+   // again when a row hydrates its full lanes on "Show all".
+   projectOverviewHidden?: { isHidden: (session: SessionInfo) => boolean; counts: Record<string, number> }
++  projectPlacement?: ProjectSessionOwner
++  sessionOwnerKey?: SessionOwnerKey
++  sessionSortableId?: (session: SessionInfo) => string | undefined
+   // True while the backend project tree is loading (overview skeleton).
+   projectsLoading?: boolean
+   onEnterProject?: (id: string) => void
+@@ -227,6 +231,9 @@ export function SidebarSessionsSection({
+   projectOverview,
+   projectOverviewPreviews,
+   projectOverviewHidden,
++  projectPlacement,
++  sessionOwnerKey,
++  sessionSortableId,
+   projectsLoading = false,
+   onEnterProject,
+   projectContent,
+@@ -278,12 +285,14 @@ export function SidebarSessionsSection({
+   // recency sort — the drag order is layered on per date group below, so the
+   // buckets stay truthful and a reorder never costs the list its dividers.
+   const displayEntries = useMemo(
+-    () => flattenSessionsWithBranches(sessions, { preserveOrder }),
+-    [sessions, preserveOrder]
++    () => flattenSessionsWithBranches(sessions, { ownerKey: sessionOwnerKey, preserveOrder }),
++    [sessions, sessionOwnerKey, preserveOrder]
+   )
+ 
+   const renderRow = useCallback(
+     (session: SessionInfo, draggable: boolean, branchStem?: string) => {
++      const sortableId = draggable && !branchStem ? (sessionSortableId ? sessionSortableId(session) : session.id) : undefined
++
+       const rowProps = {
+         branchStem,
+         card,
+@@ -295,19 +304,18 @@ export function SidebarSessionsSection({
+         onPin: () => onTogglePin(sessionPinId(session)),
+         onToggleUnread: () => onToggleUnread(session.id),
+         onResume: () => onResumeSession(session.id, session),
+-        reorderable: draggable && !branchStem,
++        reorderable: sortableId !== undefined,
+         session,
+         showProfile: showProfileTags,
+         unread: session.unread === true
+       }
+ 
+-      // Key by (profile, id): twins with the same stored id in two profiles
+-      // are distinct rows (#92454) — a bare-id key makes React misattribute
+-      // one twin's rendered state to the other.
+-      return draggable && !branchStem ? (
+-        <SortableSidebarSessionRow key={`${session.profile ?? ''}::${session.id}`} {...rowProps} />
++      const key = sidebarSessionRowKey(session, sessionOwnerKey)
++
++      return sortableId !== undefined ? (
++        <SortableSidebarSessionRow key={key} {...rowProps} sortableId={sortableId} />
+       ) : (
+-        <SidebarSessionRow key={`${session.profile ?? ''}::${session.id}`} {...rowProps} />
++        <SidebarSessionRow key={key} {...rowProps} />
+       )
+     },
+     [
+@@ -320,6 +328,8 @@ export function SidebarSessionsSection({
+       onTogglePin,
+       onToggleUnread,
+       pinned,
++      sessionOwnerKey,
++      sessionSortableId,
+       showProfileTags
+     ]
+   )
+@@ -389,8 +399,10 @@ export function SidebarSessionsSection({
+   // Sessions inside repos/worktrees are date-ordered and static.
+   const renderRows = useCallback(
+     (items: SessionInfo[]) =>
+-      flattenSessionsWithBranches(items).map(({ branchStem, session }) => renderRow(session, false, branchStem)),
+-    [renderRow]
++      flattenSessionsWithBranches(items, { ownerKey: sessionOwnerKey }).map(({ branchStem, session }) =>
++        renderRow(session, false, branchStem)
++      ),
++    [renderRow, sessionOwnerKey]
+   )
+ 
+   // Limit complete groups, not sessions, so a burst and its branches stay
+@@ -398,7 +410,7 @@ export function SidebarSessionsSection({
+   const renderPreviewRows = useCallback(
+     (items: SessionInfo[], projectId: string) => {
+       const rows = groupEntriesByRecency(
+-        flattenSessionsWithBranches(items),
++        flattenSessionsWithBranches(items, { ownerKey: sessionOwnerKey }),
+         undefined,
+         undefined,
+         showAllSessions ? Infinity : 2
+@@ -408,7 +420,7 @@ export function SidebarSessionsSection({
+ 
+       return hideCollapsedGroupRows(ordered, isListGroupOpen).map(row => renderListRow(row, false))
+     },
+-    [isListGroupOpen, manualOrderIds, renderListRow, showAllSessions]
++    [isListGroupOpen, manualOrderIds, renderListRow, sessionOwnerKey, showAllSessions]
+   )
+ 
+   // Same as `renderRows`, but with date dividers folded in — used for
+@@ -416,13 +428,13 @@ export function SidebarSessionsSection({
+   // chronologically, matching the flat recents list.
+   const renderRowsDated = useCallback(
+     (items: SessionInfo[]) => {
+-      const entries = flattenSessionsWithBranches(items)
++      const entries = flattenSessionsWithBranches(items, { ownerKey: sessionOwnerKey })
+ 
+       const rows = grouping === 'date' ? groupEntriesByRecency(entries) : toSessionRows(entries)
+ 
+       return hideCollapsedGroupRows(rows, isListGroupOpen).map(row => renderListRow(row, false))
+     },
+-    [grouping, isListGroupOpen, renderListRow]
++    [grouping, isListGroupOpen, renderListRow, sessionOwnerKey]
+   )
+ 
+   // Flat recents as list rows: grouped by recency when enabled, plain otherwise.
+@@ -453,8 +465,23 @@ export function SidebarSessionsSection({
+   // set is derived from the rows, not from `sessions`. Feeding it the unrendered
+   // session order made a drop compute its target index against a list the user
+   // wasn't looking at — the drag that landed a row in the wrong slot.
+-  const sortableRowIds = useMemo(() => reorderableRowIds(visibleRows), [visibleRows])
+-  const allSortableRowIds = useMemo(() => reorderableRowIds(flatRows), [flatRows])
++  const getSortableRowIds = useCallback(
++    (rows: SidebarListRow[]) => {
++      if (!sessionSortableId) {
++        return reorderableRowIds(rows)
++      }
++
++      return rows.flatMap(row => {
++        const id = row.kind === 'session' && !row.entry.branchStem ? sessionSortableId(row.entry.session) : undefined
++
++        return id === undefined ? [] : [id]
++      })
++    },
++    [sessionSortableId]
++  )
++
++  const sortableRowIds = useMemo(() => getSortableRowIds(visibleRows), [getSortableRowIds, visibleRows])
++  const allSortableRowIds = useMemo(() => getSortableRowIds(flatRows), [flatRows, getSortableRowIds])
+ 
+   const persistSessionOrder = useCallback(
+     (ids: string[]) => onReorderSessions?.(mergeVisibleReorder(allSortableRowIds, ids)),
+@@ -511,6 +538,7 @@ export function SidebarSessionsSection({
+             removedSessionIds={removedSessionIds}
+             renderRows={renderRowsDated}
+             repoWorktrees={projectRepoWorktrees}
++            sessionOwnerKey={sessionOwnerKey}
+           />
+         ) : (
+           emptyState
+@@ -544,7 +572,9 @@ export function SidebarSessionsSection({
+         // preview rows instead of the live overlay.
+         previewSessions={projectOverviewPreviews?.[project.id]}
+         project={project}
++        projectPlacement={projectPlacement}
+         renderRows={showAllSessions ? items => renderPreviewRows(items, project.id) : renderRows}
++        sessionOwnerKey={sessionOwnerKey}
+       />
+     )
+ 
+@@ -602,6 +632,7 @@ export function SidebarSessionsSection({
+         onToggleUnread={onToggleUnread}
+         pinned={pinned}
+         rows={visibleRows}
++        sessionOwnerKey={sessionOwnerKey}
+         showProfileTags={showProfileTags}
+         sortable={sessionsDraggable}
+       />
+@@ -672,8 +703,8 @@ interface SortableSessionRowProps {
+   onResume: () => void
+ }
+ 
+-function SortableSidebarSessionRow(props: SortableSessionRowProps) {
+-  return <SidebarSessionRow {...props} {...useSortableBindings(props.session.id)} />
++function SortableSidebarSessionRow({ sortableId, ...props }: SortableSessionRowProps & { sortableId: string }) {
++  return <SidebarSessionRow {...props} {...useSortableBindings(sortableId)} />
+ }
+ 
+ function SortableProjectOverviewRow(props: React.ComponentProps<typeof ProjectOverviewRow>) {
+diff --git a/apps/desktop/src/app/chat/sidebar/virtual-session-list.tsx b/apps/desktop/src/app/chat/sidebar/virtual-session-list.tsx
+index d6a4a8a09c26ff30f317580b113d5ad0f275d328..2b9c53140fd3e9a5011d1fbe0304ec41b363aed5 100644
+--- a/apps/desktop/src/app/chat/sidebar/virtual-session-list.tsx
++++ b/apps/desktop/src/app/chat/sidebar/virtual-session-list.tsx
+@@ -7,6 +7,7 @@ import { type FC, useEffect, useRef } from 'react'
+ 
+ import type { SessionInfo } from '@/hermes'
+ import { useI18n } from '@/i18n'
++import { sidebarSessionRowKey } from '@/lib/session-branch-tree'
+ import { type SidebarListRow } from '@/lib/session-date-groups'
+ import { sessionBucketLabel } from '@/lib/time'
+ import { cn } from '@/lib/utils'
+@@ -14,6 +15,7 @@ import { sessionPinId } from '@/store/session'
+ import { $sessionListDensity } from '@/store/session-list-density'
+ 
+ import { SidebarDateDivider } from './chrome'
++import type { SessionOwnerKey } from './projects/workspace-groups'
+ import { SidebarSessionRow } from './session-row'
+ import { SESSION_CARD_ROW_ESTIMATE_PX, sessionRowEstimate } from './session-row-details'
+ 
+@@ -47,6 +49,7 @@ export interface VirtualSessionListProps {
+     open: (key: string) => boolean
+   }
+   rows: SidebarListRow[]
++  sessionOwnerKey?: SessionOwnerKey
+   /** `session` is the clicked row: its `archived` flag is what the menu
+    *  showed, so it decides Archive vs Unarchive. */
+   onArchiveSession: (sessionId: string, session?: SessionInfo) => void
+@@ -81,6 +84,7 @@ export const VirtualSessionList: FC<VirtualSessionListProps> = ({
+   onTogglePin,
+   onToggleUnread,
+   pinned,
++  sessionOwnerKey,
+   showProfileTags = false,
+   sortable
+ }) => {
+@@ -103,7 +107,7 @@ export const VirtualSessionList: FC<VirtualSessionListProps> = ({
+     getItemKey: index => {
+       const row = listRows[index]
+ 
+-      return row ? (row.kind === 'divider' ? row.key : row.entry.session.id) : index
++      return row ? (row.kind === 'divider' ? row.key : sidebarSessionRowKey(row.entry.session, sessionOwnerKey)) : index
+     },
+     getScrollElement: () => scrollerRef.current,
+     // jsdom-friendly default; the real rect takes over on first observe.
+@@ -177,16 +181,12 @@ export const VirtualSessionList: FC<VirtualSessionListProps> = ({
+       unread: session.unread === true
+     }
+ 
+-    // Key by (profile, id): twins with the same stored id in two profiles are
+-    // distinct rows (#92454) — a bare-id key misattributes rendered state.
+-    const rowKey = `${session.profile ?? ''}::${session.id}`
+-
+     return reorderable ? (
+-      <div data-index={virtualItem.index} key={rowKey} ref={virtualizer.measureElement} style={itemStyle}>
++      <div data-index={virtualItem.index} key={virtualItem.key} ref={virtualizer.measureElement} style={itemStyle}>
+         <VirtualSortableRow rowProps={commonProps} session={session} />
+       </div>
+     ) : (
+-      <div data-index={virtualItem.index} key={rowKey} ref={virtualizer.measureElement} style={itemStyle}>
++      <div data-index={virtualItem.index} key={virtualItem.key} ref={virtualizer.measureElement} style={itemStyle}>
+         <SidebarSessionRow {...commonProps} session={session} />
+       </div>
+     )
+diff --git a/apps/desktop/src/app/command-palette/index.tsx b/apps/desktop/src/app/command-palette/index.tsx
+index a198e2193e380a376e0c5289144facc07ec824a5..66174766b8a6e7fc5de318c528f95f0a803fcd90 100644
+--- a/apps/desktop/src/app/command-palette/index.tsx
++++ b/apps/desktop/src/app/command-palette/index.tsx
+@@ -88,7 +88,7 @@ import { luminance } from '@/themes/color'
+ import { type ThemeMode, useTheme } from '@/themes/context'
+ import { isUserTheme, resolveTheme } from '@/themes/user-themes'
+ 
+-import { buildSessionByAnyId, resolvePinnedSessions } from '../chat/sidebar/session-index'
++import { resolvePinnedSessions, usePinScope } from '../chat/sidebar/session-index'
+ import { openSessionFromPicker, openSessionIntentFromModifiers } from '../open-session'
+ import {
+   AGENTS_ROUTE,
+@@ -652,6 +652,7 @@ function CommandPaletteBody({ onExited }: { onExited: () => void }) {
+   const liveMessagingSessions = useStore($messagingSessions)
+   const pinnedSessionIds = useStore($pinnedSessionIds)
+   const unconfirmedPinWrites = useStore($unconfirmedPinWrites)
++  const pinScope = usePinScope()
+   const removedSessionIds = useStore($removedSessionIds)
+ 
+   // getServers is the shared choke point that also drops malformed (null/
+@@ -662,33 +663,40 @@ function CommandPaletteBody({ onExited }: { onExited: () => void }) {
+   // server page confirms later). Overlay them on the fetched 200-row page so
+   // the palette says what the sidebar says: same title, same pin, and no row
+   // the user just archived or deleted.
++  const loadedRows = useMemo(
++    () => [...liveCronSessions, ...liveMessagingSessions, ...liveSessions],
++    [liveCronSessions, liveMessagingSessions, liveSessions]
++  )
++
+   const liveRows = useMemo(() => {
+-    const byId = new Map(
+-      [...liveCronSessions, ...liveMessagingSessions, ...liveSessions].map(row => [row.id, row] as const)
+-    )
++    const key = (row: SessionRow) => JSON.stringify([pinScope.ownerKey(row), row.id])
++    const byId = new Map(loadedRows.map(row => [key(row), row] as const))
+ 
+     return (sessionsQuery.data?.sessions ?? [])
+       .filter(session => !removedSessionIds.has(session.id))
+       .map(session => {
+-        const live = byId.get(session.id)
++        const live = byId.get(key(session))
+ 
+         return live ? { ...session, pinned: live.pinned, title: live.title } : session
+       })
+-  }, [liveCronSessions, liveMessagingSessions, liveSessions, removedSessionIds, sessionsQuery.data])
++  }, [loadedRows, pinScope, removedSessionIds, sessionsQuery.data])
+ 
+   // Same resolution as the sidebar's Pinned section: local pin order first,
+   // then server-flagged pins, minus our own in-flight unpins.
+-  const pinnedSessions = useMemo(() => {
+-    const byAnyId = buildSessionByAnyId(liveRows, [], [])
+-
+-    return resolvePinnedSessions(pinnedSessionIds, byAnyId, liveRows, unconfirmedPinWrites).map(toSessionEntry)
+-  }, [liveRows, pinnedSessionIds, unconfirmedPinWrites])
+-
+-  const sessions = useMemo(() => {
+-    const pinned = new Set(pinnedSessions.map(session => session.id))
++  const { pinnedSessions, sessions } = useMemo(() => {
++    const pins = resolvePinnedSessions(
++      pinnedSessionIds,
++      liveRows,
++      [...loadedRows, ...liveRows],
++      unconfirmedPinWrites,
++      pinScope
++    )
+ 
+-    return liveRows.filter(session => !pinned.has(session.id)).map(toSessionEntry)
+-  }, [liveRows, pinnedSessions])
++    return {
++      pinnedSessions: pins.sessions.map(toSessionEntry),
++      sessions: liveRows.filter(session => !pins.isPinned(session)).map(toSessionEntry)
++    }
++  }, [liveRows, loadedRows, pinScope, pinnedSessionIds, unconfirmedPinWrites])
+ 
+   const archivedSessions = useMemo(() => (archivedQuery.data?.sessions ?? []).map(toSessionEntry), [archivedQuery.data])
+ 
+diff --git a/apps/desktop/src/lib/session-branch-tree.ts b/apps/desktop/src/lib/session-branch-tree.ts
+index 7e34a5bdc410e490ccbf3440588ec85d0a0fa484..e829ac33ee34a924f9dcd201953bad8e64e62eda 100644
+--- a/apps/desktop/src/lib/session-branch-tree.ts
++++ b/apps/desktop/src/lib/session-branch-tree.ts
+@@ -5,7 +5,10 @@ export interface SidebarSessionEntry {
+   session: SessionInfo
+ }
+ 
++type SessionOwnerKey = (session: Pick<SessionInfo, 'connection_id' | 'profile'>) => string
++
+ export interface FlattenSessionsOptions {
++  ownerKey?: SessionOwnerKey
+   /**
+    * Keep the input root order instead of re-sorting by group recency.
+    * Use for hand-ordered surfaces (pinned ids, manual recents drag) so a
+@@ -39,18 +42,23 @@ export function forkParentId(session: SessionInfo): string | undefined {
+   return session.parent_session_id?.trim() || undefined
+ }
+ 
+-// Profile-qualified compression lineage, same key as mergeSessionPage (store/session.ts). The
+-// backend's `_lineage_root_id` follows compression edges only; /branch and /new children get
+-// their own root, so rows sharing a key are one conversation, never a fork.
+-const lineageKey = (session: SessionInfo): string =>
+-  `${(session.profile ?? '').trim() || 'default'}::${session._lineage_root_id?.trim() || session.id}`
++const defaultOwnerKey: SessionOwnerKey = session =>
++  JSON.stringify([session.connection_id?.trim() || '', session.profile?.trim() || 'default'])
++
++const ownedSessionKey = (owner: string, id: string): string => JSON.stringify([owner, id])
++
++export const sidebarSessionRowKey = (session: SessionInfo, ownerKey = defaultOwnerKey): string =>
++  ownedSessionKey(ownerKey(session), session.id)
+ 
+ /**
+  * One row per compression lineage. A stale tip can outlive its rotation in the store (#82290);
+  * keep the row nothing in its lineage continues from, then the freshest by mergeSessionPage's
+  * recency rule (first in input on a tie).
+  */
+-function collapseCompressionLineages(sessions: readonly SessionInfo[]): readonly SessionInfo[] {
++function collapseCompressionLineages(
++  sessions: readonly SessionInfo[],
++  lineageKey: (session: SessionInfo) => string
++): readonly SessionInfo[] {
+   const groups = new Map<string, SessionInfo[]>()
+ 
+   for (const session of sessions) {
+@@ -87,20 +95,23 @@ export function flattenSessionsWithBranches(
+   input: readonly SessionInfo[],
+   options: FlattenSessionsOptions = {}
+ ): SidebarSessionEntry[] {
+-  const sessions = collapseCompressionLineages(input)
++  const ownerKey = options.ownerKey ?? defaultOwnerKey
++  const keyOf = (session: SessionInfo, id = session.id) => ownedSessionKey(ownerKey(session), id)
++  const lineageKey = (session: SessionInfo) => keyOf(session, session._lineage_root_id?.trim() || session.id)
++  const sessions = collapseCompressionLineages(input, lineageKey)
+ 
+   if (sessions.length < 2) {
+     return sessions.map(session => ({ session }))
+   }
+ 
+-  const byVisibleId = new Map<string, SessionInfo>()
++  const byVisibleKey = new Map<string, SessionInfo>()
+ 
+   for (const session of sessions) {
+-    byVisibleId.set(session.id, session)
++    byVisibleKey.set(keyOf(session), session)
+     const rootId = session._lineage_root_id?.trim()
+ 
+     if (rootId) {
+-      byVisibleId.set(rootId, session)
++      byVisibleKey.set(keyOf(session, rootId), session)
+     }
+   }
+ 
+@@ -108,15 +119,16 @@ export function flattenSessionsWithBranches(
+   const survivorByLineage = new Map(sessions.map(session => [lineageKey(session), session]))
+ 
+   for (const session of input) {
++    const key = keyOf(session)
+     const survivor = survivorByLineage.get(lineageKey(session))
+ 
+-    if (survivor && !byVisibleId.has(session.id)) {
+-      byVisibleId.set(session.id, survivor)
++    if (survivor && !byVisibleKey.has(key)) {
++      byVisibleKey.set(key, survivor)
+     }
+   }
+ 
+   const childrenByParent = new Map<string, SessionInfo[]>()
+-  const nestedIds = new Set<string>()
++  const nestedKeys = new Set<string>()
+ 
+   for (const session of sessions) {
+     const parentId = forkParentId(session)
+@@ -125,17 +137,18 @@ export function flattenSessionsWithBranches(
+       continue
+     }
+ 
+-    const parent = byVisibleId.get(parentId)
++    const parent = byVisibleKey.get(keyOf(session, parentId))
+ 
+     // Compression ancestry is not a branch: never nest a row under its own lineage.
+     if (!parent || lineageKey(parent) === lineageKey(session)) {
+       continue
+     }
+ 
+-    nestedIds.add(session.id)
+-    const siblings = childrenByParent.get(parent.id) ?? []
++    const parentKey = keyOf(parent)
++    nestedKeys.add(keyOf(session))
++    const siblings = childrenByParent.get(parentKey) ?? []
+     siblings.push(session)
+-    childrenByParent.set(parent.id, siblings)
++    childrenByParent.set(parentKey, siblings)
+   }
+ 
+   for (const siblings of childrenByParent.values()) {
+@@ -149,20 +162,21 @@ export function flattenSessionsWithBranches(
+   const groupRecencyMemo = new Map<string, number>()
+ 
+   const groupRecency = (session: SessionInfo): number => {
+-    const cached = groupRecencyMemo.get(session.id)
++    const key = keyOf(session)
++    const cached = groupRecencyMemo.get(key)
+ 
+     if (cached !== undefined) {
+       return cached
+     }
+ 
+-    groupRecencyMemo.set(session.id, recency(session)) // cycle guard
++    groupRecencyMemo.set(key, recency(session))
+ 
+-    const max = (childrenByParent.get(session.id) ?? []).reduce(
++    const max = (childrenByParent.get(key) ?? []).reduce(
+       (acc, child) => Math.max(acc, groupRecency(child)),
+       recency(session)
+     )
+ 
+-    groupRecencyMemo.set(session.id, max)
++    groupRecencyMemo.set(key, max)
+ 
+     return max
+   }
+@@ -174,18 +188,22 @@ export function flattenSessionsWithBranches(
+   const seen = new Set<string>()
+ 
+   const emit = (session: SessionInfo, branchStem?: string) => {
+-    if (seen.has(session.id)) {
++    const key = keyOf(session)
++
++    if (seen.has(key)) {
+       return
+     }
+ 
+-    seen.add(session.id)
++    seen.add(key)
+     out.push(branchStem ? { branchStem, session } : { session })
+ 
+-    const children = childrenByParent.get(session.id)
++    const children = childrenByParent.get(key)
+     children?.forEach((child, index) => emit(child, index === children.length - 1 ? '└─ ' : '├─ '))
+   }
+ 
+-  const roots = sessions.filter(session => !nestedIds.has(session.id)).map((session, index) => ({ index, session }))
++  const roots = sessions
++    .filter(session => !nestedKeys.has(keyOf(session)))
++    .map((session, index) => ({ index, session }))
+ 
+   if (!options.preserveOrder) {
+     roots.sort((a, b) => groupRecency(b.session) - groupRecency(a.session) || a.index - b.index)
+@@ -194,7 +212,10 @@ export function flattenSessionsWithBranches(
+   roots.forEach(({ session }) => emit(session))
+ 
+   for (const session of sessions) {
+-    if (!seen.has(session.id)) {
++    const key = keyOf(session)
++
++    if (!seen.has(key)) {
++      seen.add(key)
+       out.push({ session })
+     }
+   }
+diff --git a/apps/desktop/src/lib/session-signatures.ts b/apps/desktop/src/lib/session-signatures.ts
+index 72576e44157b4cb0d2e3c7b1bfd4d9c8e60f5d6f..c04cf9a169b98be3fdb8dd936fb622c69777a72a 100644
+--- a/apps/desktop/src/lib/session-signatures.ts
++++ b/apps/desktop/src/lib/session-signatures.ts
+@@ -5,6 +5,12 @@
+ 
+ import type { SessionInfo, SessionMessage } from '@/hermes'
+ 
++function sameFolderScope(a: SessionInfo['project_folder_scope'], b: SessionInfo['project_folder_scope']): boolean {
++  return a === b || Boolean(a && b && (['active', 'archived'] as const).every(key =>
++    a[key].length === b[key].length && a[key].every((folder, index) => folder === b[key][index])
++  ))
++}
++
+ export function sameCronSignature(a: SessionInfo[], b: SessionInfo[]): boolean {
+   if (a.length !== b.length) {
+     return false
+@@ -20,6 +26,9 @@ export function sameCronSignature(a: SessionInfo[], b: SessionInfo[]): boolean {
+       session.title === other.title &&
+       session.source === other.source &&
+       session.profile === other.profile &&
++      session.connection_id === other.connection_id &&
++      session.session_list_backend_id === other.session_list_backend_id &&
++      sameFolderScope(session.project_folder_scope, other.project_folder_scope) &&
+       session.preview === other.preview &&
+       session.message_count === other.message_count &&
+       session.last_active === other.last_active &&
+diff --git a/apps/desktop/src/store/gateway-project-looks.ts b/apps/desktop/src/store/gateway-project-looks.ts
+index 79ec2fde8c44ba3cd97ab6dcbeabe4d749a396ee..1aa4b98587036b38fd9736393d72f094cd3489f5 100644
+--- a/apps/desktop/src/store/gateway-project-looks.ts
++++ b/apps/desktop/src/store/gateway-project-looks.ts
+@@ -1,5 +1,7 @@
++import { replaceEqualDeep } from '@tanstack/react-query'
+ import { map } from 'nanostores'
+ 
++import { type ProjectFolderScope, projectFolderScope } from '@/app/chat/sidebar/projects/workspace-groups'
+ import type { HermesGateway } from '@/hermes'
+ import { gatewayRouteState, requestGatewayForAgent } from '@/store/gateway'
+ import type { AgentProfileRoute } from '@/store/profile'
+@@ -21,6 +23,7 @@ export interface GatewayProjectLook {
+ 
+ /** route key → folder → look, for the folders each owner has a project record for. */
+ export const $gatewayProjectLooks = map<Record<string, Record<string, GatewayProjectLook>>>({})
++export const $gatewayProjectFolders = map<Record<string, ProjectFolderScope>>({})
+ 
+ export const gatewayRouteKey = (route: AgentProfileRoute): string => JSON.stringify([route.connectionId, route.profile])
+ 
+@@ -98,7 +101,7 @@ interface OwnerRead {
+   /** The socket the published looks came over; until it matches the route's socket, a render reads. */
+   readOver: HermesGateway | null
+   stopWatching: () => void
+-  watching: HermesGateway | null
++  watching: HermesGateway
+ }
+ 
+ const MAX_FAILED_READS = 3
+@@ -106,15 +109,24 @@ const reads = new Map<string, OwnerRead>()
+ 
+ async function readOwner(route: AgentProfileRoute, read: OwnerRead, gateway: HermesGateway): Promise<void> {
+   const sentAt = writeSeq
++  const key = gatewayRouteKey(route)
++  const isCurrent = () => reads.get(key) === read && gatewayRouteState(route.connectionId, route.profile).gateway === gateway
+ 
+   read.inFlight = true
+ 
+   try {
+     const payload = await gateway.request<ProjectsPayload>('projects.list', { profile: route.profile })
+ 
+-    publishOwnerLooks(route, looksByFolder(payload.projects ?? []), sentAt)
+-    read.failures = 0
+-    read.readOver = gateway
++    if (!read.rereadQueued && isCurrent()) {
++      const projects = payload.projects ?? []
++      read.failures = 0
++      read.readOver = gateway
++      publishOwnerLooks(route, looksByFolder(projects), sentAt)
++      $gatewayProjectFolders.setKey(
++        key,
++        replaceEqualDeep($gatewayProjectFolders.get()[key], projectFolderScope(projects))
++      )
++    }
+   } catch {
+     read.failures += 1
+   } finally {
+@@ -126,34 +138,53 @@ async function readOwner(route: AgentProfileRoute, read: OwnerRead, gateway: Her
+     read.failures = 0
+     read.readOver = null
+ 
+-    if (read.watching === gateway && gateway.connectionState === 'open') {
++    if (isCurrent()) {
+       await readOwner(route, read, gateway)
+     }
+   }
+ }
+ 
++function refreshOwner(route: AgentProfileRoute, read: OwnerRead, gateway: HermesGateway): void {
++  read.failures = 0
++  read.readOver = null
++
++  if (read.inFlight) {
++    read.rereadQueued = true
++  } else {
++    void readOwner(route, read, gateway)
++  }
++}
++
+ /** A socket that drops and reopens re-reads: the owner's window may have recoloured meanwhile. */
+ function watchSocket(route: AgentProfileRoute, read: OwnerRead, gateway: HermesGateway): void {
+   let dropped = false
+ 
+-  read.stopWatching()
+-  read.watching = gateway
+-  read.failures = 0
+-  read.stopWatching = gateway.onState(state => {
++  const refresh = () => {
++    if (gatewayRouteState(route.connectionId, route.profile).gateway === gateway) {
++      refreshOwner(route, read, gateway)
++    }
++  }
++
++  const stopState = gateway.onState(state => {
+     if (state !== 'open') {
+       dropped = true
++      $gatewayProjectFolders.setKey(gatewayRouteKey(route), undefined)
+     } else if (dropped) {
+       dropped = false
+-      read.failures = 0
+-      read.readOver = null
++      refresh()
++    }
++  })
+ 
+-      if (read.inFlight) {
+-        read.rereadQueued = true
+-      } else {
+-        void readOwner(route, read, gateway)
+-      }
++  const stopEvents = gateway.onEvent(event => {
++    if (event.type === 'projects.changed') {
++      refresh()
+     }
+   })
++
++  read.stopWatching = () => {
++    stopState()
++    stopEvents()
++  }
+ }
+ 
+ /** Read each owner's looks on a socket already open to it: a sidebar render never dials or spawns
+@@ -165,22 +196,22 @@ export function loadGatewayProjectLooks(routes: AgentProfileRoute[]): void {
+     const key = gatewayRouteKey(route)
+     const { gateway } = gatewayRouteState(route.connectionId, route.profile)
+ 
+-    if (!gateway) {
+-      continue
+-    }
++    let read = reads.get(key)
+ 
+-    const read = reads.get(key) ?? {
+-      failures: 0,
+-      inFlight: false,
+-      readOver: null,
+-      rereadQueued: false,
+-      stopWatching: () => {},
+-      watching: null
++    if (read && read.watching !== gateway && (gateway || read.watching.connectionState === 'open')) {
++      read.stopWatching()
++      reads.delete(key)
++      $gatewayProjectFolders.setKey(key, undefined)
++      read = undefined
+     }
+ 
+-    reads.set(key, read)
++    if (!gateway) {
++      continue
++    }
+ 
+-    if (read.watching !== gateway) {
++    if (!read) {
++      read = { failures: 0, inFlight: false, readOver: null, rereadQueued: false, stopWatching: () => {}, watching: gateway }
++      reads.set(key, read)
+       watchSocket(route, read, gateway)
+     }
+ 
+@@ -194,6 +225,39 @@ export function gatewayProjectLook(route: AgentProfileRoute, path: string): Gate
+   return $gatewayProjectLooks.get()[gatewayRouteKey(route)]?.[folderKey(path)]
+ }
+ 
++export function gatewayProjectFoldersFor(
++  route: AgentProfileRoute,
++  scopes: Record<string, ProjectFolderScope>
++): ProjectFolderScope | undefined {
++  const key = gatewayRouteKey(route)
++  const read = reads.get(key)
++
++  return read && gatewayRouteState(route.connectionId, route.profile).gateway === read.watching ? scopes[key] : undefined
++}
++
++export function revalidateGatewayProjectFolders(route: AgentProfileRoute, scope: ProjectFolderScope): void {
++  const key = gatewayRouteKey(route)
++  const read = reads.get(key)
++  const { gateway } = gatewayRouteState(route.connectionId, route.profile)
++
++  if (!gateway || read?.watching !== gateway) {
++    return
++  }
++
++  const published = $gatewayProjectFolders.get()[key]
++  const disagrees = published && replaceEqualDeep(published, scope) !== published
++
++  if (!read.inFlight && !disagrees) {
++    return
++  }
++
++  refreshOwner(route, read, gateway)
++
++  if (disagrees) {
++    $gatewayProjectFolders.setKey(key, undefined)
++  }
++}
++
+ function setLook(route: AgentProfileRoute, path: string, look: GatewayProjectLook | undefined): void {
+   const key = gatewayRouteKey(route)
+   const next = { ...$gatewayProjectLooks.get()[key] }
+diff --git a/apps/desktop/src/store/projects.ts b/apps/desktop/src/store/projects.ts
+index 4e23e73786a79187b43d19e041a3b5de398abb1e..e0224c788c724a8a4758d17d2837eb0013011ed7 100644
+--- a/apps/desktop/src/store/projects.ts
++++ b/apps/desktop/src/store/projects.ts
+@@ -6,6 +6,7 @@ import {
+   excludeProjectSessions,
+   liveSessionProjectId,
+   NO_PROJECT_ID,
++  type ProjectFolderScope,
+   projectOwnerBySessionId,
+   type SidebarProjectTree
+ } from '@/app/chat/sidebar/projects/workspace-groups'
+@@ -78,11 +79,15 @@ export const $activeProjectId = atom<null | string>(null)
+ // fetched lazily on drill-in via `fetchProjectSessions`. This is the single
+ // source of project membership — the desktop no longer derives it.
+ export const $projectTreeLoading = atom(false)
++export const $projectArchiveFolders = atom<{
++  connectionId: string | null
++  profiles: Record<string, ProjectFolderScope>
++} | null>(null)
+ // Backend-resolved session -> project owner, the ONE authority the row
+ // classifiers (filter, bucket, color, label) and the lane overlay share, so a
+ // sibling worktree the git probe assigned to its repo project never re-files
+ // under an umbrella folder by cwd.
+-export const $projectOwnerBySessionId = computed($projectTree, projectOwnerBySessionId)
++export const $projectOwnerBySessionId = computed($projectTree, tree => projectOwnerBySessionId(tree))
+ 
+ // False when the connected backend predates the projects.* JSON-RPC surface
+ // (same semver label, older install). Null until the first probe.
+@@ -454,6 +459,7 @@ interface ProjectTreePayload {
+   projects: SidebarProjectTree[]
+   active_id: null | string
+   scoped_session_ids: string[]
++  projectFoldersByProfile?: Record<string, ProjectFolderScope>
+ }
+ 
+ // Expanded previews need the complete existing tree window before the renderer
+@@ -524,7 +530,7 @@ export async function refreshProjectTreeForOwner(owner: ProjectTreeOwner, reques
+     }
+     return
+   }
+-  applyProjectTreePayload(payload, projectRowOwner())
++  applyProjectTreePayload(payload, { ...projectRowOwner(), profile: owner.profile })
+   markProjectsRpcSuccess()
+   if (invalidProjectTrees.get(key) === entry) invalidProjectTrees.delete(key)
+ }
+@@ -544,13 +550,22 @@ function stampProjectSessions(sessions: SessionInfo[], owner: ProjectRowOwner):
+     : sessions
+ }
+ 
+-function tagProjectSessionConnection(project: SidebarProjectTree, owner: ProjectRowOwner): SidebarProjectTree {
++function tagProjectSessionConnection(
++  project: SidebarProjectTree,
++  owner: ProjectRowOwner & { profile?: string }
++): SidebarProjectTree {
++  const scoped =
++    !project.sessionIdsByProfile && owner.profile && owner.profile !== 'default'
++      ? { ...project, placementProfile: owner.profile }
++      : project
++
+   if (!owner.connectionId || (owner.connectionId === 'local' && !owner.stampLocal)) {
+-    return project
++    return scoped
+   }
+ 
+   return {
+-    ...project,
++    ...scoped,
++    placementConnectionId: owner.connectionId,
+     ...(project.previewSessions ? { previewSessions: stampProjectSessions(project.previewSessions, owner) } : {}),
+     repos: project.repos.map(repo => ({
+       ...repo,
+@@ -559,8 +574,14 @@ function tagProjectSessionConnection(project: SidebarProjectTree, owner: Project
+   }
+ }
+ 
+-function applyProjectTreePayload(res: ProjectTreePayload, owner: ProjectRowOwner): void {
++function applyProjectTreePayload(res: ProjectTreePayload, owner: ProjectRowOwner & { profile?: string }): void {
+   const scoped = new Set(res.scoped_session_ids ?? [])
++  $projectArchiveFolders.set(
++    replaceEqualDeep($projectArchiveFolders.get(), {
++      connectionId: owner.connectionId,
++      profiles: res.projectFoldersByProfile ?? {}
++    })
++  )
+   // The tree refreshes on every sessions.changed and window focus, and most of
+   // those answers are unchanged. Keep unchanged nodes by reference so the
+   // entered project doesn't refetch and rebuild on a no-op (#77591).
+diff --git a/apps/desktop/src/store/session-color.ts b/apps/desktop/src/store/session-color.ts
+index d211ceff43900ab8d3540b7f6f8711e25eb0ddfa..bd626b755a6ba2be5576df9b5de152ed9c616eeb 100644
+--- a/apps/desktop/src/store/session-color.ts
++++ b/apps/desktop/src/store/session-color.ts
+@@ -1,6 +1,6 @@
+ import { computed } from 'nanostores'
+ 
+-import { sessionProjectColor } from '@/app/chat/sidebar/projects/workspace-groups'
++import { type ProjectSessionOwner, sessionProjectColor } from '@/app/chat/sidebar/projects/workspace-groups'
+ import { Codecs, persistentAtom } from '@/lib/persisted'
+ import { $projectOwnerBySessionId, $projects } from '@/store/projects'
+ import { $sessions, sessionPinId } from '@/store/session'
+@@ -43,7 +43,7 @@ function resolveSessionColor(
+   session: SessionInfo,
+   projects: ProjectInfo[],
+   overrides: Record<string, string>,
+-  owners: ReadonlyMap<string, string>
++  owners: ProjectSessionOwner
+ ): string | undefined {
+   return overrides[sessionPinId(session)] ?? sessionProjectColor(session, projects, owners) ?? undefined
+ }
+diff --git a/apps/desktop/src/store/session.ts b/apps/desktop/src/store/session.ts
+index a4d9a8c3eb40fe45f72fccc2a38a209063ffd9fc..6117f1501617ac9b8426dfe020a2e5d9ef2ba82a 100644
+--- a/apps/desktop/src/store/session.ts
++++ b/apps/desktop/src/store/session.ts
+@@ -1,7 +1,7 @@
+ import type { ConnectionState } from '@hermes/shared'
+ import { atom, computed } from 'nanostores'
+ 
+-import { setApiRequestLocalMode } from '@/api/client'
++import { getApiRequestConnection, setApiRequestLocalMode } from '@/api/client'
+ import { lastVisibleMessageIsUser } from '@/app/chat/thread-loading'
+ import type { ContextSuggestion } from '@/app/types'
+ import type { HermesConnection } from '@/global'
+@@ -26,6 +26,7 @@ import {
+ } from '@/lib/storage'
+ import type { SessionInfo, UsageStats } from '@/types/hermes'
+ 
++import { hasRegistryTopology } from './connection-registry-state'
+ import { $removedSessionIds, isSessionRemovalPending, tombstoneRowIds } from './session-removal'
+ import type { SessionOwnerRoute, SessionOwnerScope } from './session-request-router'
+ import { clearUnreadOnOpen } from './session-unread-remote'
+@@ -627,20 +628,47 @@ export function resolveComposerSessionKey(
+  *  resurrected here. */
+ const profileKeyOf = (profile: null | string | undefined): string => (profile ?? '').trim() || 'default'
+ 
+-function carriedConnectionId(prev: SessionInfo | undefined, incoming: SessionInfo): string | undefined {
+-  if (incoming.connection_id?.trim()) {
+-    return incoming.connection_id
++function ambientSessionListOwner(): string {
++  const route = getApiRequestConnection()
++  const connection = $connection.get()
++
++  return route || (connection?.mode === 'local' || (!connection && !hasRegistryTopology()) ? 'local' : '')
++}
++
++function sessionListKey(session: Pick<SessionInfo, 'connection_id' | 'profile'>, id: string, ambientOwner: string): string {
++  return `${session.connection_id?.trim() || ambientOwner}\0${profileKeyOf(session.profile)}\0${id}`
++}
++
++function sessionListAliasKey(session: SessionInfo): string | undefined {
++  const profile = session.profile?.trim()
++
++  return session.session_list_backend_id && profile && session.id
++    ? JSON.stringify([session.session_list_backend_id, profile, session.id])
++    : undefined
++}
++
++function sessionListAliasMatcher(rows: SessionInfo[]): (session: SessionInfo) => boolean {
++  const aliases = new Set(rows.map(sessionListAliasKey).filter(key => key !== undefined))
++
++  return session => {
++    const key = sessionListAliasKey(session)
++
++    return key !== undefined && aliases.has(key)
+   }
++}
+ 
+-  const carried = prev?.connection_id?.trim()
++function previousSessionsByKey(rows: SessionInfo[], keyOf: (session: SessionInfo) => string): Map<string, SessionInfo> {
++  const byKey = new Map<string, SessionInfo>()
+ 
+-  if (!carried) {
+-    return undefined
++  for (const row of rows) {
++    const key = keyOf(row)
++
++    if (row.connection_id?.trim() || !byKey.get(key)?.connection_id?.trim()) {
++      byKey.set(key, row)
++    }
+   }
+ 
+-  return !incoming.profile?.trim() || profileKeyOf(incoming.profile) === profileKeyOf(prev?.profile)
+-    ? carried
+-    : undefined
++  return byKey
+ }
+ 
+ export function mergeSessionPage(
+@@ -650,49 +678,34 @@ export function mergeSessionPage(
+ ): SessionInfo[] {
+   const keep = keepIds instanceof Set ? keepIds : new Set(keepIds)
+ 
+-  // Rows are identified by (profile, id), never bare id: two profiles can
+-  // hold sessions with the SAME stored id (restored backups, copied
+-  // state.dbs, cross-profile imports — #92454). Keyed by bare id, the twins
+-  // collapse into one sidebar row whose title/preview carry can stitch one
+-  // profile's content onto the other profile's route — the user clicks a row
+-  // previewing profile A and the resume dials profile B. Same-profile rows
+-  // (including untagged ones, which normalize together) keep the exact
+-  // carry behavior below.
+-  // (Local normalize: importing @/store/profile here would be circular —
+-  // same '' → 'default' rule as normalizeProfileKey.)
+-  const profileKeyOf = (session: SessionInfo) => (session.profile ?? '').trim() || 'default'
+-  const identity = (session: SessionInfo) => `${profileKeyOf(session)}::${session.id}`
+-
+-  const lineageIdentity = (session: SessionInfo) =>
+-    `${profileKeyOf(session)}::${session._lineage_root_id ?? session.id}`
++  const requestOwner = ambientSessionListOwner()
++  const cachedOwner = requestOwner === 'local' ? 'local' : ''
++  const previousRows = requestOwner === cachedOwner ? undefined : new Set(previous)
++  const identity = (session: SessionInfo, owner = cachedOwner) => sessionListKey(session, session.id, owner)
++
++  const lineageIdentity = (session: SessionInfo, owner = cachedOwner) =>
++    sessionListKey(session, session._lineage_root_id ?? session.id, owner)
+ 
+   // Carry a known title onto a row that arrives title-less, so a freshly
+   // submitted session (e.g. a branch draft) holds its placeholder instead of
+   // flashing its raw message preview in the gap between persist and the async
+   // auto-titler. A real clear sets the local title null first, so this never
+   // masks one.
+-  const prevById = new Map(previous.map(session => [identity(session), session]))
++  const prevById = previousSessionsByKey(previous, identity)
+   // Tip rotation changes the live id — carry activity/title across the lineage
+   // root so a mid-turn refresh can't drop a touchSessionActivity bump.
+-  const prevByLineage = new Map(previous.map(session => [lineageIdentity(session), session]))
++  const prevByLineage = previousSessionsByKey(previous, lineageIdentity)
+ 
+   const merged = incoming
+     .filter(session => !session.is_internal_child)
+     .map(session => {
+-      const prev = prevById.get(identity(session)) ?? prevByLineage.get(lineageIdentity(session))
++      const owner = previousRows?.has(session) ? cachedOwner : requestOwner
++      const prev = prevById.get(identity(session, owner)) ?? prevByLineage.get(lineageIdentity(session, owner))
+       // User-send stamps last_active before the DB flushes the user row
+       // (last_active = MAX(messages.timestamp)). Keep the fresher of the two.
+       const last_active = Math.max(prev?.last_active ?? 0, session.last_active ?? 0)
+       const title = session.title?.trim() ? session.title : prev?.title?.trim() ? prev.title : session.title
+-      // Carry the owning connection onto a row that arrives untagged. The
+-      // primary aggregate serves a `local` registry source's rows as plain
+-      // local rows (the unified-list splice tags only NON-local sources), so
+-      // the first refresh after a routed create used to replace the optimistic
+-      // row's exact owner (connection_id + profile) with a bare profile — after
+-      // which only the transient owner hint knew which socket held the runtime.
+-      // A refresh is new information layered over what we know, not a clobber;
+-      // the tag is kept only while the row still names the same profile.
+-      const connection_id = carriedConnectionId(prev, session)
++      const connection_id = session.connection_id?.trim() ? session.connection_id : prev?.connection_id?.trim()
+ 
+       return last_active === session.last_active && title === session.title && connection_id === session.connection_id
+         ? session
+@@ -703,35 +716,12 @@ export function mergeSessionPage(
+     return merged
+   }
+ 
+-  const incomingIds = new Set(merged.map(identity))
+-
+-  // Deduplicate by compression lineage: when auto-compression rotates the tip
+-  // id (old #4 → new #5), the incoming page carries the new tip but the
+-  // previous list still holds the old one.  Without lineage-level dedup both
+-  // rows survive as separate sidebar entries (fixes #43483). Lineage keys are
+-  // profile-qualified for the same reason as identity above — a twin id in
+-  // another profile is a DIFFERENT session and must survive the dedupe.
+-  const incomingLineageKeys = new Set(merged.map(lineageIdentity))
+-
+-  // Absorption filter: a survivor whose id appears ANYWHERE inside an
+-  // incoming row's compression lineage is not a separate session anymore —
+-  // the backend now serves that conversation as the chain's projected row.
+-  // `mergeSessionPage`'s own survivors come from the tip-rotation dedup
+-  // (#43483), but that only catches a lineage match through the root key.
+-  // When a reorganized chain mints a FRESH root id (manual compression-chain
+-  // repair, #85331), an old segment row in the keep set (it was the
+-  // working/selected session at refresh time) produced the exact signal of a
+-  // legitimately-kept row: absent from the incoming page, unmatched by
+-  // lineage key. It survived as a title-less ghost. The incoming rows carry
+-  // `_lineage_ids` — every id the chain has answered to — so matching a
+-  // survivor id against that list identifies absorption WITHOUT evicting a
+-  // genuinely-pinned row aged off the page: a pinned row's id never appears
+-  // inside another session's lineage. Like the identity and lineage keys
+-  // above, members are qualified by the owning row's profile — stored ids
+-  // are only unique per-profile (#92454), so a bare-id match would evict a
+-  // kept twin in another profile whose id merely coincides with a lineage.
++  const incomingIds = new Set(merged.map(session => identity(session)))
++  const hasIncomingAlias = sessionListAliasMatcher(merged)
++  const incomingLineageKeys = new Set(merged.map(session => lineageIdentity(session)))
++
+   const incomingLineageIdMembers = new Set(
+-    merged.flatMap(session => (session._lineage_ids ?? []).map(id => `${profileKeyOf(session)}::${id}`))
++    merged.flatMap(session => (session._lineage_ids ?? []).map(id => sessionListKey(session, id, cachedOwner)))
+   )
+ 
+   // The tombstone set is re-read here, not at the caller: optimistic removal
+@@ -749,7 +739,7 @@ export function mergeSessionPage(
+   const tombstoned = (session: SessionInfo): boolean =>
+     tombstones.size > 0 && tombstoneRowIds(session).some(id => tombstones.has(id))
+ 
+-  const survivors = previous.filter(
++  const survivors = [...prevById.values()].filter(
+     session =>
+       // An internal delegate child is never listed; the authoritative page
+       // already omits it, so the keep-list must not resurrect it (#94124).
+@@ -760,6 +750,7 @@ export function mergeSessionPage(
+       !session.hidden &&
+       !tombstoned(session) &&
+       !incomingIds.has(identity(session)) &&
++      !hasIncomingAlias(session) &&
+       !incomingLineageKeys.has(lineageIdentity(session)) &&
+       !incomingLineageIdMembers.has(identity(session)) &&
+       (keep.has(session.id) || (session._lineage_root_id != null && keep.has(session._lineage_root_id)))
+@@ -810,10 +801,6 @@ function sidebarProfileKey(session: Pick<SessionInfo, 'profile'>): string {
+   return (session.profile ?? '').trim() || 'default'
+ }
+ 
+-function sessionListIdentity(session: Pick<SessionInfo, 'id' | 'profile'>): string {
+-  return `${sidebarProfileKey(session)}::${session.id}`
+-}
+-
+ /**
+  * Re-attach previous rows for profiles whose sidebar slice failed this refresh.
+  *
+@@ -834,7 +821,10 @@ export function carryForwardFailedProfileSessions(
+   }
+ 
+   const failed = new Set(errors.map(error => (error.profile ?? '').trim() || 'default'))
+-  const incomingIds = new Set(incoming.map(sessionListIdentity))
++  const cachedOwner = ambientSessionListOwner() === 'local' ? 'local' : ''
++  const identity = (session: SessionInfo) => sessionListKey(session, session.id, cachedOwner)
++  const incomingIds = new Set(incoming.map(identity))
++  const hasIncomingAlias = sessionListAliasMatcher(incoming)
+   const carried: SessionInfo[] = []
+ 
+   for (const session of previous) {
+@@ -843,7 +833,8 @@ export function carryForwardFailedProfileSessions(
+     if (
+       session.hidden ||
+       !(failed.has(ALL_PROFILES_SCAN) || failed.has(sidebarProfileKey(session))) ||
+-      incomingIds.has(sessionListIdentity(session))
++      incomingIds.has(identity(session)) ||
++      hasIncomingAlias(session)
+     ) {
+       continue
+     }
+diff --git a/apps/desktop/src/types/hermes.ts b/apps/desktop/src/types/hermes.ts
+index 91c8fc2643795b800f23669a027a8c34d855dece..3b3d57727dc7e640c22f5a9ab44d95b91146bfec 100644
+--- a/apps/desktop/src/types/hermes.ts
++++ b/apps/desktop/src/types/hermes.ts
+@@ -556,6 +556,7 @@ export interface SessionCreateResponse {
+ 
+ export interface SessionInfo {
+   archived?: boolean
++  project_folder_scope?: { active: string[]; archived: string[] } | null
+   cwd?: null | string
+   /** Git branch checked out in {@link cwd} when the session started/resumed.
+    *  The sidebar groups main-checkout sessions by this so feature-branch work
+@@ -658,6 +659,7 @@ export interface SessionInfo {
+    *  rows served by the primary/local backend. Opens must route through the
+    *  connection-scoped gateway (`ensureGatewayAgent`) when present. */
+   connection_id?: string
++  session_list_backend_id?: string
+ }
+ 
+ export type TimelineDisplayMetadata =
+diff --git a/apps/shared/src/gateway-contract.generated.ts b/apps/shared/src/gateway-contract.generated.ts
+index f06eb2980c2c2b6fad4b0d5dc7d5a681966f1539..1b7741cdc526a72074ed1de663c512beb74d441b 100644
+--- a/apps/shared/src/gateway-contract.generated.ts
++++ b/apps/shared/src/gateway-contract.generated.ts
+@@ -2704,6 +2704,7 @@ export interface ProjectsTreeResult {
+   projects: ProjectTreeNode[]
+   active_id?: string | null
+   scoped_session_ids?: string[]
++  projectFoldersByProfile?: Record<string, ProjectTreeFolderScope>
+ }
+ /** ``project_tree._project_node`` — explicit, auto (git root) or the synthetic Home bucket. */
+ export interface ProjectTreeNode {
+@@ -2721,6 +2722,7 @@ export interface ProjectTreeNode {
+   repos?: ProjectTreeRepo[]
+   previewSessions?: ProjectTreeSession[]
+   sessionIds?: string[]
++  sessionIdsByProfile?: Record<string, string[]>
+ }
+ export interface ProjectTreeRepo {
+   id: string
+@@ -2771,6 +2773,10 @@ export interface ProjectTreeSession {
+   profile?: string | null
+   [key: string]: unknown
+ }
++export interface ProjectTreeFolderScope {
++  active: string[]
++  archived: string[]
++}
+ export interface ProjectsProjectSessionsParams {
+   profile?: string | null
+   project_id: string
+diff --git a/apps/shared/src/gateway-contract.openrpc.json b/apps/shared/src/gateway-contract.openrpc.json
+index 1cd6858c50502089aa141af7a93728b395905481..7fb427b4438c586c7348499683ad303e8d49a5fb 100644
+--- a/apps/shared/src/gateway-contract.openrpc.json
++++ b/apps/shared/src/gateway-contract.openrpc.json
+@@ -32558,6 +32558,31 @@
+         "title": "ProjectResult",
+         "type": "object"
+       },
++      "ProjectTreeFolderScope": {
++        "additionalProperties": false,
++        "properties": {
++          "active": {
++            "items": {
++              "type": "string"
++            },
++            "title": "Active",
++            "type": "array"
++          },
++          "archived": {
++            "items": {
++              "type": "string"
++            },
++            "title": "Archived",
++            "type": "array"
++          }
++        },
++        "required": [
++          "active",
++          "archived"
++        ],
++        "title": "ProjectTreeFolderScope",
++        "type": "object"
++      },
+       "ProjectTreeLane": {
+         "additionalProperties": false,
+         "description": "One branch / worktree / kanban lane inside a repo; ``sessions`` is empty unless hydrated.",
+@@ -32710,6 +32735,16 @@
+             },
+             "title": "Sessionids",
+             "type": "array"
++          },
++          "sessionIdsByProfile": {
++            "additionalProperties": {
++              "items": {
++                "type": "string"
++              },
++              "type": "array"
++            },
++            "title": "Sessionidsbyprofile",
++            "type": "object"
+           }
+         },
+         "required": [
+@@ -33657,6 +33692,13 @@
+             },
+             "title": "Scoped Session Ids",
+             "type": "array"
++          },
++          "projectFoldersByProfile": {
++            "additionalProperties": {
++              "$ref": "#/components/schemas/ProjectTreeFolderScope"
++            },
++            "title": "Projectfoldersbyprofile",
++            "type": "object"
+           }
+         },
+         "required": [
