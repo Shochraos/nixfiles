@@ -160,10 +160,6 @@ in
                   label = "Astaroth/Appdata";
                 }
                 {
-                  path = "/mnt/astaroth/projects";
-                  label = "Astaroth/Projects";
-                }
-                {
                   path = "/mnt/astaroth/misc";
                   label = "Astaroth/Misc";
                 }
