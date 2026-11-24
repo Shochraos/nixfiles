@@ -10,21 +10,11 @@
           ...
         }:
         let
-          libgit2 = pkgs.libgit2.overrideAttrs (old: {
-            patches = (old.patches or [ ]) ++ [
-              (pkgs.fetchurl {
-                name = "libgit2-safe-directory-wildcard.patch";
-                url = "https://github.com/libgit2/libgit2/commit/c90dc5284e5f72146c85141c9e0a69e813bdfc7f.patch";
-                hash = "sha256-OjMOQSaXcPbh8izCh+wbTdrJw4x1B7CdpW6CLgBV9rU=";
-              })
-            ];
-          });
           shares = [
             "appdata"
             "backups"
             "data"
             "misc"
-            "projects"
           ];
           needsNetworkReadiness = host.name == "Solas";
           networkReady = pkgs.writeShellScript "astaroth-network-ready" ''
@@ -106,17 +96,6 @@
           '';
         in
         {
-          nix.package =
-            let
-              series = lib.versions.majorMinor pkgs.nixVersions.stable.version;
-              components = "nixComponents_${builtins.replaceStrings [ "." ] [ "_" ] series}";
-            in
-            (pkgs.nixVersions.extend (
-              _: prev: {
-                ${components} = prev.${components}.overrideScope (_: _: { inherit libgit2; });
-              }
-            )).stable;
-
           assertions = [
             {
               assertion = !config.sops.useSystemdActivation;
@@ -124,19 +103,34 @@
             }
           ];
 
-          sops.secrets."network/home-domain" = { };
+          sops.secrets = {
+            "astaroth/smb-username" = { };
+            "astaroth/smb-password" = { };
+            "network/home-domain" = { };
+          };
 
-          sops.templates = builtins.listToAttrs (
+          sops.templates = {
+            "astaroth-smb-credentials" = {
+              owner = "root";
+              group = "root";
+              mode = "0400";
+              content = ''
+                username=${config.sops.placeholder."astaroth/smb-username"}
+                password=${config.sops.placeholder."astaroth/smb-password"}
+              '';
+            };
+          }
+          // builtins.listToAttrs (
             map (
               share:
-              lib.nameValuePair "astaroth-nfs-${share}" {
+              lib.nameValuePair "astaroth-smb-${share}" {
                 path = "/run/systemd/system/mnt-astaroth-${share}.mount.d/50-hostname.conf";
                 owner = "root";
                 group = "root";
                 mode = "0400";
                 content = ''
                   [Mount]
-                  What=astaroth.${config.sops.placeholder."network/home-domain"}:/mnt/user/${share}
+                  What=//astaroth.${config.sops.placeholder."network/home-domain"}/${share}
                 '';
               }
             ) shares
@@ -158,7 +152,7 @@
             };
           };
 
-          boot.supportedFilesystems.nfs = true;
+          boot.supportedFilesystems.cifs = true;
 
           systemd.services."user@".after = map (share: "mnt-astaroth-${share}.mount") shares;
 
@@ -179,20 +173,23 @@
                   };
                   Mount = {
                     Where = "/mnt/astaroth/${share}";
-                    Type = "nfs";
+                    Type = "cifs";
                     TimeoutSec = "30s";
                     Options = lib.concatStringsSep "," [
                       "_netdev"
                       "nofail"
                       "rw"
-                      "vers=4.2"
-                      "proto=tcp"
-                      "sec=sys"
-                      "hard"
-                      "retry=0"
+                      "credentials=${config.sops.templates."astaroth-smb-credentials".path}"
+                      "uid=shochraos"
+                      "gid=${config.users.users.shochraos.group}"
+                      "vers=3.1.1"
+                      "seal"
+                      "cache=strict"
                       "nosuid"
                       "nodev"
-                      (if share == "projects" then "exec" else "noexec")
+                      "noexec"
+                      "file_mode=0600"
+                      "dir_mode=0700"
                     ];
                   };
                 };
@@ -205,20 +202,6 @@
             wantedBy = [ "remote-fs.target" ];
             automountConfig.TimeoutIdleSec = "5min";
           }) shares;
-        };
-      provides.to-users.homeManager =
-        {
-          config,
-          lib,
-          osConfig,
-          pkgs,
-          ...
-        }:
-        {
-          programs.direnv.nix-direnv.package = pkgs.nix-direnv.override { nix = osConfig.nix.package; };
-          programs.git.settings.safe.directory = lib.mkIf (
-            config.home.username == "shochraos"
-          ) "/mnt/astaroth/projects/*";
         };
     };
 }
