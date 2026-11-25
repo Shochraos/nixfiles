@@ -28,6 +28,7 @@ in
       halloyTemplate = ../../assets/templates/halloy.toml;
       hermesDesktopArchivedCheckoutsPatch = ../../assets/patches/hermes-desktop-archived-checkouts.patch;
       hermesDesktopContextMeterPatch = ../../assets/patches/hermes-desktop-context-meter.patch;
+      hermesDesktopProjectsSidebarPatch = ../../assets/patches/hermes-desktop-projects-sidebar.patch;
       hermesDesktopRefinerTitlePatch = ../../assets/patches/hermes-desktop-refiner-title.patch;
       hermesDesktopSelectionOnlyPatch = ../../assets/patches/hermes-desktop-selection-only.patch;
       hermesDesktopTemplate = ../../assets/templates/hermes-desktop.js;
