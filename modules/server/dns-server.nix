@@ -138,6 +138,7 @@
                     "jellyfin"
                     "komga"
                     "stash"
+                    "unraid"
                   ];
                 };
                 azazel = {
