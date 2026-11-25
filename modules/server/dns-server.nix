@@ -112,7 +112,6 @@
                   aliases = [
                     "autobrr"
                     "convert"
-                    "fritz"
                     "git"
                     "npm"
                     "ntfy"
@@ -120,7 +119,6 @@
                     "prowlarr"
                     "qui"
                     "radarr"
-                    "router"
                     "sonarr"
 
                     "tools"
@@ -146,6 +144,11 @@
                   ipv6 = [ "fdba:457d:2cbe:20:140f:c8c:50b:71b3" ];
                   aliases = [ ];
                 };
+                fritz = {
+                  ipv4 = [ "192.168.178.1" ];
+                  ipv6 = [ "" ];
+                  aliases = [ ];
+                };
                 solas = {
                   ipv4 = [
                     "192.168.20.5"
@@ -166,6 +169,11 @@
                   ipv4 = [ "192.168.10.254" ];
                   ipv6 = [ "fdba:457d:2cbe:10:da59:8116:2311:7e94" ];
                   aliases = [ "dns2" ];
+                };
+                unifi = {
+                  ipv4 = [ "192.168.1.1" ];
+                  ipv6 = [ "fdba:457d:2cbe:1::1" ];
+                  aliases = [ "" ];
                 };
               };
             in
