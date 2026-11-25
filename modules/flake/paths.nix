@@ -26,13 +26,10 @@ in
       btopConf = ../../configs/btop/btop.conf;
       discordTemplate = ../../assets/templates/discord.css;
       halloyTemplate = ../../assets/templates/halloy.toml;
-      hermesDesktopArchivedCheckoutsPatch = ../../assets/patches/hermes-desktop-archived-checkouts.patch;
       hermesDesktopContextMeterPatch = ../../assets/patches/hermes-desktop-context-meter.patch;
-      hermesDesktopProjectsSidebarPatch = ../../assets/patches/hermes-desktop-projects-sidebar.patch;
       hermesDesktopRefinerTitlePatch = ../../assets/patches/hermes-desktop-refiner-title.patch;
       hermesDesktopSelectionOnlyPatch = ../../assets/patches/hermes-desktop-selection-only.patch;
       hermesDesktopTemplate = ../../assets/templates/hermes-desktop.js;
-      hermesDesktopWorkspaceControlsPatch = ../../assets/patches/hermes-desktop-workspace-controls.patch;
       hdrStateScript = ../../assets/scripts/hdr-state.sh;
       hdrRunScript = ../../assets/scripts/hdr-run.sh;
       hsFuldaEduroamCa = ../../assets/certs/hs-fulda-eduroam-ca.pem;

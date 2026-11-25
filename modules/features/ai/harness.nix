@@ -39,12 +39,9 @@
             arguments:
             (hermesPackage.hermesNpmLib.buildPnpmPackage arguments).overrideAttrs (previous: {
               patches = (previous.patches or [ ]) ++ [
-                config.assets.hermesDesktopWorkspaceControlsPatch
                 config.assets.hermesDesktopSelectionOnlyPatch
                 config.assets.hermesDesktopRefinerTitlePatch
                 config.assets.hermesDesktopContextMeterPatch
-                config.assets.hermesDesktopArchivedCheckoutsPatch
-                config.assets.hermesDesktopProjectsSidebarPatch
               ];
               patchFlags = (previous.patchFlags or [ "-p1" ]) ++ [ "--fuzz=0" ];
             });
