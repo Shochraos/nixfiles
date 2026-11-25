@@ -109,34 +109,26 @@
                 astaroth = {
                   ipv4 = [ "192.168.10.2" ];
                   ipv6 = [ "fdba:457d:2cbe:10:12ff:e0ff:fe89:2a09" ];
-                  aliases = [
-                    "autobrr"
-                    "convert"
-                    "git"
-                    "npm"
-                    "ntfy"
-                    "pihole"
-                    "prowlarr"
-                    "qui"
-                    "radarr"
-                    "sonarr"
-
-                    "tools"
-                    "usenet"
-                  ];
+                  aliases = [ ];
                 };
                 proxy = {
                   ipv4 = [ "192.168.10.253" ];
                   ipv6 = [ "fdba:457d:2cbe:10:7965:bc79:23dc:5f61" ];
                   aliases = [
                     "attic"
+                    "autobrr"
                     "cloud"
                     "hermes"
                     "immich"
                     "jellyfin"
                     "komga"
+                    "prowlarr"
+                    "qui"
+                    "radarr"
+                    "sonarr"
                     "stash"
                     "unraid"
+                    "usenet"
                   ];
                 };
                 azazel = {
