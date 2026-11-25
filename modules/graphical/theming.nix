@@ -1,6 +1,6 @@
 { inputs, config, ... }:
 let
-  inherit (config) assets;
+  inherit (config) assets packageSources;
 in
 {
   den.aspects.theming = {
@@ -103,6 +103,7 @@ in
         ...
       }:
       let
+        tutanota = pkgs.callPackage packageSources.tutanotaDesktop { };
         tutaMatugen = pkgs.writeShellApplication {
           name = "tutanota-matugen";
           excludeShellChecks = [
@@ -117,7 +118,7 @@ in
             util-linux
           ];
           runtimeEnv = {
-            TUTA_EXECUTABLE = "${pkgs.tutanota-desktop}/bin/tutanota-desktop";
+            TUTA_EXECUTABLE = "${tutanota}/bin/tutanota-desktop";
             TUTA_THEME_KEYS = builtins.toJSON (
               builtins.attrNames (builtins.fromJSON (builtins.readFile assets.tutanotaTemplate))
             );
@@ -125,15 +126,15 @@ in
           text = builtins.readFile assets.tutanotaMatugenScript;
         };
         tutaDesktop = pkgs.symlinkJoin {
-          name = "tutanota-desktop-matugen-${pkgs.tutanota-desktop.version}";
-          paths = [ pkgs.tutanota-desktop ];
+          name = "tutanota-desktop-matugen-${tutanota.version}";
+          paths = [ tutanota ];
           nativeBuildInputs = [ pkgs.makeWrapper ];
           postBuild = ''
             rm "$out/bin/tutanota-desktop"
             makeWrapper ${tutaMatugen}/bin/tutanota-matugen "$out/bin/tutanota-desktop" \
               --add-flags --launch
           '';
-          inherit (pkgs.tutanota-desktop) meta;
+          inherit (tutanota) meta;
         };
 
         hermesDesktopTemplate = pkgs.writeText "hermes-desktop.js" (
