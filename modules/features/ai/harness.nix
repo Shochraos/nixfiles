@@ -44,6 +44,7 @@
                 config.assets.hermesDesktopRefinerTitlePatch
                 config.assets.hermesDesktopContextMeterPatch
                 config.assets.hermesDesktopArchivedCheckoutsPatch
+                config.assets.hermesDesktopProjectsSidebarPatch
               ];
               patchFlags = (previous.patchFlags or [ "-p1" ]) ++ [ "--fuzz=0" ];
             });
