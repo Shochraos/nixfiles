@@ -114,7 +114,6 @@
                     "convert"
                     "fritz"
                     "git"
-                    "komga"
                     "npm"
                     "ntfy"
                     "pihole"
@@ -122,9 +121,8 @@
                     "qui"
                     "radarr"
                     "router"
-                    "server"
                     "sonarr"
-                    "stash"
+
                     "tools"
                     "usenet"
                   ];
@@ -138,6 +136,8 @@
                     "hermes"
                     "immich"
                     "jellyfin"
+                    "komga"
+                    "stash"
                   ];
                 };
                 azazel = {
