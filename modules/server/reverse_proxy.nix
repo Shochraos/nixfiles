@@ -8,10 +8,12 @@
         dns1 = "127.0.0.1:3000";
         dns2 = "192.168.10.254:3000";
         attic = "192.168.10.2:8085";
-        immich = "192.168.10.2:2283";
         cloud = "192.168.10.2:8666";
+        hermes = "192.168.10:2:9119";
+        immich = "192.168.10.2:2283";
+        jellyfin = "192.168.10.2:8096";
       };
-      unrestrictedSites = [ "proxy2" ];
+      unrestrictedSites = [ "jellyfin" ];
       allowedClientRanges = [
         "192.168.2.0/24"
         "192.168.10.0/24"

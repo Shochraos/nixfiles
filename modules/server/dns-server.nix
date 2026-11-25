@@ -114,8 +114,6 @@
                     "convert"
                     "fritz"
                     "git"
-                    "hermes"
-                    "jellyfin"
                     "komga"
                     "npm"
                     "ntfy"
@@ -136,8 +134,10 @@
                   ipv6 = [ "fdba:457d:2cbe:10:7965:bc79:23dc:5f61" ];
                   aliases = [
                     "attic"
-                    "immich"
                     "cloud"
+                    "hermes"
+                    "immich"
+                    "jellyfin"
                   ];
                 };
                 azazel = {
