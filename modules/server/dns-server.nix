@@ -146,7 +146,7 @@
                 };
                 fritz = {
                   ipv4 = [ "192.168.178.1" ];
-                  #ipv6 = [ "" ];
+                  ipv6 = [ ];
                   aliases = [ ];
                 };
                 solas = {
@@ -173,7 +173,7 @@
                 unifi = {
                   ipv4 = [ "192.168.1.1" ];
                   ipv6 = [ "fdba:457d:2cbe:1::1" ];
-                  aliases = [ "" ];
+                  aliases = [ ];
                 };
               };
             in
