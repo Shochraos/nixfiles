@@ -164,6 +164,10 @@ in
                   label = "Astaroth/Misc";
                 }
                 {
+                  path = "/mnt/astaroth/projects";
+                  label = "Astaroth/Projects";
+                }
+                {
                   path = "/mnt/nextcloud";
                   label = "Nextcloud";
                 }
