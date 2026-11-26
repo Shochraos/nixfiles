@@ -63,6 +63,7 @@ in
       mp3tag = ../../pkgs/mp3tag/package.nix;
       rea = ../../pkgs/rea/package.nix;
       tutanotaDesktop = ../../pkgs/tutanota-desktop/package.nix;
+      unslothLlamaCpp = ../../pkgs/unsloth-llama-cpp/package.nix;
     };
   };
 }

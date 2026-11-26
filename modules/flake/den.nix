@@ -50,6 +50,7 @@
     gaming
     research-project
     ai-harness
+    ai-local
     #ai-stt
     irc
     media
