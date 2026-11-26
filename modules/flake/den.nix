@@ -48,6 +48,7 @@
     nvidia
     gamedev
     gaming
+    research-project
     ai-harness
     #ai-stt
     irc
