@@ -57,7 +57,6 @@
     gamechat
     lgtv
     #mp3tag
-    backup
     crypto
   ];
 

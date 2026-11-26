@@ -349,16 +349,6 @@
         LockDatabaseIdle = false;
         LockDatabaseScreenLock = false;
       };
-
-      host.backup = {
-        repo = "ssh://storagebox/./security";
-        paths = [ "/mnt/nextcloud/Security" ];
-        excludes = [
-          "*.sync_*"
-          "*.sync-conflict-*"
-        ];
-        sshHostKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIICf9svRenC/PLKIL9nk6K/pxQgoiFC41wTNvoIncOxs";
-      };
     };
 
   den.aspects.azazel.provides.to-users.homeManager = _: {
