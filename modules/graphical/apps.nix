@@ -4,6 +4,8 @@ let
 in
 {
   den.aspects.apps = {
+    nixos.services.pcscd.enable = true;
+
     provides.to-users.homeManager =
       {
         pkgs,
