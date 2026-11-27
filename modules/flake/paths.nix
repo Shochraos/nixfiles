@@ -62,6 +62,7 @@ in
       ironyModManager = ../../pkgs/irony-mod-manager/package.nix;
       mp3tag = ../../pkgs/mp3tag/package.nix;
       rea = ../../pkgs/rea/package.nix;
+      token2KeyManager = ../../pkgs/token2-key-manager/package.nix;
       tutanotaDesktop = ../../pkgs/tutanota-desktop/package.nix;
       unslothLlamaCpp = ../../pkgs/unsloth-llama-cpp/package.nix;
     };

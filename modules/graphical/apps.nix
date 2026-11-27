@@ -1,4 +1,8 @@
-_: {
+{ config, ... }:
+let
+  inherit (config) packageSources;
+in
+{
   den.aspects.apps = {
     provides.to-users.homeManager =
       {
@@ -19,7 +23,7 @@ _: {
           pkgs.gnome-text-editor
           pkgs.loupe
           pkgs.evince
-          pkgs.fido2-manage
+          (pkgs.callPackage packageSources.token2KeyManager { })
         ];
 
         home.file = {
