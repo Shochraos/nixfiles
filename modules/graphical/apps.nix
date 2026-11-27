@@ -19,6 +19,7 @@ _: {
           pkgs.gnome-text-editor
           pkgs.loupe
           pkgs.evince
+          pkgs.fido2-manage
         ];
 
         home.file = {
